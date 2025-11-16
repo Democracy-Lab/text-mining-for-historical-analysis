@@ -157,6 +157,12 @@ Once the data is cleaned, ordered, and conceptually meaningful, our goal shifts 
 
 This distinction matters for interpretive work in the digital humanities because even seemingly small formatting decisions shape how patterns are perceived: which numbers look large or small, which words appear central or marginal, which contrasts emerge as meaningful. Exploratory output supports the researcher's reasoning process; published tables communicate the conclusion of that reasoning to others.
 
+## A Note on Consent
+
+A brief clarification about style and address is in order. We recognize that some readers are actively running the code in this book, while others are simply reading to decide whether this mode of historical analysis resonates with their own practice. For that reason, we have written parts of the text as if it were fiction.
+
+We speak to a fictional analyst—a constructed figure who moves through the examples, asks questions, and encounters problems. We do not presume to address the reader directly as “you” except at this one point: if it is helpful, you are welcome to imagine yourself in the position of this fictional analyst and to accompany them on the journey through the material, but this participation is entirely optional.
+
 ## Book Organization 
 
 Introducing computational historical analysis is challenging because it requires balancing close reading with quantitative methods. An introduction to the domain must bring together traditional approaches to historical interpretation with computational approaches, showing how the two can complement and enrich each other. Our goal is to equip readers with the ability to engage in both modes of analysis. As a result, the chapters in this book serve different purposes. Early chapters introduce the R programming language and critical thinking skills. However, the book does not follow a strictly linear progression. Some chapters emphasize close reading and the process of historical inquiry—tracing how a scholarly question evolves into both qualitative and quantitative analysis—while others focus more on quantitative methods themselves: how they work, what they measure, and how they can be meaningfully applied to historical research. Here we provide an overview of how the rest of the book is organized. 

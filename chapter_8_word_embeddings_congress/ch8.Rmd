@@ -14,7 +14,6 @@ knitr::opts_chunk$set(echo = TRUE)
 The output is a data frame with the top words for each keyword ("climate", "woman", "environmentalist", and "government")
 
 ```{r}
-source("https://raw.githubusercontent.com/Democracy-Lab/tmha.data/main/tools/install_tmha.data.R")
 library(tmha.data)
 ```
 

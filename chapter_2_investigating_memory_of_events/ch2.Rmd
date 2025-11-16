@@ -40,8 +40,6 @@ data("hansard_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-
-library("dplyr")
 library("knitr")
 library("kableExtra")
 
@@ -187,13 +185,7 @@ Accordingly, in the sections below, we will begin by counting phrases, but that 
 ### Finding Bigrams
 
 While there are several approaches to finding multiword phrases, we will demonstrate this by tokenizing the text into bigrams. 
-
 The following code filters the speeches of the 1860s for the first months of 1867 before the vote on the Second Reform Act, which gave Britain's urban working-class men the right to vote. We also introduce a new package, `lubridate`, which can be installed in the usual way using `install.packages()`.
-
-```{r, eval=FALSE}
-# Install lubridate
-install.packages("lubridate")
-```
   
 ```{r}
 # load packages for tokenization and date handling
@@ -255,7 +247,7 @@ Now we can count the top bigrams and remove any that contain stop words. We remo
 clean_bigrams_1867 <- bigrams_1867 %>%
   filter(!str_detect(bigram, 
                      paste0("\\b(", paste(stop_words$word, collapse = "|"), ")\\b"))) %>%
-  filter(str_detect(bigram, "^[a-z]+ [a-z]+$")) # keep only two-word lowercase alphabetic bigrams
+  filter(str_detect(bigram, "^[a-z]+ [a-z]+$"))
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
@@ -412,7 +404,7 @@ bigrams_1867 <- hansard_1867 %>%
   unnest_tokens(bigram, text, token = "ngrams", n = 2) 
 
 # remove bigrams that contain any stop word (e.g., "the", "of", "and")
-# and keep only bigrams made up of two lowercase alphabetic words (exclude numbers and punctuation)
+# and keep only bigrams made up of two lowercase alphabetic words
 clean_bigrams_1867 <- bigrams_1867 %>% 
   filter(!str_detect(bigram, paste0("\\b(", 
                                     paste(stop_words$word, collapse = "|"), ")\\b"))) %>% 
@@ -429,7 +421,7 @@ controlled_vocab = c("riot", "meeting", "famine","revolt", "exhibition", "massac
                      "strike", "war") 
 
 # filter the cleaned bigrams to keep only those that contain one of the vocabulary terms
-# build a regex pattern from the vocabulary and match bigrams containing any of those words
+# build a regex pattern from the vocabulary and match bigrams containing those words
 # select only the bigram and the associated speech date for further analysis
 events_1867 <- clean_bigrams_1867 %>%
   filter(str_detect(bigram, 
@@ -476,10 +468,6 @@ top_events_1867_w_speech_metadata <- top_events_1867 %>%
   ungroup() # remove grouping
 
 head(top_events_1867_w_speech_metadata)
-```
-
-```{r, eval=FALSE}
-install.packages("viridis")
 ```
 
 ```{r, fig.fullwidth=TRUE, fig.asp = 0.8, fig.width = 7}
@@ -627,7 +615,7 @@ head(indexed_events)
 
 ```{r}
 # Define a boundary value by adding 8 days to the latest speech date in the dataset
-# Make the visualization easier to read by adding padding to the visualization, ensuring no points are cut off or jammed against the end of the plot 
+# Make the visualization easier to read by adding padding to the visualization
 left_range <- max(events_1830$speechdate) + 8
 ```
 
@@ -969,10 +957,6 @@ new_matched_events <- hansard_1860 %>%
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
-library("dplyr")
-library("knitr")
-library("kableExtra")
-
 # Show top 5 rows
 df_head <- new_matched_events %>% 
   slice_head(n = 5)

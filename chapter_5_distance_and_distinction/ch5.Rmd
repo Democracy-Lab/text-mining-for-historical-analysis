@@ -169,10 +169,6 @@ By measuring distance, we can compare the distribution of words in the two books
 
 Again, don't worry about the code, but pay attention to the scores in the results:
 
-```{r, eval=FALSE}
-install.packages("text2vec")  # Install text2vec
-```
-
 ```{r}
 library("text2vec")             # Load the package
 
@@ -416,10 +412,9 @@ top_hansard_tf_idf <- hansard_tf_idf %>%
   ungroup()
 ```
 
-Let's make a fancy table to inspect the data.
+Let's make a fancy table using `kableExtra` to inspect the data.
 
 ```{r, results='asis'}
-library("dplyr")
 library("knitr")
 library("kableExtra")
 
@@ -537,7 +532,6 @@ most_dist_hansard_words <- hansard_words_1830_to_1870 %>% # start with merged wo
 ```
 
 ```{r}
-library("dplyr")
 library("knitr")
 library("kableExtra")
 

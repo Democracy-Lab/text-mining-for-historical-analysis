@@ -927,9 +927,6 @@ most_distinctive_speakers_top_words <- most_distinctive_speakers_top_words %>%
 #        subtitle = "of the speakers who only spoke before or after the Reform Act of 1832?",
 #        y = "word count")
 
-#install.packages("gt")
-library("tidyr")
-
 # Pivot the data to wider format
 most_distinctive_speakers_top_words_wide <- most_distinctive_speakers_top_words %>%
   select(-wordsperspeaker, -tf_idf) %>%
@@ -1140,8 +1137,6 @@ ggplot(graph_ready, aes(x = year, y = wordcount, color = class, shape = class)) 
   
 
 ```{r}
-library("textstem")
-
 all_words_cleaned <- rbind(prereform_words, postreform_words) %>%
   filter(!str_detect(word,"^\\s*[0-9]*\\s*$")) %>% # remove all numbers 
   anti_join(stop_words, by = "word") %>% # remove stopwords 
@@ -1335,8 +1330,6 @@ hist(postreform_only_speakers_wordcount$wordcount)
 
 #***** STeph - not working -- attempt to model top speakers against others -- no new results
 ```{r}
-library("textstem")
-
 major_prereform_speakers <- prereform_only_speakers_wordcount %>%
   filter(wordcount >= 50000)
  

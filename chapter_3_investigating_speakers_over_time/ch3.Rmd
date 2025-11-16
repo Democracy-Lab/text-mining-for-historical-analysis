@@ -386,7 +386,8 @@ ggplot(data = mrs_walrand_top_words,
   geom_col() +
   coord_flip() +
   labs(title = "Mrs. Walrand\'s Top Words",
-       subtitle = "From \"Motion Respecting the Trial and Condemnation of Missionary Smith at Demerara\"",
+       subtitle = "From \"Motion Respecting the Trial and Condemnation of 
+                   Missionary Smith at Demerara\"",
        x = "Word",
        y = "Count")
 ```
@@ -397,9 +398,7 @@ ggplot(data = mrs_walrand_top_words,
 
 We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. To do this, refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
 
-```{r, echo = F, message = F}
-library("kableExtra")
-
+```{r, echo = False, message = False}
 name <- c("Mrs. (Mary Ann) Clark", 
                   "Mrs. Bridgeman", 
                   "Miss Mary Ann Taylor",

@@ -7,11 +7,142 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Appendix C 
-## Troubleshooting
-
 ## Troubleshooting Code with Chatbots
 
+Chatbots are by now an established way of troubleshooting code and debugging, sometimes taking the roll of documentation. 
 
 ChatGPT does not know you intention 
 so if your problem looks liek somethign else, it might misunderstand / represent 
+
+
+
+
+
+
+
+
+
+A Troubleshooting Cycle for Working with ChatGPT
+
+A Repeatable Workflow for Digital Humanists
+
+This cycle helps structure your interactions with ChatGPT so you can move from confusion → clarity → working code → reflection.
+
+1. Describe the Task
+
+What are you trying to do?
+Provide:
+
+The goal in plain language (“I am trying to extract bigrams from 1850 Hansard debates…”)
+
+The expected type of output (“…and return a dataframe with word counts per speaker.”)
+
+This keeps both you and ChatGPT anchored in the research objective.
+
+2. Provide the Minimal Code
+
+Aim for the smallest possible example—a few lines only:
+
+Include the function or chunk generating the error.
+
+Exclude unrelated steps.
+
+This helps ChatGPT reason accurately and prevents “hallucinated” fixes.
+
+3. Provide the Exact Error Message
+
+Copy-paste error output verbatim, including:
+
+The first line (most important)
+
+Any traceback shown
+
+This helps ChatGPT see what the interpreter saw.
+
+4. Ask a Specific Question
+
+Examples:
+
+“Why is this object not being found?”
+
+“Is this a many-to-many join?”
+
+“Why is spacyr failing to initialize?”
+
+“How do I get this to run in PDF LaTeX?”
+
+Precise questions lead to precise help.
+
+5. Receive the Explanation, Try the Fix
+
+ChatGPT will:
+
+Propose a diagnosis
+
+Provide corrected code
+
+Explain why the issue happened
+
+Run the suggestion in your environment (RStudio, Jupyter, Terminal).
+
+Don’t skip this. Your environment is the source of truth.
+
+6. Report Back the New Behavior
+
+If it works:
+
+Say “that fixed it”
+If it fails:
+
+Paste the new error
+
+Paste the changed code
+
+You are not “starting over”; you’re moving to the next loop of the cycle with more information.
+
+7. Iterate
+
+This cycle repeats:
+
+New error → new snippet → new explanation → new test
+
+Iteration is normal, especially when:
+
+Working with large humanities corpora
+
+Using complex libraries (tidytext, quanteda, spaCy, ggplot, plotly)
+
+Moving across environments (Windows/Mac/Linux, HPC clusters)
+
+Working with multimodal pipelines (e.g., OCR → parsing → tokenization → modeling)
+
+Troubleshooting becomes a collaborative conversation, not a one-off question.
+
+8. Consolidate the Working Solution
+
+Once it works:
+
+Ask ChatGPT to rewrite the code cleanly
+
+Add comments
+
+Make it reusable (turn into a function)
+
+This step turns messy debugging into a stable tool you can use later or teach to others.
+
+9. Reflect on the Pattern
+
+Ask:
+
+“What was the underlying cause of this error?”
+
+“How can I avoid this in future?”
+
+“What’s the general principle here?”
+
+This helps build technical literacy rather than dependency.
+
+Summary Cycle Diagram (Text Version)
+
+Describe task → Provide minimal code → Provide error → Ask a focused question →
+Receive explanation → Test locally → Report result → Iterate → Consolidate solution → Reflect

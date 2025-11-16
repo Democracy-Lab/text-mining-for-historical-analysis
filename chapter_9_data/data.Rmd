@@ -112,7 +112,7 @@ APIs are a central mechanism through which analysts can access the vast quantiti
 
 Successfully interacting with open APIs—such as those provided by the City of Dallas or New York City—often depends on navigating several technical considerations, including user authentication, rate limits on the number of requests, options for customizing queries, and the specific data formats returned by the API. In what follows, we provide an overview of these considerations. 
 
-#### Sample APIs
+## Sample APIs
 
 Some examples of API endpoints include those offered by Reddit or The Guardian. Reddit, for instance, allows users to retrieve the latest posts in a given subreddit using an endpoint like: 
 
@@ -124,7 +124,7 @@ Similarly, _The Guardian_, a global news platform, offers an API that enables us
 
 `https://content.guardianapis.com/search?q=education`. 
 
-#### Using an API: Setting up an API Key
+## Using an API: Setting up an API Key
 
 Using _The Guardian's_ API requires additional set up. Accessing many APIs--particularly those provided by commercial services or large-scale platforms like _The Gaurdian_ requires user authentication in the form of an API key.
 
@@ -136,11 +136,11 @@ Once obtained, the key is appended to API requests—for example:
 
 `https://content.guardianapis.com/search?q=education&api-key=your-api-key-here`.
 
-#### Using an API Key: Authentification
+## Using an API Key: Authentification
 
 Authentication is the process by which a user verifies their identity to the API, typically by including an API key with each request for data. Importantly, once an API key tethered to a user is submitted, the interaction is no longer anonymous—the exchange of information is now linked to a specific account, allowing the API provider to monitor usage, enforce rate limits, or restrict access if necessary. In this chapter, we will not use an API that requires authentication. 
 
-#### Practical Exercise: The API in Action
+## Practical Exercise: The API in Action
 
 To illustrate how an API works, consider this example from the New York City Open Data portal, "NYC OpenData", which provides access to vast public datasets including population data, budgetary data, and data on city infrastructure. For this exercise we will look at just current and historic 311 service requests. The link below takes us to a webpage for the dataset _311 Call Center Inquiry_, which also provides a direct link to the API endpoint.
 
@@ -192,7 +192,7 @@ Because this request was successful, we now have a data frame containing the she
 head(service_requests[, 1:5])
 ```
 
-#### Examining the Data Returned by APIs: JSON Records
+## Examining the Data Returned by APIs: JSON Records
 
 APIs typically return data in structured formats such as JSON (JavaScript Object Notation), XML (eXtensible Markup Language), or CSV (Comma-Separated Values). JSON is widely used because of its interpretability across programming languages. 
 
@@ -305,7 +305,7 @@ ggplot(top_words, aes(x = reorder(word, n), y = n)) +
   theme_minimal()
 ```
 
-#### APIs for Scholarly Research
+## APIs for Scholarly Research
 
 Here we present a list of APIs for scholarly researcher derived from the University of Virginia Library with description provided by the authors of this book (University of Virginia).
 
@@ -365,7 +365,7 @@ Bulk downloads also include particular challenges for the data analyst.  Bulk do
 
 A notable limitation on bulk downloads is that the data is "static" and does not update dynamically, as is typically the case with API-based access. In other words, analysts may not receive the most current or up-to-date information if the dataset is still considered "live", such as is the case with accessing police reports in Dallas. This concern is generally less applicable for historical datasets that are fixed to a past time period, unless records are still being uncovered and added to the collection. 
 
-#### Examples of Bulk Download Websites
+## Examples of Bulk Download Websites
 
 A representative example of a bulk download resource is provided by Old Bailey Online, which states: 
 
@@ -378,7 +378,7 @@ Other popular sites for bulk downloads include:
 * Harvard Dataverse, an open-access data repository designed to share, cite, and preserve research data across disciplines. It hosts datasets from a wide range of academic fields, including political science surveys, public health data, economics experiments, and qualitative social science studies. 
 * Kaggle, a data science platform perhaps best known for its competitions, also hosts a wide array of community-contributed datasets, ranging from open science research (such as climate or genomics data) to pop culture topics (like movie ratings, video game sales, or lyrics datasets).
 
-#### Working With Bulk Download Data
+## Working With Bulk Download Data
 
 Importantly, while bulk data downloads seem straightforward, they can be difficult to work with in practice. Many open data portals offer complete dataset exports in formats such as CSV or JSON. The primary advantage of this approach is the ability to download substantial volumes of data in a single step. 
 
@@ -388,7 +388,7 @@ The `hansardr` package was built with this challenge in mind: the full Hansard c
 
 "Chunking" data is the key approach for an analyst who needs to break a large dataset down into smaller, more workable sections.
 
-#### Reading in a Large Dataset in Chunks
+## Reading in a Large Dataset in Chunks
 
 In cases where large dataset has not been partitioned, it is often necessary to process the data in smaller chunks, such as reading one line at a time or loading a subset of rows using functions like `read_csv_chunked()` from the `tidyverse`'s `readr` or `fread(nrows = ...)` from the `"data.table"()` package. 
 
@@ -407,8 +407,6 @@ chunk2 <- fread("hansard_large.csv", nrows = 1000, skip = 1000)
 This is the same process but automated, so the user will read up to 100,000 rows of the data. 
 
 ```{r, eval=FALSE}
-library("data.table")
-
 # Set parameters for reading data
 file_path <- "hansard_large.csv"
 chunk_size <- 1000
@@ -434,7 +432,7 @@ For the purposes of learning how to read in a pdf to R, let's explore how the pr
 
 Please note that most pdfs that analysts might find on the web are not so well formatted, and they will have  formatting or cleaning issues that the analyst must deal with -- and which we will turn to in a later section.  
 
-#### Practicing with PDFs: Egil's Saga
+## Practicing with PDFs: Egil's Saga
 
 It is possible to download a PDF file directly to one's computer and extract its text content for text mining. The following example demonstrates how this process can be automated. 
 
@@ -446,7 +444,6 @@ Please note: The code that follows handles downloading and text extraction, but 
 library("httr")
 library("fs")
 library("pdftools")
-library("tidyverse")
 
 # Define the URL with the PDF to be downloaded
 url <- "https://sagadb.org/files/pdf/egils_saga.en.pdf"
@@ -519,7 +516,7 @@ library("gt")
 gt(head(tidy_egils_saga_with_metadata))
 ```
 
-#### Getting PDFs Ready for Computer Readability: Optical Character Recognition (OCR)
+## Getting PDFs Ready for Computer Readability: Optical Character Recognition (OCR)
 
 The foregoing exmaple used a deliberately simple-to-read PDF to demonstrate a process.  However, in real life, the PDFs collected by analysts or digitalized by museums, archives, corporations, or government institutions may or may not have been prepared for computer readability. 
 
@@ -543,14 +540,11 @@ In R, the `rvest` package facilitates web scraping by parsing HTML content into 
 
 An additional precaution is to add code to slow down the web scraping process.  To avoid overloading the server hosting the webpage, requests are typically rate-limited during this process.
 
-#### Practicing Web Scraping: Retrieving the Code for _Text Mining for Historical Analysis_
+## Practicing Web Scraping: Retrieving the Code for _Text Mining for Historical Analysis_
 
 The following example illustrates the initial step in this process: retrieving the HTML content of the GitHub repository page for this book followed by a snippet of the page's HTML. 
 
 ```{r}
-library("rvest")
-library("dplyr")
-
 url <- "https://github.com/stephbuon/text-mining-for-historical-analysis"
 
 page <- read_html(url)
@@ -573,7 +567,7 @@ cat(paste(html_preview, collapse = "\n"))
 
 ```
 
-#### Understanding HTML Code and Finding the Content 
+## Understanding HTML Code and Finding the Content 
 
 To make practical use of webscraping, the analyst first needs to become aware of the components of the HTML code that structures a website.  On a webpage, each element of HTML code gives the computer specific information about what to display, for instance headers, paragraphs, and links. This information is given in a specific structure in the HTML document, which has a tree-like branching structure.  
 
@@ -602,8 +596,6 @@ As an example, in the following code the CSS selector `p` would select both para
 To extract the content itself, the analyst uses these selectors to locate relevant elements in the HTML tree and then retrieve their text. In practice, this involves three steps: downloading the page’s HTML, parsing it into a structured document, and applying CSS or XPath queries to extract the desired nodes. For example, using the `rvest` package in R, the following code retrieves all paragraph text from a webpage using the `p` tag as the selector:
 
 ```{r}
-library(rvest)
-
 # Step 1: Read the webpage
 url <- "https://example.com"
 page <- read_html(url)
@@ -690,11 +682,9 @@ https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.ht
 
 for a comprehensive encyclopedia of regular expressions in R. 
 
-While effective, writing our own regular expression-based approaches to data cleaning can become increasingly intricate and difficult to scale, such as demonstrated by the following code. 
+While effective, writing our own regular expression-based approaches to data cleaning can become increasingly intricate and difficult to scale, such as demonstrated by the following code that relies on `stringr` for handling strings. 
 
 ```{r}
-library("stringr")
-
 # Messy string
 messy_string <- " <p>We!!!   can clean   messy--<b> text using </b>.. ,    regular expressions </p> "
 
@@ -847,7 +837,7 @@ The caption serves to remind us that a representation is an object, different in
 Just so, a human analyst may stare at their code for hours while asking themselves why two seemingly identical objects are behaving differently once they run their code. The painting draws our attention away from its content (a pipe) back to the pieces making up the content (oil and canvas). Programming, too, asks us to practice shifting our attention away from the content of our constructions ("42") and onto the components that make up our constructions (the rules that govern data types within a programing language).
 
 
-#### When Data Type is Missing: NA and NULL Values
+## When Data Type is Missing: NA and NULL Values
 
 Not all values have a data type. Analysts delving deeper into programming may encounter values like `NA` and `NULL` often appear in datasets with missing records. Engaging datasets with these values can be confusing because they analyst cannot treat them the same as data that have a type, like character or integer data. 
 
@@ -904,7 +894,7 @@ census %>%
   slice(1:10)
 ```
 
-#### Mixed Methods: Lists as Data Type 
+## Mixed Methods: Lists as Data Type 
 
 Lists are an important data type in R that also function as a data structure (defined in the following section). Lists are more complex than other types because they can include multiple data types within them. 
 
@@ -979,7 +969,7 @@ The solution to working with new data structures is to learn how to translate a 
 
 So the goal is to: extract what you need → eeshape it → coerce it into a tibble
 
-#### Working with the Output of Other R-Based Software: `Quanteda`
+## Working with the Output of Other R-Based Software: `Quanteda`
 
 However, there are cases where a data frame may not be the most appropriate or efficient data structure. For example, when working with the `quanteda` package (such as when we performed Key Words in Context (KWIC), we rely on its custom-built data structure known as a `quanteda` "tokens object." The tokens object was specifically designed to optimize performance when handling large-scale text data within the `quanteda` ecosystem. In fact, it would be very difficult to perform some of the analyses we did without invoking the `quanteda` ecosystem given how efficient `quanteda` is at processing. 
 
@@ -1027,7 +1017,7 @@ Now we can use `tidyverse` functions freely.
 slice(tokens_tibble, 1:5)
 ```
 
-#### Working With Packages Beyond `Quanteda`
+## Working With Packages Beyond `Quanteda`
 
 Wrangling diverse data structures into the tidy format can be frustrating, but learning the proprietary functions for each individual software package can take a time. Each analyst will have to balance their own level of interest and comfort as they navigate between different formats of data. In general, however, the strategy for the analyst who has learned tidy methods of working with data remains the same: wrangle the data into the tidy format, then work with it according to methods you already understand. 
 

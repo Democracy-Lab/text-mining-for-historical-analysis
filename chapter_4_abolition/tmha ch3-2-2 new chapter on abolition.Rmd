@@ -781,7 +781,6 @@ Here again we must read the sentences in their original speeches to make sense o
 
 ```{r, message = F}
 # moving from a list of sentences to the full speeches for context
-library("dplyr")
 library("kableExtra")
 
 # Trim each source to just the fields you need

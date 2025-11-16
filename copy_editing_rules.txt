@@ -36,6 +36,8 @@ Make sure comments are in regular case:
 # Fit GloVe model
 
 
+change you to the analyst
+
 
 w not with 
 

@@ -68,27 +68,9 @@ First we will load the data we wish to analyze. Analysts, programmers, researche
 
 The authors developed a data package to go with this book, `hansardr`, to give readers an ability to access the Hansard 19th-Century British Parliamentary Debates within the R environment (Buongiorno 2022). This is a cleaned, analysis-ready corpus of the 19th-century British Parliamentary Debates (1803-1899), also known as "Hansard" in reference to Thomas Curzon Hansard, the publisher.  It identifies debates whose records are missing from UK Parliament's corpus, and it also offers a field for disambiguated speakers. We believe this dataset will enable researchers to analyze the Hansard debates, including speaker discourse, in a way that has not been accessible before. Once installed, the data can be loaded with the `data()` function.
 
-Functions are an important characteristic of the R language. Unlike other popular programming languages--such as Python--R is a functional language, which means it emphasizes processing data using these functions rather than relying on complex programming syntax. In R, a function is a block of code that performs a specific task. It can take inputs, called "arguments", that serve as instructions for how the function should behave, process data, or return an output. Functions are like the verbs of the R language in the sense that they say what should be done to the data. We will use functions throughout this book to perform data processing. 
+R also has a large ecosystem of libraries—which are bundles of additional functions, example data, and notes created by the wider R community. Think of libraries as add-ons that expand what R can do. If base R is the core toolkit, libraries contain all the specialty tools others have built for tasks like text analysis, mapping, visualization, or cleaning messy historical data.
 
-To use a function from another package, you must first install the package with `install.packages().` Here is how you would install the packages used in this chapter with `install.packages()` before loading them with `library()`, which we demonstrate later in the chapter:
-
-```{r, eval=FALSE}
-install.packages("tidyverse")
-install.packages("tidytext")
-install.packages("quanteda")
-```
-
-In RStudio, you can also verify whether a package is already installed by checking the Packages tab in the lower-right panel. This tab displays all packages currently available in your R library. If a package appears in that list, it is already installed; if not, you can install it using `install.packages()`. You can also load an installed package by checking the box next to its name in this tab, which is equivalent to calling `library()` in your script.
-
-When installing code or data from a repository such as GitHub, we can use a special installation script that we created for this book. 
-
-If RStudio prompts you to restart R while installing a package, click Yes to allow the restart, and then re-run the installation command so the package loads into the fresh session.
-
-```{r, eval=FALSE}
-source("https://raw.githubusercontent.com/Democracy-Lab/hansardr/master/tools/install_hansardr.R")
-```
-
-As we explained in the introduction, packages only have to be installed once, but they need to be reloaded for each new R session using `library()`. Only once we have run `library(hansardr)` will the data be available for our use. 
+To load these specialty tools, we use `library()`, like this. Loading only works after the package has been installed—something we walk through in the "Computer Specifications and Setup" section.
 
 ```{r, message=FALSE}
 # load the hansardr package
@@ -149,9 +131,6 @@ As shown by Table 2, the first column in this dataset is `sentence_id`, which gi
 Below is an excerpt from `hansardr`: 
 
 ```{r, results='asis', warning=FALSE, message=FALSE}
-library("knitr")
-library("kableExtra")
-
 df_head <- hansard_1850 %>% 
   slice_head(n = 5)
 
