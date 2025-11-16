@@ -202,6 +202,33 @@ Recognizing that langauge contains keywords that can, for example, be
 chosen by an analyst to guide data processing is a first step towards
 producing meaning from text data.
 
+\subsection{R Versions}\label{r-versions}
+
+Before we get started, we need to make sure we have an up-to-date
+version of R installed in order to use the packages and functions in
+this book.
+
+To check which version of R is currently running on your computer, run:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{R.version.string}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "R version 4.5.1 (2025-06-13)"
+\end{verbatim}
+
+If your version is more than one major release behind (e.g., anything
+below 4.3 while the current version is 4.4), you should update R from:
+
+\url{https://cran.r-project.org}
+
+Keeping R up to date helps ensure that your code runs
+smoothly---especially when installing or loading packages, which often
+require the latest versions of R to work correctly.
+
 \subsection{Running a Line of Code}\label{running-a-line-of-code}
 
 The first step in learning R is understanding how to run a line of code.
@@ -250,56 +277,16 @@ debates, including speaker discourse, in a way that has not been
 accessible before. Once installed, the data can be loaded with the
 \texttt{data()} function.
 
-Functions are an important characteristic of the R language. Unlike
-other popular programming languages--such as Python--R is a functional
-language, which means it emphasizes processing data using these
-functions rather than relying on complex programming syntax. In R, a
-function is a block of code that performs a specific task. It can take
-inputs, called ``arguments'', that serve as instructions for how the
-function should behave, process data, or return an output. Functions are
-like the verbs of the R language in the sense that they say what should
-be done to the data. We will use functions throughout this book to
-perform data processing.
+R also has a large ecosystem of libraries---which are bundles of
+additional functions, example data, and notes created by the wider R
+community. Think of libraries as add-ons that expand what R can do. If
+base R is the core toolkit, libraries contain all the specialty tools
+others have built for tasks like text analysis, mapping, visualization,
+or cleaning messy historical data.
 
-To use a function from another package, you must first install the
-package with \texttt{install.packages().} Here is how you would install
-the packages used in this chapter with \texttt{install.packages()}
-before loading them with \texttt{library()}, which we demonstrate later
-in the chapter:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{install.packages}\NormalTok{(}\StringTok{"tidyverse"}\NormalTok{)}
-\FunctionTok{install.packages}\NormalTok{(}\StringTok{"tidytext"}\NormalTok{)}
-\FunctionTok{install.packages}\NormalTok{(}\StringTok{"quanteda"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-In RStudio, you can also verify whether a package is already installed
-by checking the Packages tab in the lower-right panel. This tab displays
-all packages currently available in your R library. If a package appears
-in that list, it is already installed; if not, you can install it using
-\texttt{install.packages()}. You can also load an installed package by
-checking the box next to its name in this tab, which is equivalent to
-calling \texttt{library()} in your script.
-
-When installing code or data from a repository such as GitHub, we can
-use a special installation script that we created for this book.
-
-If RStudio prompts you to restart R while installing a package, click
-Yes to allow the restart, and then re-run the installation command so
-the package loads into the fresh session.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{source}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/Democracy{-}Lab/hansardr/master/tools/install\_hansardr.R"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-As we explained in the introduction, packages only have to be installed
-once, but they need to be reloaded for each new R session using
-\texttt{library()}. Only once we have run \texttt{library(hansardr)}
-will the data be available for our use.
+To load these specialty tools, we use \texttt{library()}, like this.
+Loading only works after the package has been installed---something we
+walk through in the ``Computer Specifications and Setup'' section.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -449,9 +436,6 @@ Below is an excerpt from \texttt{hansardr}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(}\StringTok{"knitr"}\NormalTok{)}
-\FunctionTok{library}\NormalTok{(}\StringTok{"kableExtra"}\NormalTok{)}
-
 \NormalTok{df\_head }\OtherTok{\textless{}{-}}\NormalTok{ hansard\_1850 }\SpecialCharTok{\%\textgreater{}\%} 
   \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{5}\NormalTok{)}
 
@@ -460,7 +444,7 @@ Below is an excerpt from \texttt{hansardr}:
       \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
       \AttributeTok{linesep =} \StringTok{""}\NormalTok{,}
       \AttributeTok{caption =} \StringTok{"Excerpt from Hansard 1850"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"scale\_down"}\NormalTok{, }\StringTok{"striped"}\NormalTok{, }\StringTok{"repeat\_header"}\NormalTok{),}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"scale\_down"}\NormalTok{, }\StringTok{"repeat\_header"}\NormalTok{),}
                 \AttributeTok{table.envir =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\FunctionTok{which}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(df\_head) }\SpecialCharTok{==} \StringTok{"text"}\NormalTok{), }
               \AttributeTok{latex\_column\_spec =} \StringTok{"p\{12cm\}"}\NormalTok{, }
@@ -470,18 +454,18 @@ Below is an excerpt from \texttt{hansardr}:
 
 \begin{table}
 \centering
-\caption{\label{tab:unnamed-chunk-6}Excerpt from Hansard 1850}
+\caption{\label{tab:unnamed-chunk-5}Excerpt from Hansard 1850}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{tabular}[t]{lp{12cm}}
 \toprule
 sentence\_id & text\\
 \midrule
-\cellcolor{gray!10}{S3V0108P0\_0} & \cellcolor{gray!10}{, which had been prorogued successively from the 1st of August to the 9th of October, from thence to the 20th of November, thence to the 16th of January, and from thence to the 31st January, met this day for despatch of business.}\\
+S3V0108P0\_0 & , which had been prorogued successively from the 1st of August to the 9th of October, from thence to the 20th of November, thence to the 16th of January, and from thence to the 31st January, met this day for despatch of business.\\
 S3V0108P0\_1 & The Parliament was opened by Commission, the LORDS COMMISSIONERS present being the LORD CHANCELLOR; the LORD PRESIDENT OF THE COUNCIL (the Marquess of Lansdowne); the LORD PRIVY SEAL (the Earl of Minto); the LORD CHAMBERLAIN OF THE HOUSEHOLD (the Marquess of Breadalbane); and the LORD BISHOP OF LONDON.\\
-\cellcolor{gray!10}{S3V0108P0\_2} & \cellcolor{gray!10}{called attention to a great omission of their duty on the part of Ministers, with respect to the privileges of their Lordships, which might and ought to have been avoided.}\\
+S3V0108P0\_2 & called attention to a great omission of their duty on the part of Ministers, with respect to the privileges of their Lordships, which might and ought to have been avoided.\\
 S3V0108P0\_3 & At pre-sent there were two vacancies in the representative Peers of Scotland, in consequence of the deaths of the Earl of Airlie and of Lord Colville.\\
-\cellcolor{gray!10}{S3V0108P0\_4} & \cellcolor{gray!10}{Although the Act of Parliament directed that the proclamation should issue forthwith for the election of representative Peers to fill up any vacancies which might occur, by death or otherwise, no such proclamation had yet taken place in the case of the two vacancies he had just mentioned, and the consequence was, that for twenty-four days after the meeting of Parliament it was not possible for any Scotch representative Peers to be elected.}\\
+S3V0108P0\_4 & Although the Act of Parliament directed that the proclamation should issue forthwith for the election of representative Peers to fill up any vacancies which might occur, by death or otherwise, no such proclamation had yet taken place in the case of the two vacancies he had just mentioned, and the consequence was, that for twenty-four days after the meeting of Parliament it was not possible for any Scotch representative Peers to be elected.\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -499,12 +483,10 @@ Libraries}\label{tidy-text-mining-and-loading-libraries}
 Most of the functions used in the first chapters of this book come from
 a software package called \texttt{tidyverse} (2019) which is a family of
 smaller packages developed by Chief Scientist at Posit (formerly known
-as RStudio), Hadley Wickham.
-
-The \texttt{tidyverse} was created to order data in ``tidy'' tables
-where it is structured as a data frame made up of columns and rows. In
-other words, the \texttt{tidyverse} is built to work with data like
-\texttt{hansard\_1850}.
+as RStudio), Hadley Wickham. The \texttt{tidyverse} was created to order
+data in ``tidy'' tables where it is structured as a data frame made up
+of columns and rows. In other words, the \texttt{tidyverse} is built to
+work with data like \texttt{hansard\_1850}.
 
 We have found that a tidy approach to text exploration and analysis
 allows us to write code quickly and effectively, giving us ample control
@@ -1236,7 +1218,7 @@ throughout this book.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-28-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-27-1}
 
 The resulting bar chart shows us the number of times ``coal'' was
 mentioned, as well as the top words that appear with coal. Note that
@@ -1334,7 +1316,7 @@ makes this context easier to apprehend.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-30-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-29-1}
 
 Comparison between the words used in the context of coal and corn gives
 us a foothold for beginning to think about how taxation was discussed in
@@ -1478,25 +1460,7 @@ with uppercase or lowercase instances of our keyword.
 \begin{Highlighting}[]
 \CommentTok{\# load the quanteda package}
 \FunctionTok{library}\NormalTok{(}\StringTok{"quanteda"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Package version: 4.3.1
-## Unicode version: 14.0
-## ICU version: 70.1
-\end{verbatim}
-
-\begin{verbatim}
-## Parallel computing: disabled
-\end{verbatim}
-
-\begin{verbatim}
-## See https://quanteda.io for tutorials and examples.
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\# convert the filtered february 1850 dataset into a quanteda corpus object}
 \CommentTok{\# specify that the \textquotesingle{}text\textquotesingle{} column contains the actual speech content}
 \NormalTok{my\_corpus }\OtherTok{\textless{}{-}} \FunctionTok{corpus}\NormalTok{(top\_month, }\AttributeTok{text\_field =} \StringTok{"text"}\NormalTok{) }
@@ -1508,27 +1472,57 @@ with uppercase or lowercase instances of our keyword.
                   \StringTok{"corn"}\NormalTok{, }\CommentTok{\# keyword to search}
                   \AttributeTok{window =} \DecValTok{5}\NormalTok{, }\CommentTok{\# number of words before/after}
                   \AttributeTok{case\_insensitive =} \ConstantTok{TRUE}\NormalTok{) }\CommentTok{\# match regardless of case}
-
-\FunctionTok{head}\NormalTok{(corn\_kwic)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Keyword-in-context with 6 matches.                                                            
-##   [text2032, 7]             cultivation of land, as | corn |
-##  [text2036, 11]           south of Ireland dealt in | corn |
-##  [text2038, 13] , deterred persons from cultivating | corn |
-##   [text2536, 2]                                  on | corn |
-##  [text2568, 23]         laws governing the price of | corn |
-##  [text2578, 13]                to the repeal of the | corn |
-##                         
-##  ground, being given up 
-##  , and were the pro     
-##  .                      
-##  , would never have been
-##  .                      
-##  laws, for those laws
-\end{verbatim}
+We can convert our KWIC results into a regular data frame and display
+them using \texttt{kable()}, which formats the table neatly.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{corn\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(corn\_kwic)}
+
+\CommentTok{\# Wrap long contexts so they don\textquotesingle{}t overflow}
+\NormalTok{corn\_df }\OtherTok{\textless{}{-}}\NormalTok{ corn\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{pre =} \FunctionTok{str\_wrap}\NormalTok{(pre, }\AttributeTok{width =} \DecValTok{40}\NormalTok{),}
+         \AttributeTok{keyword =} \FunctionTok{str\_wrap}\NormalTok{(keyword, }\AttributeTok{width =} \DecValTok{10}\NormalTok{),}
+         \AttributeTok{post =} \FunctionTok{str\_wrap}\NormalTok{(post, }\AttributeTok{width =} \DecValTok{40}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(docname, from, to, pattern))}
+
+\NormalTok{corn\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{head}\NormalTok{(}\DecValTok{15}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{align =} \StringTok{"l"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"hold\_position"}\NormalTok{, }\StringTok{"scale\_down"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}[!h]
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}{lll}
+\toprule
+pre & keyword & post\\
+\midrule
+cultivation of land , as & corn & ground , being given up\\
+south of Ireland dealt in & corn & , and were the pro\\
+, deterred persons from cultivating & corn & .\\
+on & corn & , would never have been\\
+laws governing the price of & corn & .\\
+\addlinespace
+to the repeal of the & corn & laws , for those laws\\
+out a moderate duty on & corn & , were a second time\\
+the manner in which the & corn & laws had been repealed ;\\
+proposed the repeal of the & corn & laws , there had been\\
+which had characterised all the & corn & laws that had passed that\\
+\addlinespace
+His objection to the & corn & law had been this ,\\
+of a high price for & corn & , agriculture was so backward\\
+" " We grow the & corn & , but we don't know\\
+of the repeal of the & corn & laws , every person who\\
+was not now whether the & corn & laws were to be repealed\\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \subsection{Critical Thinking With
 Collocates}\label{critical-thinking-with-collocates}

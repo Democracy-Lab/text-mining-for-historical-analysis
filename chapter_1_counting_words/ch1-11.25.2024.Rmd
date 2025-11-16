@@ -95,16 +95,12 @@ library("knitr")
 library("kableExtra")
 library("tidyverse")
 
-df <- data.frame(
-  Label = c("hansard_YYYY", "debate_metadata_YYYY", "speaker_metadata_YYYY", "file_metadata_YYYY"),
-  Description = c(
-    "Hansard debate text",
-    "Metadata such as speech date and title.",
-    "Metadata on speakers.",
-    "Metadata for source file, column, and more."
-  ),
-  Key = rep("sentence_id", 4)
-)
+df <- data.frame(Label = c("hansard_YYYY", "debate_metadata_YYYY", "speaker_metadata_YYYY", "file_metadata_YYYY"),
+                 Description = c("Hansard debate text",
+                                 "Metadata such as speech date and title.",
+                                 "Metadata on speakers.",
+                                 "Metadata for source file, column, and more."),
+                 Key = rep("sentence_id", 4))
 
 kable(df, caption = "Table 1: Description of Hansard Corpus Files by Decade")
 ```
@@ -139,7 +135,7 @@ kable(df_head,
       booktabs = TRUE, 
       linesep = "",
       caption = "Excerpt from Hansard 1850") %>%
-  kable_styling(latex_options = c("scale_down", "striped", "repeat_header"),
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -540,7 +536,7 @@ KWIC returns a concordance-style text output with the words that come directly b
 
 When using `KWIC()` we can specify the keyword, the maximum number of words to display before and after the keyword, and we can also tell `KWIC()` to do a case insensitive match so that we match with uppercase or lowercase instances of our keyword.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # load the quanteda package
 library("quanteda")
 
@@ -555,8 +551,24 @@ corn_kwic <- kwic(tokens(my_corpus), # tokenize corpus
                   "corn", # keyword to search
                   window = 5, # number of words before/after
                   case_insensitive = TRUE) # match regardless of case
+```
 
-head(corn_kwic)
+We can convert our KWIC results into a regular data frame and display them using `kable()`, which formats the table neatly.
+
+```{r}
+corn_df <- as.data.frame(corn_kwic)
+
+# Wrap long contexts so they don't overflow
+corn_df <- corn_df %>%
+  mutate(pre = str_wrap(pre, width = 40),
+         keyword = str_wrap(keyword, width = 10),
+         post = str_wrap(post, width = 40)) %>%
+  select(-c(docname, from, to, pattern))
+
+corn_df %>%
+  head(15) %>%
+  kable("latex", booktabs = TRUE, align = "l") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
 ## Critical Thinking With Collocates

@@ -42,6 +42,7 @@ data("hansard_1860")
 # This code does not show, just the table
 library("knitr")
 library("kableExtra")
+library(tidyverse)
 
 df_head <- hansard_1860 %>% 
   slice_head(n = 5)
@@ -51,7 +52,7 @@ kbl(df_head, format = "latex",
     linesep = "",
     caption = "Hansard Speeches 1860") %>%
   kable_styling(
-    latex_options = c("scale_down", "striped", "repeat_header"),
+    latex_options = c("scale_down", "repeat_header"),
     table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -74,7 +75,7 @@ kbl(df_head, format = "latex",
     linesep = "",
     caption = "Hansard Metadata 1860.") %>%
   kable_styling(
-    latex_options = c("scale_down", "striped", "repeat_header"),
+    latex_options = c("scale_down", "repeat_header"),
     table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -101,7 +102,7 @@ kbl(df_head, format = "latex",
     linesep = "",
     caption = "Hansard Metadata 1860.") %>%
   kable_styling(
-    latex_options = c("scale_down", "striped", "repeat_header"),
+    latex_options = c("scale_down", "repeat_header"),
     table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -136,7 +137,7 @@ kbl(df_head, format = "latex",
     linesep = "",
     caption = "Source File Metadata 1860.") %>%
   kable_styling(
-    latex_options = c("scale_down", "striped", "repeat_header"),
+    latex_options = c("scale_down", "repeat_header"),
     table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -158,10 +159,10 @@ hansard_1860 <- left_join(hansard_1860, debate_metadata_1860)
 # Show the first few rows of the 1860 Hansard debate text
 hansard_1860 %>%
   head() %>%
-  mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
+  mutate(text = str_trunc(text, 120)) %>%  
   kable("latex", booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")    # wrap the "text" column
+  column_spec(2, width = "4cm") 
 ```
 
 Notice that the resulting dataset, `hansard_corpus_1860`, has information about speaker and date for each sentence of text. 
@@ -228,7 +229,7 @@ kbl(df_head, format = "latex",
     linesep = "",
     caption = "Hansard Bigrams with Metadata.") %>%
   kable_styling(
-    latex_options = c("scale_down", "striped", "repeat_header"),
+    latex_options = c("scale_down", "repeat_header"),
     table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -259,7 +260,7 @@ kbl(df_head, format = "latex",
     booktabs = TRUE, 
     linesep = "",
     caption = "Clean Hansard Bigrams with Metadata.") %>%
-  kable_styling(latex_options = c("scale_down", "striped", "repeat_header"),
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -300,7 +301,7 @@ kbl(df_head, format = "latex",
     booktabs = TRUE, 
     linesep = "",
     caption = "Top Hansard Bigrams for 1867.") %>%
-  kable_styling(latex_options = c("scale_down", "striped", "repeat_header"),
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
@@ -520,7 +521,7 @@ One way to approach this line of inquiry would be by using the graph we have gen
 
 Next, let's return to the idea of finding events using what we have learned about joins.  The authors of this book have created a controlled vocabulary of event names which lists the date of famous events like the Magna Carta (1215).  
 
-As _The Dangerous Art of Text Mining_ makes clear, the authors of this book understand that there is no universal definition of the most important events in world history. Any controlled vocabulary list has its merits and its omissions. It is in comparing the subtleties of different lists of events that the historian begins to explore the changing political and cultural nature of memory -- for example, the fact that references to the Glorious Revolution began to disappear after the First Reform Act, gradually displaced by allusions to the Tudor past.
+As _The Dangerous Art of Text Mining_ makes clear, we understand that there is no universal definition of the most important events in world history. Any controlled vocabulary list has its merits and its omissions. It is in comparing the subtleties of different lists of events that the historian begins to explore the changing political and cultural nature of memory -- for example, the fact that references to the Glorious Revolution began to disappear after the First Reform Act, gradually displaced by allusions to the Tudor past.
 
 ```{r}
 # load the scholar-created "events" dataset from hansardr
@@ -565,7 +566,15 @@ bigrams_1830 <- hansard_1830 %>% # create a new dataset
 events_1830 <- bigrams_1830 %>% # create a new dataset
   inner_join(eventslist, by = c("ngram" = "event_name")) # join the bigrams and events
 
-head(events_1830)
+events_1830 %>%
+  head() %>%
+  mutate(ngram = str_trunc(ngram, 120)) %>%  
+  kable("latex", booktabs = TRUE) %>%
+  kable_styling(full_width = FALSE,
+                position = "left",
+                latex_options = c("hold_position", "scale_down"),
+                font_size = 7) %>% 
+  column_spec(2, width = "4cm")
 ```
 
 Notice that the resulting dataset contains speaker and date columns from the parliamentary speeches, but the only bigrams listed are those that correspond to events from `eventslist`. 
@@ -714,7 +723,12 @@ c14_mentions <- hansard_1830 %>% # create a new dataset
 
 ```{r}
 # display the filtered speech texts that mention "fourteenth century"
-c14_mentions$text
+c14_mentions %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>%
+  select(text) %>%
+  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  column_spec(1, width = "14cm")
 ```
 
 ```{r}
@@ -730,7 +744,12 @@ c13_mentions <- hansard_1830 %>% # create a new dataset
 
 ```{r}
 # display the filtered speech texts that mention "thirteenth century"
-c13_mentions$text
+c13_mentions %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>%
+  select(text) %>%
+  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  column_spec(1, width = "14cm")
 ```
 
 ```{r}
@@ -745,7 +764,12 @@ c12_mentions <- hansard_1830 %>% # create a new dataset
 
 ```{r}
 # display the filtered speech texts that mention "twelfth century"
-c12_mentions$text
+c12_mentions %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>%
+  select(text) %>%
+  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  column_spec(1, width = "14cm")
 ```
 
 What we see is a collection of historical references which serve two purposes: one is explaining why the institutions of the past differ from the needs of the present, and one is invoking the fact that parliamentary institutions have changed in the past to support the cause of reform in the present. The arguments work together, not against each other.  
@@ -936,7 +960,6 @@ data("debate_metadata_1860")
 
 hansard_1860 <- hansard_1860 %>% 
   left_join(debate_metadata_1860)
-
 ```
 
 The following code filters the `hansard_1860` dataset to include rows where the `text` column matches any event name in `events_df$event_name`, using case-insensitive matching. It then adds a new column, `matched_event`, which contains the specific matched event name from the `text`. The result is a filtered data frame with an additional column identifying the matched event for each row.
@@ -945,15 +968,12 @@ The following code filters the `hansard_1860` dataset to include rows where the 
 # Match with each event and 
 # add a column to capture the matched event
 new_matched_events <- hansard_1860 %>%
-  filter(str_detect(
-    text,
-    regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
-          ignore_case = TRUE))) %>%
-  mutate(
-    matched_event = str_extract(
-      text,
-      regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
-            ignore_case = TRUE)))
+  filter(str_detect(text,
+                    regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
+                          ignore_case = TRUE))) %>%
+  mutate(matched_event = str_extract(text,
+                                     regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
+                                           ignore_case = TRUE)))
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
@@ -966,7 +986,7 @@ kbl(df_head, format = "latex",
     booktabs = TRUE, 
     linesep = "",
     caption = "Excerpt from Hansard 1850") %>%
-  kable_styling(latex_options = c("scale_down", "striped", "repeat_header"),
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 

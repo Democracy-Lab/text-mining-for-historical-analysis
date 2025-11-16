@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Troubleshooting Code with Chatbots
 
-Chatbots are by now an established way of troubleshooting code and debugging, sometimes taking the roll of documentation. 
+Chatbots are by now an established way of troubleshooting code and debugging, sometimes taking the role of documentation. 
 
 ChatGPT does not know you intention 
 so if your problem looks liek somethign else, it might misunderstand / represent 

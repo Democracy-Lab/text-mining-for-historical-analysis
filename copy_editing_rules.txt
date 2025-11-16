@@ -38,6 +38,8 @@ Make sure comments are in regular case:
 
 change you to the analyst
 
+dataset names and column names are surrounded by `` 
+
 
 w not with 
 

@@ -174,38 +174,39 @@ custom_stop_words = tibble(word = c("hon", "speaker", "house", "question", "lord
 "civil", "wished", "people", "discussion", "applied", "proper", "taking", "amendment", 
 "statements", "repeal", "papers", "fund", "feeling", "measures", "minister", "purposes", 
 "payment", "stock", "increased", "bound", "grant", "grounds", "doubt", "applied", "stamp", 
-"manner", "conduct", "exchequer", "provide", "reduced", "table", "difficulties", "anxious", 
-"compared", "provide", "king", "individual", "expressed", "hear", "hope", "establishment", 
-"debate", "contrary", "instance", "introduced", "call", "lords", "existing", "half", 
-"head", "offices", "views", "leave", "respecting", "speech", "feel", "excise", "effected", 
-"economy", "night", "price", "majority", "reason", "disposed", "held", "claims", "leave", 
-"required", "moment", "admitted", "ready", "words", "issue", "allowed", "true", "treasury", 
-"administration", "consent", "advantage", "business", "calculated", "enter", "fair",
-"nature", "oppose", "reign", "honour", "mode", "reduce", "difficulty", "favour", "credit", 
-"adopt", "additional", "individuals", "mind", "sale", "times", "amounted", "deficiency", 
-"laws", "til", "agreed", "alluded", "mentioned", "meant", "heard", "feelings", "engaged", 
-"consolidated", "conclusion", "circulation", "begged", "calculations", "afford", "acts", 
-"acted", "giving", "pledge", "matters", "contract", "proceed", "determined", "satisfaction", 
-"declare", "giving", "spirits", "resolutions", "pursue", "opposition", "force","pursue", 
-"force", "opinions", "refer", "produce", "appeal", "pay", "terms", "private", "reform", 
-"observations", "entitles", "laws", "alteration", "due", "gallant", "joint", "undoubtedly", 
-"alluded", "benefit", "consequence", "perfectly", "trusted", "loan", "proceed", "cent", 
-"regard", "political", "royal", "carry", "importance", "proceedings", "aware", "rates", 
-"similar", "examination", "details", "told", "supposed", "sufficient", "person", "necessity", 
-"millions", "emoluments", "difference", "department", "till", "submit", "lay", "imposed", 
-"claim", "branches", "recommended", "privy", "personal", "select", "salary", "revenues", 
+"manner", "conduct", "exchequer", "provide", "reduced", "table", "difficulties", 
+"anxious", "compared", "provide", "king", "individual", "expressed", "hear", "hope", 
+"establishment", "debate", "contrary", "instance", "introduced", "call", "lords", 
+"existing", "half", "head", "offices", "views", "leave", "respecting", "speech", "feel", 
+"excise", "effected", "economy", "night", "price", "majority", "reason", "disposed", 
+"held", "claims", "leave", "required", "moment", "admitted", "ready", "words", "issue", 
+"allowed", "true", "treasury", "administration", "consent", "advantage", "business", 
+"calculated", "enter", "fair","nature", "oppose", "reign", "honour", "mode", "reduce", 
+"difficulty", "favour", "credit", "adopt", "additional", "individuals", "mind", "sale", 
+"times", "amounted", "deficiency", "laws", "til", "agreed", "alluded", "mentioned", 
+"meant", "heard", "feelings", "engaged", "consolidated", "conclusion", "circulation", 
+"begged", "calculations", "afford", "acts", "acted", "giving", "pledge", "matters", 
+"contract", "proceed", "determined", "satisfaction", "declare", "giving", "spirits", 
+"resolutions", "pursue", "opposition", "force","pursue", "force", "opinions", "refer", 
+"produce", "appeal", "pay", "terms", "private", "reform", "observations", "entitles", 
+"laws", "alteration", "due", "gallant", "joint", "undoubtedly", "alluded", "benefit", 
+"consequence", "perfectly", "trusted", "loan", "proceed", "cent", "regard", "political", 
+"royal", "carry", "importance", "proceedings", "aware", "rates", "similar", "examination", 
+"details", "told", "supposed", "sufficient", "person", "necessity", "millions", 
+"emoluments", "difference", "department", "till", "submit", "lay", "imposed", "claim", 
+"branches", "recommended", "privy", "personal", "select", "salary", "revenues", 
 "preceding", "practice", "move", "meet", "hand", "funds", "formed", "expenses", 
-"establishments", "entitled", "dimunition", "settlement", "sense", "arrangement", "address", 
-"sufficient", "local", "clergy", "relief", "necessity", "application", "claim", 
+"establishments", "entitled", "dimunition", "settlement", "sense", "arrangement", 
+"address", "sufficient", "local", "clergy", "relief", "necessity", "application", "claim", 
 "responsibility", "situation", "satisfactory", "ground", "revenues", "quarter", "change", 
 "founded", "secretary", "provided", "read", "commutation", "body", "provision", "practice", 
-"difference", "composition", "condition", "hands", "provision", "capital", "responsibility", 
-"press", "knowledge", "raised", "friends", "altogether", "meet", "hand", "free", 
-"difference", "claim", "necessity", "arguments", "left", "single", "founded", "arrangement", 
-"admit", "total", "told", "operation", "apply", "shown", "person", "decision", "actual", 
-"returns", "return", "restrictions", "national", "limited", "hundred", "existed", "council", 
-"charged", "annual", "allowances", "proceeding", "word", "existed", "fairly", "loss", "spirit", 
-"west", "sum"))
+"difference", "composition", "condition", "hands", "provision", "capital", 
+"responsibility", "press", "knowledge", "raised", "friends", "altogether", "meet", "hand", 
+"free", "difference", "claim", "necessity", "arguments", "left", "single", "founded", 
+"arrangement", "admit", "total", "told", "operation", "apply", "shown", "person", 
+"decision", "actual", "returns", "return", "restrictions", "national", "limited", "hundred", 
+"existed", "council", "charged", "annual", "allowances", "proceeding", "word", "existed", 
+"fairly", "loss", "spirit", "west", "sum"))
 ```
 
 We are ready to filter and clean our data and explore the langauge of speakers called Chancellor of the Exchequer. 
@@ -310,12 +311,10 @@ Notice that the resulting dataset has a new field, "year."
 
 If we want to count words by year, first we need to tokenize the speeches.  
 ```{r, message = F}
-
 words_1830_w_year <- hansard_1830_w_year %>% 
   left_join(speaker_metadata_1830) %>%
   select(speaker, suggested_speaker, text, year) %>%
   unnest_tokens(word, text)
-
 
 words_1830_w_year %>% 
   head() %>% 
@@ -398,7 +397,7 @@ ggplot(data = mrs_walrand_top_words,
 
 We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. To do this, refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
 
-```{r, echo = False, message = False}
+```{r, echo = FALSE, message = FALSE}
 name <- c("Mrs. (Mary Ann) Clark", 
                   "Mrs. Bridgeman", 
                   "Miss Mary Ann Taylor",
