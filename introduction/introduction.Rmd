@@ -157,6 +157,10 @@ Once the data is cleaned, ordered, and conceptually meaningful, our goal shifts 
 
 This distinction matters for interpretive work in the digital humanities because even seemingly small formatting decisions shape how patterns are perceived: which numbers look large or small, which words appear central or marginal, which contrasts emerge as meaningful. Exploratory output supports the researcher's reasoning process; published tables communicate the conclusion of that reasoning to others.
 
+## The Style of Code Comments Used in this Book 
+
+Readers differ in how much commentary they want while reading code. Some prefer every step explained; others find heavy annotation distracting. To help readers get started, the early chapters of this book include extensive comments—often on nearly every line of code. We hope these serve as a scaffolding for learning coding concepts and becoming more familiar with the R syntax. As the chapters progress, we gradually reduce the amount of commenting, or add comments only when introducing a new idea, method, or pattern.
+
 ## A Note on Consent
 
 A brief clarification about style and address is in order. We recognize that some readers are actively running the code in this book, while others are simply reading to decide whether this mode of historical analysis resonates with their own practice. For that reason, we have written parts of the text as if it were fiction.

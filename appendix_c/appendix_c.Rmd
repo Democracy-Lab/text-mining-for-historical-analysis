@@ -9,39 +9,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Troubleshooting Code with Chatbots
 
-Chatbots are by now an established way of troubleshooting code and debugging, sometimes taking the role of documentation. 
+Chatbots like ChatGPT are now commonly used to troubleshoot and debug code, often replacing traditional approaches to scanning and interpreting documentation. However, while they can recognize patterns, they do not know our exact intentions. If our problem looks similar to another issue, is uncommon and poorly represented in the chatbot's training data, or arises from a new use case, the chatbot may misinterpret our problem or offer a solution meant for a different situation. 
 
-ChatGPT does not know you intention 
-so if your problem looks liek somethign else, it might misunderstand / represent 
+The following section introduces a repeatable troubleshooting cycle designed specifically for working with code. In doing so, it provides some context for how chatbots process information that way we can anticipate where misalignments might occur and correct them. The goal is to make interactions with a chatbot more predictable and productive by structuring the conversation: clearly stating the task, providing minimal reproducible code and screenshots of the data, showing the exact error, asking a focused question, testing the suggestions locally, and iterating until the issue resolves. This cyclical workflow helps minimize the gap between what we might intend and what the chatbot thinks we are asking, turning the debugging process into a human-guided loop.
 
-
-
-
-
-
-
-
-
-A Troubleshooting Cycle for Working with ChatGPT
-
-A Repeatable Workflow for Digital Humanists
-
-This cycle helps structure your interactions with ChatGPT so you can move from confusion → clarity → working code → reflection.
+## A Troubleshooting Cycle for Working with ChatGPT
 
 1. Describe the Task
 
-What are you trying to do?
-Provide:
+What are we hoping to achieve? Provide a description in plain language
+(“I am trying to extract bigrams from 1850 Hansard debates…”)
+The expected type of output (“…and return a dataframe with bigram counts per speaker.”)
 
-The goal in plain language (“I am trying to extract bigrams from 1850 Hansard debates…”)
+This helps to not just perform the task, extracting bigrams, which could result in many different paths. While most things in R are in dataframes, in another language bigrams could be given back in a different format. 
 
-The expected type of output (“…and return a dataframe with word counts per speaker.”)
-
-This keeps both you and ChatGPT anchored in the research objective.
 
 2. Provide the Minimal Code
 
-Aim for the smallest possible example—a few lines only:
+If possible, aim for a small example—a few lines only:
 
 Include the function or chunk generating the error.
 
@@ -49,7 +34,14 @@ Exclude unrelated steps.
 
 This helps ChatGPT reason accurately and prevents “hallucinated” fixes.
 
-3. Provide the Exact Error Message
+Sometimes provide it with a script or dataset, however, this can exceed the chatbot's memory, causing ___ 
+
+
+3. Provide a Screenshot or Snippet of the Dataset 
+
+
+
+4. Provide the Exact Error Message
 
 Copy-paste error output verbatim, including:
 
@@ -59,7 +51,7 @@ Any traceback shown
 
 This helps ChatGPT see what the interpreter saw.
 
-4. Ask a Specific Question
+5. Ask a Specific Question
 
 Examples:
 
@@ -87,20 +79,7 @@ Run the suggestion in your environment (RStudio, Jupyter, Terminal).
 
 Don’t skip this. Your environment is the source of truth.
 
-6. Report Back the New Behavior
-
-If it works:
-
-Say “that fixed it”
-If it fails:
-
-Paste the new error
-
-Paste the changed code
-
-You are not “starting over”; you’re moving to the next loop of the cycle with more information.
-
-7. Iterate
+6. Iterate
 
 This cycle repeats:
 
@@ -145,4 +124,4 @@ This helps build technical literacy rather than dependency.
 Summary Cycle Diagram (Text Version)
 
 Describe task → Provide minimal code → Provide error → Ask a focused question →
-Receive explanation → Test locally → Report result → Iterate → Consolidate solution → Reflect
+Receive explanation → Test locally → Report result → Iterate → Consolidate solution → 

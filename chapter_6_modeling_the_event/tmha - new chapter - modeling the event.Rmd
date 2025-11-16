@@ -18,10 +18,6 @@ To analyze how the reform acts changed parliament, we can compare the speakers a
 
 In the previous chapters, we worked with intentionally small, subsetted datasets so the examples would run on a laptop. In this chapter, we take the opposite approach: we join multiple decades and create a much larger dataset first. We then filter it as needed. This allows us to demonstrate another workflow for working with large-scale historical data—one in which analysts begin with the full corpus and progressively narrow the scope through filtering and subsetting.
 
-Because we will ask our computer to store data from three decades at a time, the following exercise may crash smaller computers. If this happens, do not be alarmed. Power users of data sometimes need to upgrade their machines or work on university-provided servers to accomplish their research; you can make inquiries about using a more powerful computer with your IT services department. For the purposes of the rest of the chapter, you may regard the code that follows as an example of a process, recognizing how the tools we have previously used are deployed in what follows.
-
-Users with more modern laptops may find that the code runs, but it runs extremely slowly. The following block of text, for example, may well take an hour to run on some machines. It is worthwhile; the results merit patience. 
-
 Previously, we demonstrated techniques were we worked with chunks of the data at a time to save computer memory. We did this so the code will run on a laptop. 
 
 ```{r, message=FALSE}

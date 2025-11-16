@@ -80,7 +80,7 @@ By now, it should be clear that tokenization can be performed using a range of p
 
 To install `spacyr`, we begin by using the standard `install.packages()` function. This gives us access to the `spacy_install()` function. Running `spacy_install()` sets up the required Python environment and installs the spaCy library along with its dependencies, integrating spaCy's capabilities within the R environment. 
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, warning=FALSE, message=FALSE}
 # First time only -- installing spacyr on your computer
 install.packages("spacyr") 
 
@@ -284,9 +284,15 @@ top_nouns <- filtered_nouns %>%
 
 ```{r, message=FALSE, warning=FALSE}
 library(gridExtra)
-# layout as a table
-grid.arrange(tableGrob(top_nouns[1:15, ]), tableGrob(top_nouns[16:30, ]), tableGrob(top_nouns[31:45, ]), ncol = 3)
-# the notation [1:15, ] tells R to extract the first fifteen rows and all tables from a dataset.  tableGrob() formats them as a table, and grid.arrange() places the tables side-by-side so that we can inspect more of them at once.
+
+# Arrange the output tables in a grid layout
+# [1:15, ] selects the first fifteen rows (and all columns) from the dataset
+# tableGrob() converts each chunk into a table for plotting
+# grid.arrange() places the tables side by side so we can view more at once
+grid.arrange(tableGrob(top_nouns[1:15, ]),
+             tableGrob(top_nouns[16:30, ]),
+             tableGrob(top_nouns[31:45, ]),
+             ncol = 3)
 ```
 
 Some of these words, including "country," "number," "time," "question," "case," "opinion," and "respect" rank among the most prominent words in parliament overall, suggesting that "man" and "men" feature as the default personality for all discussions of politics.  Collocates like "officers," "army," "position," "force," "war," and "ships" remind us that these debates transpired in an era when both the military and government bureaucracies were entirely occupied by men. Mentions of "money," "fact," and "property" remind us that in this era, capitalism and science were equally realms of male prerogative, while "franchise" reminds us that contemporary debates over the vote reflected the contestation of the vote for men.  
@@ -361,9 +367,10 @@ adjective_noun_pair_counts_woman <- adjective_noun_pairs_woman %>%
 ```
 
 ```{r}
-# print results as tables
-grid.arrange(tableGrob(adjective_noun_pair_counts_woman[1:15, ]), tableGrob(adjective_noun_pair_counts_woman[16:30, ]), tableGrob(adjective_noun_pair_counts_woman[31:45, ]),ncol = 3)
-# the notation [1:15, ] tells R to extract the first fifteen rows and all tables from a dataset.  tableGrob() formats them as a table, and grid.arrange() places the tables side-by-side so that we can inspect more of them at once.
+grid.arrange(tableGrob(adjective_noun_pair_counts_woman[1:15, ]), 
+             tableGrob(adjective_noun_pair_counts_woman[16:30, ]), 
+             tableGrob(adjective_noun_pair_counts_woman[31:45, ]),
+             ncol = 3)
 ```
 
 It is easy to explore the top 10, 20, or even top 100 adjective-noun pairs by slicing the data and presenting the results in a table. Adjusting the number of pairs displayed allows us to shift between a broader overview and a more focused examination of the corpus. 
@@ -432,14 +439,16 @@ woman_adjectives <- adjective_noun_pair_counts_woman %>%
   count(adjective, name = "count")
 
 # join the two into one database and subtract the count of men from the count of women.
-comparison <- full_join(man_adjectives, woman_adjectives, by = "adjective", suffix = c("_1", "_2")) %>% #join
-  mutate( # add a new column 
-    count_1 = replace_na(count_1, 0),
-    count_2 = replace_na(count_2, 0), 
-    count_diff = count_2 - count_1) %>% # subtract men's count from women's
-    filter(count_diff!=0) # delete all entries where there is no difference
+comparison <- full_join(man_adjectives, woman_adjectives, by = "adjective", 
+                        suffix = c("_1", "_2")) %>% #join
+  mutate(count_1 = replace_na(count_1, 0),
+         count_2 = replace_na(count_2, 0), 
+         count_diff = count_2 - count_1) %>% # subtract men's count from women's
+  filter(count_diff!=0) # delete all entries where there is no difference
 
-# In this dataset, there are a large number of adjectives with a count of two. We will therefore "sample" from the results to draw our visualization. This means that every time the visualization below is redrawn, different results will appear.  
+# In this dataset, there are a large number of adjectives with a count of two. 
+# We will therefore "sample" from the results to draw our visualization. 
+# This means that every time the visualization below is redrawn, different results will appear.  
 
 # take the top adjectives unique to women
 positive_sample <- comparison %>%

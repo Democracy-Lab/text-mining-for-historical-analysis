@@ -13,13 +13,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The output is a data frame with the top words for each keyword ("climate", "woman", "environmentalist", and "government")
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(tmha.data)
 ```
 
 we will take just the `content` column 
 
-```{r, message=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(text2vec)
 library(tidyverse)
 library(kableExtra)
@@ -326,5 +326,3 @@ ggplot(df_sim, aes(period, similarity, group = 1)) +
 
 ```
 
-
-## Conclusion

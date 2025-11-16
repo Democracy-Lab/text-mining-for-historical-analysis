@@ -199,14 +199,14 @@ custom_stop_words = tibble(word = c("hon", "speaker", "house", "question", "lord
 "establishments", "entitled", "dimunition", "settlement", "sense", "arrangement", 
 "address", "sufficient", "local", "clergy", "relief", "necessity", "application", "claim", 
 "responsibility", "situation", "satisfactory", "ground", "revenues", "quarter", "change", 
-"founded", "secretary", "provided", "read", "commutation", "body", "provision", "practice", 
+"founded", "secretary", "provided", "read", "commutation", "body", "provision",  
 "difference", "composition", "condition", "hands", "provision", "capital", 
 "responsibility", "press", "knowledge", "raised", "friends", "altogether", "meet", "hand", 
 "free", "difference", "claim", "necessity", "arguments", "left", "single", "founded", 
 "arrangement", "admit", "total", "told", "operation", "apply", "shown", "person", 
-"decision", "actual", "returns", "return", "restrictions", "national", "limited", "hundred", 
-"existed", "council", "charged", "annual", "allowances", "proceeding", "word", "existed", 
-"fairly", "loss", "spirit", "west", "sum"))
+"decision", "actual", "returns", "return", "restrictions", "national", "limited", 
+"hundred", "existed", "council", "charged", "annual", "allowances", "proceeding", "word", 
+"existed", "fairly", "loss", "spirit", "west", "sum"))
 ```
 
 We are ready to filter and clean our data and explore the langauge of speakers called Chancellor of the Exchequer. 

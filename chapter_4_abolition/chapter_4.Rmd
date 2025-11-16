@@ -91,7 +91,7 @@ slavery_1830 <- hansard_1830 %>%  # Create a new dataset called 'debates_1830'
 
 slavery_debates_1830 <- slavery_1830 %>%
   left_join(speaker_metadata_1830) %>% # join datasets 
-  select(sentence_id, speaker, suggested_speaker, text, year) %>% # retain relevant columns 
+  select(sentence_id, speaker, suggested_speaker, text, year) %>% # keep relevant columns 
   filter(suggested_speaker != "") # remove any lines with missing speaker information
 
 # break up the text into words
@@ -200,10 +200,10 @@ top_slavery_speakers_1833 <- slavery_debates_1833 %>%
 
 top_slavery_speakers_1833 %>%
   head() %>%
-  mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
+  mutate(text = str_trunc(text, 120)) %>% 
   kable("latex", booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")    # wrap the "text" column
+  column_spec(4, width = "4cm") 
 ```
 
 Next, let's break the text into words and clean it up, removing numbers and stop words. We're lemmatizing each word into its word stem so that we can count singular and plural of the same word as one.
@@ -306,10 +306,10 @@ Now that we have an index of how distinctive each word is per speaker, we can us
 # find the words most distinctive of each speaker
 most_distinctive_words_per_abolition_speaker <- tfidf_per_top_slavery_speaker_1833 %>%
   group_by(speaker) %>% # group by speaker
-  arrange(desc(tf_idf)) %>% # arrange in descending order of tf_idf, the index of how distinctive each word is of each speaker
+  arrange(desc(tf_idf)) %>% # arrange distinctive words in descending order
   slice(1:15) %>% # find the top n words, ranked by tf_idf
   ungroup() %>% # ungroup the words
-  mutate(index = row_number()) %>% # create a new column, "index," which tells what the #1-4 word is for each speaker
+  mutate(index = row_number()) %>% # Add a column for each speaker’s top-ranked word
   mutate(tf_idf = round(tf_idf, 4)) %>% # round the tf_idf score to only 4 decimal places 
   select(index, word, tf_idf, n, speaker) # drop all columns except these
 
@@ -390,7 +390,8 @@ most_distinctive_words_per_abolition_speaker %>%
   scale_y_continuous(breaks = function(x) 
     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers, not  decimals, for the x axis +
   labs(title = "Speakers\' Most Distinctive Words", # label the visualization with a title
-       subtitle = "From the Debates in the 1830s on the Abolition of Slavery; pale means more distinctive", # text for the subtitle
+       subtitle = "From the 1830s debates on the abolition of slavery",
+       caption = "Pale shading indicates greater distinctiveness", # text for the subtitle
        x = "Word", # x axis label
        y = "Count") # y axis label
 ```
@@ -424,7 +425,7 @@ ggplot(data = most_distinctive_words_per_abolition_speaker2,
   scale_x_reordered() + 
   guides(fill = "none") +
    scale_y_continuous(breaks = function(x) 
-     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers, not decimals, for the x axis +
+     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers on x-axis
   labs(title = "Speakers\' Most Distinctive Words with N > 5",
        subtitle = "From the Debates in the 1830s on the Abolition of Slavery; pale means more distinctive",
        x = "Word",
@@ -456,7 +457,7 @@ ggplot(data = mr_buckingham_slavery_debates,
     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers, not decimals, for the x axis +
   geom_col() + # create a bar graph 
   coord_flip() + # switches the x and y axis for a more elegant presentation 
-  labs(title = "Mr Buckingham\'s Most Frequenlty Spoken Words", # this is another way of labeling title and axes
+  labs(title = "Mr Buckingham\'s Most Frequenlty Spoken Words",
        subtitle = "From the 1833 Debates on the Abolition of Slavery",
        x = "Word",
        y = "Count")
@@ -536,7 +537,7 @@ buckingham_sentences %>%
   mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
   kable("latex", booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")    # wrap the "text" column
+  column_spec(4, width = "4cm")    # wrap the "text" column
 ```
 
 Here they are as plaintext:
@@ -580,14 +581,13 @@ buck_speeches <- buck_speech_ids %>%
 
 buck_speeches %>%
   head() %>%
-  mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
+  mutate(text = str_trunc(text, 120)) %>%
   kable("latex", 
         booktabs = TRUE,
         col.names=NULL,
         caption="Speeches by Buckingham about Slavery that invoke the word 'wages'") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")    # wrap the "text" column
-  
+  column_spec(2, width = "4cm")
 ```
 
 With missing sentences added back in, the speeches in their entirety are much easier to understand. 
@@ -692,7 +692,8 @@ The id of Sentence #5 is S3V0018P0_8993. Since we understand the gist of Bucking
 
 ```{r}
 missing_context <- hansard_1830 %>% 
-  filter(sentence_id %in% c("S3V0018P0_8990", "S3V0018P0_8991", "S3V0018P0_8992", "S3V0018P0_8993"))
+  filter(sentence_id %in% c("S3V0018P0_8990", "S3V0018P0_8991", "S3V0018P0_8992", 
+                            "S3V0018P0_8993"))
 
 missing_context %>%
   head() %>%
@@ -726,19 +727,16 @@ my_words <- c("wage", "enjoyment", "love", "universal", "desire")
 
 # find the tfidf scores for my words by looking in previous data
 my_words_w_tfidf <- tfidf_per_top_slavery_speaker_1833 %>% 
-  filter(speaker == "Mr. Buckingham", word %in% my_words) %>% # find just words in my list spoken by Mr. Buckingham
+  filter(speaker == "Mr. Buckingham", word %in% my_words) %>% # find words spoken by Mr. Buckingham
   ungroup() %>% # necessary because the previous dataset was grouped
   select(word, n, tf_idf) %>% # retain three columns
   mutate(tf_idf = round(tf_idf, 4)) # round tf-idf to four decimal places
 
 # make a table
-kable(
-  my_words_w_tfidf,
-  format = "latex",
-  booktabs = TRUE,
-  caption = "Some of Mr. Buckingham's Most Distinctive Words in the Debates About Slavery"
-)
-
+kable(my_words_w_tfidf,
+      format = "latex",
+      booktabs = TRUE,
+      caption = "Some of Mr. Buckingham's Most Distinctive Words in Debates About Slavery")
 ```
 
 As to the substance of the argument, we have most of the interpretive work above in the sentences that move, word by word, through a synopsis of the arguments Buckingham made about slavery, through his use of the words "desire" and "universal" to sketch out the enlightenment system of perfection that he believed made immediate abolition both inevitable and desirable, and finally through his identification of "wages" as the crucial mechanism that made it possible for men's willingness to endure dangerous work to be rewarded and thus workers to be incentivized to learn and apply themselves -- something slavery could not provide. We might cut and paste into a new series of paragraphs our piecemeal analyses above of words in context. We might reshape the resulting paragraph with topic and concluding sentences into a series of arguments supported by evidence. The resulting argument, based on the actual words of the primary text, will be -- above all -- highly persuasive, because it is composed solely of arguments and pieces of evidence, each argument corresponding to a series of pieces of evidence.  
@@ -811,12 +809,14 @@ peel_speeches <- peel_base %>%
   mutate(speech = paste0(speechdate, ": ", toupper(speaker), " ", speech)) %>%
   select(speech)
 
-kable(peel_speeches,
-      format = "latex",
-      booktabs = TRUE,
-      col.names = "",
-      caption = "Three Speeches by Buckingham about Slavery That Invoke the Word 'Wages'") %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
+peel_speeches %>%
+  head() %>%
+  mutate(text = str_trunc(speech, 120)) %>% 
+  kable("latex", 
+        booktabs = TRUE, 
+        caption = "Three Speeches by Buckingham about Slavery That Invoke the Word 'Wages'") %>%
+  kable_styling(full_width = FALSE, position = "left") %>%
+  column_spec(2, width = "4cm") 
 ```
 
 In the three speeches above, we find Peel invoking the colonial assemblies of the West Indies in order to defend the principle of independent democracies being entitled to make their own laws, unhindered by empire -- even when the laws contained principles so odious as that of the enslavement of human beings. 

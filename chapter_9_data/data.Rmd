@@ -686,7 +686,8 @@ While effective, writing our own regular expression-based approaches to data cle
 
 ```{r}
 # Messy string
-messy_string <- " <p>We!!!   can clean   messy--<b> text using </b>.. ,    regular expressions </p> "
+messy_string <- paste0("<p>We!!!   can clean   messy--", 
+                       "<b> text using </b>.. ,    regular expressions </p>")
 
 # Clean it with a complex regex pipeline that
 # removes all HTML tags
@@ -721,7 +722,9 @@ library("stringr")
 # Remove HTML tags
 messy_string <- gsub("<[^>]+>", "", messy_string)
 
-# Replace multiple punctuation marks with a space (put hyphen first or last to avoid range error)
+# Replace multiple punctuation marks with a space 
+# (put hyphen first or last to avoid an error where the code
+# goes out of range
 messy_string <- gsub("[-!.,]+", " ", messy_string)
 
 # Collapse multiple spaces and trim
@@ -853,9 +856,21 @@ The "occupation" column (which records the species’ conservation status—e.g.
 library("tidyverse")
 
 census <- tibble(
-  name = c("Mary Jenkins", "Samuel Price", "Hannah Lee", "Charles Morton", "Unnamed Child"),
-  occupation = c("washerwoman", NA, "seamstress", "laborer", NA),
-  age = c(32, 44, 29, 51, 1))
+  name = c("Mary Jenkins", 
+           "Samuel Price", 
+           "Hannah Lee", 
+           "Charles Morton", 
+           "Unnamed Child"),
+  occupation = c("washerwoman", 
+                 NA, 
+                 "seamstress", 
+                 "laborer", 
+                 NA),
+  age = c(32, 
+          44, 
+          29, 
+          51, 
+          1))
 ```
 
 ```{r}
@@ -901,7 +916,8 @@ Lists are an important data type in R that also function as a data structure (de
 Here, we define a list of continent names followed by their approximate population in millions. 
 
 ```{r}
-continents_population <- list('South America', 644.54, 'Africa', 1305, 'Europe', 745.64, 'Asia', 4587)
+continents_population <- list('South America', 644.54, 'Africa', 1305, 'Europe', 
+                              745.64, 'Asia', 4587)
 ```
 
 ```{r}
@@ -1024,10 +1040,8 @@ Wrangling diverse data structures into the tidy format can be frustrating, but l
 Here is a guide for extracting data from the most common text-based software packages in R and their outputs.
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-library("dplyr")
 library("rlang")
-library("gt")
-library("tibble")
+library("kableExtra")
 
 md_col <- function(tbl, col) {
   col <- rlang::ensym(col)
@@ -1132,18 +1146,15 @@ use <- c("Makes many text objects tidy (DTMs, LDA, etc.)",
          "Tokenization (splitting text into units, e.g., words or n-grams)",
          "Tidy output from models (including `topicmodels`)")
 
-# Safety check so knit fails early if a copy/paste ever drops an item
-stopifnot(length(tools) == length(use))
-
-tidyverse_tools_tbl <- tibble(
-  `Tool/Package` = tools,
-  Use = use
-)
+tidyverse_tools_tbl <- tibble(`Tool/Package` = tools,
+                              Use = use)
 
 tidyverse_tools_tbl %>%
-  md_col(Use) %>%
-  gt() %>%
-  tab_header(title = "Helpful Tidyverse-Compatible Tools")
+  kable(format = "latex", 
+        booktabs = TRUE,
+        escape = TRUE) %>%
+  kable_styling(full_width = FALSE, position = "left") %>%
+  add_header_above(c("Helpful Tidyverse-Compatible Tools" = ncol(tidyverse_tools_tbl)))
 ```
 
 # Conclusion
