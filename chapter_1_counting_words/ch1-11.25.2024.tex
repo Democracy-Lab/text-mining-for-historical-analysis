@@ -755,13 +755,10 @@ this case, ``word'' from the tokenized hansard data.
 \NormalTok{tokenized\_hansard\_counts }\OtherTok{\textless{}{-}}\NormalTok{ tokenized\_hansard }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Create a new data frame }
   \FunctionTok{count}\NormalTok{(word) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# count how many times each word appears}
   \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(n)) }\CommentTok{\# sort the results in descending order of frequency}
+
+\FunctionTok{head}\NormalTok{(tokenized\_hansard\_counts)}
 \end{Highlighting}
 \end{Shaded}
-
-With the command \texttt{arrange(desc(n))}, we tell the computer to
-arrange the results from greatest to least. We perform this step so that
-the results are easier to read, not because this step is necessary for
-counting words.
 
 \begin{verbatim}
 ##   word       n
@@ -772,6 +769,11 @@ counting words.
 ## 5  and  706117
 ## 6   in  597753
 \end{verbatim}
+
+With the command \texttt{arrange(desc(n))}, we tell the computer to
+arrange the results from greatest to least. We perform this step so that
+the results are easier to read, not because this step is necessary for
+counting words.
 
 We now have a frequency count of every word recorded in the speeches of
 Hansard, 1850-59. The initial results are unimpressive. In our dataset,
@@ -788,9 +790,18 @@ in the first dataset that do not have a match in the second dataset.
 Using \texttt{anti\_join()} we can remove words we do not want in our
 analysis from our data.
 
-\begin{verbatim}
-## Joining with `by = join_by(word)`
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# load tidytext\textquotesingle{}s dataset of common stop words}
+\FunctionTok{data}\NormalTok{(}\StringTok{"stop\_words"}\NormalTok{)}
+
+\CommentTok{\# remove common stop words from the tokenized word counts}
+\NormalTok{stopworded\_hansard\_counts }\OtherTok{\textless{}{-}}\NormalTok{ tokenized\_hansard\_counts }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# create a new data frame }
+  \FunctionTok{anti\_join}\NormalTok{(stop\_words) }\CommentTok{\# exclude words that appear in the stop\_words dataset}
+
+\FunctionTok{head}\NormalTok{(stopworded\_hansard\_counts)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{verbatim}
 ##         word      n
@@ -1140,10 +1151,6 @@ The following code chains multiple data processing steps together.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Joining with `by = join_by(word)`
-\end{verbatim}
-
 Instead of running these functions independently, we have chosen to
 chain them together with the pipe, \texttt{\%\textgreater{}\%},
 operator. Using the pipe allows us to use many functions sequentially
@@ -1196,15 +1203,7 @@ throughout this book.
 \CommentTok{\# this will be used to limit the plot to the most relevant terms}
 \NormalTok{top\_coal }\OtherTok{\textless{}{-}}\NormalTok{ coal\_context }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{top\_n}\NormalTok{(}\DecValTok{20}\NormalTok{)  }\CommentTok{\# top 20 words}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Selecting by n
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\# create a horizontal bar chart of word frequencies}
 \CommentTok{\# this visualizes the most common terms in coal{-}related sentences}
 \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ top\_coal) }\SpecialCharTok{+}  
@@ -1218,7 +1217,7 @@ throughout this book.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-27-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-26-1}
 
 The resulting bar chart shows us the number of times ``coal'' was
 mentioned, as well as the top words that appear with coal. Note that
@@ -1294,15 +1293,7 @@ makes this context easier to apprehend.
 \CommentTok{\# this subset will be used to visualize the most relevant terms}
 \NormalTok{top\_corn }\OtherTok{\textless{}{-}}\NormalTok{ corn\_context }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{top\_n}\NormalTok{(}\DecValTok{20}\NormalTok{)  }\CommentTok{\# top 20 words}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Selecting by n
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{\# create a horizontal bar plot showing word frequencies}
 \CommentTok{\# this plot highlights the most common words in sentences mentioning "corn"}
 \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ top\_corn) }\SpecialCharTok{+}
@@ -1316,7 +1307,7 @@ makes this context easier to apprehend.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-29-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-28-1}
 
 Comparison between the words used in the context of coal and corn gives
 us a foothold for beginning to think about how taxation was discussed in
@@ -1412,11 +1403,12 @@ speeches are aligned with their correct dates.
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_trunc}\NormalTok{(text, }\DecValTok{120}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# optional: shorten long lines}
   \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{position =} \StringTok{"left"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)    }\CommentTok{\# wrap the "text" column}
+  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"7cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# wrap the "text" column}
+  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{tabular}{l>{\raggedright\arraybackslash}p{4cm}ll}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{7cm}l>{\raggedright\arraybackslash}p{4cm}}
 \toprule
 sentence\_id & text & speechdate & debate\\
 \midrule
@@ -1600,7 +1592,7 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-36-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-35-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1609,7 +1601,7 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-37-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-36-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1618,7 +1610,7 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-38-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-37-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1627,7 +1619,7 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-39-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-38-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1636,7 +1628,7 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-40-1}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-39-1}
 
 Producing many graphs in succession can be useful for exploratory data
 analysis. Performing a comparative analysis of graphs side-by-side is
@@ -1999,139 +1991,5 @@ trying the following exercises:
   words but not others? What do we learn from this exercise about the
   prejudices of Britain's members of parliament in the 1850s?
 \end{enumerate}
-
-\subsection{Practicing with AI}\label{practicing-with-ai}
-
-Working through the process of writing your own code step-by-step
-provides insight into the underlying concepts and processes behind
-working with text as data. Understanding the premise behind syntax,
-functions, and how they tie back to data processing enables us to
-actualize our analytic goals. With this knowledge of data processing we
-can begin to use AI chatbots in a meaningful and critical away. Here, we
-iterate on our analyses by practicing with the AI chatbot, ChatGPT. In
-future chapters we will engage different AI chatbots, like open source
-ones.
-
-This chapter has demonstrated how to perform exploratory data analysis,
-a process through which we construct a high-level overview of the
-corpus, engage in iterative refinement, and draw upon preliminary
-findings to inform more focused, in-depth investigations. We can also
-use AI chatbots in this process by facilitating brainstorming and
-supporting iterative analysis through the automation of tasks. For
-instance, in this chapter we removed stop words (e.g., ``the'' or
-``and'') from our dataset, which significantly improved the clarity of
-our results. We can also use ChatGPT to generate additional stop words,
-specifically attuned to the linguistic characteristics of 19th-century
-Hansard.
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
-Act like an R Programmer and generate a list of stopwords to be removed for an analysis of the 19th-century Hansard corpus.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-\begin{verbatim}
-custom_stopwords <- c("lord", "lords", "hon", "mr", "sir", "gentleman", "gentlemen",
-                      "speaker", "right", "honourable", "house", "parliament", 
-                      "minister", "bill", "member", "question", "motion", "committee", 
-                      "government", "debate", "order", "division", "clause")
-\end{verbatim}
-\end{tcolorbox}
-
-Before removing the stop words, we can think critically about whether or
-not the generated results align with our own analytic goals. We may, for
-example, want to keep the word ``government'' if we wanted to analyze
-this word's collocates.
-
-Throughout this book we will explore multiple different ways we can use
-AI chatbots to the benefit of our workflows. For example, we can also
-use it during brainstorming to help us decide which keywords we may want
-to analyze.
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt]
-I want to text mine and analyze heated topics from within the 1850 Hansard Parliamentary debates. Suggest several keywords that might be interesting.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-When analyzing the 1850 Hansard Parliamentary debates for heated topics, you'll want to focus on issues that were contentious or widely discussed at the time. Here are some keyword suggestions:
-
-\textbf{Corn Laws} – Although the Corn Laws were repealed in 1846, the economic and social impacts continued to be a hot topic of debate.
-
-\textbf{Irish Famine} – The Great Irish Famine (1845–1852) was a significant issue, particularly regarding the British government's response.
-
-\textbf{Chartism} – Though the Chartist movement had declined by 1850, discussions about labor rights, suffrage, and political reform were still prevalent.
-
-\textbf{Poor Law} – The administration and reform of the Poor Laws were highly debated, particularly in relation to poverty and public welfare.
-
-\textbf{Colonial Governance} – Issues around the governance and management of British colonies, particularly in places like India and Ireland.
-
-\textbf{Free Trade} – Discussions around free trade policies, especially in the aftermath of the Corn Laws repeal.
-
-\textbf{Slavery} – Although the British Empire abolished slavery in 1833, discussions about slavery and the slave trade (particularly in relation to other nations) continued.
-
-\textbf{Catholic Emancipation} – Ongoing debates about the rights of Catholics in Britain and Ireland.
-
-\textbf{Industrialization} – Issues related to the rapid industrialization of Britain, including worker rights, factory conditions, and urbanization.
-
-\textbf{Public Health} – Particularly in the context of the cholera outbreaks and the general health of the urban poor.
- 
-These keywords should help you identify debates that were particularly heated or significant during that time. You can further refine your analysis by focusing on specific phrases or related terms within these broader topics.
-\end{tcolorbox}
-
-This response provides us with an overview of other critical,
-interrelated topics. Treating these debate topics as keywords can lead
-to additional, meaningful analyses. To demonstrate this, we will use the
-code introduced previously in the chapter to identify the context for
-the word ``Irish''
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{irish\_context }\OtherTok{\textless{}{-}}\NormalTok{ hansard\_1850 }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{filter}\NormalTok{(}\FunctionTok{str\_detect}\NormalTok{(text, }\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{bIrish}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{b"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{unnest\_tokens}\NormalTok{(word, text) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{anti\_join}\NormalTok{(stop\_words) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{str\_detect}\NormalTok{(word, }\StringTok{"[:digit:]"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{count}\NormalTok{(word) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(n))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{top\_irish }\OtherTok{\textless{}{-}}\NormalTok{ irish\_context  }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{top\_n}\NormalTok{(}\DecValTok{20}\NormalTok{)}
-
-\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ top\_irish) }\SpecialCharTok{+}
-  \FunctionTok{geom\_col}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(word, n), }
-               \AttributeTok{y =}\NormalTok{ n),}
-           \AttributeTok{fill =} \StringTok{"steel blue"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Top Words Occuring in Sentences Mentioning Irish"}\NormalTok{,}
-       \AttributeTok{subtitle =} \StringTok{"From the 1850 Hansard debates"}\NormalTok{,}
-       \AttributeTok{x =} \StringTok{"Word"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"Count"}\NormalTok{) }
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-49-1}
-
-In this chapter, we used computational historical thinking as a method
-for examining change over time. We integrated historical theory, code,
-and artificial intelligence (AI) in a hybrid method of analysis. This
-method is co-creative: it brings attention to how data processing
-techniques shape historical analysis, while also recognizing that
-interpretive insights can lead us to revise our computational approach.
-In doing so, it emphasizes the dynamic interplay between computation and
-historical interpretation.
-
-In the chapters that follow, we will build on this foundation by
-introducing more advanced techniques. We will also critically examine
-how AI is used in historical research. A key question we will explore is
-whether current AI chatbots can generate meaningful historical
-interpretations of 19th-century Parliamentary debates.
-
-While AI offers powerful tools for exploratory analysis, we will also
-examine the limitations of using AI chatbots as an approach to
-computational text analysis, including the conditions under which they
-may produce inaccurate or misleading interpretations of history.
 
 \end{document}

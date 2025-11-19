@@ -1,5 +1,5 @@
 ---
-title: "Chapter 5: Decoding Grammar to Uncover the Language of Agency"
+title: "Chapter 7: Decoding Grammar to Uncover the Language of Agency"
 output: pdf_document
 fontsize: 11pt
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
@@ -18,7 +18,7 @@ Language change does not only happen at the level of individual words or phrases
 
 In this chapter, we focus on how gendered power relations are constructed and reflected through syntactic structures, particularly in the ways language encodes positionality, that is, the context that shapes a person’s access to--or lack of--power in a society. We are not the first to recognize that grammar, and syntax in particular, plays a foundational role in shaping the expression of gender, and can serve to empower, constrain, naturalize, or delegitimize people. The basis of Feminist theory is in part built upon the idea that the structures of language both reveal and reinforce gendered expressions of power, making syntax a critical site for analyzing power dynamics as produced through discourse.
 
-Foundational feminist theorists including Hélène Cixous, Luce Irigaray, and Monique Wittig each approach the politics of syntax from distinct angles. Cixous critiques conventional syntactic forms—such as subject-verb-object constructions—as mirroring the rigid hierarchies of patriarchal political order. She calls for forms of writing that defy linear structure and fixed meaning, arguing that fluid, disruptive syntax resists systems in which agency is centralized in a dominant (often male) subject and others are relegated to passive roles. Luce Irigaray, in contrast, interrogates the deeper structural logic of discourse itself. She argues that fundamentally masculine forms of discourse structure what we might call the “syntax” of social and political systems -- even structuring thinking itself. These systems reproduce the male subject as the universal norm and language and politics will remain systems of masculine self-reproduction. Monique Wittig argues that language doesn’t just reflect gendered hierarchies—it actively produces them. For Wittig, the very category of “woman” is a political fiction sustained through language and syntax that encode heterosexual norms. Rather than seek a “feminine” alternative, Wittig calls for the destruction of the linguistic structures that make gender seem natural. Language, she insists, must be politically rewritten to dismantle the binary logic on which patriarchy depends.
+Foundational feminist theorists including Hélène Cixous, Luce Irigaray, and Monique Wittig each approach the politics of syntax from distinct angles. Cixous critiques conventional syntactic forms—such as subject-verb-object constructions—as mirroring the rigid hierarchies of patriarchal political order (1976). She calls for forms of writing that defy linear structure and fixed meaning, arguing that fluid, disruptive syntax resists systems in which agency is centralized in a dominant (often male) subject and others are relegated to passive roles. Luce Irigaray, in contrast, interrogates the deeper structural logic of discourse itself (1985). She argues that fundamentally masculine forms of discourse structure what we might call the “syntax” of social and political systems -- even structuring thinking itself. These systems reproduce the male subject as the universal norm and language and politics will remain systems of masculine self-reproduction. Monique Wittig argues that language doesn’t just reflect gendered hierarchies—it actively produces them (1992). For Wittig, the very category of syntax is a political fiction sustained through language that encode heterosexual norms. Rather than seek a "feminine" alternative to syntax, Wittig calls for the destruction of the linguistic structures that make gender seem natural. Language, she insists, must be politically rewritten to dismantle the binary logic on which patriarchy depends.
 
 These theories offer a powerful lens through which to understand the stakes of grammatical part-of-speech analysis in historical texts. The Nineteenth-century Hansard represents an enormous opportunity in this regard; as a collection of political debates between men, Hansard has been minimally engaged as a resource for understanding how gender norms were perpetuated. Yet as feminist historians have long understood, parliament played a massive role in structuring women's experience, from the Laws of Coverture to the Matrimonial Clauses Act (1857), the Married Women's Property Acts (1870-1882), the Contagious Disease Acts (1864-69) and women's right to vote in the UK (1918-28) (Rackley and Auchmuty 2019, Kent 1999, Griffin 2012). Feminist historians have shown how, in the debates around the Contagious Diseases Acts, women were portrayed as both powerless and degraded, yet also as potentially threatening (Walkowitz, 1970, p. 4). 
 
@@ -38,7 +38,7 @@ When we speak of "syntax" as having a role in perpetuating political points of v
 
 Feminist theorists have shown that from Victorian novels to twentieth-century cinema, the gaze was often gendered. The masculine gaze refers to a way of positioning women as objects to be looked at, evaluated, or acted upon—typically through a masculine perspective that exerts social power. The roots of this theory stem from cinema studies. Laura Mulvey famously argues in "Visual Pleasure and Narrative Cinema" (1975) that cinema positions the viewer as male and women as passive objects of visual pleasure. However, Mulvey's argument has since been widely extended to the study of literature, history, and language in which the male subject functions as a mechanism of visual and narrative control, framing women as passive subjects of observation rather than active agents (Mulvey 1975). Here we will demonstrate that a similar pattern can be identified through syntactic analysis. 
 
-With text mining, we have the opportunity to test whether the subjects who gaze are always gendered male and the subjects who are gazed at are always gendered female. We can ask a computer to extract every instance of the word "gaze" and the pronouns associated with it, even when it is presented in different grammatical forms, such as "will gaze at him/her," or "gazing at him/her." Next, we can quantify the number of times the word "gaze" was applied to "her" versus to the number of times "gaze" was applied to "him." Part-of-speech extraction thus allows the analyst to aggregate a great deal of information about any given verb: when it arises, who uses it, and what other words are used in a similar context. The same technique can be applied to all verbs in a given corpus, and so give a portrait of *who* is doing the action and who receives the action in the minds of people associated with an institution. 
+With text mining, we have the opportunity to test whether the subjects who gaze are always gendered male and the subjects who are gazed at are always gendered female. We can ask a computer to extract every instance of the word "gaze" and the pronouns associated with it, even when it is presented in different grammatical forms, such as "will gaze at him/her," or "gazing at him/her." Next, we can quantify the number of times the word "gaze" was applied to "her" versus to the number of times "gaze" was applied to "him." Part-of-speech extraction thus allows the analyst to aggregate a great deal of information about any given verb: when it arises, who uses it, and what other words are used in a similar context. The same technique can be applied to all verbs in a given corpus, and so give a portrait of who is doing the action and who receives the action in the minds of people associated with an institution. 
 
 In digital literary studies, part-of-speech (PoS) extraction has been widely used to analyze gender within text, for instance, by allowing scholars to count the number of times female and male characters are referred to, either by name or by pronoun (Chen 2020, Kraicer and Piper 2018, Underwood et. al 2018). The process of breaking prose into discrete linguistic units and then using these units to guide analysis has previously been described as a form of "reductive reading" (Allison 2018). However, this characterization has primarily been applied to the bag-of-words (BoW) approach to text analysis, in which words are counted without consideration of their grammatical context or their syntactic relations (Arnold 2019). In this chapter, we seek to extend this line of inquiry by making a distinction between "part-of-speech extraction," which tags and analyzes parts-of-speech without regard to grammar, and "grammatical part-of-speech extraction," which accounts for the syntactic relationships between words, incorporating grammatical rules to determine the function of each part-of-speech within a sentence. 
 
@@ -119,13 +119,16 @@ spacy_initialize(model = "en_core_web_sm") # load the English model
 
 In each future session, we will need to not only load the spacyr library, but also initialize the model like so: 
 
-```{r, message=FALSE, warning=FALSE}
-# Entire startup for future sessions
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+library(spacyr)
+
+invisible(spacy_initialize(model = "en_core_web_sm"))
+```
+
+```{r, eval=FALSE}
 library(spacyr) # load the library
 
 spacy_initialize(model = "en_core_web_sm") # load the English model
-
-library(kableExtra)
 ```
 
 ### `spacyr` in Action: Outlining the Dependency Grammar of a Single Sentence
@@ -164,14 +167,17 @@ The specifics of what system women were submitting to, or why women must "submit
 
 Figure 1 shows a dependency tree generated by `spacyr`, where each word is connected to its head by a directed arc. These arcs indicate the type of grammatical relationship between the words—such as subject, object, or modifier—with the direction of the arc pointing from the head to the dependent (child).
 
-```{r pos-image, fig.align='center', fig.width=6, echo=FALSE, message=FALSE, warning=FALSE}
+```{r pos-image, fig.align='center', fig.width=2, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+
 url <- "https://raw.githubusercontent.com/Democracy-Lab/text-mining-for-historical-analysis/main/chapter_7_decoding_grammar_agency_gender/pos_spacy_tmha_example.jpg"
+
 dest <- "pos_spacy_tmha_example.jpg"
 
 if (!file.exists(dest)) {
   download.file(url, dest, mode = "wb") }
 
-knitr::include_graphics(dest)
+include_graphics(dest)
 ```
 
 In this example, the head of the verb "submitting" is the subject "women." The verb "submitting" also has multiple children: "themselves," "voluntarily," and "to." The head of the adjective "medical" is the object "examination." The head can vary based on the type of phrase or clause. For instance, in noun phrases, the noun is typically the head, while in verb phrases, the verb often functions as the head. With an understanding of how `spacyr` processes linguistic data, we can now use it to parse our Hansard data and extract parts-of-speech with a more critical eye.  
@@ -208,6 +214,8 @@ head(parsed_hansard_woman)
 `spacy_parse()` returns a new data frame in which each row represents an individual token from the text. This data now includes the token's part-of-speech (POS) tag and syntactic dependency, which can be used for further analysis. For instance, I can filter and count to find the top adjectives stated in the Hansard sentences containing the word "woman" or "women." 
 
 ```{r}
+library(kableExtra)
+
 # Filter for just words tagged by spacyr as adjectives 
 adjectives <- filter(parsed_hansard_woman, pos == "ADJ")
 
@@ -424,7 +432,7 @@ grid.arrange(tableGrob(adjective_noun_pair_counts_man[1:15, ]),
 
 To compare the words used of each gender, the appropriate next step is to make a list of just the adjectives and to subtract the counts for one gender from the counts for the other.  This step, known as "vector subtraction," will reveal the words that are most distinctive of each gender.
 
-```{r fig.height=12, fig.width=8}
+```{r, message=FALSE, fig.height=12, fig.width=8}
 # Vector subtraction: words applied to men vs words applied to women
 
 # extract just the adjectives used to describe men
@@ -445,9 +453,9 @@ comparison <- full_join(man_adjectives, woman_adjectives, by = "adjective",
          count_diff = count_2 - count_1) %>% # subtract men's count from women's
   filter(count_diff!=0) # delete all entries where there is no difference
 
-# In this dataset, there are a large number of adjectives with a count of two. 
-# We will therefore "sample" from the results to draw our visualization. 
-# This means that every time the visualization below is redrawn, different results will appear.  
+# In this dataset, there are a large number of adjectives with a count of two
+# We will therefore "sample" from the results to draw our visualization
+# This means each regeneration of the visualization will produce different results.
 
 # take the top adjectives unique to women
 positive_sample <- comparison %>%
@@ -485,69 +493,80 @@ filtered_df %>%
   geom_hline(yintercept = 0, color = "black")
 ```
 
-```{r, message=FALSE, warning=FALSE}
-#library(gt)
-#library(htmltools)
+```{r, message=FALSE, warning=FALSE, results='asis'}
 
 # take the top adjectives unique to men; because there are so many with a max of 2, sample some positives
-#positive_sample <- comparison %>%
-#  filter(count_diff > 0) %>%
-#  arrange(desc(count_diff)) %>%
-#  top_n(20) %>%
-#  mutate(Category = "Women", Color = "blue")
+positive_sample <- comparison %>%
+  filter(count_diff > 0) %>%
+  arrange(desc(count_diff)) %>%
+  top_n(20) %>%
+  mutate(Category = "Women", Color = "blue")
 
 # take the top adjectives unique to women
-#negative_sample <- comparison %>%
-#  filter(count_diff < 0) %>%
-#  top_n(-20) %>%
-#  mutate(Category = "Men", Color = "red")
+negative_sample <- comparison %>%
+  filter(count_diff < 0) %>%
+  top_n(-20) %>%
+  mutate(Category = "Men", Color = "red")
 
 # combine men and women
-#filtered_df <- negative_sample %>%
-#  bind_rows(positive_sample) %>%
-#  mutate(adjective = fct_reorder(adjective, count_diff)) %>%
-#  arrange(desc(count_diff)) %>%
-#  select(adjective, count_diff, Category, Color) %>%
-#  arrange(desc(abs(count_diff))) %>%
-#  mutate(adjective = fct_reorder(adjective, count_diff))
+filtered_df <- negative_sample %>%
+  bind_rows(positive_sample) %>%
+  mutate(adjective = fct_reorder(adjective, count_diff)) %>%
+  arrange(desc(count_diff)) %>%
+  select(adjective, count_diff, Category, Color) %>%
+  arrange(desc(abs(count_diff))) %>%
+  mutate(adjective = fct_reorder(adjective, count_diff))
 
-# Function to generate a single gt table
-#make_gt_table <- function(data_slice) {
-#  data_slice %>%
-#    gt() %>%
-#    cols_label(
-#      adjective = "Adjective",
-#      count_diff = "Count Difference",
-#      Category = "Used More About"
-#    ) %>%
-#    text_transform(
-#      locations = cells_body(vars(Category)),
-#      fn = function(x) {
-#        color_map <- ifelse(x == "Women", "blue", "red")
-#        mapply(function(txt, col) {
-#          HTML(
-#            paste0("<span style='color:", col, "'>", txt, "</span>")) }, x, color_map) })}
+make_kable_table <- function(data_slice) {
+  data_slice %>%
+    mutate(
+      `Used More About` = if_else(
+        Category == "Women",
+        cell_spec(Category, format = "latex", color = "blue"),
+        cell_spec(Category, format = "latex", color = "red")
+      )
+    ) %>%
+    select(
+      Adjective        = adjective,
+      `Count Difference` = count_diff,
+      `Used More About`
+    ) %>%
+    kable(
+      format   = "latex",
+      booktabs = TRUE,
+      escape   = FALSE
+    ) %>%
+    kable_styling(
+      full_width = FALSE,
+      position   = "center",
+      font_size  = 7
+    )
+}
 
-# Create three slices
-#table1 <- make_gt_table(filtered_df %>% 
-#                          slice(1:200))
 
-#table2 <- make_gt_table(filtered_df %>% 
-#                          slice(101:200))
+table1 <- make_kable_table(filtered_df %>% 
+                             slice(1:100))
 
-#table3 <- make_gt_table(filtered_df %>% 
-#                          slice(201:300))
+table2 <- make_kable_table(filtered_df %>% 
+                             slice(101:200))
 
-#browsable(tagList(tags$div(style = "display: flex; gap: 20px;",
-#             tags$div(style = "flex: 1;", table1),
-#             tags$div(style = "flex: 1;", table2),
-#             tags$div(style = "flex: 1;", table3))))
+table3 <- make_kable_table(filtered_df %>% 
+                             slice(201:300))
+```
 
-library(knitr)
-library(kableExtra)
+```{r}
+table1
+```
 
-# ---- Build comparison subset ----
+```{r}
+table2
+```
 
+```{r}
+table3
+```
+
+```{r}
 # top adjectives used more about women (count_diff > 0)
 positive_sample <- comparison %>%
   filter(count_diff > 0) %>%
@@ -569,17 +588,13 @@ filtered_df <- bind_rows(positive_sample, negative_sample) %>%
   arrange(Category, desc(abs(count_diff))) %>%
   select(adjective, count_diff, Category)
 
-# ---- Function to generate a single kable table ----
-
 make_kable_table <- function(data_slice) {
   data_slice %>%
     mutate(
       UsedMoreAbout = if_else(
         Category == "Women",
         cell_spec(Category, format = "latex", color = "blue"),
-        cell_spec(Category, format = "latex", color = "red")
-      )
-    ) %>%
+        cell_spec(Category, format = "latex", color = "red"))) %>%
     select(
       Adjective = adjective,
       `Count Difference` = count_diff,
@@ -596,28 +611,33 @@ make_kable_table <- function(data_slice) {
 # ---- Create slices (adjust ranges as needed) ----
 # If you have fewer rows, make these smaller (e.g., 1:20, 21:40, etc.)
 
-table1 <- make_kable_table(filtered_df %>% slice(1:200))
-table2 <- make_kable_table(filtered_df %>% slice(201:400))
-table3 <- make_kable_table(filtered_df %>% slice(401:600))
+table1 <- make_kable_table(filtered_df %>% 
+                             slice(1:200))
 
-# In your Rmd, print them in separate chunks, e.g.:
-# ```{r}
-# table1
-# ```
-# ```{r}
-# table2
-# ```
-# ```{r}
-# table3
-# ```
+table2 <- make_kable_table(filtered_df %>% 
+                             slice(201:400))
 
+table3 <- make_kable_table(filtered_df %>% 
+                             slice(401:600))
+```
+
+```{r}
+table1
+```
+
+```{r}
+table2
+```
+
+```{r}
+table3
 ```
 
 When tested, we find that there are very few words that are used much more often to refer to one gender than the other, and those that there are occur quite rarely -- a maximum of two times over all of the 1860s. These small numbers are a warning against overinterpreting our findings. Nevertheless, the differences are instructive.  Along with being "pregnant," women are more likely to be depicted as vulnerable -- "forlorn," "delicate," "forlorn," "deserted," "destitute" -- and as an aesthetic object of desire -- "charming," "attractive," "ideal," "passionate." When women are depicted as dangerous, they show a surplus of passion; they are "angry," "infuriat[ing]." Men are more likely to be assigned virtues of character ("intellectual," "enterprising," "courageous," "determined," "devoted," "humble," "honourable," "holy," "reasonable," "scrupulous") or capacity ("sturdy," "hale," "robust," "strongest) -- or vices that show them as agents ("dangerous," "evil," "selfish," "reckless") or as having had their agency temporarily taken away ("aggrieved", "inefficient," "ignorant").  
 
 These findings confirm that members of parliament articulated a gendered politics of agency as they discussed the matters of their day -- assigning agency as the entitled domain of one gender, and vulnerability as characteristic of the other. While these findings may not be unexpected, they nonetheless affirm that our methodological approach can mirror established understandings of the period. At the same time, the results offer a different vantage point into the debates. Comparing the two visualizations side-by-side perhaps emphasizes the difference in the ways in which parliamentarian's imagined men and women. 
 
-### Extracting Simple Subject-Verb-Object Triples
+## Extracting Simple Subject-Verb-Object Triples
 
 Extracting subject-verb-object (SVO) triples can provide another pattern through which we can understand the relationships and actions within a sentence, enabling analysis of agency and interactions between entities. Adjective-noun pairs, while useful for identifying descriptive attributes, lack this relational context and may not capture the dynamics of who is doing what, and to whom.
 
@@ -641,9 +661,9 @@ hansard_woman_1870 <- hansard_1870 %>%
   filter(str_detect(text, regex("woman|women", ignore_case = T)))
 
 parsed_hansard_woman_1870 <- spacy_parse(hansard_woman_1870$text, 
-                                    dep = TRUE, 
-                                    lemma = TRUE, 
-                                    entity = FALSE)
+                                         dep = TRUE, 
+                                         lemma = TRUE, 
+                                         entity = FALSE)
 
 head(parsed_hansard_woman_1870)
 ```
@@ -655,7 +675,7 @@ A single sentence can contain multiple subjects, verbs, and objects, but not all
 Instead of matching raw tokens we match on lemmas. Lemmas are the "base" forms of words — their simplest and most fundamental forms, without any inflectional changes. Inflection refers to grammatical modifications of a word, such as changes in tense, case, or number. For example, "run," "runs," and "ran" are inflectional variations of the same base word, or lemma, "run." By shifting to lemma-based matching, we reduce the variability in the extracted triples. This approach unifies different forms of the same word, enabling us to identify broader patterns. As a result, our text analysis becomes more comprehensive for our purposes by focusing on the underlying meaning of the triples rather than their morphological variations.
 
 ```{r}
-get_simple_lemmatized_svo_triples <- function(parsed_data){
+get_simple_lemmatized_triples <- function(parsed_data) {
   svo_triples <- parsed_data %>%
     group_by(doc_id, sentence_id) %>%
     
@@ -668,36 +688,31 @@ get_simple_lemmatized_svo_triples <- function(parsed_data){
     ungroup() %>%
     
     # Join with subject tokens
-    left_join(
-      parsed_data %>%
-        filter(dep_rel %in% c("nsubj", "nsubjpass")) %>%
-        select(doc_id, 
-               sentence_id, 
-               head_token_id, 
-               subject = lemma),
-      by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
-      relationship = "many-to-many") %>%
+    left_join(parsed_data %>%
+                filter(dep_rel %in% c("nsubj", "nsubjpass")) %>%
+                select(doc_id, 
+                       sentence_id, 
+                       head_token_id, 
+                       subject = lemma),
+              by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
+              relationship = "many-to-many") %>%
     
     # Join with object tokens
-    left_join(
-      parsed_data %>%
-        filter(dep_rel %in% c("dobj", "obj", "pobj", "iobj")) %>%
-        select(doc_id, 
-               sentence_id, 
-               head_token_id, 
-               object = lemma),
-      by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
-      relationship = "many-to-many") %>%
+    left_join(parsed_data %>%
+                filter(dep_rel %in% c("dobj", "obj", "pobj", "iobj")) %>%
+                select(doc_id, 
+                       sentence_id, 
+                       head_token_id, 
+                       object = lemma),
+              by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
+              relationship = "many-to-many") %>%
     
     # Combine SVO into a single string for readability, skipping NAs
-    mutate(
-      svo_triple = paste(
-        if_else(is.na(subject), "", subject),
-        if_else(is.na(verb), "", verb),
-        if_else(is.na(object), "", object),
-        sep = " "),
-      # Remove excess white space
-      svo_triple = str_squish(svo_triple)) %>%
+    mutate(svo_triple = paste(if_else(is.na(subject), "", subject),
+                              if_else(is.na(verb), "", verb),
+                              if_else(is.na(object), "", object),
+                              sep = " "),
+           svo_triple = str_squish(svo_triple)) %>% # Remove excess white space
     
     filter(!is.na(subject),
            !is.na(verb),
@@ -710,7 +725,7 @@ get_simple_lemmatized_svo_triples <- function(parsed_data){
 ```
 
 ```{r}
-simple_svo_triples_1870 <- get_simple_lemmatized_svo_triples(parsed_hansard_woman_1870)
+simple_svo_triples_1870 <- get_simple_lemmatized_triples(parsed_hansard_woman_1870)
 
 head(simple_svo_triples_1870)
 ```
@@ -723,16 +738,14 @@ Not all of the extracted triples are easy to interpret. The top triple, "he tell
 
 ```{r}
 # Find the Most Common Simple SVO Triples 
-
-svo_counts_1870 <- simple_svo_triples_1870 %>%
+triples_counts_1870 <- simple_svo_triples_1870 %>%
   count(svo_triple, sort = TRUE) %>%
   slice_head(n = 20)
   
-ggplot(svo_counts_1870, 
+ggplot(triples_counts_1870, 
        aes(x = reorder(svo_triple, n),
            y = n)) +
   geom_col(fill = "steelblue") +
-   # rotate horizontally for readability
   coord_flip() + 
   labs(x = "SVO triple",
        y = "Count",
@@ -747,6 +760,7 @@ In this exercise, we see that many of the most prevelant SVO phrases have to do 
 We read many sentences in this chart where gender and rights are foregrounded, including "woman have vote," "woman hae right," and "woman have knowledge." They seem to indicate that some members of parliament are talking about the empowerment of women -- a different perspective than that suggested by our previous exercises. 
 
 We could perform different kinds of analyses with our extracted triples. We could compare times in which women and men are imagined to have the vote. But perhaps the first thing we should do is to call up some context for the handful of phrases alluding to women having rights or the vote.  
+
 ```{r}
 svo_triples_context_1870 <- hansard_woman_1870 %>%
   filter(str_detect(text, 
@@ -768,13 +782,12 @@ This, however is an incomplete picture, because we are only looking at the top t
 
 ## Looking for Women as Subject or Object
 
-We can better explore how parliament spoke about women more by searching for *all* the triples where "woman" or "women" appear. Do they appear as a subject or an object? 
+We can better explore how parliament spoke about women more by searching for all the triples where "woman" or "women" appear. Do they appear as a subject or an object? 
 
 To specifically match rows where the subject is "woman," we can take one of two approaches. The first option is to filter directly on the subject column, identifying rows where the word "woman" appears. Alternatively, we can use the `str_detect()` function on the `svo_triple` column to find triples that start with "woman." By applying the regular expression ^woman, we ensure that only strings beginning with the word "woman" are matched, as the `^` symbol anchors the pattern to the start of the string. 
 
 ```{r}
 # Finding Triples Where Women are the Subject 
-
 triples_with_woman_as_subject_1870 <- simple_svo_triples_1870 %>%
   filter(str_detect(svo_triple, "^woman"))
 
@@ -868,91 +881,3 @@ Extracted triples can show us the dynamics between subjects and objects--the ins
 Hint: We use the carrot `^` symbol to return items that start with a word and the `$` symbol to return items that end with a word. To search for triples that contain a verb you will need to search for the word as it exists between two spaces. 
 
 5) In the previous chapter we introduced methods of measuring distinctiveness in a corpus using TF-IDF and JSD. Instead of counting top triples, use your knowledge of the application of distinctiveness measurements to determine which adjective noun pairs are distinctive of one year but not another, and vice-versa (e.g. which pairs are distinctive of 1879 versus 1878). Then load the speaker metadata and explore which triples are distinctive across speakers (e.g. which triples are distinctive of William Gladstone versus Benjamin Disraeli).
-
-### Using AI Chatbots for Part-of-Speech Analysis
-
-AI chatbots can provide a more fluid approach to grammatical part-of-speech (POS) analysis. Rather than depending on methods that require the analysts to write code that navigates dependency structures or formal syntactic labels, researchers can pose questions in human language. One might, for example, prompt a chatbot to state all adjectives modifying nouns, or to extract particular noun–verb combinations within a given passage. More pointed queries—such as “List all adjectives used to describe ‘man’ and ‘woman’ in this text”—can return structured linguistic data that aligns closely with interpretive goals. This mode of interaction enables an iterative approach to analysis, allowing scholars to move fluidly between exploratory and targeted modes of reading.
-
-Yet this accessibility comes with trade-offs. Unlike spaCy, which extracts linguistic features based on rule-governed models, AI chatbots generate responses probabilistically. As a result, chatbots can produce “hallucinations”--or plausible but inaccurate or false responses. These issues become especially pronounced when large or complex texts are submitted in a single prompt; in such cases, the language model may fixate on peripheral details or return answers that fail to align with the user's interpretive aims. To counter this, scholars can adopt a more modular approach: issuing focused prompts, segmenting longer passages, and iteratively refining their queries to align the model's output with the research question at hand.
-
-Imprecise or overly general prompts—such as "List all of the subjects"—can yield ambiguous results. A chatbot may interpret “subjects” thematically rather than grammatically, revealing the extent to which interpretive framing must be built into the prompt itself. As with any critical approach, humanistic engagement with chatbots requires methodological awareness: clarity of instruction, sensitivity to linguistic ambiguity, and attention to the model’s generative tendencies. The following examples illustrate how prompt design can shape the chatbot’s performance—and, by extension, the kinds of readings we bring to bear on the text.
-
-At the time of writing, LLMs such as ChatGPT have been credited strong performance on inferential reasoning tasks as modeled by standardized tests like the LSAT, which are designed to assess the ability to identify implicit speaker intentions and evaluate logical relationships within text. However, AI chatbots exhibit poor performance when applied to the interpretation of 19th-century parliamentary discourse. The following example suggests that the characteristics of 19th-century speech introduce patterns that cannot be parsed by chatbots, despite their apparent success on standardized measures like the LSAT. 
-
-We presented GPT-4o with the same sentence spoken by Parliamentarian Acton Ayrton and asked the model to identify the speaker’s intended meaning.
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Human Prompt] 
-This is a summation of a speaker's utterance in the 19th-century Hansard Parliamentary Debates of Great Britain regarding the Contagious Diseases Acts. Can you tell me the speaker's intent? Reply in a paragraph. 
-
-> "He proposed to amend the clause which related to women submitting themselves voluntarily to periodical medical examination by requiring them to make a declaration that they were persons which the law recognizes only to punish."
-
-\end{tcolorbox}
-
-ChatGPT-4o's response does not accurately reflect Ayrton's position. Although it correctly notes that Ayrton is proposing an amendment to the Contagious Diseases Acts, it misinterprets the reasoning behind his proposal. Specifically, GPT-4o takes the phrase “persons which the law recognizes only to punish” out of context, interpreting it as a critique of the law’s discriminatory treatment of women. Based on this misreading, GPT-4o concludes that Ayrton is advocating for women's individual rights. In reality, however, Ayrton's argument supports the existing punitive framework. He is not objecting to the law's treatment of women, but rather reinforcing the view that such women are deserving of punishment and should remain subject to the law’s disciplinary measures. 
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT 4o Chatbot Response]
-The speaker’s intent seems to be to propose a modification to the clause concerning the mandatory periodical medical examination of women under the Contagious Diseases Acts. By suggesting that women be required to make a declaration that they are "persons which the law recognizes only to punish," the speaker appears to be emphasizing the legal and punitive nature of the act. This could be interpreted as an objection to the invasive and discriminatory nature of the medical examinations, which were primarily aimed at women, as well as a critique of the laws that criminalized women based on their sexual health, implying that the law treats them as objects of punishment rather than recognizing them as individuals with rights.
-\end{tcolorbox}
-
-
-This example highlights a crucial limitation in how ChatGPT-4o parses and generates text. The model fails to account for the formal, indirect rhetorical style of 19th-century parliamentary speech, leading to a misinterpretation of the speaker’s intent. It generates language that frames the argument as progressive, despite the speaker advocating punitive measures. This mismatch reveals how generative models can project contemporary assumptions onto historical texts, obscuring their original meaning and ideological position.
-
-Still can use for other cases. Just need to practice discretion.
-
-Responses can seem fine:
-
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] "Act like a literary analyst and list the text's subject(s): "But it is urged that landlords may exercise a grievous oppression over tenants." \end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
-As a literary analyst, the subjects of the text can be identified as:
-1. Landlords - Representing figures of authority and power.
-2. Tenants - Symbolizing the vulnerable or subordinate group in a power dynamic.
-3. Oppression - Central to the thematic tension, embodying the potential for abuse of power.
-4. Conflict - Implied in the relationship between landlords and tenants, suggesting a broader struggle.
-5. Advocacy or Persuasion - Hinted at by "it is urged," suggesting the presence of rhetoric or argumentation in the narrative voice.
-6. Ethics and Morality - Underlying the concept of "grievous oppression," pointing to questions of justice and fairness.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] "Act like a high quality part-of-speech extraction algorithm for extracting subjects and their grammatical verb. List all of the subjects and their grammatical verbs in this sentence: But it is urged that landlords may exercise a grievous oppression over tenants." \end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
-Here is the list of subjects and their grammatical verbs:
-- it → is urged
-- landlords → may exercise
-\end{tcolorbox}
-
-While these responses seem fine, providing the chatbot with a more complex sentence from the Hansard corpus demonstrates that it can return an incorrect response. In the following, example sentence, "views" is not a subject but rather a direct object in the clause "it may not meet the views of unreasonable individuals." The subject of the clause is "it," and the verb is "may not meet."
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] Act like a high quality part-of-speech extraction algorithm for extracting subjects and their grammatical verb. List all of the subjects and their grammatical verbs in this sentence: "As to the mode of dealing with the question practically I have no doubt that the measure which will be brought before Parliament by Her Majesty's Government will be just to both landlord and tenant, and Her Majesty's Government ought not to be deterred from bringing in such a measure, although it may not meet the views of unreasonable individuals." \end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
-Here is the list of subjects and their grammatical verbs extracted from the sentence:
-- I → have
-- measure → will be brought
-- Her Majesty's Government → will be
-- Her Majesty's Government → ought not to be deterred
-- it → may not meet
-- views → are (implied "of unreasonable individuals")
-\end{tcolorbox}
-
-Comparing the AI chatbot's output with spaCy's allows us to critically examine how each approach might generate responses when parsing text. Such a comparison surfaces not only differences in performance but also underlying differences about language embedded in their design.
-
-```{r}
-complex_sentence <- "As to the mode of dealing with the question practically 
-I have no doubt that the measure which will be brought before Parliament by Her
-Majesty's Government will be just to both landlord and tenant, and Her Majesty's
-Government ought not to be deterred from bringing in such a measure, although it
-may not meet the views of unreasonable individuals."
-
-parsed_complex_sentence <- spacy_parse(complex_sentence, 
-                                    dep = TRUE, 
-                                    lemma = FALSE, 
-                                    entity = FALSE)
-
-parsed_complex_sentence %>%
-  filter(token == "views")
-```
-
-In this example, spaCy identified correctly that "views" is a direct object. However, both spaCy and the chatbot are susceptible to errors when predicting linguistic patterns, especially in cases involving ambiguous or complex sentence structures like those commonly found in historical documents. This highlights the importance of evaluating their performance across diverse examples to better understand their strengths and limitations, and for an analysts to inspect the results from both methods. 
-

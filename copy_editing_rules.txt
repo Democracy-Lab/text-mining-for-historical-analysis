@@ -44,3 +44,16 @@ dataset names and column names are surrounded by ``
 w not with 
 
 All headings should be ## 
+
+
+get rid of sstudent teacher dichotomy 
+
+
+should be no "selecting by" or "joining by" notes 
+
+
+
+TMHA should be Text Mining for Historiacal Analysis 
+
+
+Call it a textbook not a book 

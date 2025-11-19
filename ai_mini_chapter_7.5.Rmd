@@ -1,0 +1,207 @@
+---
+title: "ai_mini_chapter_7.5"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Practicing with AI 
+
+Throughout _Text Mining for Historical Analysis_, we have primarily visualized data using bar charts. This is because bar charts are accessible and allow viewers to quickly apprehend patterns, comparisons, and trends. We can, however, use an AI chatbot to suggest different approaches to visualizing data. Such can be useful for exploratory data analysis and considering alternative forms of representation--such as line graphs for temporal trends or word clouds for lexical frequency. However, AI-generated suggestions are not truly aware of research contexts, so the generated results should be critically explored and vetted by the analyst. 
+
+In the following examples, we used suggestions from an AI chatbot to explore alternative ways of visualizing our JSD data. To ensure the AI-generated code was compatible with our existing dataset, we included the code we had been using to create the JSD data frame in our prompt. This helped align the chatbot's responses with the structure and content of our data, so the plots it produced would work correctly. With this context the AI chatbot can generate suggestions that take into account the structure of our data, the libraries we were using (if necessary), and the types of historical patterns we were interested in highlighting. This allowed us to rapidly experiment with new forms of visualization while staying grounded in the context of our existing work.
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
+I calculated partial JSD using the following code. Can you suggest multiple ways of visualizing the results in R? Tell me why you have chosen each visualization.  
+
+\begin{verbatim}
+word_dist <- word_dist %>%
+  rowwise() %>%
+  mutate(
+    Partial_JSD_1840 = partial_jsd_1840_to_1850(p_1840, p_1850),
+    Partial_JSD_1850 = partial_jsd_1850_to_1840(p_1840, p_1850)) %>%
+  ungroup()
+
+word_dist <- word_dist %>%
+  mutate(
+    Direction = ifelse(Partial_JSD_1840 > Partial_JSD_1850, "1840 to 1850", "1850 to 1840"),
+    Partial_JSD = ifelse(Direction == "1840 to 1850", -Partial_JSD_1840, Partial_JSD_1850))
+
+word_dist <- word_dist %>%
+  arrange(desc(abs(Partial_JSD))) %>%
+  slice(1:30)
+\end{verbatim}
+\end{tcolorbox}
+
+The chatbot responded with multiple different options for visualizing the data, as shown below. Some of these suggestions are new to us--like a "density ridge plot" or a "sankey diagram"--while others might already be familiar to us, like a "word cloud." 
+
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
+If you have many words and want to see distribution trends, use a Density Ridge Plot.
+If you want a text-heavy, intuitive view, go for a Word Cloud.
+If you want a precise, labeled view of shifts, use a Dot Plot.
+If you want to visually depict flows between decades, use a Sankey Diagram.
+\end{tcolorbox}
+
+We will explore just the density ridge plot, word cloud, and dot plot. 
+
+A density ridge plot may be an unfamiliar term, as it has not been previously used in this book. Asking the AI chatbot to explain its suggestion reveals that the plot is used to display the full distribution of Partial JSD values across the dataset, helping to highlight whether the shifts are symmetric or skewed in one direction. While the explanation is not true reasoning but rather a probabilistic output, it happens to align with commonly accepted knowledge—something we confirm by consulting a secondary source (Wilke 2019). However, as we will demonstrate in Chapter 5, AI-generated rationales can often be unreliable in the context of digital history. 
+
+The chatbot generated the following code for a density ridge plot.
+
+```{r, warning=FALSE, message=FALSE}
+library("ggridges")
+
+ggplot(word_dist, aes(x = Partial_JSD, y = Direction, fill = Direction)) +
+  geom_density_ridges(alpha = 0.7) +
+  scale_fill_manual(values = c("1840 to 1850" = "blue", 
+                               "1850 to 1840" = "red")) +
+  labs(title = "Density of Partial JSD by Direction",
+       x = "Partial JSD",
+       y = "Direction of Change") +
+  theme_minimal()
+```
+
+ The plot is demonstrating how frequently values--such as JSD values--occur across a range , using smooth curves rather than raw counts, as in a bar chart.   
+ 
+ Smoothing helps reveal the overall shape of the distribution, making the plot useful for identifying patterns such as skew or symmetry. However, this type of visualization sacrifices detail at the individual word level, making it less effective for examining word-specific differences.
+ 
+ While using a chatbot to brainstorm can be helpful, simply copying and pasting the code it generates —- without understanding how it shapes our analysis —- can lead to misleading results. For example, a density ridge plot assumes that the two distributions being compared (such as word usage from 1840 to 1850 and from 1850 to 1840) have similar shapes and ranges. This assumption holds in our case, because we limited the analysis to the top 50 words from each decade. But in other contexts—especially when looking at all words—this assumption may break down. If one decade has significantly more words than the other, the plot might distort the comparison, making one group appear more prevalent than it really is.
+
+The chatbot generated the following code for a word cloud. Its generated rationale for doing so was to provide a more "intuitive" overview of the words that had the greatest shifts between decades. In this visualization, the red words shifted the most from 1850 to 1840 (indicating a higher Partial JSD in that direction) whereas the blue words shifted the most from 1840 to 1850. Words that appear more prominently had larger changes. In this example, "Ireland" had a greater change than "stated." 
+
+```{r, warning=FALSE, message=FALSE}
+library("wordcloud")
+
+wordcloud(
+  words = word_dist$word,
+  freq = abs(word_dist$Partial_JSD),
+  colors = ifelse(word_dist$Direction == "1840 to 1850", "blue", "red"),
+  scale = c(4, 0.5),
+  random.order = FALSE)
+```
+
+
+
+The advantage of this visualization is that it is understood at a glance. However, it lacks quantitative precision. Unlike the bar charts we created above, the word cloud does not show exact values--only relative importance of words against one another. In addition, the visualization can be misleading as the difference between the sizes of each word may not be proportional to the underlying data. Indeed, word clouds may be highly subjective or misread. The random placement of words, for example, might have an impact on an analyst's interpretation where a word near the center might look more important than a word at the edge of the cloud, even if this is not true. 
+
+The last option we will explore is the dot plot. The chatbot generated the following code for a dot plot. The visualization appears to communicate the same information as the diverging bar chart we created at the end of the chapter. The left side of the plot shows the words that shifted the most from 1840 to 1850, and the right side shows the words that shifted the most from 1850 to 1840. 
+
+In this case, however, the data is represented using a dot plot. Arguably, the dot plot does not provide a significant advantage over the diverging bar chart. Unlike the Density Ridge Plot and the Word Cloud, which offer new perspectives by emphasizing different linguistic features and drawing the viewer’s eye to specific patterns, the dot plot does not introduce additional insights beyond what we have already observed at the end of this chapter. 
+
+Instead, the dot plot may present more drawbacks than benefits. One potential issue is readability—some labels extend beyond the plot's boundaries, making the visualization harder to interpret at a glance. While this can be adjusted through formatting, it highlights a limitation of the default code provided by the chatbot, which would require additional tweaking by the analyst to improve its presentation.
+
+Perhaps the most critical concern for readability is the absence of a central reference point. As mentioned, Partial JSD relies on a clearly defined midpoint to illustrate distributional shifts. Partial JSD quantifies change by comparing how probability distributions diverge from this central reference point. Unlike the diverging bar chart, which includes a middle bar to visually anchor the comparison, the dot plot lacks this structured reference, making it harder to discern patterns of deviation at a glance. This omission forces the analyst to rely solely on the relative positioning of individual data points, which can be straining to the analyst and may reduce the effectiveness of the visualization for communicating meaningful shifts. 
+
+```{r}
+ggplot(word_dist, aes(x = Partial_JSD, 
+                      y = reorder(word, Partial_JSD), 
+                      color = Direction)) +
+  geom_point(size = 3) +
+  geom_text(aes(label = word), 
+            hjust = ifelse(word_dist$Partial_JSD > 0, -0.2, 1.2)) +
+  scale_color_manual(values = c("1840 to 1850" = "blue", "1850 to 1840" = "red")) +
+  labs(title = "Partial JSD of Words (Top 30)",
+       x = "Partial JSD",
+       y = "Word") +
+  theme_minimal()
+```
+
+
+
+In sum, brainstorming with chatbots can be a valuable approach to exploratory data analysis. In this example, analysts can quickly generate and explore multiple visualization options, some of which may highlight patterns or approaches to data interpretation that might not have been considered otherwise. However, each suggestion must be evaluated with care. While certain visualizations can be an asset, others may be misleading.
+
+
+
+
+### Using AI Chatbots for Part-of-Speech Analysis
+
+AI chatbots can provide a more fluid approach to grammatical part-of-speech (POS) analysis. Rather than depending on methods that require the analysts to write code that navigates dependency structures or formal syntactic labels, researchers can pose questions in human language. One might, for example, prompt a chatbot to state all adjectives modifying nouns, or to extract particular noun–verb combinations within a given passage. More pointed queries—such as “List all adjectives used to describe ‘man’ and ‘woman’ in this text”—can return structured linguistic data that aligns closely with interpretive goals. This mode of interaction enables an iterative approach to analysis, allowing scholars to move fluidly between exploratory and targeted modes of reading.
+
+Yet this accessibility comes with trade-offs. Unlike spaCy, which extracts linguistic features based on rule-governed models, AI chatbots generate responses probabilistically. As a result, chatbots can produce “hallucinations”--or plausible but inaccurate or false responses. These issues become especially pronounced when large or complex texts are submitted in a single prompt; in such cases, the language model may fixate on peripheral details or return answers that fail to align with the user's interpretive aims. To counter this, scholars can adopt a more modular approach: issuing focused prompts, segmenting longer passages, and iteratively refining their queries to align the model's output with the research question at hand.
+
+Imprecise or overly general prompts—such as "List all of the subjects"—can yield ambiguous results. A chatbot may interpret “subjects” thematically rather than grammatically, revealing the extent to which interpretive framing must be built into the prompt itself. As with any critical approach, humanistic engagement with chatbots requires methodological awareness: clarity of instruction, sensitivity to linguistic ambiguity, and attention to the model’s generative tendencies. The following examples illustrate how prompt design can shape the chatbot’s performance—and, by extension, the kinds of readings we bring to bear on the text.
+
+At the time of writing, LLMs such as ChatGPT have been credited strong performance on inferential reasoning tasks as modeled by standardized tests like the LSAT, which are designed to assess the ability to identify implicit speaker intentions and evaluate logical relationships within text. However, AI chatbots exhibit poor performance when applied to the interpretation of 19th-century parliamentary discourse. The following example suggests that the characteristics of 19th-century speech introduce patterns that cannot be parsed by chatbots, despite their apparent success on standardized measures like the LSAT. 
+
+We presented GPT-4o with the same sentence spoken by Parliamentarian Acton Ayrton and asked the model to identify the speaker’s intended meaning.
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Human Prompt] 
+This is a summation of a speaker's utterance in the 19th-century Hansard Parliamentary Debates of Great Britain regarding the Contagious Diseases Acts. Can you tell me the speaker's intent? Reply in a paragraph. 
+
+> "He proposed to amend the clause which related to women submitting themselves voluntarily to periodical medical examination by requiring them to make a declaration that they were persons which the law recognizes only to punish."
+
+\end{tcolorbox}
+
+ChatGPT-4o's response does not accurately reflect Ayrton's position. Although it correctly notes that Ayrton is proposing an amendment to the Contagious Diseases Acts, it misinterprets the reasoning behind his proposal. Specifically, GPT-4o takes the phrase “persons which the law recognizes only to punish” out of context, interpreting it as a critique of the law’s discriminatory treatment of women. Based on this misreading, GPT-4o concludes that Ayrton is advocating for women's individual rights. In reality, however, Ayrton's argument supports the existing punitive framework. He is not objecting to the law's treatment of women, but rather reinforcing the view that such women are deserving of punishment and should remain subject to the law’s disciplinary measures. 
+
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT 4o Chatbot Response]
+The speaker’s intent seems to be to propose a modification to the clause concerning the mandatory periodical medical examination of women under the Contagious Diseases Acts. By suggesting that women be required to make a declaration that they are "persons which the law recognizes only to punish," the speaker appears to be emphasizing the legal and punitive nature of the act. This could be interpreted as an objection to the invasive and discriminatory nature of the medical examinations, which were primarily aimed at women, as well as a critique of the laws that criminalized women based on their sexual health, implying that the law treats them as objects of punishment rather than recognizing them as individuals with rights.
+\end{tcolorbox}
+
+
+This example highlights a crucial limitation in how ChatGPT-4o parses and generates text. The model fails to account for the formal, indirect rhetorical style of 19th-century parliamentary speech, leading to a misinterpretation of the speaker’s intent. It generates language that frames the argument as progressive, despite the speaker advocating punitive measures. This mismatch reveals how generative models can project contemporary assumptions onto historical texts, obscuring their original meaning and ideological position.
+
+Still can use for other cases. Just need to practice discretion.
+
+Responses can seem fine:
+
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] "Act like a literary analyst and list the text's subject(s): "But it is urged that landlords may exercise a grievous oppression over tenants." \end{tcolorbox}
+
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
+As a literary analyst, the subjects of the text can be identified as:
+1. Landlords - Representing figures of authority and power.
+2. Tenants - Symbolizing the vulnerable or subordinate group in a power dynamic.
+3. Oppression - Central to the thematic tension, embodying the potential for abuse of power.
+4. Conflict - Implied in the relationship between landlords and tenants, suggesting a broader struggle.
+5. Advocacy or Persuasion - Hinted at by "it is urged," suggesting the presence of rhetoric or argumentation in the narrative voice.
+6. Ethics and Morality - Underlying the concept of "grievous oppression," pointing to questions of justice and fairness.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] "Act like a high quality part-of-speech extraction algorithm for extracting subjects and their grammatical verb. List all of the subjects and their grammatical verbs in this sentence: But it is urged that landlords may exercise a grievous oppression over tenants." \end{tcolorbox}
+
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
+Here is the list of subjects and their grammatical verbs:
+- it → is urged
+- landlords → may exercise
+\end{tcolorbox}
+
+While these responses seem fine, providing the chatbot with a more complex sentence from the Hansard corpus demonstrates that it can return an incorrect response. In the following, example sentence, "views" is not a subject but rather a direct object in the clause "it may not meet the views of unreasonable individuals." The subject of the clause is "it," and the verb is "may not meet."
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt] Act like a high quality part-of-speech extraction algorithm for extracting subjects and their grammatical verb. List all of the subjects and their grammatical verbs in this sentence: "As to the mode of dealing with the question practically I have no doubt that the measure which will be brought before Parliament by Her Majesty's Government will be just to both landlord and tenant, and Her Majesty's Government ought not to be deterred from bringing in such a measure, although it may not meet the views of unreasonable individuals." \end{tcolorbox}
+
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=AI Chatbot Response]
+Here is the list of subjects and their grammatical verbs extracted from the sentence:
+- I → have
+- measure → will be brought
+- Her Majesty's Government → will be
+- Her Majesty's Government → ought not to be deterred
+- it → may not meet
+- views → are (implied "of unreasonable individuals")
+\end{tcolorbox}
+
+Comparing the AI chatbot's output with spaCy's allows us to critically examine how each approach might generate responses when parsing text. Such a comparison surfaces not only differences in performance but also underlying differences about language embedded in their design.
+
+```{r}
+complex_sentence <- "As to the mode of dealing with the question practically 
+I have no doubt that the measure which will be brought before Parliament by Her
+Majesty's Government will be just to both landlord and tenant, and Her Majesty's
+Government ought not to be deterred from bringing in such a measure, although it
+may not meet the views of unreasonable individuals."
+
+parsed_complex_sentence <- spacy_parse(complex_sentence, 
+                                    dep = TRUE, 
+                                    lemma = FALSE, 
+                                    entity = FALSE)
+
+parsed_complex_sentence %>%
+  filter(token == "views")
+```
+
+In this example, spaCy identified correctly that "views" is a direct object. However, both spaCy and the chatbot are susceptible to errors when predicting linguistic patterns, especially in cases involving ambiguous or complex sentence structures like those commonly found in historical documents. This highlights the importance of evaluating their performance across diverse examples to better understand their strengths and limitations, and for an analysts to inspect the results from both methods. 
+
+
+

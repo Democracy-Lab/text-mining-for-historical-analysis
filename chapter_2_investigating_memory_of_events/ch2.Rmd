@@ -23,7 +23,7 @@ This chapter builds on the previous to introduce analysts to fundamental data pr
 
 One essential concept in data processing is "joining" datasets. A join combines two datasets into one, allowing us to analyze parliamentary texts alongside metadata such as speaker information, dates, and significant events. Additionally, this chapter teaches readers how to work with event-based data, including years, months, and dates. By moving through the data processing steps one-by-one, we draw on Paul Fyfe’s framing of “data mining” as “data archaeology,” shifting attention away from analysis as a final product and instead foregrounding the transformational work of data processing as a central part of the analytical process (Fyfe 2016).
 
-As with the previous chapter, this chapter will emphasize the skills of moving from analyzing text as data to performing a close reading of historical speeches in context. It models the iterative process of working with a controlled vocabulary and reading words in context with the idea of demonstrating a method of inquiry about how and why events happen. This approach provides analysts with the tools of deciding for themselves how the patterns identified throughout text mining relate back to their primary sources, that is, the full Hansard debates. As we had previously discussed, this process is iterative, emphasizing that researchers transition from data processing to counting words to applying metrics on those word counts to visualizing trends, and then repeating this deductive process. Throughout this process, it may prove valuable to inspect and re-evaluate the intermediary steps that were taken to arrive at any conclusions about the corpus. This cyclical process may lead to additional historical questions and associations, which may mean more measuring, more visualization, and more guided reading in pursuit of a historical analysis.  
+As with the previous chapter, this chapter will emphasize the skills of moving from analyzing text as data to performing a close reading of historical speeches in context. It models the iterative process of working with a controlled vocabulary and reading words in context with the idea of demonstrating a method of inquiry about how and why events happen. The approach we model provides analysts with the tools of deciding for themselves how the patterns identified throughout text mining relate back to their primary sources, that is, the full Hansard debates. As we had previously discussed, our analytic process is iterative, emphasizing that researchers transition from data processing to counting words to applying metrics on those word counts to visualizing trends, and then repeating this deductive process. Throughout the process, it may prove valuable to inspect and re-evaluate the intermediary steps that were taken to arrive at any conclusions about the corpus. This cyclical process may lead to additional historical questions and associations, which may mean more measuring, more visualization, and more guided reading in pursuit of a historical analysis.  
 
 ## Joining Debate Metadata
 
@@ -82,7 +82,7 @@ kbl(df_head, format = "latex",
               latex_valign = "top")
 ```
 
-`hansardr` includes detailed contextual information for each of these speeches, using the same system of references that we saw in the previous data set -- series, volume, page, and sentence number. In this dataset, however, there is no "text" column, but rather a series of columns that illuminate multiple "fields" of each sentence: the speech date (recorded as "speechdate" within the data) for when the speech was given and the official title of the "debate" in which the sentence was spoken. 
+`hansardr` includes detailed contextual information for each of the speeches, using the same system of references that we saw in the previous data set -- series, volume, page, and sentence number. In the `debate_metadata` dataset, however, there is no "text" column, but rather a series of columns that illuminate multiple "fields" of each sentence: the speech date (recorded as "speechdate" within the data) for when the speech was given and the official title of the "debate" in which the sentence was spoken. 
 
 In addition to the debate metadata, `hansardr` provides two additional metadata files: `speaker_metadata_1860` and `file_metadata_1860`. 
 
@@ -93,7 +93,6 @@ data("speaker_metadata_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-
 df_head <- speaker_metadata_1860 %>% 
   slice_head(n = 5)
 
@@ -111,13 +110,13 @@ kbl(df_head, format = "latex",
 
 The `speaker_metadata_1860` dataset provides information about the "speaker" of each sentence as the MP's name was recorded in the original Hansard debates. It also includes a "suggested speaker" column, which contains a disambiguated version of the speaker names where ambiguous or inconsistent references to the same individual have been resolved into a single, standardized name, allowing for more accurate identification of MPs across the corpus. 
 
-The "suggested speakers" came from a large-scale disambiguation effort where the authors of this book disambiguated speaker names, building upon the work completed by the Digging into Linked Parliamentary Data Project and the Egger and Spirling database (Eggers and Spirling 2014; Winters and Steer 2013). This effort was designed to address these problems: speakers may have been called only by temporary office titles (like “Prime Minister"); speakers may have been called only by their peerage titles (such as “Duke” or “Viscount”);a single name might have several permutations (such as W. Gladstone, W. E. Gladstone, or William Gladstone all referring to the same Mr. William Ewart Gladstone); speakers may have shared the exact name with someone else who was active during the same period (like the two different Sir Robert Peels in the early 19th-century); speaker names may contain OCR errors; speaker names might have spelling inconsistencies due to how they were originally recorded during the 19th-century; some speakers were misrecorded, such as they were called by the wrong title. 
+The "suggested speakers" came from a large-scale disambiguation effort where the authors of this book disambiguated speaker names, building upon the work completed by the Digging into Linked Parliamentary Data Project and the Egger and Spirling database (Eggers and Spirling 2014; Winters and Steer 2013). Our disambiguation effort was designed to address these problems: speakers may have been called only by temporary office titles (like “Prime Minister"); speakers may have been called only by their peerage titles (such as “Duke” or “Viscount”);a single name might have several permutations (such as W. Gladstone, W. E. Gladstone, or William Gladstone all referring to the same Mr. William Ewart Gladstone); speakers may have shared the exact name with someone else who was active during the same period (like the two different Sir Robert Peels in the early 19th-century); speaker names may contain OCR errors; speaker names might have spelling inconsistencies due to how they were originally recorded during the 19th-century; some speakers were misrecorded, such as they were called by the wrong title. 
 
-By providing both the original speaker field as well as the disambiguated version, this dataset preserves the original historical recording and draws attention to the data transformation that occurred in the speaker field before the corpus was packed into `hansardr`. The purpose of including the "suggested speakers" field is to support computational analysis by linking variant or ambiguous names to consistent, canonical speaker identities for a more reliable analysis. 
+By providing both the original speaker field as well as the disambiguated version, our version of the Hansard dataset preserves the original historical recording and draws attention to the data transformation that occurred in the speaker field before the corpus was packed into `hansardr`. The purpose of including the "suggested speakers" field is to support computational analysis by linking variant or ambiguous names to consistent, canonical speaker identities for a more reliable analysis. 
 
-However, we also advise discretion. While disambiguation significantly improves analysis by standardizing speaker identities, it is not without limitations. In some cases, speakers may be incorrectly matched or mislabeled by the algorithm. In others, no suggested speaker name is provided because the necessary metadata was unavailable, and the sheer number of speakers made manual correction infeasible within our project timeline. To address these challenges, we have uploaded the Hansard corpus to Democracy Viewer, an online text mining and data sharing platform where researchers can also submit corrections to the corpus (Buongiorno et al., 2023). Over time, we plan to incorporate these contributions into future releases of the `hansardr` package.
+However, we also advise discretion. While disambiguation significantly improves analysis by standardizing speaker identities, it is not without limitations. In some cases, speakers may be incorrectly matched or mislabeled by the algorithm. In others, no suggested speaker name is provided because the necessary metadata was unavailable, and the sheer number of speakers made manual correction infeasible within our project timeline. To address these challenges, we have uploaded the Hansard corpus to Democracy Viewer, an online text mining and data sharing platform where researchers can also submit corrections to the corpus (Buongiorno et al., 2023). Over time, we plan to incorporate data set improvements into future releases of the `hansardr` package.
 
-Additionally, disambiguation can obscure the nuances of the original records, such as these shifts in titles or the historical importance of misspellings for understanding contemporary spelling conventions or clerical practices. For this reason, we provide both the original speaker field and the disambiguated version, so that researchers can critically assess and, if desired, use the original speaker name data instead. 
+Additionally, disambiguation can obscure the nuances of the original records, such as shifts in titles or the historical importance of misspellings for understanding contemporary spelling conventions or clerical practices. Due to the historical richness of original speaker names, we provide both the original speaker field and the disambiguated version, so that researchers can critically assess and, if desired, use the original speaker name data instead. 
 
 Lastly, `hansardr` provides file metadata. For example, the `file_metadata_1860` dataset provides metadata about the records themselves, including the ID for the original source file, and the column in which the text appears. 
 
@@ -128,7 +127,6 @@ data("file_metadata_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-
 df_head <- file_metadata_1860 %>% 
   slice_head(n = 5)
 
@@ -144,11 +142,11 @@ kbl(df_head, format = "latex",
               latex_valign = "top")
 ```
 
-We have chosen to store the debate text (`hansard_1860`) separately from the contextual information about each speech (for example, `debate_metadata_1860` or `speaker_metadata_1860`), as well as the information about each hard copy file containing the speeches (`file_metadata_1860`). We subsetted the data into these individual files because the data for each decade is quite large. Processing such a large dataset can exceed a computer's resources, such as its memory. In other cases, we chose to exclude certain fields from processing if they were not immediately relevant to our analysis, as doing so reduces memory usage and improves overall processing speed so that we can focus on our research instead of waiting too long for any intermediary processing step to complete. Furthermore, many operations in this book -- for instance, counting words per decade -- require just a few datasets loaded at a time. 
+We have chosen to store the debate text (`hansard_1860`) separately from the contextual information about each speech (for example, `debate_metadata_1860` or `speaker_metadata_1860`), as well as the information about each hard copy file containing the speeches (`file_metadata_1860`). We subsetted the data into individual files because the data for each decade is quite large. Processing such a large dataset can exceed a computer's resources, such as its memory. In other cases, we chose to exclude certain fields from processing if they were not immediately relevant to our analysis, as doing so reduces memory usage and improves overall processing speed so that we can focus on our research instead of waiting too long for any intermediary processing step to complete. Furthermore, many operations in this book -- for instance, counting words per decade -- require just a few datasets loaded at a time. 
 
-As a result of this organization scheme, many kinds of analyses will require working with multiple datasets from `hansardr` joined together. We will use the function `left_join()` to join the annotated information about speech context with each of the speech text. A left join returns every record from the data frame specified by the left-most argument, and all the matched records from the data frame on the right. 
+Many kinds of analyses will require working with multiple datasets from `hansardr` joined together. We will use the function `left_join()` to join the annotated information about speech context with each of the speech text. A left join returns every record from the data frame specified by the left-most argument, and all the matched records from the data frame on the right. 
 
-```{r, warning=FALSE,message=FALSE}
+```{r, warning=FALSE, message=FALSE}
 # Load the tidyverse
 library("tidyverse")
 
@@ -169,7 +167,7 @@ Notice that the resulting dataset, `hansard_corpus_1860`, has information about 
 
 Joins are a crucial concept for combining and analyzing data that is distributed across multiple datasets. They allow us to link related information from different tables based on a shared key or common field thus enabling us to perform analyses of the records in relation to its metadata. 
 
-In the example above, both `hansard_1860` and `debate_metadata_1860` share a column called `sentence_id`. This shared column acts as a common identifier, enabling us to link the speaker and date information from one dataset to the corresponding text of the speech in the other dataset. By using this common identifier, the two datasets can be "joined" together to create a single, unified dataset that we will use for text processing. 
+In the example above, both `hansard_1860` and `debate_metadata_1860` share a column called `sentence_id`. The shared `sentence_id` column acts as a common identifier, enabling us to link the speaker and date information from one dataset to the corresponding text of the speech in the other dataset. By using this common identifier, the two datasets can be "joined" together to create a single, unified dataset that we will use for text processing. 
 
 Thus joins are so important because it is through linking the records to their metadata that we are able to break text into subsets and analyze change over time, or create a biography of any individual speaker. We can explore the words invoked in parliament in the months leading up to August 15, 1867, when most working-class men in Britain finally achieved the right to vote. 
 
@@ -179,13 +177,14 @@ Beyond analyzing individual words, an analyst may want to explore multiword phra
 
 The analyst cannot anticipate in advance how such a phrase might have been used. The only way of gaining knowledge from a count of phrases is to "validate" one theory or the other by gaining more information.
 
-We could, in theory, contrive computational approaches to help us discern why people invoked "the will of the people." But in _Text Mining for Historical Analysis_, we often want to move from identifying a data-driven phenomenon to gaining more information about historical context by reading the actual speeches. This approach provides insight into the rich nuances suggested by speakers by giving us perspective into how they invoke particular phrase in the original records. This is because, while visualizations might demonstrate that a parliamentarian invoked a phrase, they may not clearly demonstrate how that phrase was invoked.  
+We could, in theory, contrive computational approaches to help us discern why people invoked "the will of the people." But in _Text Mining for Historical Analysis_, we often want to move from identifying a data-driven phenomenon to gaining more information about historical context by reading the actual speeches. Our approach modeled approach--moving from a visualization overview back to the data itself--provides insight into the rich nuances suggested by speakers by giving us perspective into how they invoke particular phrase in the original records. While visualizations might demonstrate that a parliamentarian invoked a phrase, they may not clearly demonstrate how that phrase was invoked.  
 
 Accordingly, in the sections below, we will begin by counting phrases, but that is not where we will end. We will return to the original speeches to read more deeply. 
 
 ### Finding Bigrams
 
-While there are several approaches to finding multiword phrases, we will demonstrate this by tokenizing the text into bigrams. 
+While there are several approaches to finding multiword phrases, we will demonstrate finding them by tokenizing the text into bigrams. 
+
 The following code filters the speeches of the 1860s for the first months of 1867 before the vote on the Second Reform Act, which gave Britain's urban working-class men the right to vote. We also introduce a new package, `lubridate`, which can be installed in the usual way using `install.packages()`.
   
 ```{r}
@@ -201,17 +200,17 @@ hansard_1867 <- hansard_1860 %>% # create a new data frame
          speechdate <= ymd("1867-08-15")) # and speechdate before or on august 15
 ```
 
-Now that we have filtered the dataset for our desired timeline, we can tokenize the text into bigrams. The order in which we perform data processing is important. Tokenizing after filtering ensures that we are working with a smaller and more focused dataset. Working with a smaller dataset ensures we do not exhaust our computer's resources or its processing capabilities. This issue we think is paramount to processing large corpora for historical analysis, as we describe in more detail in subsequent chapters.
+Now that we have filtered the dataset for our desired timeline, we can tokenize the text into bigrams. The order in which we perform data processing is important. Tokenizing after filtering ensures that we are working with a smaller and more focused dataset. Working with a smaller dataset ensures we do not exhaust our computer's resources or its processing capabilities. Skills for handling a large dataset on a smaller computer, like a laptop, is paramount to being able to answer questions while processing large corpora for historical analysis, as we describe in more detail in subsequent chapters.
 
-As a result, the order of these steps is not arbitrary, but the outcome of a deliberate decision. We could have reversed them—for example, tokenizing the text before filtering by date. However, that approach would have used more of our computer's resources, as it would require processing a larger volume of irrelevant text before narrowing the records down to just the data needed for our inquiry into a given time period. With large datasets like Hansard, the sequence of processing steps can significantly impact whether the data remains manageable.
+The order of our steps is not arbitrary, but the outcome of a deliberate decision. We could have reversed them—for example, tokenizing the text before filtering by date. However, that approach would have used more of our computer's resources, as it would require processing a larger volume of irrelevant text before narrowing the records down to just the data needed for our inquiry into a given time period. With large datasets like Hansard, the sequence of processing steps can significantly impact whether the data remains manageable.
 
-In turn, the limitations of any computing environment directly shape the types of analyses we prioritize. In other words, it is not only theoretical or interpretive concerns that determine our methodological choices, but also what is computationally feasible. In this sense, technical constraints become analytical constraints. 
+In turn, the limitations of any computing environment directly shape the types of analyses we prioritize. In other words, it is not only theoretical or interpretive concerns that determine our methodological choices, but also what is computationally feasible. Technical constraints become analytical constraints. 
 
-When working with large-scale historical data, researchers often adapt their questions, models, and scope to align with the practical boundaries of a computer's available memory, processing speed, and storage. These limitations might encourage researchers to think critically and strategically about what kinds of knowledge are worth pursuing, and how best to pursue them with the tools at hand. 
+When working with large-scale historical data, researchers often adapt their questions, models, and scope to align with the practical boundaries of a computer's available memory, processing speed, and storage. Computational limitations might encourage researchers to think critically and strategically about what kinds of knowledge are worth pursuing, and how best to pursue them with the tools at hand. 
 
 Throughout _Text Mining for Historical Analysis_ we have attempted to limit barriers to processing a dataset as large as Hansard through our data organization scheme that breaks each decade of text and related metadata files into their own files, and presents readers with an order of intermediary data processing that is more efficient for working with historical data in R. 
 
-The following code uses the `unnest_tokens()` function, which we previously used to split text into individual words. This time, we adjust the function to extract pairs of consecutive words instead. To do this, we set the token argument to n-grams, instructing R to create sequences of consecutive words, and the `n` argument to `2`, specifying that each sequence should consist of two words. These two arguments work together to extract bigrams. 
+The following code uses the `unnest_tokens()` function, which we previously used to split text into individual words. This time, we adjust the function to extract pairs of consecutive words instead. To focus on pairs of consecutive words instead, we set the token argument to n-grams, instructing R to create sequences of consecutive words, and the `n` argument to `2`, specifying that each sequence should consist of two words. The two arguments work together to extract bigrams. 
 
 ```{r}
 # Generate bigrams (two-word sequences) from the "text" column of the hansard_1867 data
@@ -236,7 +235,7 @@ kbl(df_head, format = "latex",
               latex_valign = "top")
 ```
 
-Note that the bigrams extracted overlap, as if the same sentence had been subdivided several times. This output is expected bigrams are created by looking at each pair of words in order, one step at a time—so each new bigram shares a word with the one before it.
+Note that the bigrams extracted overlap, as if the same sentence had been subdivided several times. The presentation of the bigrams is expected, as bigrams are created by looking at each pair of words in order, one step at a time—so each new bigram shares a word with the one before it.
 
 ###  Counting Bigrams 
 
@@ -274,7 +273,7 @@ The above code processes the dataset by applying the following transformations a
 - It constructs a regular expression from a list of stop words (`stop_words$word`) by:
   - Combining them with the OR operator (`|`).
   - Surrounding them with word boundaries (`\\b`) to match complete words only.
-- This ensures that only bigrams without stop words are retained.
+- Only bigrams without stop words are retained.
 
 `filter(str_detect(bigram, "^[a-z]+ [a-z]+$"))`
 - Keeps rows where the `bigram` column matches a specific pattern:
@@ -283,7 +282,7 @@ The above code processes the dataset by applying the following transformations a
 
 We can now count the resulting bigrams. 
 
-```{r}
+```{r, message=FALSE}
 # count the frequency of each bigram in the cleaned dataset
 # keep the top 100 most frequent bigrams and sort them in descending order
 top_bigrams_1867 <- clean_bigrams_1867 %>%
@@ -308,9 +307,9 @@ kbl(df_head, format = "latex",
               latex_valign = "top")
 ```
 
-In this list, we see several contemporary rhetorical figures that stem from the practice of referring to other speakers in parliament as "my noble friend" or "my learned friend."  We also see allusions to the debates over representation and the question of who would have the vote, especially in the phrases "household suffrage," referencing historical argument for granting middle-class men the right to vote with the Reform Bill of 1832, and "roman catholic," a reference to the fact that Roman Catholics could already vote until the Reform Act of 1834. Only in 1867 did those working-class men get the vote in Britain, and these earlier precedents were frequently alluded to as a justification.  
+In our list, we see several contemporary rhetorical figures that stem from the practice of referring to other speakers in parliament as "my noble friend" or "my learned friend."  We also see allusions to the debates over representation and the question of who would have the vote, especially in the phrases "household suffrage," referencing historical argument for granting middle-class men the right to vote with the Reform Bill of 1832, and "roman catholic," a reference to the fact that Roman Catholics could already vote until the Reform Act of 1834. Only in 1867 did those working-class men get the vote in Britain, and these earlier precedents were frequently alluded to as a justification.  
 
-We also see a reference to "public meetings."  Why did speakers in parliament invoke public meetings in the lead-up to the Second Reform Act?  We will answer this question by reading the original text. 
+We also see a reference to "public meetings."  Why did speakers in parliament invoke public meetings in the lead-up to the Second Reform Act? We will answer this question by reading the original text. 
 
 ```{r}
 # Filter the 1867 Hansard speeches to keep only those that mention "public meetings"
@@ -335,7 +334,7 @@ Text mining also allows us to look for multiword phrases beyond bigrams.  We can
 
 We can use a slight adjustment of the code we used above to count bigrams to find n-grams of any length. Here is code for finding common five-word-phrases, filtering them, counting them, and finding the top 50 examples:
 
-```{r}
+```{r, message=FALSE}
 # create 5-grams (sequences of 5 consecutive words) from the "text" column
 # store the results in a new column called "ngram"
 # unnest_tokens() is used with token = "ngrams" and n = 5 to generate 5-word sequences
@@ -354,7 +353,7 @@ head(people_n_grams)
 
 We see a great many political concepts invoked about what members of parliament believed they were working for -- the people of Ireland, England, or the metropolis, their representation, condition, education, minds, interests, feelings, rights, and welfare.  An entire vocabulary of social engagement and political will was being spelled out.  
 
-Reading further down this list might give us more hints about the language with which speakers urged the principle of representation.  Again, the careful analyst would trace these words back to their original context, using the original text of the speeches to develop an argument about why a phrase like "the minds of the people" was used.
+Reading further down the list of multi-word phrases might give us more hints about the language with which speakers urged the principle of representation.  Again, the careful analyst would trace the vocabulary words back to their original context, using the original text of the speeches to develop an argument about why a phrase like "the minds of the people" was used.
 
 ```{r}
 # Filter the 1867 Hansard speeches to include only rows where the exact phrase 
@@ -376,11 +375,11 @@ These images of the peoples' collective wisdom contrast against the bias express
 
 ## Using Bigrams to Find Mentions of Events
 
-For many kinds of textual analyses, incorporating external information can help guide the focus of the analysis and ensure it aligns with specific research questions. For example, a historian analyzing data might be interested in tracking references to notable events in British history, such as the Magna Carta, the Spanish Inquisition, or the Glorious Revolution, to see how often these events are mentioned in parliamentary records. To achieve this, the analyst may create and use a "controlled vocabulary" which is a predefined list of terms or topics of interest related to the analysis. `hansardr` includes an example controlled vocabulary: a curated list of significant events in British history, along with the corresponding years of their occurrence.
+For many kinds of textual analyses, incorporating external information can help guide the focus of the analysis and ensure it aligns with specific research questions. For example, a historian analyzing data might be interested in tracking references to notable events in British history, such as the Magna Carta, the Spanish Inquisition, or the Glorious Revolution, to see how often these events are mentioned in parliamentary records. To analyze how often these events are mentioned, the analyst may create and use a "controlled vocabulary" which is a predefined list of terms or topics of interest related to the analysis. `hansardr` includes an example controlled vocabulary: a curated list of significant events in British history, along with the corresponding years of their occurrence.
 
-In applying this list, this exercise invites readers to investigate the idea that representations of memory change over time using the controlled vocabulary to search for a set group of phrases. We will use a controlled vocabulary to measure Parliamentarians' references to past events in the 1860 debates. We are intentionally choosing words such as "riot" or "meeting" that might collect evidence of parliamentary speakers referencing public meetings like those we saw evidence of above.  We are also curious about how those references compare with references to famines, wars, strikes, exhibitions, and other contemporary and historical events.
+In applying our list, this exercise invites readers to investigate the idea that representations of memory change over time using the controlled vocabulary to search for a set group of phrases. We will use a controlled vocabulary to measure Parliamentarians' references to past events in the 1860 debates. We are intentionally choosing words such as "riot" or "meeting" that might collect evidence of parliamentary speakers referencing public meetings like those we saw evidence of above.  We are also curious about how those references compare with references to famines, wars, strikes, exhibitions, and other contemporary and historical events.
 
-```{r}
+```{r, message=FALSE}
 # Load the Hansard speech data and the corresponding debate metadata for the 1860s
 data("hansard_1860")
 data("debate_metadata_1860")
@@ -414,7 +413,7 @@ clean_bigrams_1867 <- bigrams_1867 %>%
 head(clean_bigrams_1867)
 ```
 
-The following code filters the `clean_bigrams_1867` dataset to retain only rows where the bigram column contains any word from the pattern1 list (e.g., "riot," "meeting," "famine"). It uses a regular expression to match whole words, ensuring accurate filtering. After filtering, the resulting dataset, `events_1867`, includes only the bigram and speechdate columns. This allows the analyst to focus on specific bigrams related to the predefined topics of interest.
+The following code filters the `clean_bigrams_1867` dataset to retain only rows where the bigram column contains any word from the pattern1 list (e.g., "riot," "meeting," "famine"). It uses a regular expression to match whole words, ensuring accurate filtering. After filtering, the resulting dataset, `events_1867`, includes only the bigram and speechdate columns. Filtering allows the analyst to focus on specific bigrams related to the predefined topics of interest.
 
 ```{r}
 # define a controlled vocabulary of event-related keywords to search for in bigrams
@@ -432,11 +431,11 @@ events_1867 <- clean_bigrams_1867 %>%
 head(events_1867)
 ```
 
-If we look carefully at the events list so generated, we will recognize only a few of these references as actual events.  Many of the bigrams including our controlled vocabulary are simply descriptions, for example, "disorderly riot."  A few are references to actual events and meetings specified by the name of an event, for instance, the "Bristol Riot" or a "Yorkshire meeting."  Far more frequent are general references to a "public meeting" or "recent meeting."  All of this is interesting, of course, because as we have seen members of parliament leaned on each other to acknowledge the public sentiment for expanding the vote.  
+If we look carefully at the events list so generated, we will recognize only a few of the references as actual events.  Many of the bigrams including our controlled vocabulary are simply descriptions, for example, "disorderly riot."  A few are references to actual events and meetings specified by the name of an event, for instance, the "Bristol Riot" or a "Yorkshire meeting."  Far more frequent are general references to a "public meeting" or "recent meeting."  All of the results are interesting, of course, because as we have seen members of parliament leaned on each other to acknowledge the public sentiment for expanding the vote.  
 
 How did references to meetings vary over time? By this time, you will have noticed that searching for a controlled vocabulary, visualization, guided reading, and deliberation about the meaning of the data is an iterative process that we engage over many rounds -- not an automatic process where the analyst looks for a word like "riot" and immediately finds meaningful results.  We can search for our key phrases and visualize them.  
 
-In the following code, we define a new list of bigrams that make up our controlled vocabulary—specific phrases referring to historical events—and then filter the dataset to keep only the rows where these phrases appear. Note that the code below uses a new command for faceted counting--`group_by()`--which we will investigate in greater detail throughout the book. 
+In the following code, we define a new list of bigrams that make up our controlled vocabulary—specific phrases referring to historical events—and then filter the dataset to keep only the rows where the phrases appear. Note that the code below uses a new command for faceted counting--`group_by()`--which we will investigate in greater detail throughout the book. 
 
 For now, it is just important to know that `group_by()` effectively sorts data into buckets based on some category. For example, you could use group_by() to organize the data by year—putting all the speeches from the same year into one group—or by speaker, grouping together everything each person said. By grouping, we are able to perform calculations on each category individually. Instead of counting words for an entire data subset, like we did in Chapter 1, we can count words by group. In the following code we use `group_by()` to combine and count each bigram.
 
@@ -511,7 +510,7 @@ ggplot(top_events_1867_w_speech_metadata,
   ggtitle("Events Mentioned by Name") # main title
 ``` 
 
-What do we make of this timeline? It suggests a swell of public meetings referenced in parliament in the months leading up to August 1867, which received more intense attention than either the Crimean War or the Paris Exhibition.  Individual meetings such as those in Yorkshire or Clontarf received passing acknowledgment rather than deeper debate.  Understanding more than this requires more cycles of research and reading.  
+What do we make of this timeline? It suggests a swell of public meetings referenced in parliament in the months leading up to August 1867, which received more intense attention than either the Crimean War or the Paris Exhibition.  Individual meetings such as those in Yorkshire or Clontarf received passing acknowledgment rather than deeper debate.  Understanding the results of the visualization deeper requires more cycles of research and reading.  
 
 Other research questions appear that the individual analyst, engaged in a process of research, would want to follow.  Did references to public meetings change from January to August, while their mentions intensified?  Were all of these public meetings about the vote?  What was the meaning of references to a "civil war" -- the English civil war or recent events in America -- and was this civil war invoked in reference to 1867?  What about the references to the contemporary famine in Orissa (in India) or the (presumably historical) famine in Ireland?  
   
@@ -541,9 +540,9 @@ head(eventslist)
 
 Notice that events contains two columns: events by their name, and the historical dates on which those events occurred. 
 
-We will now count events mentioned in parliamentary speeches, starting with using an `inner_join()`.  Like its cousin, `left_join()`, `inner_join()` works with two data sets to make a new, combined data set.  We use `inner_join()` when we want to analyze shared areas of overlap between two data sets. In this case, we want to find the n-grams from `annotated_1830` that are also listed as entities in the events controlled vocabulary. 
+We will now count events mentioned in parliamentary speeches, starting with using an `inner_join()`.  Like its cousin, `left_join()`, `inner_join()` works with two data sets to make a new, combined data set.  We use `inner_join()` when we want to analyze shared areas of overlap between two data sets. For our analysis. we want to find the n-grams from `annotated_1830` that are also listed as entities in the events controlled vocabulary. 
 
-```{r}
+```{r, message=FALSE}
 # Load the Hansard speech text and associated metadata for the year 1830
 data("hansard_1830")
 data("debate_metadata_1830")
@@ -574,14 +573,14 @@ events_1830 %>%
                 position = "left",
                 latex_options = c("hold_position", "scale_down"),
                 font_size = 7) %>% 
-  column_spec(2, width = "4cm")
+  column_spec(3, width = "4cm")
 ```
 
 Notice that the resulting dataset contains speaker and date columns from the parliamentary speeches, but the only bigrams listed are those that correspond to events from `eventslist`. 
 
 In the next blocks of code, we use our new list of events to generate a visualization. 
 
-```{r}
+```{r, message=FALSE}
 # count how many times each event bigram is mentioned on each speech date
 # extract year from date, group by relevant fields, and remove grouping after summarizing
 counted_events <- events_1830 %>% # create a new dataset
@@ -593,7 +592,7 @@ counted_events <- events_1830 %>% # create a new dataset
 head(counted_events)
 ```
 
-```{r}
+```{r, message=FALSE}
 # summarize total mentions of each event across all speech dates
 # grouped by event name and assigned historical date
 # then sort chronologically for historical analysis
@@ -684,7 +683,7 @@ Note that the visualization here resembles the visualization of events we genera
 
 How should we interpret this graph? One approach is to identify the most surprising aspects of the visualization and explore their implications. For instance, as a British historian, I am unsurprised by frequent references in Parliament to events from the previous half-century, such as the French and American Revolutions. Similarly, it's expected that the Glorious Revolution was heavily referenced in the early 1830s, with mentions tapering off after 1836, and that the Riot Act was invoked annually. However, the most striking feature of the graph may be the vertical line around 1832, where references to much older historical periods—the sixteenth, thirteenth, and twelfth centuries—appear. This invocation of the distant past invites further investigation into its context and significance.
 
-Why? I find myself asking. That verticality of temporal experience--the long perspective on the deep past--seems to be fairly distinct for 1830-32 of all the years in the decade. Why do so many different, varied periods suddenly become relevant all at  once? Is this a general characteristic of moments of political reform -- that the deep past is trawled for a multitude of examples, for and against?  
+Why? we find ourselves asking. That verticality of temporal experience--the long perspective on the deep past--seems to be fairly distinct for 1830-32 of all the years in the decade. Why do so many different, varied periods suddenly become relevant all at  once? Is this pattern a general characteristic of moments of political reform -- that the deep past is trawled for a multitude of examples, for and against?  
 
 We continue the explanation through reading.
 
@@ -786,7 +785,7 @@ Here is a typical workflow for handling large data like Hansard:
 
 - Filter or Subset the Dataset: Narrow down the dataset to include only the data relevant to your analysis. For example, if we are analyzing speeches by William Gladstone, we can filter rows where the speaker is Gladstone using functions like `filter()` from the `dplyr` package. Similarly, we could filter for speeches belonging to a specific debate by filtering the data based on a title. Subsetting early in the process reduces the amount of data that will be processed later, saving processing time and computational resources. 
 
-- Clean the Dataset: After subsetting, clean the dataset to prepare it for analysis. Cleaning typically involves handling missing values, removing stop words, and normalizing text (e.g., converting text to lowercase). This can be done with functions like `mutate()` from `dplyr`, or string processing functions like `str_to_lower()`, which transforms text to lower case, from the `stringr` package.
+- Clean the Dataset: After subsetting, clean the dataset to prepare it for analysis. Cleaning typically involves handling missing values, removing stop words, and normalizing text (e.g., converting text to lowercase). We can clean data with functions like `mutate()` from `dplyr`, or string processing functions like `str_to_lower()`, which transforms text to lower case, from the `stringr` package.
 
 - Analyze the Dataset: Now that you have just the needed data, perform your analysis by applying metrics. 
 
@@ -801,207 +800,3 @@ Tips: Instead of joining every decade together, process the decades separately t
 2) In the code above, we created two kinds of timelines, one for 1867 using a controlled vocabulary of words such as "meeting" and the other for the 1830s using the list of historical events, `eventlist`. Make two more timelines.  Apply the controlled vocabulary to the 1830s, and search for the items in `eventlist` in the 1860s. Use the code above to graph the results. Keep in mind that you will need to adjust your controlled vocabulary to what you find in the data.  
 
 3) Analyze the results of your timelines.  Use iterative investigations of phrases, as modeled above, to conduct a distant reading of the parliamentary speeches.  Using at least ten examples, compose a one-page essay investigating the question: how did parliamentary speakers use references to contemporary and historical events to make arguments for or against political change?
-
-## Practicing with AI 
-
-Throughout this book, we emphasize the importance of an iterative approach to analysis. During this iterative process we can refine one's own understanding of the data by revisiting the original records, or by questioning one's assumptions of historical interpretation through interrogative processes that build upon one-another. 
-
-AI chatbots can support iterative research, too, by supporting an interactive bnrainstorming process. Analysts can ask questions, review responses, and adjust their queries, engaging in a cycle of exploration and refinement. When used this way, an AI chatbot is guided by the analyst to generate focused, relevant responses. The analyst must also critique the chatbot’s output to ensure it is accurate and useful. This approach allows analysts to use AI chatbots as a tool for inquiry while maintaining control over the research process.
-
-In the following example, we use our queries from earlier in the chapter to guide an AI chatbot in helping us to brainstorm additional events that we might want to explore. Specifically, we ask the chatbot to generate additional events that might be of interest to someone studying language relating to war in the 1860 Hansard debates. We will guide the chatbot's response by giving it an example of the types of events that interest us taken from the `eventslist` dataset.
-
-The template we provide the chatbot (e.g. "return your answer in this fomrat...") instructs it to return its response in the specified format. 
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt] I am providing you with a list of events followed by their year. The purpose of this list is to analyze key events that were mentioned in the 1860 Hansard debates. Name some different events that might be relevant based on the list I provide you. Don't mention the same as provided by the list. Also provide a reason for why the events are relevant. 
-
-Return your answer in this format:
-
-\textbf{Event:} \\
-\textbf{Reason:}
-
-These are the events from the list: (copy/paste contents of eventslist) \end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-
-\textbf{Event: Abolition of the Slave Trade (1807)} \\
-\textbf{Reason:} The abolition of the slave trade would be highly relevant in discussions about moral and economic reforms during the 1860 Hansard debates, particularly in the context of human rights and British colonial policies.
-
-\textbf{Event: Reform Act (1832)} \\ 
-\textbf{Reason:} This act, which expanded suffrage and restructured parliamentary representation, would likely influence discussions on electoral reform and representation in 1860.
-
-\textbf{Event: Crimean War (1853–1856)} \\ 
-\textbf{Reason:} The Crimean War had significant impacts on British foreign policy, military reforms, and public health improvements, all of which could be relevant topics of debate in 1860.
-
-\textbf{Event: Irish Potato Famine (1845–1852)} \\ 
-\textbf{Reason:} The famine’s aftermath would remain a pressing issue, influencing debates about Irish governance, economic policies, and relief efforts.
-
-\textbf{Event: Great Exhibition (1851)} \\ 
-\textbf{Reason:} As a symbol of industrial progress and imperial power, the Great Exhibition could be discussed in terms of economic innovation and Britain's global role in the mid-19th century.
-
-\textbf{Event: Indian Rebellion (1857)} \\
-\textbf{Reason:} The rebellion was a turning point in British imperial governance, leading to significant debates about military strategy, colonial administration, and the justification of imperial rule.
-
-\textbf{Event: Public Health Act (1848)} \\ 
-\textbf{Reason:} This act, which addressed urban sanitation and public health, would be relevant to discussions about improving living conditions and public health policies in 1860.
-
-\textbf{Event: Establishment of the Penny Post (1840)} \\ 
-\textbf{Reason:} The reform in postal services, increasing communication efficiency and accessibility, could relate to debates on economic and infrastructural development.
-
-\end{tcolorbox}
-
-Our initial prompt to the AI chatbot successfully guided it to identify and return events similar to the query. However, when we provided the chatbot with the entire contents of eventslist, the results lacked precision and specificity. This outcome suggests that more targeted guidance is necessary to focus on the specific characteristics of interest. To tailor the results to a specific research question, we will refine the prompt further by narrowing in on the events we are most interested in from `eventslist` and instructing the chatbot to return like-events, in this case, other names of meetings that occurred in the 1860s. 
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
-I am providing you with a list of events followed by their year. The purpose of this list is to analyze key events that were mentioned in the 1860 Hansard debates. Name some different events that might be relevant based on the list I provide you. Don't mention the same as provided by the list. Also provide a reason for why the events are relevant based on the list I provide. 
-
-Return your answer like this:
-
-\textbf{Event:} \\
-\textbf{Date:} \\
-\textbf{Reason:}
-
-These are the events from the list: "greek war", "napoleonic wars."
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-Here are some different events that might be relevant based on your list:
-
-\textbf{Event: Chartist Movements} \\
-\textbf{AI Assigned Date:} 1838–1850\\
-\textbf{Reason:} The Chartist movements, with their organized public gatherings for political reform, directly relate to the mentioned events like "public meeting" and "recent meeting," illustrating how assemblies have historically been used to drive societal change.
-
-\textbf{Event: Anti-Corn Law League Meetings}\\
-\textbf{AI Assigned Date:} 1839–1846\\
-\textbf{Reason:} These meetings share a thematic connection to "public meeting" by demonstrating how public gatherings have been pivotal in shaping discourse around economic reform, similar to those discussed in the 1860 debates.
-
-\textbf{Event: Hyde Park Demonstrations}\\
-\textbf{AI Assigned Date:} 1855–1860\\
-\textbf{Reason:} Hyde Park demonstrations resonate with "public meeting" and "recent meeting," showing how such gatherings functioned as platforms for political and social advocacy, reflecting the period's reliance on public discourse for progress.
-
-\textbf{Event: Meetings on the Reform Act of 1832}\\
-\textbf{AI Assigned Date:} 1831–1832\\
-\textbf{Reason:} These meetings are akin to "yorkshire meeting" and "clontarf meeting," showcasing historical instances where regional or national public assemblies catalyzed significant legislative reforms, serving as a possible reference point in 1860.
-
-\textbf{Event: Fenian Meetings}\\
-\textbf{AI Assigned Date:} 1858–1860\\
-\textbf{Reason:} While slightly later, Fenian meetings parallel "clontarf meeting" by highlighting Irish political concerns and illustrating how public gatherings were used to address issues of representation and governance.
-\end{tcolorbox}
-
-Now that we have a more specific list of events that aligns with our interests, we can use them in our analysis. To use our new events, we will create a data frame for them. We can prompt the chatbot to return the needed code. Given that we are very familiar with creating data frames at this point, we can also proof the chatbot's results and ensure they match our desired output. 
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
-Return this text as a data frame in R with two columns: a column for the event, named event\_name and a column for the date, named AI Assigned Date. Write the events in lower case. 
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-Here is the R code to create the requested data frame:
-  
-\begin{verbatim}
-# Create the data frame
-
-events_df <- data.frame(
-  event_name = c(
-    "crimean war",
-    "russo-turkish war",
-    "congress of vienna",
-    "siege of acre",
-    "battle of navarino",
-    "schleswig-holstein wars"
-  ),
-  AI_Assigned_Date = c(
-    "1853–1856",
-    "1828–1829",
-    "1814–1815",
-    "1799",
-    "1827",
-    "1848–1852"
-  )
-)
-
-# Print the data frame
-print(events_data)
-\end{verbatim}
-
-This will create a data frame in R with two columns: event\_name (containing the event names in lowercase) and AI Assigned Date.
-\end{tcolorbox}
-
-We can now test the chatbot's responses by running the code. 
-
-```{r}
-# Create the data frame
-events_df <- data.frame(
-  event_name = c(
-    "crimean war",
-    "russo-turkish war",
-    "congress of vienna",
-    "siege of acre",
-    "battle of navarino",
-    "schleswig-holstein wars"
-  ),
-  AI_Assigned_Date = c(
-    "1853–1856",
-    "1828–1829",
-    "1814–1815",
-    "1799",
-    "1827",
-    "1848–1852"
-  )
-)
-
-# Print the data frame
-print(events_df)
-
-```
-
-
-```{r}
-data("hansard_1860")
-data("debate_metadata_1860")
-
-hansard_1860 <- hansard_1860 %>% 
-  left_join(debate_metadata_1860)
-```
-
-The following code filters the `hansard_1860` dataset to include rows where the `text` column matches any event name in `events_df$event_name`, using case-insensitive matching. It then adds a new column, `matched_event`, which contains the specific matched event name from the `text`. The result is a filtered data frame with an additional column identifying the matched event for each row.
-
-```{r}
-# Match with each event and 
-# add a column to capture the matched event
-new_matched_events <- hansard_1860 %>%
-  filter(str_detect(text,
-                    regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
-                          ignore_case = TRUE))) %>%
-  mutate(matched_event = str_extract(text,
-                                     regex(paste0("\\b(", paste(events_df$event_name, collapse = "|"), ")\\b"), 
-                                           ignore_case = TRUE)))
-```
-
-```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
-# Show top 5 rows
-df_head <- new_matched_events %>% 
-  slice_head(n = 5)
-
-# Print table with fixed position and word wrap
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Excerpt from Hansard 1850") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
-```
-
-The results show that not all of the events were mentioned word-for-word in the Hansard corpus; however, we successfully matched several, including the Crimean War, Congress of Vienna, and Battle of Navarino. While an AI chatbot can suggest a wider range of related terms to search for--and these terms might spark our curiosity--those terms may not actually appear in the corpus. For experts 19th-century history, it might be expected that some phrases would not be found, but for others, this process can offer a useful way to explore which events were and were not mentioned in the data. This kind of exploration is part of an ongoing, iterative process—where analysts refine their searches by adding or adjusting keywords, either manually or with AI. 
-
-It is also important to note that the AI chatbot did not automatically fix formatting issues in the text, such as inconsistent capitalization. To obtain more reliable and visually meaningful results, the analyst may want to take extra processing steps to clean the data—such as making all text lowercase and fixing other formatting problems—before analysis.
-
-```{r}
-event_counts <- new_matched_events %>%
-  count(matched_event, name = "count") %>%
-  arrange(desc(count))
-
-print(event_counts)
-```
-

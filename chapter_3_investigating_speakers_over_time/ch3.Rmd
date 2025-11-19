@@ -42,7 +42,7 @@ head(speaker_metadata_1830)
 
 For now, we will just go over three relevant fields from `speaker_metadata`. 
 
-Each sentence from the Hansard corpus is assigned a unique ID, as represented by the `sentence_id` field. The speaker who stated a sentence is assigned the same ID. This allows us to join the data from speaker_metadata to other data from `hansardr`, such as the debate text. 
+Each sentence from the Hansard corpus is assigned a unique ID, as represented by the `sentence_id` field. The speaker who stated a sentence is assigned the same ID. The shared key across datasets allows us to join the data from speaker_metadata to other data from `hansardr`, such as the debate text. 
 
 The other two important fields we will address are the `speaker` and the `suggested_speaker` fields. 
 
@@ -54,7 +54,7 @@ To make analysis of speaker names more challenging yet, during the digitization 
 
 Because of these nuances, any naive attempt to count words by speaker would be guaranteed to produce wrong results. It was paramount, therefore, that in managing the `hansardr` data, we produce an authoritative index of actual speakers that corresponded to the facts. In data science, adding a column with information inking this authoritative index to the names as presented is called "metadata."
 
-The curators of the dataset -- a team of historians and datascientists run by the authors -- stored the metadata about the speakers in the "suggested_speaker" field. This field contains our suggestion for the true identity of the speaker. Importantly, this suggested_speaker field represents a marked improvement on existing data sources, tested by historians, but our data is not guaranteed for universal accuracy; hence it is only "suggested." In the suggested_speaker field, a unique id is given that refers to one unique speaker who was in parliament during the time covered by the database.  While multiple speakers during the same period sometimes share the same name (like the two Gladstones or two Peels), each individual speaker is assigned a unique number.  Thus, when we see the number 3104 in the suggested_speaker field, the curators of the database have made the inference that the W. Gladstone in question refers to William Gladstone, not his son William Henry.  
+The curators of the dataset -- a team of historians and datascientists run by the authors -- stored the metadata about the speakers in the `suggested_speaker` field. The `suggested_speaker` field contains our suggestion for the true identity of the speaker. Importantly, the `suggested_speaker` field represents a marked improvement on existing data sources, tested by historians, but our data is not guaranteed for universal accuracy; hence it is only "suggested." In the suggested_speaker field, a unique id is given that refers to one unique speaker who was in parliament during the time covered by the database.  While multiple speakers during the same period sometimes share the same name (like the two Gladstones or two Peels), each individual speaker is assigned a unique number.  Thus, when we see the number 3104 in the suggested_speaker field, the curators of the database have made the inference that the W. Gladstone in question refers to William Gladstone, not his son William Henry.  
 
 In the following code, we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" fields before tokenizing the data into individual words. 
 
@@ -108,9 +108,9 @@ words_per_speaker_1830 <- words_1830 %>%
 head(words_per_speaker_1830)
 ```
 
-Most students of British history will be familiar with the names of the speakers on this list, which include two prime ministers as well as one noted Irish orator and nationalist, Daniel O'Connell. The count above also shows us that among the most prolific speakers was the Chancellor of the Exchequer. How should we interpret this fact?
+Most students of British history will be familiar with the names of the speakers included in the `words_per_speaker_1830` variable, which include two prime ministers as well as one noted Irish orator and nationalist, Daniel O'Connell. The count above also shows us that among the most prolific speakers was the Chancellor of the Exchequer. How should we interpret this fact?
 
-A naive analyst might assume that the Chancellor of the Exchequer was one person, the fifth most prolific speaker in the 1830s.  Yet this would be an error of interpretation. The number of words spoken by the Chancellor counts the speeches of several  distinct individuals. 
+A naive analyst might assume that the Chancellor of the Exchequer was one person, the fifth most prolific speaker in the 1830s. Yet this assumption would be an error of interpretation. The number of words spoken by the Chancellor counts the speeches of several distinct individuals. 
 
 The careful analyst will be concerned about the speaker classified as "The Chancellor of the Exchequer," for many individuals held this post over the course of the years 1830-39, which we are looking at now. The Chancellor of the Exchequer is the head financial officer of the United Kingdom. 
 
@@ -134,7 +134,7 @@ Nevertheless, our first pass revealed something interesting -- as byways in the 
 
 It may seem arbitrary to investigate the Chancellor of the Exchequer, but the office provides a perfect opportunity to test how the metadata indexing individual speakers works. Next, will use the suggested_speaker field to pull apart the many individuals associated with the office.  
 
-Because the dataset includes metadata about each speaker and how they are described, we can find the many individuals who occupied this office, and we can do research on them instead. In a sense, it's a happy accident of our research process that we used group_by() applied to the speaker field rather than the authoritative suggested_speaker field, because the speaker field tells us about the way that individuals were actually designated in Hansard, including their office name.
+Because the dataset includes metadata about each speaker and how they are described, we can find the many individuals who occupied the office of the Chancellor of the Exchequer, and we can do research on them instead. In a sense, it's a happy accident of our research process that we used `group_by()` applied to the speaker field rather than the authoritative suggested_speaker field, because the speaker field tells us about the way that individuals were actually designated in Hansard, including their office name.
 
 Before we proceed, we should try to refine our research question to provide maximum historical insight so that we can start to imagine how our quantitative research process becomes worthwhile.  For instance, we can ask questions about the diversity of views of the individuals who and we can ask questions about the office.  
 
@@ -146,7 +146,8 @@ To analyze the different speakers, the code that follows will use `group_by()` t
 
 Before we proceed, a first step is to "clean" our data. In previous chapters we used an existing stop words list from `tidytext`. The `hansardr` library also provides its own stop words list. 
 
-It may be the case, however, that an analyst wants to curate their own stop words list that caters to their specific data set or research question. In the following code we create a custom stop words list by assigning a list of words to a tibble (a `tidyverse`-style data frame). In this case, suppose we want to restrict all words referring to parliament, ideas, or procedures; we only want to look at words that are more or less substantive about the subjects being discussed in parliament.  s
+It may be the case, however, that an analyst wants to curate their own stop words list that caters to their specific data set or research question. In the following code we create a custom stop words list by assigning a list of words to a tibble (a `tidyverse`-style data frame). For our analysis, suppose we want to restrict all words referring to parliament, ideas, or procedures; we only want to look at words that are more or less substantive about the subjects being discussed in parliament. 
+
 An appropriate stopwords list might look like this:
 
 ```{r}
@@ -236,7 +237,7 @@ chancellor_of_the_exchequeur %>%
   head()
 ```
 
-Note that in the table above, the "word" is annotated with information about the speaker. This is to prevent confusion about what is being counted; we're not just counting how many times a word appears, but how many times each speaker said it.
+Note that in the table above, the "word" is annotated with information about the speaker. Annotation is used to prevent confusion about what is being counted; we're not just counting how many times a word appears, but how many times each speaker said it.
 
 Next, let's visualize the data so that we can see how many words are spoken. 
 
@@ -258,16 +259,16 @@ The results show that the individuals who occupied the post of Chancellor of the
 
 Goulburn is interested in talking about commodities such as beer, tobacco, and malt; Peel is interested in addressing questions about how taxes relate to the church and its tithes, as well as political issues about how dissenters, Protestants and Catholics. Peel also thinks about commodities, but his commodities are different than Goulburn's; they include malt, land, and barley. Rice takes the issues in a different direction, reflecting on Dublin, India, banks, newspapers, and pensions.  He shares with Peel a concern about property or land taxes.    
 
-Interpretation always represents an intellectual challenge. A list of most frequent words is not necessarily an index of importance: the most frequently-mentioned terms are typically the terms most subject to debate. Robert Peel, for instance, does not name Ireland's church tithes because he was interested in protecting the church in Ireland; to the contrary, he wished to abolish the system of tithes.  Nor does the word list give us material for interpreting the rest of Peel's politics; the word list does nothing to tell the uninformed analyst about the movement for the abolition of taxes on grain, which forms a background to interpreting Peel's mentions of barley.  The word list tells us little about the presence in 1830s Ireland of two churches, Roman Catholic and the Church of England. Without further reading, we might never known that Goulburn was famous for arguing for reductions on taxation (although with this knowledge, we might become interested in the word "lower").  The analyst who comes to this data without a background in British history would do well to read in secondary sources before attempting to interpret the graph.  
+Interpretation always represents an intellectual challenge. A list of most frequent words is not necessarily an index of importance: the most frequently-mentioned terms are typically the terms most subject to debate. Robert Peel, for instance, does not name Ireland's church tithes because he was interested in protecting the church in Ireland; to the contrary, he wished to abolish the system of tithes.  Nor does the word list give us material for interpreting the rest of Peel's politics; the word list does nothing to tell the uninformed analyst about the movement for the abolition of taxes on grain, which forms a background to interpreting Peel's mentions of barley.  The word list tells us little about the presence in 1830s Ireland of two churches, Roman Catholic and the Church of England. Without further reading, we might never known that Goulburn was famous for arguing for reductions on taxation (although with this knowledge, we might become interested in the word "lower").  The analyst who comes to the Hansard corpus without a background in British history would gain greater insight by reading secondary sources before interpreting the graph.
 
-After some basic background research, however, the word lists can help produce insight, cluing the reader into differences such as Goulburn's relative willingness to talk about "distress," Peel's interest in "education," or Rice's interest in the post office.  With word lists of this sort, we retrieve important clues about the salient differences contributed to political debates by individual ministers.  A researcher interested in the careers of Chancellors of the Exchequer might start here before reading more deeply.
+After some basic background research, however, the word lists can help produce insight, cluing the reader into differences such as Goulburn's relative willingness to talk about "distress," Peel's interest in "education," or Rice's interest in the post office.  With word lists, we retrieve important clues about the salient differences contributed to political debates by individual ministers.  A researcher interested in the careers of Chancellors of the Exchequer might start here before reading more deeply.
 
 There is no rule of thumb for how many words to look at, but more words is always better. Distant reading, by its nature, is a shortcut to making sense of long passages of text. We want to take our time with these words, not rush to conclusions, and not merely read the top five.  If we expanded the list of words, we might get more insight -- especially if we have gone to the trouble of reading more about the work of Goulborn and Rice during the 1830s and we have specific questions about their priorities. The researcher is welcome to adjust upwards the number of words shown in these charts by raising the number in the code `top_n(35)` -- although at a certain point, legibility will require new code to expand the bounding box that limits how big a visualization is. 
 
 
-How new is this information to readers of British history?  We have long known that issues of what was taxed and how are a basic matter for politics of class, empire and nation; everyone wants someone else to pay for the government.   The research modeled in this textbook has a pedagogical function, and for that reason, we often present in these chapters examples that could be improved or investigated further, and the above chart is one of those.  
+How new is the information we have gleaned to readers of British history?  We have long known that issues of what was taxed and how are a basic matter for politics of class, empire and nation; everyone wants someone else to pay for the government.   The research modeled in this textbook has a pedagogical function, and for that reason, we often present in these chapters examples that could be improved or investigated further, and the above chart is one of those.  
 
-#### Critical Thinking About Our Results
+## Critical Thinking About Our Results
 
 In any research process, it is important to reflect on how the choices we have made impact our analysis, and how making different choices might have produced different results.  For some researchers, the list in `custom_stop_words` may unnecessarily eliminate words whose usage they might want to track. Some researchers will want to identify words for rhetorical statements such as "hoped" or "feeling"; others may be intrigued about how different speakers refer to "information" or "knowledge." In general, I have opted for a deep list which includes every general allusion to governance, institutions, discovery, and communication.  The beauty of custom lists is that each researcher can easily adjust the words to match their interests Analysts should understand how carefully they must tailor a custom stop words list to their project, and how much of a difference additions and subtractions make. Using a custom stop word list is very much an artisinal skill of research; it involves much the same skills of judgment, awareness, curiosity, and sensitivity to background issues from theory and secondary sources as does careful reading of primary sources.  
 
@@ -353,7 +354,8 @@ data("file_metadata_1820")
 mrs_walrand_speaker_metadata <- speaker_metadata_1820 %>%
   filter(str_detect(speaker, regex("Mrs(.*)Walrand", ignore_case = T)))
 
-mrs_walrand_sentences <- left_join(mrs_walrand_speaker_metadata, file_metadata_1820, by = "sentence_id") %>%
+mrs_walrand_sentences <- left_join(mrs_walrand_speaker_metadata, 
+                                   file_metadata_1820, by = "sentence_id") %>%
   left_join(., hansard_1820, by = "sentence_id") %>%
   select(debate_id, text)
 
@@ -393,9 +395,9 @@ ggplot(data = mrs_walrand_top_words,
 
 ## Exercises
 
-1) As we discussed in the beginning of this chapter, analyzing the individual or collective speeches of men in Parliament can give insight into the workings of the Parliament as an institution of power. We can explore the roles of elite white men as they exerted their will--and the will of their peers--through the Parliamentary institution. We can also explore the roles of women in this space and examine how women differ in their contributions, as they were prohibited from becoming members of Parliament. Further, the woman's presence had to be mediated by one of the MPs, as they could not be there without being selected or approved. In this way, women were treated as instruments of power in Parliament. 
+1) As we discussed in the beginning of this chapter, analyzing the individual or collective speeches of men in Parliament can give insight into the workings of the Parliament as an institution of power. We can explore the roles of elite white men as they exerted their will--and the will of their peers--through the Parliamentary institution. We can also explore the roles of women in Parliament and examine how women differ in their contributions, as they were prohibited from becoming members of Parliament. Further, the woman's presence had to be mediated by one of the MPs, as they could not be there without being selected or approved. In result, women were treated as instruments of power in Parliament. 
 
-We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. To do this, refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
+We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. Refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
 
 ```{r, echo = FALSE, message = FALSE}
 name <- c("Mrs. (Mary Ann) Clark", 
@@ -435,9 +437,9 @@ df %>%
   kable_styling()
 ```
 
-Note: The way in which their names are recorded in this table might not reflect the way in which their names appear in the debates. This is because the names have been consolidated into one representation
+Note: The way in which their names are recorded in this table might not reflect the way in which their names appear in the debates because the names have been consolidated into one representation
 
-2) Use the techniques shown above to move between a distant reading of the top words spoken by Mrs. Walrand or Louisa Demont in all of her speeches to the full debate. (As a reminder, you can view all of a speaker's speeches by filtering for just that speaker. You will also need to load the data for the appropriate years.) How does transitioning between the different modes of reading text provide insight into this specific debate? How does this illuminate the role of women in 19th-century Parliament?
+2) Use the techniques shown above to move between a distant reading of the top words spoken by Mrs. Walrand or Louisa Demont in all of her speeches to the full debate. (As a reminder, you can view all of a speaker's speeches by filtering for just that speaker. You will also need to load the data for the appropriate years.) How does transitioning between the different modes of reading text provide insight into this specific debate? How does the data frame illuminate the role of women in 19th-century Parliament?
 
 3) Adjust the above code to search for a different office title. What can you infer about the different MPs who held this title? Can we support our inferences through close readings of their speeches?  
 

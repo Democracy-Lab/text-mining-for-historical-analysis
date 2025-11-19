@@ -159,41 +159,27 @@ print(both_periods_word_count_totals$total[2] - both_periods_word_count_totals$t
 Next, let's look at the actual words spoken in each period and see how they compare.
 
 ```{r, echo=FALSE}
-library("gt")
+library(kableExtra)
+library(scales)
 
-# top words
+# Extract the top 10 most frequent words for each period
+# sort by highest word count and
+# keep the top 10 words per period
 top_words <- both_periods_word_count %>% 
-  group_by(period) %>%
-  slice_max(order_by = wordcount, # put the words in descending order by "wordcount," the column for the count
-            n = 10) # the argument "n" for the function "slice_max" takes the number of positions from the top to retain
+  group_by(period) %>% 
+  slice_max(order_by = wordcount,
+            n = 10)
 
-# make a table
+# Create a clean table with kable
 top_words %>%
-  gt() %>% # we're using the "great tables" package to make an elegant table
-  fmt_number( # format the numbers in the table
-    columns = everything(), # apply to all numbers
-    decimals = 0, # no decimals
-    use_seps = TRUE # use commas
-  ) %>%
-  tab_header(title = "The Top Ten Words Spoken in Prereform and Postreform Parliament") %>%
-  tab_style(
-    style = list(cell_text(weight = "bold")),
-    locations = cells_row_groups()
-  ) %>%
-  tab_style( # format the column labels
-     style = list(
-        cell_fill(color = "black"),
-        cell_text(weight = "bold", color = "white")
-        ),
-      locations = cells_column_labels()
-     ) %>%
-    tab_style( # format the title
-      style = list(
-        cell_fill(color = "lightgray"),
-        cell_text(weight = "bold")
-        ),
-      locations = cells_title()
-      )
+  mutate(across(where(is.numeric), comma)) %>%  # format numbers with commas
+  kable("latex", 
+        booktabs = TRUE, 
+        caption = "The Top Ten Words Spoken in Prereform and Postreform Parliament") %>%
+  kable_styling(full_width = FALSE, position = "left") %>%
+  row_spec(0, bold = TRUE, background = "black", color = "white") %>%   # header styling
+  add_header_above(c(" " = ncol(top_words)))  # keeps table width stable
+
 ```
 
 The analyst will discern that there are only very minor differences between the top words of both categories. What are we to make of that?  

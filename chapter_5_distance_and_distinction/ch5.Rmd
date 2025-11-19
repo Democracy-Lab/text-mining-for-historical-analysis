@@ -390,10 +390,10 @@ These results are ready to be passed to the distinctiveness algorithm so that th
 We use the function `bind_tf_idf()` to calculate distinctiveness for any word-document pair, using the arguments _word_, _document_, and _n_. To calculate distinctiveness by decade, we set the argument _document_ as "decade."
 
 ```{r, message = F}
-# calculate tf-idf (term frequency–inverse document frequency) for each word by decade 
-# using word frequency and total count
+# calculate tf-idf (term frequency–inverse document frequency) 
+# for each word by decade using word frequency and total count
 hansard_tf_idf <- words_per_decade %>%
-  bind_tf_idf(word, decade, word_count_per_decade)  # compute tf-idf \
+  bind_tf_idf(word, decade, word_count_per_decade)  # compute tf-idf
 ```
 
 ```{r}
@@ -487,7 +487,7 @@ In preparation for using tf-idf across multiple decades, we use the following co
 
 While a `for` loop is not needed to perform these actions, we have chosen to use one here to process text data separately for each decade in the dataset. Otherwise, tokenizing all four decade subsets simultaneously could exceed available computer memory. The code may run slow on older or more limited machines -- give it time to run.
 
-```{r}
+```{r, message=FALSE}
 # define the list of decades to analyze. each value will be used to 
 # filter the main dataset, enabling decade-by-decade processing.
 decades <- c(1830, 1840, 1850, 1860)
@@ -497,7 +497,8 @@ decades <- c(1830, 1840, 1850, 1860)
 hansard_words_1830_to_1870 <- data.frame()
 
 # iterate through each specified decade to perform tokenization, 
-# filtering, and word frequency counting. results are combined into a single table.
+# filtering, and word frequency counting
+# results are combined into a single table.
 for(d in decades) {
   
   # filter the full hansard dataset for just the current decade (d)
@@ -584,7 +585,8 @@ Some of the words may key the analyst into rhetorical shifts, like the old-fashi
 ## Cleaning Out the Cache so as to Preserve Memory
 
 At this stage of our analysis, we are working with several datasets. Working with multiple datasets at a given time can provide us with a richer overview of the historical records, however, it can consume a significant amount of memory on our computer. To free memory, we can remove some of the large datasets from our Global Environment before going to our next examples and analyses. 
-One can remove data using `rm()` while passing the variables you wish to clear. For example, `rm()` can be passed a single variable name or multiple variable names. 
+
+We can remove data using `rm()` while passing the variables you wish to clear. For example, `rm()` can be passed a single variable name or multiple variable names. 
 
 ```{r}
 # Remove both datasets from the global environment
@@ -663,7 +665,7 @@ We hope that readers will become comfortable with the idea that algorithmic appr
 
 First we will load our data and prepare it for our partial JSD function. The following code tokenizes and cleans both decades. 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library("tidyverse")
 library("hansardr")
 library("tidytext")
@@ -792,8 +794,9 @@ word_dist <- word_dist %>%
   mutate(p_1840 = count_1840 / sum(count_1840),  # normalize 1840 counts
          p_1850 = count_1850 / sum(count_1850))  # normalize 1850 counts
 
-# Taking the log of zero isn’t allowed, so we replace any zeros with a tiny number.
-# This keeps the math stable without changing the results in any meaningful way.
+# Taking the log of zero isn’t allowed
+# Therefore, we replace any zeros with a tiny number
+# This keeps the math stable without changing the results in a meaningful way.
 word_dist$p_1840[word_dist$p_1840 == 0] <- 1e-10
 word_dist$p_1850[word_dist$p_1850 == 0] <- 1e-10
 
@@ -820,21 +823,22 @@ word_dist <- word_dist %>%
          Partial_JSD_1850 = partial_jsd_1850_to_1840(p_1840, p_1850)) %>% 
   ungroup()
 
-# For interpretation, assign each word to a single dominant direction:
-# - If its contribution is greater when comparing 1840 to 1850, it is labeled "1840 to 1850"
-# - Otherwise, it's labeled "1850 to 1840"
-# Also, assign a signed Partial JSD value:
-# - Negative if the word is more distinctive of 1840 (helps indicate direction visually)
-# - Positive if more distinctive of 1850
+# Assign a direction for each word:
+# - 1840 → 1850" if its contribution is higher in that direction,
+# - otherwise "1850 → 1840".
+# Signed Partial JSD:
+# - Negative = more distinctive of 1840
+# - Positive = more distinctive of 1850
 word_dist <- word_dist %>%
-  mutate(Direction = ifelse(Partial_JSD_1840 > Partial_JSD_1850,  # decide dominant direction
+  mutate(Direction = 
+           ifelse(Partial_JSD_1840 > Partial_JSD_1850,  # decide dominant direction
                             "1840 to 1850", 
                             "1850 to 1840"),
          Partial_JSD = ifelse(Direction == "1840 to 1850", 
                               -Partial_JSD_1840,  # negate to show shift from 1840
                                Partial_JSD_1850))  # keep positive for 1850-leaning
 
-# Rank words by the magnitude of their contribution to divergence (i.e., absolute Partial JSD)
+# Rank words by the their contribution to divergence (i.e., absolute Partial JSD)
 # and keep the top 30 most distinctive words across the two decades
 word_dist <- word_dist %>%
   arrange(desc(abs(Partial_JSD))) %>%  # Sort by highest absolute contribution
@@ -849,7 +853,8 @@ Partial JSD can be interpreted as follows:
 One effective way of visualizing the results from Partial JSD is with a diverging bar chart, like in the following visualization. Higher Partial JSD values (e.g., war, india, government) indicate words whose relative importance changed significantly between 1840 and 1850 whereas lower Partial JSD values (e.g., noble, stated, foreign) suggest words that remained relatively stable in their frequency distribution across both decades. 
 
 ```{r}
-# create a mirrored bar chart showing which words contribute most to linguistic shift
+# create a mirrored bar chart showing which words contribute 
+# most to linguistic shift
 # between 1840 and 1850 
 # bars are flipped to show direction, based on partial jsd
 ggplot(word_dist, aes(x = reorder(word, Partial_JSD), # order words by divergence
@@ -862,8 +867,8 @@ ggplot(word_dist, aes(x = reorder(word, Partial_JSD), # order words by divergenc
        y = "partial jsd value", # y-axis label
        fill = "change direction") + # legend title
   theme_minimal() + # use a clean minimal theme
-  scale_fill_manual(values = c("1840 to 1850" = "red", # set color for 1840 shift
-                               "1850 to 1840" = "blue")) + # set color for 1850 shift
+  scale_fill_manual(values = c("1840 to 1850" = "red", # color for 1840 shift
+                               "1850 to 1840" = "blue")) + # color for 1850 shift
   theme(legend.position = "bottom") # move legend below plot
 ```
 
@@ -872,8 +877,6 @@ From this analysis, we can start to interpret what was trending and what was goi
 Less and less in evidence after 1850 were discussions of war, India, and the work of committees. Various formal language were passing, including addressing other members of parliament as "gentleman," talking about the "matter" at hand, or addressing each other as "sir."  
 
 The causes and implications of these changes are interesting to contemplate, and, as with much work in text mining, they require deeper reading of context in order to dive deeper.  The point is that distance measurement lends us a metric to make concrete phenomena that are otherwise invisible -- the pulse of rising and falling trends over time.  
-
-
 
 ## Exercises: 
 
@@ -884,108 +887,5 @@ The causes and implications of these changes are interesting to contemplate, and
 3) In chapter 2 and chapter 3, we learned how to use a controlled vocabulary to focus our analyses on subsets of the data that include a particular word of interest. Re-do the comparison of the decades 1830 and 1860, but this time filter the two decades for just debates that include the word "cotton." How does tf-idf obviate the need for stopwords lists? How does working with tf-idf result in a different interpretation than working with stopwords alone?  Is one method more accurate than another, or does each algorithm contribute a different perspective on the truth?
 
 4) Up to this point we have analyzed one-word and two-word utterances (e.g. tokens and bigrams). Are there limitations to this approach when it comes to making meaning from historical data? 
-
-## Practicing with AI 
-
-Throughout _Text Mining for Historical Analysis_, we have primarily visualized data using bar charts. This is because bar charts are accessible and allow viewers to quickly apprehend patterns, comparisons, and trends. We can, however, use an AI chatbot to suggest different approaches to visualizing data. Such can be useful for exploratory data analysis and considering alternative forms of representation--such as line graphs for temporal trends or word clouds for lexical frequency. However, AI-generated suggestions are not truly aware of research contexts, so the generated results should be critically explored and vetted by the analyst. 
-
-In the following examples, we used suggestions from an AI chatbot to explore alternative ways of visualizing our JSD data. To ensure the AI-generated code was compatible with our existing dataset, we included the code we had been using to create the JSD data frame in our prompt. This helped align the chatbot's responses with the structure and content of our data, so the plots it produced would work correctly. With this context the AI chatbot can generate suggestions that take into account the structure of our data, the libraries we were using (if necessary), and the types of historical patterns we were interested in highlighting. This allowed us to rapidly experiment with new forms of visualization while staying grounded in the context of our existing work.
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
-I calculated partial JSD using the following code. Can you suggest multiple ways of visualizing the results in R? Tell me why you have chosen each visualization.  
-
-\begin{verbatim}
-word_dist <- word_dist %>%
-  rowwise() %>%
-  mutate(
-    Partial_JSD_1840 = partial_jsd_1840_to_1850(p_1840, p_1850),
-    Partial_JSD_1850 = partial_jsd_1850_to_1840(p_1840, p_1850)) %>%
-  ungroup()
-
-word_dist <- word_dist %>%
-  mutate(
-    Direction = ifelse(Partial_JSD_1840 > Partial_JSD_1850, "1840 to 1850", "1850 to 1840"),
-    Partial_JSD = ifelse(Direction == "1840 to 1850", -Partial_JSD_1840, Partial_JSD_1850))
-
-word_dist <- word_dist %>%
-  arrange(desc(abs(Partial_JSD))) %>%
-  slice(1:30)
-\end{verbatim}
-\end{tcolorbox}
-
-The chatbot responded with multiple different options for visualizing the data, as shown below. Some of these suggestions are new to us--like a "density ridge plot" or a "sankey diagram"--while others might already be familiar to us, like a "word cloud." 
-
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
-If you have many words and want to see distribution trends, use a Density Ridge Plot.
-If you want a text-heavy, intuitive view, go for a Word Cloud.
-If you want a precise, labeled view of shifts, use a Dot Plot.
-If you want to visually depict flows between decades, use a Sankey Diagram.
-\end{tcolorbox}
-
-We will explore just the density ridge plot, word cloud, and dot plot. 
-
-A density ridge plot may be an unfamiliar term, as it has not been previously used in this book. Asking the AI chatbot to explain its suggestion reveals that the plot is used to display the full distribution of Partial JSD values across the dataset, helping to highlight whether the shifts are symmetric or skewed in one direction. While the explanation is not true reasoning but rather a probabilistic output, it happens to align with commonly accepted knowledge—something we confirm by consulting a secondary source (Wilke 2019). However, as we will demonstrate in Chapter 5, AI-generated rationales can often be unreliable in the context of digital history. 
-
-The chatbot generated the following code for a density ridge plot.
-
-```{r, warning=FALSE, message=FALSE}
-library("ggridges")
-
-ggplot(word_dist, aes(x = Partial_JSD, y = Direction, fill = Direction)) +
-  geom_density_ridges(alpha = 0.7) +
-  scale_fill_manual(values = c("1840 to 1850" = "blue", 
-                               "1850 to 1840" = "red")) +
-  labs(title = "Density of Partial JSD by Direction",
-       x = "Partial JSD",
-       y = "Direction of Change") +
-  theme_minimal()
-```
-
- The plot is demonstrating how frequently values--such as JSD values--occur across a range , using smooth curves rather than raw counts, as in a bar chart.   
- 
- Smoothing helps reveal the overall shape of the distribution, making the plot useful for identifying patterns such as skew or symmetry. However, this type of visualization sacrifices detail at the individual word level, making it less effective for examining word-specific differences.
- 
- While using a chatbot to brainstorm can be helpful, simply copying and pasting the code it generates —- without understanding how it shapes our analysis —- can lead to misleading results. For example, a density ridge plot assumes that the two distributions being compared (such as word usage from 1840 to 1850 and from 1850 to 1840) have similar shapes and ranges. This assumption holds in our case, because we limited the analysis to the top 50 words from each decade. But in other contexts—especially when looking at all words—this assumption may break down. If one decade has significantly more words than the other, the plot might distort the comparison, making one group appear more prevalent than it really is.
-
-The chatbot generated the following code for a word cloud. Its generated rationale for doing so was to provide a more "intuitive" overview of the words that had the greatest shifts between decades. In this visualization, the red words shifted the most from 1850 to 1840 (indicating a higher Partial JSD in that direction) whereas the blue words shifted the most from 1840 to 1850. Words that appear more prominently had larger changes. In this example, "Ireland" had a greater change than "stated." 
-
-```{r, warning=FALSE, message=FALSE}
-library("wordcloud")
-
-wordcloud(
-  words = word_dist$word,
-  freq = abs(word_dist$Partial_JSD),
-  colors = ifelse(word_dist$Direction == "1840 to 1850", "blue", "red"),
-  scale = c(4, 0.5),
-  random.order = FALSE)
-```
-
-The advantage of this visualization is that it is understood at a glance. However, it lacks quantitative precision. Unlike the bar charts we created above, the word cloud does not show exact values--only relative importance of words against one another. In addition, the visualization can be misleading as the difference between the sizes of each word may not be proportional to the underlying data. Indeed, word clouds may be highly subjective or misread. The random placement of words, for example, might have an impact on an analyst's interpretation where a word near the center might look more important than a word at the edge of the cloud, even if this is not true. 
-
-The last option we will explore is the dot plot. The chatbot generated the following code for a dot plot. The visualization appears to communicate the same information as the diverging bar chart we created at the end of the chapter. The left side of the plot shows the words that shifted the most from 1840 to 1850, and the right side shows the words that shifted the most from 1850 to 1840. 
-
-In this case, however, the data is represented using a dot plot. Arguably, the dot plot does not provide a significant advantage over the diverging bar chart. Unlike the Density Ridge Plot and the Word Cloud, which offer new perspectives by emphasizing different linguistic features and drawing the viewer’s eye to specific patterns, the dot plot does not introduce additional insights beyond what we have already observed at the end of this chapter. 
-
-Instead, the dot plot may present more drawbacks than benefits. One potential issue is readability—some labels extend beyond the plot's boundaries, making the visualization harder to interpret at a glance. While this can be adjusted through formatting, it highlights a limitation of the default code provided by the chatbot, which would require additional tweaking by the analyst to improve its presentation.
-
-Perhaps the most critical concern for readability is the absence of a central reference point. As mentioned, Partial JSD relies on a clearly defined midpoint to illustrate distributional shifts. Partial JSD quantifies change by comparing how probability distributions diverge from this central reference point. Unlike the diverging bar chart, which includes a middle bar to visually anchor the comparison, the dot plot lacks this structured reference, making it harder to discern patterns of deviation at a glance. This omission forces the analyst to rely solely on the relative positioning of individual data points, which can be straining to the analyst and may reduce the effectiveness of the visualization for communicating meaningful shifts. 
-
-```{r}
-ggplot(word_dist, aes(x = Partial_JSD, 
-                      y = reorder(word, Partial_JSD), 
-                      color = Direction)) +
-  geom_point(size = 3) +
-  geom_text(aes(label = word), 
-            hjust = ifelse(word_dist$Partial_JSD > 0, -0.2, 1.2)) +
-  scale_color_manual(values = c("1840 to 1850" = "blue", "1850 to 1840" = "red")) +
-  labs(title = "Partial JSD of Words (Top 30)",
-       x = "Partial JSD",
-       y = "Word") +
-  theme_minimal()
-```
-
-
-In sum, brainstorming with chatbots can be a valuable approach to exploratory data analysis. In this example, analysts can quickly generate and explore multiple visualization options, some of which may highlight patterns or approaches to data interpretation that might not have been considered otherwise. However, each suggestion must be evaluated with care. While certain visualizations can be an asset, others may be misleading.
-
 
 

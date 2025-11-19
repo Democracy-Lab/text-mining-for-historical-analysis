@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  16 NOV 2025 14:08
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  19 NOV 2025 08:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2078,7 +2078,7 @@ Underfull \hbox (badness 2617) in paragraph at lines 577--591
  []
 
 [7] [8] [9] [10]
-Overfull \hbox (676.14525pt too wide) in paragraph at lines 806--817
+Overfull \hbox (1189.92538pt too wide) in paragraph at lines 806--817
  [][] 
  []
 
@@ -2097,26 +2097,7 @@ Missing character: There is no ઠ (U+0AA0) in font Noto Sans Mono Regular/OT:sc
 [27] [28] [29]
 File: ch5_files/figure-latex/unnamed-chunk-31-1.pdf Graphic file (type pdf)
 <use ch5_files/figure-latex/unnamed-chunk-31-1.pdf>
-[30] [31]
-Overfull \hbox (85.54292pt too wide) in paragraph at lines 2070--2070
-[]    \TU/NotoSansMono(0)/m/it/10 Direction = ifelse(Partial_JSD_1840 > Partial_JSD_1850, "1840 to 1850", "1850 to 1840"),[] 
- []
-
-
-Overfull \hbox (83.54292pt too wide) in paragraph at lines 2071--2071
-[]    \TU/NotoSansMono(0)/m/it/10 Partial_JSD = ifelse(Direction == "1840 to 1850", -Partial_JSD_1840, Partial_JSD_1850))[] 
- []
-
-[32] [33]
-File: ch5_files/figure-latex/unnamed-chunk-32-1.pdf Graphic file (type pdf)
-<use ch5_files/figure-latex/unnamed-chunk-32-1.pdf>
-[34]
-File: ch5_files/figure-latex/unnamed-chunk-33-1.pdf Graphic file (type pdf)
-<use ch5_files/figure-latex/unnamed-chunk-33-1.pdf>
-[35]
-File: ch5_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (type pdf)
-<use ch5_files/figure-latex/unnamed-chunk-34-1.pdf>
-[36] [37] (./ch5.aux)
+[30] [31] [32] (./ch5.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-06>
@@ -2129,12 +2110,12 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 35175 strings out of 470195
- 702015 string characters out of 5477908
- 1234203 words of memory out of 5000000
- 63190 multiletter control sequences out of 15000+600000
+ 35095 strings out of 470195
+ 699344 string characters out of 5477908
+ 1234160 words of memory out of 5000000
+ 63113 multiletter control sequences out of 15000+600000
  634494 words of font info for 121 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 98i,15n,116p,455b,585s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,15n,116p,455b,534s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on ch5.pdf (37 pages).
+Output written on ch5.pdf (32 pages).

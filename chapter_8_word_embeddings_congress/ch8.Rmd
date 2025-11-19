@@ -219,7 +219,7 @@ If you get an error like `Error in embeddings[word2, , drop = FALSE] : subscript
 
 
 ```{r}
-vector_subtraction("democrat", "republican", word_embeddings_2010)
+vector_subtraction("renewable", "fossil", word_embeddings_2010)
 ```
 
 ## Vector Addition
@@ -240,8 +240,10 @@ vector_addition <- function(word1, word2, embeddings, top_n = 10) {
 ```
 
 
+If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
+
 ```{r}
-vector_addition("climate", "security", congress_daily_climate_change_2000)
+vector_addition("man", "woman", congress_daily_climate_change_2000)
 ```
 
 ### Vectors Over Time

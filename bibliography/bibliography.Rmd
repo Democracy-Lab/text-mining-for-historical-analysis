@@ -197,6 +197,31 @@ Xiang, Lin. "Application of an Improved TF-IDF Method in Literary Text Classific
 
 ### Chapter 5
 
+
+ADD THESE:
+
+Rackley and Auchmuty 2019
+Kent 1999
+
+Griffin 2012
+
+
+(Tangherlini 2016, 
+
+Franzosi 2024).
+
+
+(Allison 2018)
+
+(Arnold 2019)
+
+
+Kraicer and Piper 2018, 
+
+Underwood et. al 2018)
+
+
+
 Allison, Sarah. _Reductive Reading: A Syntax of Victorian Moralizing_. Johns Hopkins University Press, 2018.
 
 Arnold, Taylor, Nicolas Ballier, Paula Lissón, and Lauren Tilton. “Beyond Lexical Frequencies: Using R for Text Analysis in the Digital Humanities.” Language Resources and Evaluation, vol. 53, no. 4, 2019, pp. 707–733. Springer, https://doi.org/10.1007/s10579-019-09456-6.

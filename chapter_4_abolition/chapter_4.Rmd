@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The British Abolition of Slavery in 1833, alongside the abolition of the slave trade by British naval vessels in 1806, were once celebrated as the sign that Britain was a nation committed to moral progress around the world. That claim has been significantly modified by historical research in recent years, as researchers have underscored that the abolition of slavery failed to end many forms of slavery; it wooed slave owners through instituting a prolonged form of slavery called "apprenticeships." In India and the rest of Asia, slavery meanwhile persisted unreformed. 
 
-Studying the interplay between white male politicians as they debated the fate of millions of enslaved persons from the West Indies to South Africa is in many ways an out-of-date exercise. Today, we recognize the degree to which enslaved people across British empire struggled to liberate themselves. A persistent tradition of uprisings and riots marked their ongoing resistance. The life of ideas and leaders — even women leaders like Queen Nannie — are important to this story.  
+Studying the interplay between white male politicians as they debated the fate of millions of enslaved persons from the West Indies to South Africa is in many ways an out-of-date exercise. Today, we recognize the degree to which enslaved people across British empire struggled to liberate themselves. A persistent tradition of uprisings and riots marked their ongoing resistance. The life of ideas and leaders — even women leaders like Queen Nannie — are important to understanding the British Empire.  
 
 We will find only an indirect trace of how the freedom struggles of the Caribbean changed laws and ideas in Britain. The personages and uprisings that rocked the West Indies were rarely named in Westminster. The direct records of those events are held in pamphlets and documents in the Caribbean itself, slowly being digitalized through other means. 
 
@@ -22,7 +22,7 @@ One question that might allow us to unpack the impact of abolition is how Britis
 
 Before we begin to think about the contribution that text mining can make to the problem, we first need to be able to summarize the understanding and debates of the historians who have studied these questions. The paragraphs above summarize some of the different perspectives on the slavery question taken by historians from the recent and more distant past. In short, we need some background knowledge. But how does an analyst get there, if they don't first have a series of prepared paragraphs to introduce them to a historical problem? 
 
-"Background knowledge" in a subject field refers to the kind of knowledge that one acquires by reading the major textbooks and secondary monographs from the field of History that cover the historical time period in question. This is extensive knowledge about which sources have been consulted, what scholars have debated, whether the actions of kings or parliaments or working-class people mattered at this period of time and why.  
+"Background knowledge" in a subject field refers to the kind of knowledge that one acquires by reading the major textbooks and secondary monographs from the field of History that cover the historical time period in question. Textbooks and secondary monographs provide extensive knowledge about which sources have been consulted, what scholars have debated, whether the actions of kings or parliaments or working-class people mattered at this period of time and why.  
 
 Remarks about the importance of reading background information may be experienced as off-putting by some undergraduate students of data, who want to be assured that in a course on text mining that they will acquire the tools to make wonderful discoveries.  But just as students of statistics must study more than an introductory course in statistics to make a novel contribution, so too students of text mining must enroll in more than one course to do really important work.  Reading a wikipedia entry cannot substitute for the kind of background knowledge that a student would acquire in the course of taking an introductory course on the History of Victorian England. Nor can Text Mining for Historical Analysis make up for courses in the undergraduate study of History, although this book’s companion volume, The Dangerous Art of Text Mining, includes many arguments about the specific kind of knowledge of sources, obfuscations, agency, and experience that historical study makes available.  Producing insight worthy of the attention of multiple fields is no simple game. It cannot be produced at the touch of a button or the application of a new algorithm to new data; it requires adjusting the algorithm, rethinking the questions, examining the data, and iterating through the work until something truly surprising has come to light. 
 
@@ -373,27 +373,38 @@ Before we get too excited about any of these words, however, we also need to thi
 We can check the significance of our distinctiveness measure by another kind of representation of the same data, one that brings both distinctiveness and count into the same graphic. 
 
 ```{r, message = F}
-# create a chart
-most_distinctive_words_per_abolition_speaker %>%
-  mutate(word = reorder_within(word, n, speaker)) %>% # rearrange the data by n and speaker
-  ggplot(aes( # create a chart
-    x = word,  # word on the x axis 
-    y = n, # n on the y axis
-    fill = factor(tf_idf) )) + # the color of the bars in the bar chart will reflect tf_idf. 
-    # we must tell the computer to treat tf_idf as a "factor' because the the numbers are enumerated rather than continuous.
-  geom_col() + # create a bar chart
-  facet_wrap(~speaker, scales = "free") + # create a series of mini-charts, breaking the data up by speaker
-  coord_flip() + # switch the information on x and y axes (this is a shortcut to make the 'word' labels easy to read)
-  scale_x_reordered() + # keep the 'word' axis ordered by n and speaker
-  scale_fill_grey() + # use a gray scale (if this line is removed, a color chart will be produced)
-  guides(fill = "none") + # don't show a legend for the colors of the bar chart (if removed, a color legend will be shown)
+most_distinctive_words_per_abolition_speaker <- most_distinctive_words_per_abolition_speaker %>%
+  mutate(word = reorder_within(word, n, speaker)) 
+
+# x-axis: words (flipped for readability)
+# y-axis: counts of each word
+# fill color: tf-idf score (converted to a factor so bars are shaded categorically, not continuously)
+# geom_col(): draws the bar chart
+# facet_wrap(): creates separate mini-plots by speaker
+# coord_flip(): makes long word labels readable
+# scale_x_reordered(): preserves word ordering within facets
+# scale_fill_grey(): use grayscale instead of color
+# guides(fill = "none"): hides the fill legend
+# scale_y_continuous(): forces whole number tick marks
+# labs(): titles, subtitles, captions, axis labels
+ggplot(data = most_distinctive_words_per_abolition_speaker,
+       aes(most_distinctive_words_per_abolition_speaker,
+           x = word,
+           y = n, 
+           fill = factor(tf_idf) )) +
+  geom_col() + 
+  facet_wrap(~speaker, scales = "free") +
+  coord_flip() +
+  scale_x_reordered() + 
+  scale_fill_grey() + 
+  guides(fill = "none") + 
   scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers, not  decimals, for the x axis +
-  labs(title = "Speakers\' Most Distinctive Words", # label the visualization with a title
+    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + 
+  labs(title = "Speakers\' Most Distinctive Words", 
        subtitle = "From the 1830s debates on the abolition of slavery",
-       caption = "Pale shading indicates greater distinctiveness", # text for the subtitle
-       x = "Word", # x axis label
-       y = "Count") # y axis label
+       caption = "Pale shading indicates greater distinctiveness", 
+       x = "Word", 
+       y = "Count") 
 ```
 
 As opposed to the list, our bar chart shows both tf-idf distinctiveness (represented as paleness of the bar) with count on the x axis.  This visualization can guide us as to whether we want to investigate a particular word because of its distinctiveness -- or whether that word might be a poor marker of significance. For instance, most of Stanley's distinctive words are revealed to have a wordcount of only 2, which is too few to be significant; it simply doesn't make sense that "rum," "mine," and "barrel" merit investigation when Stanley spoke them only twice in his voluminous speech-giving -- that is, unless we already had a previous interest in the rum trade and its intersection with slavery. Statistically distinctive these words might be; worthy of further investigation they are not (at least not necessarily). 
@@ -427,7 +438,8 @@ ggplot(data = most_distinctive_words_per_abolition_speaker2,
    scale_y_continuous(breaks = function(x) 
      unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers on x-axis
   labs(title = "Speakers\' Most Distinctive Words with N > 5",
-       subtitle = "From the Debates in the 1830s on the Abolition of Slavery; pale means more distinctive",
+       subtitle = "From the Debates in the 1830s on the Abolition of Slavery",
+       caption = "Pale means more distinctive",
        x = "Word",
        y = "Count")
 ```
@@ -447,14 +459,17 @@ mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>%
   slice(1:40)
   
 mr_buckingham_slavery_debates
+```
 
+```{r}
 ggplot(data = mr_buckingham_slavery_debates,
        aes(x = reorder(word, n), # the x axis will show words ordered by their count 
            y = n),
           fill = factor(tf_idf)) + # the y axis will show n 
   scale_fill_grey() +
   scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers, not decimals, for the x axis +
+    unique(floor(pretty(seq(min(x), 
+                            (max(x) + 1) * 1))))) + # use whole numbers for the x-axis
   geom_col() + # create a bar graph 
   coord_flip() + # switches the x and y axis for a more elegant presentation 
   labs(title = "Mr Buckingham\'s Most Frequenlty Spoken Words",
@@ -481,7 +496,8 @@ ggplot(data = mr_buckingham_slavery_debates2,
           fill = factor(tf_idf)) + # the y axis will show n 
   scale_fill_grey() +
   scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers for the x axis
+    unique(floor(pretty(seq(min(x), 
+                            (max(x) + 1) * 1))))) + # use whole numbers for the x-axis
   geom_col() + # create a bar graph 
   coord_flip() + # switches the x and y axis for a more elegant presentation 
   labs(title = "Mr Buckingham\'s Most Distinctive Words",
@@ -587,7 +603,7 @@ buck_speeches %>%
         col.names=NULL,
         caption="Speeches by Buckingham about Slavery that invoke the word 'wages'") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")
+  column_spec(2, width = "8cm")
 ```
 
 With missing sentences added back in, the speeches in their entirety are much easier to understand. 
@@ -727,7 +743,7 @@ my_words <- c("wage", "enjoyment", "love", "universal", "desire")
 
 # find the tfidf scores for my words by looking in previous data
 my_words_w_tfidf <- tfidf_per_top_slavery_speaker_1833 %>% 
-  filter(speaker == "Mr. Buckingham", word %in% my_words) %>% # find words spoken by Mr. Buckingham
+  filter(speaker == "Mr. Buckingham", word %in% my_words) %>% # filter for words by Buckingham
   ungroup() %>% # necessary because the previous dataset was grouped
   select(word, n, tf_idf) %>% # retain three columns
   mutate(tf_idf = round(tf_idf, 4)) # round tf-idf to four decimal places
@@ -760,10 +776,13 @@ One place to start is Peel's invocation of the word "assembly," a word that in t
 Most of the speakers didn't use the word "assembly" or used it rarely. But for Peel, "assembly" was a distinctive word, used 11 times in 1833 alone.  
 
 ```{r, message = F}
-peel_sentences <- slavery_1830 %>% # start with the text of speeches 
-  left_join(speaker_metadata_1830) %>%  # merge with speaker information
-  filter(speaker == "Sir Robert Peel",  # keep just the sentences by Peel
-         str_detect(text, "Assembl|assembl")) # searching for both capitalized, uncapitalized, singular and plural
+# merge slavery_1830 with speaker metadata
+# keep only sentences by Peel
+# str_detect to search for capitalized, uncapitalized, singular and plural
+peel_sentences <- slavery_1830 %>%
+  left_join(speaker_metadata_1830) %>%
+  filter(speaker == "Sir Robert Peel",
+         str_detect(text, "Assembl|assembl"))
 ```
 
 ```{r}
@@ -814,7 +833,7 @@ peel_speeches %>%
   mutate(text = str_trunc(speech, 120)) %>% 
   kable("latex", 
         booktabs = TRUE, 
-        caption = "Three Speeches by Buckingham about Slavery That Invoke the Word 'Wages'") %>%
+        caption = "Three Speeches by Buckingham about Slavery Invoking the Word 'Wages'") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(2, width = "4cm") 
 ```
@@ -856,7 +875,7 @@ The reason why the top speakers in any debate matter is the hypothesis that thei
 
 We can ask this question two ways: first, by asking about the debates around slavery before and after 1833, and secondly by asking the same question about all of Hansard for the same dates.
 
-```{r}
+```{r, message=FALSE}
 slavery_debates_before_1833 <- slavery_1830 %>% 
   filter(year < 1833) 
 
@@ -876,7 +895,7 @@ top_freedom_collocates_before_1833 <- freedom_collocates_before_1833 %>%
 top_freedom_collocates_before_1833
 ```
 
-```{r}
+```{r, message=FALSE}
 slavery_debates_after_1833 <- slavery_1830 %>% 
   filter(year > 1833) 
 
@@ -898,7 +917,7 @@ top_freedom_collocates_after_1833
 
 Let's use tf-idf to find the words that are most distinctive of each period -- before and after 1833 -- in the debates about slavery.
 
-```{r}
+```{r, message=FALSE}
 freedom_collocates_before_1833 <- slavery_debates_before_1833 %>%
   mutate(when = "1830-32") %>%
   filter(str_detect(tolower(text), "free")) %>%
@@ -979,7 +998,6 @@ freedom_collocates_after_1833 <- hansard_after_1833 %>%
  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
-
 
 tf_idf_freedom_collocates <- bind_rows(freedom_collocates_after_1833, 
                                        freedom_collocates_before_1833) %>%
