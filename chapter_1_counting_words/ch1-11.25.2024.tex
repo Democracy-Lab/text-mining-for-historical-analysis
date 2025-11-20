@@ -1403,12 +1403,12 @@ speeches are aligned with their correct dates.
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_trunc}\NormalTok{(text, }\DecValTok{120}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# optional: shorten long lines}
   \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{position =} \StringTok{"left"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"7cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# wrap the "text" column}
+  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"6cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# wrap the "text" column}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{tabular}{l>{\raggedright\arraybackslash}p{7cm}l>{\raggedright\arraybackslash}p{4cm}}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{6cm}l>{\raggedright\arraybackslash}p{4cm}}
 \toprule
 sentence\_id & text & speechdate & debate\\
 \midrule

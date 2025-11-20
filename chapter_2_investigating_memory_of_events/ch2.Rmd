@@ -47,15 +47,18 @@ library(tidyverse)
 df_head <- hansard_1860 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Hansard Speeches 1860") %>%
-  kable_styling(
-    latex_options = c("scale_down", "repeat_header"),
-    table.envir = FALSE) %>%
+kable(df_head, 
+      format = "latex", 
+      booktabs = TRUE, 
+      linesep = "",
+      caption = "Hansard Speeches 1860") %>%
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
+                table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
+              latex_valign = "top") %>%
+  column_spec(which(colnames(df_head) == "debate"),
+              latex_column_spec = "p{4cm}",
               latex_valign = "top")
 ```
 

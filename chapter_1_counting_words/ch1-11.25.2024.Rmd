@@ -431,7 +431,7 @@ ggplot(data = top_coal) +
   geom_col(aes(x = reorder(word, n), y = n), # bar chart with reordered x-axis
            fill = "steel blue") + # set bar color
   coord_flip() + # flip for horizontal layout
-  labs(title = "Figure 1.1: Top Words Occurring in Sentences Mentioning Coal", # add title
+  labs(title = "Top Words from Sentences Mentioning Coal", # add title
        subtitle = "From the 1850 Hansard debates", # add subtitle
        x = "Word", # x-axis label
        y = "Count") # y-axis label
@@ -444,6 +444,7 @@ The second most frequent word is "steam" followed by "duties," "bill," and "mine
 Rather than focusing on specific speeches, this method of visualizing data allows us to trace broader semantic and thematic structures that shaped the discourse around the keyword coal in the 1850s. By aggregating linguistic data over time, we can detect not only the persistence of industrial and economic concerns, but also a macroscopic view of historical language.
 
 Taken together, the visualization emphasizes the central role of coal in the British economy and legislation in the 1850s, as well as its links to other industrial and governmental matters. The visualization also reflects concerns around infrastructure, taxation, and policy decisions regarding coal. 
+
 Our analysis will gain nuance the more we compare near concepts.  While coal was important to powering Britain's industrial revolution, perhaps the most controversial economic debates of the 1850s revolved around the issue of the Corn Laws, the system of taxation of wheat and other grains, which were originally introduced to protect British farmers.  Working-class demands for cheap bread led to the repeal of the Corn Laws in 1846.  Knowledge of these facts might lead us to ask: were coal and corn debated using the same language or different words?
 
 ```{r, message=FALSE}
