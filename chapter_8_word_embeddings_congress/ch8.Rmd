@@ -1,8 +1,15 @@
 ---
-title: "Word Embeddings of Congress"
+title: "Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record"
 output:
-  pdf_document: default
+  pdf_document:
+    number_sections: true
   html_document: default
+header-includes:
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{8}
+  - \counterwithin{table}{chapter}
+
 ---
 
 ```{r setup, include=FALSE}

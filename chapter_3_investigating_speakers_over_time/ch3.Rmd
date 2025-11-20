@@ -1,7 +1,14 @@
 ---
 title: "Chapter 3: Investigating Speakers and Change Over Time Using Grouped Data"
-output: pdf_document
+output: 
+  pdf_document:
+    number_sections: true
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
+header-includes:
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{3}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}

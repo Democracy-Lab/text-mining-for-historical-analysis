@@ -1,5 +1,5 @@
 ---
-title: 'Chapter 1: Counting Words in the 19th-Century British Parliamentary Debates'
+title: "Chapter 1: Counting Words in the 19th-Century British Parliamentary Debates"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -8,6 +8,10 @@ header-includes:
   - \usepackage{fontspec}
   - \setmainfont{DejaVu Serif}
   - \usepackage[most]{tcolorbox}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{1}
+  - \counterwithin{table}{chapter} 
 ---
 
 ```{r setup, include=FALSE}
@@ -102,7 +106,7 @@ df <- data.frame(Label = c("hansard_YYYY", "debate_metadata_YYYY", "speaker_meta
                                  "Metadata for source file, column, and more."),
                  Key = rep("sentence_id", 4))
 
-kable(df, caption = "Table 1: Description of Hansard Corpus Files by Decade")
+kable(df, caption = "Overview of the hansardr corpus, showing the primary text files and their associated metadata. Each data set is linked through a common sentence ID.")
 ```
 
 Both text and metadata are divided into subsets named by decade, for instance, `hansard_1850`. `hansard_1850` contains just the speech text as well as a unique sentence ID that can be used to connect the speech text with its corresponding metadata. We will demonstrate this process later in _Text Mining for Historical Analysis_.  
@@ -134,7 +138,7 @@ kable(df_head,
       format = "latex", 
       booktabs = TRUE, 
       linesep = "",
-      caption = "Excerpt from Hansard 1850") %>%
+      caption = "Excerpt from the 1850 Hansard corpus showing sentence-level text with associated sentence ID values.") %>%
   kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
@@ -252,7 +256,6 @@ head(tokenized_hansard_counts)
 ```
 
 With the command `arrange(desc(n))`, we tell the computer to arrange the results from greatest to least. We perform this step so that the results are easier to read, not because this step is necessary for counting words. 
-
 
 We now have a frequency count of every word recorded in the speeches of Hansard, 1850-59. The initial results are unimpressive.  In our dataset, as with most textual datasets, the most common words are also often the least interesting.  For this reason, analysts compile lists of the most common words, called "stop words." Analysts often remove stop words from their results before analysis.  
 
@@ -379,7 +382,10 @@ hansard_coal %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -518,9 +524,11 @@ hansard_1850_with_metadata <- left_join(hansard_1850, debate_metadata_1850)
 hansard_1850_with_metadata %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE,
+        caption = "Excerpt from the 1850 Hansard corpus showing sentence-level text joined with debate-level metadata, including speech dates and debate titles.") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "6cm") %>%   # wrap the "text" column
+  column_spec(2, width = "6cm") %>%
   column_spec(4, width = "4cm")
 ```
 
@@ -568,7 +576,9 @@ corn_df <- corn_df %>%
 
 corn_df %>%
   head(15) %>%
-  kable("latex", booktabs = TRUE, align = "l") %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        align = "left") %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
@@ -660,7 +670,8 @@ Analyzing the entire data frame to further inspect the data can be distracting s
 hansard_1850_with_metadata %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(2, width = "4cm")    # wrap the "text" column
 ```

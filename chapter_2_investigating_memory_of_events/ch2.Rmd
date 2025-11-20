@@ -1,12 +1,18 @@
 ---
 title: 'Chapter 2: Investigating the Memory of Events Using n-grams, Controlled Vocabulary, and Joins'
-output: pdf_document
+output: 
+  pdf_document:
+    number_sections: true
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{tcolorbox}
   - \tcbuselibrary{listingsutf8}
   - \usepackage{listings}
   - \usepackage{xcolor}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{2}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}
@@ -56,9 +62,6 @@ kable(df_head,
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
-              latex_valign = "top") %>%
-  column_spec(which(colnames(df_head) == "debate"),
-              latex_column_spec = "p{4cm}",
               latex_valign = "top")
 ```
 

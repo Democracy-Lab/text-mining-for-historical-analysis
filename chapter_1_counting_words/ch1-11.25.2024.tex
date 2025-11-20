@@ -108,6 +108,10 @@
 \usepackage{fontspec}
 \setmainfont{DejaVu Serif}
 \usepackage[most]{tcolorbox}
+\usepackage{chngcntr}
+\newcounter{chapter}
+\setcounter{chapter}{1}
+\counterwithin{table}{chapter}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -339,8 +343,9 @@ any given decade.
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2821}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5641}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1538}}@{}}
-\caption{Table 1: Description of Hansard Corpus Files by
-Decade}\tabularnewline
+\caption{Overview of the hansardr corpus, showing the primary text files
+and their associated metadata. Each data set is linked through a common
+sentence ID.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Label
@@ -443,7 +448,7 @@ Below is an excerpt from \texttt{hansardr}:
       \AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
       \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
       \AttributeTok{linesep =} \StringTok{""}\NormalTok{,}
-      \AttributeTok{caption =} \StringTok{"Excerpt from Hansard 1850"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing sentence{-}level text with associated sentence ID values."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"scale\_down"}\NormalTok{, }\StringTok{"repeat\_header"}\NormalTok{),}
                 \AttributeTok{table.envir =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\FunctionTok{which}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(df\_head) }\SpecialCharTok{==} \StringTok{"text"}\NormalTok{), }
@@ -454,7 +459,7 @@ Below is an excerpt from \texttt{hansardr}:
 
 \begin{table}
 \centering
-\caption{\label{tab:unnamed-chunk-5}Excerpt from Hansard 1850}
+\caption{\label{tab:unnamed-chunk-5}Excerpt from the 1850 Hansard corpus showing sentence-level text with associated sentence ID values.}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{tabular}[t]{lp{12cm}}
@@ -1092,7 +1097,10 @@ contains only sentences from the 1850 debates that contain the word
   \FunctionTok{head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_wrap}\NormalTok{(text, }\DecValTok{80}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{select}\NormalTok{(text) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{longtable =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{escape =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable}\NormalTok{(}\AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
+        \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
+        \AttributeTok{longtable =} \ConstantTok{TRUE}\NormalTok{, }
+        \AttributeTok{escape =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{width =} \StringTok{"14cm"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -1210,7 +1218,7 @@ throughout this book.
   \FunctionTok{geom\_col}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(word, n), }\AttributeTok{y =}\NormalTok{ n), }\CommentTok{\# bar chart with reordered x{-}axis}
            \AttributeTok{fill =} \StringTok{"steel blue"}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# set bar color}
   \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+} \CommentTok{\# flip for horizontal layout}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Figure 1.1: Top Words Occurring in Sentences Mentioning Coal"}\NormalTok{, }\CommentTok{\# add title}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Top Words from Sentences Mentioning Coal"}\NormalTok{, }\CommentTok{\# add title}
        \AttributeTok{subtitle =} \StringTok{"From the 1850 Hansard debates"}\NormalTok{, }\CommentTok{\# add subtitle}
        \AttributeTok{x =} \StringTok{"Word"}\NormalTok{, }\CommentTok{\# x{-}axis label}
        \AttributeTok{y =} \StringTok{"Count"}\NormalTok{) }\CommentTok{\# y{-}axis label}
@@ -1244,14 +1252,16 @@ Taken together, the visualization emphasizes the central role of coal in
 the British economy and legislation in the 1850s, as well as its links
 to other industrial and governmental matters. The visualization also
 reflects concerns around infrastructure, taxation, and policy decisions
-regarding coal. Our analysis will gain nuance the more we compare near
-concepts. While coal was important to powering Britain's industrial
-revolution, perhaps the most controversial economic debates of the 1850s
-revolved around the issue of the Corn Laws, the system of taxation of
-wheat and other grains, which were originally introduced to protect
-British farmers. Working-class demands for cheap bread led to the repeal
-of the Corn Laws in 1846. Knowledge of these facts might lead us to ask:
-were coal and corn debated using the same language or different words?
+regarding coal.
+
+Our analysis will gain nuance the more we compare near concepts. While
+coal was important to powering Britain's industrial revolution, perhaps
+the most controversial economic debates of the 1850s revolved around the
+issue of the Corn Laws, the system of taxation of wheat and other
+grains, which were originally introduced to protect British farmers.
+Working-class demands for cheap bread led to the repeal of the Corn Laws
+in 1846. Knowledge of these facts might lead us to ask: were coal and
+corn debated using the same language or different words?
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1401,14 +1411,19 @@ speeches are aligned with their correct dates.
 \NormalTok{hansard\_1850\_with\_metadata }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_trunc}\NormalTok{(text, }\DecValTok{120}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# optional: shorten long lines}
-  \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable}\NormalTok{(}\AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
+        \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{,}
+        \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing sentence{-}level text joined with debate{-}level metadata, including speech dates and debate titles."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{position =} \StringTok{"left"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"6cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# wrap the "text" column}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{tabular}{l>{\raggedright\arraybackslash}p{6cm}l>{\raggedright\arraybackslash}p{4cm}}
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-30}Excerpt from the 1850 Hansard corpus showing sentence-level text joined with debate-level metadata, including speech dates and debate titles.}
+\begin{tabular}[t]{l>{\raggedright\arraybackslash}p{6cm}l>{\raggedright\arraybackslash}p{4cm}}
 \toprule
 sentence\_id & text & speechdate & debate\\
 \midrule
@@ -1421,6 +1436,7 @@ S3V0108P0\_4 & Although the Act of Parliament directed that the proclamation sho
 S3V0108P0\_5 & The Peerage of Scotland was not therefore represented in Parliament at present as it ought to be. & 1850-01-31 & SCOTCH REPRESENTATIVE PEERS.\\
 \bottomrule
 \end{tabular}
+\end{table}
 
 In the following code we filter for speech dates that are on or after
 (greater than or equal to \texttt{\textgreater{}=}) February 1, 1850,

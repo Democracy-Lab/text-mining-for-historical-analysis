@@ -1,5 +1,5 @@
 ---
-title: "Chapter 7: Data"
+title: "Chapter 9: Working with Data"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -7,6 +7,11 @@ output:
       in_header: preamble.tex
     df_print: tibble
 md_extensions: -smart
+header-includes:
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{9}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}
@@ -851,25 +856,11 @@ The "occupation" column (which records the species’ conservation status—e.g.
 ```{r}
 library("tidyverse")
 
-census <- tibble(
-  name = c("Mary Jenkins", 
-           "Samuel Price", 
-           "Hannah Lee", 
-           "Charles Morton", 
-           "Unnamed Child"),
-  occupation = c("washerwoman", 
-                 NA, 
-                 "seamstress", 
-                 "laborer", 
-                 NA),
-  age = c(32, 
-          44, 
-          29, 
-          51, 
-          1))
-```
+census <- tibble(name = c("Mary Jenkins", "Samuel Price", "Hannah Lee", "Charles Morton", 
+                          "Unnamed Child"),
+                 occupation = c("washerwoman", NA, "seamstress", "laborer", NA),
+                 age = c(32, 44, 29, 51, 1))
 
-```{r}
 census
 ```
 
@@ -943,14 +934,13 @@ For instance, the `quanteda` software package exports many outputs as S3 objects
 
 Some common data structures in R that we have used for text mining are represented by the following table. 
 
-```{r gt-text-table, echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
 ### Code doesn't show; only table
-library("gt")
 
 # Create a data frame with the structure
-text_structures <- tibble(Structure = c("Matrix", "List", "Data Frame", "Tibble", "S3 Object", "S4 Object"),
+data_structures <- tibble(Structure = c("Matrix", "List", "Data Frame", "Tibble", "S3 Object", "S4 Object"),
   Dimensions = c("2D", "1D", "2D", "2D", "Varies", "Varies"),
-  Homogeneous = c("Yes", "No", "No", "No", "No", "No"),
   `Key Use for Text Mining` = c("Numeric structure for word embeddings or term-document counts",
                                 "Flexible storage for mixed or uniform data—e.g., texts, dates, names",
                                 "Standard tabular format for digitized records or structured text metadata",
@@ -964,16 +954,17 @@ text_structures <- tibble(Structure = c("Matrix", "List", "Data Frame", "Tibble"
               "`class(tokens_object) → \"tokens\"`",
               "`class(corpus_object) → \"Corpus\", \"VCorpus\"`"))
 
-# Generate the gt table
-text_structures %>%
-  gt() %>%
-  tab_header(title = "Common R Data Structures in Text Mining") %>%
-  cols_label(Structure = "Structure",
-             Dimensions = "Dimensions",
-             Homogeneous = "Homogeneous",
-             `Key Use for Text Mining` = "Key Use for Text Mining",
-             Example = "Example") %>%
-  fmt_markdown(columns = everything())
+data_structures %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        escape = TRUE,   
+        caption = "Common R Data Structures in Text Mining") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"),
+                full_width = FALSE,
+                position = "left") %>%
+  column_spec(1, bold = TRUE) %>%  
+  column_spec(3, width = "7cm") %>%  
+  column_spec(4, width = "7cm")   
 ```
  
 
@@ -986,7 +977,7 @@ So the goal is to: extract what you need → eeshape it → coerce it into a tib
 However, there are cases where a data frame may not be the most appropriate or efficient data structure. For example, when working with the `quanteda` package (such as when we performed Key Words in Context (KWIC), we rely on its custom-built data structure known as a `quanteda` "tokens object." The tokens object was specifically designed to optimize performance when handling large-scale text data within the `quanteda` ecosystem. In fact, it would be very difficult to perform some of the analyses we did without invoking the `quanteda` ecosystem given how efficient `quanteda` is at processing. 
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library("quanteda")
 library("tidyverse")
 library("hansardr")
@@ -1005,13 +996,30 @@ kwic_result <- kwic(tokens_hansard, pattern = "corn", window = 5)
 Impressively, the results from running `KWIC()` on an entire decade of the Hansard debates are now ready to analyze. 
 
 ```{r}
-gt(head(kwic_result))
+kwic_result %>%
+  head(10) %>% 
+  kable(format = "latex",
+        booktabs = TRUE,
+        caption = "KWIC results") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"),
+                full_width = FALSE,
+                position = "left")
 ```
 
 However, attempting to use a `tidyverse` function on the `quanteda` tokens object returns an error. 
 
-```{r, error=TRUE}
+```{r, error=TRUE, eval=FALSE}
 slice(tokens_hansard, 1:5)
+```
+
+```{r, echo = FALSE, results = "asis"}
+knitr::asis_output("
+\\begin{minipage}{0.9\\linewidth}
+\\ttfamily
+Error in UseMethod(\"slice\"): no applicable method for 'slice' applied to an object of class \"tokens\".
+\\end{minipage}
+")
+
 ```
 
 While `quanteda`'s design improves efficiency, it also introduces certain limitations. In particular, a `quanteda` tokens object cannot be passed directly to most base R or `tidyverse` functions. Instead, handling a `quanteda` obejct largely restricts us to using `quanteda` functions--or other functions explicitly designed to interface with this structure--unless we first convert the corpus back into a data frame.
@@ -1044,22 +1052,38 @@ md_col <- function(tbl, col) {
   tbl %>% mutate(!!col := gt::md(!!col)) }
 
 quanteda_tbl <- tibble(
-  Task = c("Convert dfm to tibble",
-           "Get token list",
-           "Combine with metadata",
-           "Tidy version"),
-  `What to do` = c("`dfm %>% convert(to = \"data.frame\") %>% as_tibble()`",
-                   "`tokens %>% as.list()`",
-                   "`docvars(dfm)` gives doc-level covariates",
-                   "`Use quanteda.textmodels::convert()` or `tidytext::tidy()` if applicable")
+  Task = c(
+    "Convert dfm to tibble",
+    "Get token list",
+    "Combine with metadata",
+    "Tidy version"
+  ),
+  `What to do` = c(
+    "dfm %>% convert(to = \"data.frame\") %>% as_tibble()",
+    "tokens %>% as.list()",
+    "docvars(dfm) gives doc-level covariates",
+    "Use quanteda.textmodels::convert() or tidytext::tidy() if applicable"
+  )
 )
 
 quanteda_tbl %>%
-  md_col(`What to do`) %>%
-  gt() %>%
-  tab_header(title = "Quanteda (tokens, dfm, etc.)") %>%
-  cols_label(`What to do` = "What to do")
+  kable(
+    format  = "latex",
+    booktabs = TRUE,
+    # let kable escape %, _, &, etc. for us
+    escape  = TRUE,
+    caption = "Quanteda (tokens, dfm, etc.)"
+  ) %>%
+  kable_styling(
+    latex_options = c("hold_position", "scale_down"),
+    full_width    = FALSE,
+    position      = "left"
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, width = "8cm")
+```
 
+```{r}
 # --- tm ---
 tm_tbl <- tibble(
   Task = c("Convert Corpus",
@@ -1075,7 +1099,9 @@ tm_tbl %>%
   gt() %>%
   tab_header(title = "tm (Corpus, DocumentTermMatrix)") %>%
   cols_label(`What to do` = "What to do")
+```
 
+```{r}
 # --- text2vec ---
 text2vec_tbl <- tibble(
   Task = c("Convert DTM",

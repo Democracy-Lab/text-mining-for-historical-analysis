@@ -1,7 +1,14 @@
 ---
-title: "Chapter 6: Pursing the Event"
+title: "Chapter 6: Pursuing the Event"
 output:
-  pdf_document: default
+  pdf_document:
+    number_sections: true
+geometry: "left=1in,right=1in,top=2in,bottom=1in"
+header-includes:
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{6}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}

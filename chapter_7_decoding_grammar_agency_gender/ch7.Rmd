@@ -1,6 +1,8 @@
 ---
 title: "Chapter 7: Decoding Grammar to Uncover the Language of Agency"
-output: pdf_document
+output:
+  pdf_document:
+    number_sections: true
 fontsize: 11pt
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
@@ -8,6 +10,10 @@ header-includes:
   - \tcbuselibrary{listingsutf8}
   - \usepackage{listings}
   - \usepackage{xcolor}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{7}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}

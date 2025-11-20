@@ -3,21 +3,26 @@ title: "Chapter 5: Using Distinctiveness and Distance for Comparative Analyses o
 output:
   pdf_document:
     latex_engine: xelatex
+    number_sections: true
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
-  - \usepackage{fontspec}              
-  - \usepackage{ucharclasses}         
-  - \setmainfont{Noto Serif}             
+  - \usepackage{fontspec}
+  - \usepackage{ucharclasses}
+  - \setmainfont{Noto Serif}
   - \setsansfont{Noto Sans}
   - \setmonofont{Noto Sans Mono}
-  - \newfontfamily\NkoFont{Noto Sans NKo} % font that supports U+07DE
-  - \setTransitionsFor{Nko}{\NkoFont}{}   % use Nko font whenever N’Ko chars appear
+  - \newfontfamily\NkoFont{Noto Sans NKo}
+  - \setTransitionsFor{Nko}{\NkoFont}{}
   - \usepackage{tcolorbox}
   - \tcbuselibrary{listingsutf8}
   - \usepackage{listings}
   - \usepackage{xcolor}
   - \usepackage{caption}
   - \usepackage{booktabs}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{5}
+  - \counterwithin{table}{chapter}
 ---
 
 ```{r setup, include=FALSE}
