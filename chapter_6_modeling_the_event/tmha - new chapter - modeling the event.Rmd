@@ -8,7 +8,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Powerful research questions can be unpacked as soon as we have the tools for counting mentions of words over time. Previously, we've been unpacking research questions that stem from the tools we have -- like the ability to follow particular speakers or words through time. But another approach, which leverages the power of historical analysis, is to start with the event and ask: what can these approaches teach us about history that we previously did not know?
+Powerful research questions can be unpacked as soon as we have the tools for counting mentions of words over time. Previously, we've been unpacking research questions that stem from the tools we have -- like the ability to follow particular speakers or words through time. But another approach, which leverages the power of historical analysis, is to start with the event and ask: what can computational approaches teach us about history that we previously did not know?
 
 In the history of parliament, one of the most important events is the Reform Act of 1832, which granted the middle class the right to vote, and the Reform Act of 1867, which granted the right to vote to most working-class men living in cities.  
 
@@ -16,9 +16,9 @@ To analyze how the reform acts changed parliament, we can compare the speakers a
 
 ### Working With Big Data: Cautions Before Proceeding 
 
-In the previous chapters, we worked with intentionally small, subsetted datasets so the examples would run on a laptop. In this chapter, we take the opposite approach: we join multiple decades and create a much larger dataset first. We then filter it as needed. This allows us to demonstrate another workflow for working with large-scale historical data—one in which analysts begin with the full corpus and progressively narrow the scope through filtering and subsetting.
+In the previous chapters, we worked with intentionally small, subsetted datasets so the examples would run on a laptop. In this chapter, we take the opposite approach: we join multiple decades and create a much larger dataset first. We then filter it as needed. Doing so, we demonstrate another workflow for working with large-scale historical data on a computer with limited resources. This time, the analyst begin with the full corpus and progressively narrow the scope through filtering and subsetting.
 
-Previously, we demonstrated techniques were we worked with chunks of the data at a time to save computer memory. We did this so the code will run on a laptop. 
+Previously, we demonstrated techniques were we worked with chunks of the data at a time to save computer memory. We chunked the data so the code will be able to process it on a laptop. 
 
 ```{r, message=FALSE}
 # load some data (hansardr version needed)
@@ -190,7 +190,7 @@ The only apparent difference in this table occurs in the words "time" -- a top-t
 
 In short, this step provides us with what data scientists refer to as a "validation" -- that is, we have confirmed that the method of counting words tells us that the speech of parliament concerns the business of parliament. 
 
-This kind of validation step is crucial to knowing that we are on the right track. If our attempt at counting (or any other statistical analysis) suggested that parliamentary speech in general concerned squids, whales, and cephalopods, or even obscure names of towns in Ireland, we would guess that something had gone wrong. Throughout the process of data analysis, we should use basic statistical measures as validation that the general idea is working. If our analysis tells us anything that doesn't make sense, we should rush to check our method -- not revisit the laws of history. 
+A validation step is crucial to knowing that we are on the right track. If our attempt at counting (or any other statistical analysis) suggested that parliamentary speech in general concerned squids, whales, and cephalopods, or even obscure names of towns in Ireland, we would guess that something had gone wrong. Throughout the process of data analysis, we should use basic statistical measures as validation that the general idea is working. If our analysis tells us anything that doesn't make sense, we should rush to check our method -- not revisit the laws of history. 
 
 ### Strategies for Reaching Insight 
 
@@ -260,7 +260,7 @@ With the data frame both_periods_speakers, we have wordcounts for each speaker f
 
 We'll start by asking how many members of parliament stood for the ten years pre and post reform. We will label each with a "class" called "prereform only," "postreform only," or "continuous speakers." Note that these "classes" are fundamentally different than the "period" categorization we applied above, where we labeled speeches given before the 1832 reform law as "prereform" and those after the law as "postreform." Instead of labeling the years, we want to identify the speakers that spoke only in one period or the other, and those who spoke in both. 
 
-To identify these speakers, we will begin by returning to an earlier data frame -- `prereform_speakers_wordcount` -- and using a process called a "join" to exclude those speakers who also appear in the dataset `postreform_speakers_wordcount`.  
+To identify these speakers, we will begin by returning to an earlier data frame -- `prereform_speakers_wordcount` -- and cleaning it to exclude those speakers who also appear in the dataset `postreform_speakers_wordcount`.  
 
 Information scientists theorize several ways to combine data through what is called "set theory." Two of the simplest joins are known as the "union" of two sets -- what they have in common -- and the "difference" between two sets -- what is in one but not the other. 
 
@@ -308,9 +308,9 @@ How many speakers were there postreform?
 nrow(postreform_only_speakers)
 ```
 
-We now have two sets of numbers -- the count of unique speakers who spoke 1822-32 and 1832-42. These numbers are new to history; there has never before been a count of these speakers. We can learn something from them. Before text mining, it was impossible to get a real impression of how many speakers were active in parliament before and after 1832.  But the simple ability to count allows us to add detail to our accounts of the reform and its mechanisms.
+We now have two sets of numbers -- the count of unique speakers who spoke 1822-32 and 1832-42. The sets of numbers are new to history; there has never before been a count of these speakers. We can learn something from them. Before text mining, it was impossible to get a real impression of how many speakers were active in parliament before and after 1832.  But the simple ability to count allows us to add detail to our accounts of the reform and its mechanisms.
 
-The basic finding is that there were more speakers after the reform period. This makes sense, because the reforms of 1832 introduced more popular consent into the democratic process. No longer were members appointed in "pocket buroughs" by aristocrats who held the sole authority for electing the representative. Now, all seats were open to a popular vote (albeit of those rich enough to pay at least £10 per year in taxes -- no mean sum). If we know that the number of seats  in the House of Commons were set at 658 before and after the reform (which we learn by consulting a secondary source, XXXXXX), the numbers tell us that this reform introduced more variation and turnover in who occupied the seats of parliament.
+The basic finding is that there were more speakers after the reform period. Our observation makes sense, because the reforms of 1832 introduced more popular consent into the democratic process. No longer were members appointed in "pocket buroughs" by aristocrats who held the sole authority for electing the representative. Now, all seats were open to a popular vote (albeit of those rich enough to pay at least £10 per year in taxes -- no mean sum). If we know that the number of seats  in the House of Commons were set at 658 before and after the reform (which we learn by consulting a secondary source, XXXXXX), the numbers tell us that this reform introduced more variation and turnover in who occupied the seats of parliament.
 
 Substantively more different members of parliament were elected in the ten years following 1832 than in the decade before. How many more members were there among the postreform only members than the prereform only members?
 
@@ -323,7 +323,7 @@ We can also investigate speakers from a third category -- those who were continu
 
 Please note that we do not have the data to ask which members of parliament who held office before 1832 were elected to office after 1832. We do not have the data to support that question. What we have in Hansard is only a record of who was recorded as having spoken. This is a rather more discrete query, because not every elected member actually speaks when they are in office, and some of those who spoke might have spoken so little that the clerks recording speeches took no notice of what they said. 
 
-Because recorded parliamentary speech is an index of importance, the members who were recorded as having spoken before and after 1832 offers a list of those members who were important enough to have taken notice of the public in both periods. This is a good proxy for which members mattered in the public imagination and met the criterion for having been elected both before and after the reform.  Do we imagine this number to have been large or small? 
+Because recorded parliamentary speech is an index of importance, the members who were recorded as having spoken before and after 1832 offers a list of those members who were important enough to have taken notice of the public in both periods. The overlap of members who appear in both the pre- and post-reform records is a good proxy for which members mattered in the public imagination and met the criterion for having been elected both before and after the reform.Do we imagine this number to have been large or small? 
 
 We might guess that it was vanishingly small, because a reform of historical significance could have swept away all incumbents. On the other hand, many historians of the 1832 Reform Bill have pointed out that it didn't shift the election process so drastically as had once been assumed. 
 
@@ -400,7 +400,7 @@ We also have a wordcount column that reflects the words each speaker spoke per y
 
 Next, let's sort the data to find the speakers who spoke the most per year within each category -- prereform, postreform, and continuously through the periods.  
 
-To do this, we'll want to first create a new column, `wordcount_per_speaker`, which adds together each speaker's total wordcount. If we have multiple "wordcount" columns, we should add information about what each refers to.  To make it less confusing, we'll rename our previous wordcount column `wordcount_per_year`. It's good practice to keep renaming fields in our datasets for clarity so that we don't get confused about what they mean. To calculate `wordcount_per_speaker`, we'll use the `group_by()` and `mutate()` functions that we've seen before. Note that we won't use `summarize()` in this case because we still want to keep the `wordcount_per_year()` field upon which the new count is based.
+To find the speakers who spoke the most, we'll want to first create a new column, `wordcount_per_speaker`, which adds together each speaker's total wordcount. If we have multiple "wordcount" columns, we should add information about what each refers to.  To make it less confusing, we'll rename our previous wordcount column `wordcount_per_year`. It's good practice to keep renaming fields in our datasets for clarity so that we don't get confused about what they mean. To calculate `wordcount_per_speaker`, we'll use the `group_by()` and `mutate()` functions that we've seen before. Note that we won't use `summarize()` in this case because we still want to keep the `wordcount_per_year()` field upon which the new count is based.
 
 we'll use `group_by()` to group the data by "class," then use the `arrange()` and `slice_head()` functions to take the top wordcounts for each category.
 
@@ -432,7 +432,7 @@ As the analyst will recall, because of the structure of our data, names that wer
 
 When we make a graph to share, we'd like to substitute Robert Peel's name for this awkward string. Therefore, we need to create a "key" where we can match the individual id "robert_peel_1665" to the name "Sir Robert Peel."
 
-The names as given in the text are in the Hansard dataset under the `speaker` column. We can grab any one of them -- minus the titles like "Lord Chancellor" with which some speakers are referenced  -- and it will read like a normal name. The `str_detect()` function is useful for searching for a string. In this case, `!str_detect()` will allow us to throw out names that include titles we don't want to use. The `sample_n()` function is useful here as it tells the computer to select a random pick from a set; in other words, if we've grouped Robert Peel's many possible names, and we have the set "Robert Peel," "Sir Robert Peel," and "Mr. Robert Peel," the computer is instructed to pull out one of these at random.  
+The names as given in the text are in the Hansard dataset under the `speaker` column. We can grab any one of them -- minus the titles like "Lord Chancellor" with which some speakers are referenced  -- and it will read like a normal name. The `str_detect()` function is useful for searching for a string. `!str_detect()` will allow us to throw out names that include titles we don't want to use. The `sample_n()` function is useful here as it tells the computer to select a random pick from a set; in other words, if we've grouped Robert Peel's many possible names, and we have the set "Robert Peel," "Sir Robert Peel," and "Mr. Robert Peel," the computer is instructed to pull out one of the names at random.  
 
 After we choose one name to use from the full Hansard list of literal speaker references, we can use these names to annotate the previous dataset, `all_speakers_annotated`, which has `wordcount` (per speaker per year) and `speaker`. 
 
@@ -470,7 +470,7 @@ speaker_key %>%
   filter(str_detect(suggested_speaker, "peel_")) 
 ```
 
-The results may not be impressive for the vast majority of speakers who spoke very little. But for major speakers like Robert Peel, this `speaker_key` dataset will help us reconcile the many names with which they appeared in the text with one numeric id number, then reconciling that numeric id with one recognizable name from the Hansard transcription.
+The results may not be impressive for the vast majority of speakers who spoke very little. But for major speakers like Robert Peel, the `speaker_key` dataset will help us reconcile the many names with which they appeared in the text with one numeric id number, then reconciling that numeric id with one recognizable name from the Hansard transcription.
 
 # Using Left Join to Annotate the Data
 
@@ -499,13 +499,13 @@ Sometimes the most effective way of analyzing data is to "inspect" the results o
 
 But for questions about information when several dimensions of data are related to each other -- for instance speaker words over time when speakers have been categorized in three "classes" -- visualization may be useful for conveying how many factors are related to each other. Next, we'll use `ggplot()` to create a visualization of the results as a timeline. 
 
-In the case of the data about speakers before and after 1832, we have rich information that deserves to be represented in an interesting way. We have three categories of speakers -- prereform, postreform, and continuous speakers -- and information about how many speakers are in each category. We also have information about how much each speaker spoke each year.  Can we model this information together and learn something from the result?
+In the case of the data about speakers before and after 1832, we have rich information that deserves to be represented in an interesting way. We have three categories of speakers -- prereform, postreform, and continuous speakers -- and information about how many speakers are in each category. We also have information about how much each speaker spoke each year.  Can we model the information together and learn something from the result?
 
 in the code block below, we'll create a "dot plot," mapping one point for each of the 10,810 speakers in the data frame. We will use the color and shape of the dots to map the three classes of speakers -- prereform, postreform, and continuous. 
 
 ### Contingent labeling
 
-Because labeling all the speakers would result in an unreadable graphic, we will tell the computer to only label those speakers who are classified as "TRUE" in the column `top`, where we annotated if a speaker was among the top n speakers of each class by wordcount. The syntax for this operation is given inside the parentheses of `geom_label_repel()`, where the coder has an opportunity to point to a new dataset as the source of the text in the labels.  Here, we tell the computer which dots to label and which to leave blank with  the use of `subset(graph_ready, top == TRUE)`. Operations of this type are relatively advanced for visualization, but they are extremely useful for the kind of dense, text-forward information that implementors of text mining often want from their analysis.
+Because labeling all the speakers would result in an unreadable graphic, we will tell the computer to only label those speakers who are classified as `TRUE` in the column `top`, where we annotated if a speaker was among the top n speakers of each class by wordcount. The syntax for this operation is given inside the parentheses of `geom_label_repel()`, where the coder has an opportunity to point to a new dataset as the source of the text in the labels.  Here, we tell the computer which dots to label and which to leave blank with  the use of `subset(graph_ready, top == TRUE)`. Operations of this type are relatively advanced for visualization, but they are extremely useful for the kind of dense, text-forward information that implementors of text mining often want from their analysis.
 
 If you are new to visualization with `ggplot()`, we encourage you to play around with the code below to understand how the components work. Try changing the size of the dots by adjusting the "size" parameter inside `geom_jitter()`.  Or try changing from a `geom_jitter()` plot to a `geom_point()` plot. For an in-depth tutorial about the powerful `ggplot()` library and the philosophy of the "grammar of graphics" behind it, we encourage you to consult Hadley Wickham, "A Layered Grammar of Graphics,"  _Journal of Computational and Graphical Statistics_, vol. 19, no. 1, pp. 3–28, 2010. 
 
@@ -534,7 +534,7 @@ We also learn that by and large it was the continuous speakers -- not the preref
 
 We can also use this visualization to note the few prereform-only speakers who delivered relatively long speeches, for instance Mr. Canning and Mr. Huskisson, the latter important to the Board of Trade, represented by light gray squares. 
 
-Equally exceptional were the few members of parliament elected only after 1832 who spoke with prominence, among them John Roebuck and Frederick Shaw.  These men whose careers were endorsed by reform swam in a sea of seasoned representatives who had first joined parliament in an earlier era.
+Equally exceptional were the few members of parliament elected only after 1832 who spoke with prominence, among them John Roebuck and Frederick Shaw. Both men whose careers were endorsed by reform swam in a sea of seasoned representatives who had first joined parliament in an earlier era.
 
 Note that our visualization is only as good as the quality of the data. Where speakers have not been reconciled correctly -- as is the case with "Lord Brougham" (classified as postreform only), who in reality is the same as "Henry Brougham" (classified as a continuous speaker) -- they may appear as discrete speakers when indeed they are the same. 
 
@@ -709,17 +709,13 @@ ggplot(postreform_top_words_w_speaker_classifications_tfidf,
   scale_fill_gradient(low = "grey90", high = "black") +  # continuous, fixes the error
   scale_x_reordered() +
   guides(fill = FALSE) +
-  labs(
-    title = "Which Words Are Most Distinctive",
-    subtitle = "of the postreform only speakers vs those who also spoke before the Reform Act of 1832?",
-    y = "word count",
-    x = NULL
-  )
-
-
+  labs(title = "Most Distinctive Words",
+       subtitle = "Postreform only speakers vs those who also spoke before the Reform Act of 1832",
+       y = "word count",
+       x = NULL)
 ```
 
-Again, a list of words emerges which is hard to interpret. In this case, we choose to ask the analyst to supply their own interpretation in the exercises for this chapter. 
+Again, a list of words emerges which is hard to interpret. We choose to ask the analyst to supply their own interpretation in the exercises for this chapter. 
 
 An alternative approach to measurement is to look exclusively at the speakers who only held office before or after the Reform Act.  This means measuring the words of those who weren't reelected after 1832 with those who were only elected in 1832 or after. 
 

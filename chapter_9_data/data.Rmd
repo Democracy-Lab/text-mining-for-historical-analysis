@@ -59,15 +59,15 @@ knitr::knit_hooks$set(output = function(x, options) {
 })
 ```
 
-Many careful thinkers, when beginning a new project, seek out multiple archives for research.  Katherine Bode, for example, argues for the importance of scholars building their own resources as a means of challenging the prevailing reliance on canonical texts and curated corpora, as solely engaging these risks reinforcing narrow or dominant histories (Bode 2018). A plurality of archives and texts offers an opportunity to think critically about the boundaries and biases of each archive under consideration. Many of the approaches to text mining we have profiled already -- especially distinctiveness and distance measures -- offer tools for systematically extending the study of the boundaries of the archive, such that a scholar can accumulate critical perspectives as they broaden their access to archives.
+Many careful thinkers, when beginning a new project, seek out multiple archives for research.  Katherine Bode, for example, argues for the importance of scholars building their own resources as a means of challenging the prevailing reliance on canonical texts and curated corpora, as solely engaging canonical texts risks reinforcing narrow or dominant histories (Bode 2018). A plurality of archives and texts offers an opportunity to think critically about the boundaries and biases of each archive under consideration. Many of the approaches to text mining we have profiled already -- especially distinctiveness and distance measures -- offer tools for systematically extending the study of the boundaries of the archive, such that a scholar can accumulate critical perspectives as they broaden their access to archives.
 
 When a scholar is pursuing a complex research question, the relevant data must often be located, extracted, and prepared independently before analysis can begin. In historical research or other research problems across the social sciences and humanities, relevant sources may be scattered across different archives and exist only in incomplete or inconsistent formats. While basic guidance can provide some degree of comfort to the analyst who wishes to gain access to the diverse kinds of data available on the web, today's data ecosystem is highly diverse and even fragmented in terms of its infrastructures. 
 
-Data diversity brings new technical challenges. The method of extracting and analyzing data vary with how the data is stored and processed. Some archives offer well-documented APIs that facilitate access to records, while others provide only partial documentation or inconsistent metadata. These differences often reflect underlying disparities in the resources allocated to developing, maintaining, and preserving digital archives.  Very few archives come packaged as a software repository as `hansardr` is. Therefore most data analysts will eventually want to engage the broader data ecosystem that exists beyond the data prepared for this book. 
+Data diversity brings new technical challenges. The method of extracting and analyzing data vary with how the data is stored and processed. Some archives offer well-documented APIs that facilitate access to records, while others provide only partial documentation or inconsistent metadata. The differences in how data is stored often reflect underlying disparities in the resources allocated to developing, maintaining, and preserving digital archives.  Very few archives come packaged as a software repository as `hansardr` is. Therefore most data analysts will eventually want to engage the broader data ecosystem that exists beyond the data prepared for this book. 
 
 As Ian Milligan argues in _History in the Age of Abundance_ (2019), the explosion of born-digital content has transformed the historian's archive, requiring new tools and methods to access, process, and interpret digital records at scale.  In fields ranging from the humanities to computer science (Dobson 2019, Hayler et. al 2016, Hai-Jew 2018), analysts have documented approaches that are useful for aggregating text from the web.  Once data has been properly accessed, cleaned, and stored, the analysis exercises from the rest of the book can be applied towards a variety of research questions -- but only if the analyst is able to manipulate data.  
 
-The skills of accessing and manipulating data from the web are not well distributed.  Our own experience suggests that, far from being a familiar task to most college seniors with a degree in data science, downloading and processing data from the web is often beyond the abilities of most students. Even computer scientists graduates skilled in data processing may face trouble when working with unfamiliar file types. Few textbooks offer a practical approach for analysts who wish to meet this growing digital archive, and the existing how-to guides published by historians and archives are, while useful, often disaggregated. Other The piecemeal approach to accessing one digital archive at a time rarely arms the analyst with the skills they need to feel comfortable ingesting large amounts of data.
+The skills of accessing and manipulating data from the web are not well distributed.  Our own experience suggests that, far from being a familiar task to most college seniors with a degree in data science, downloading and processing data from the web is often beyond the abilities of most students. Even computer scientists graduates skilled in data processing may face trouble when working with unfamiliar file types. Few textbooks offer a practical approach for analysts who wish to meet a growing digital archive, and the existing how-to guides published by historians and archives are, while useful, often disaggregated. Other The piecemeal approach to accessing one digital archive at a time rarely arms the analyst with the skills they need to feel comfortable ingesting large amounts of data.
 
 To access the broader data ecosystem, analysts need to understand at least three modes of accessing data: 
 (a) access to APIs, 
@@ -76,7 +76,7 @@ To access the broader data ecosystem, analysts need to understand at least three
 
 In this chapter, we show how historians can engage with data housed in online archives--even though the data freely available may be found in disparate and irreconciliable types, many of which are increasingly born-digital. 
 
-A highly-skilled data scientist is able to engage these different infrastructures under any circumstance. The ability to engage these fragmented infrastructures provides the key to becoming flexible enough to adopt the many archives that may been needed for a grand project.
+The ability to engage fragmented infrastructures under any circumstance provides the key to becoming flexible enough to adopt the many archives that may been needed for a grand project.
 
 In the age of AI, many analysts compile their own archives or have collected data from primary sources, resulting in a haphazard and sometimes poorly-labeled dataset that needs much cleaning before it is fit for analysis.  Even when the data has been carefully treated by librarians or other custodians, the datasets rarely arrive in a neatly curated or structured state.
 
@@ -92,13 +92,13 @@ Through a series of exercises, the following chapter will introduce high-level c
 
 # APIs 
 
-Although vast quantities of cultural and historical materials are now available online through APIs (Application Programming Interfaces, or mechanisms that allow one piece of software to request and receive data from another), the ability to actually retrieve and work with these materials remains unevenly distributed. This matters because an increasing share of cultural production is "born digital," meaning the digital record is the original form rather than a later digitized copy (Ries 2022). 
+Although vast quantities of cultural and historical materials are now available online through APIs (Application Programming Interfaces, or mechanisms that allow one piece of software to request and receive data from another), the ability to actually retrieve and work with APIs remains unevenly distributed. Accessibility matters because an increasing share of cultural production is "born digital," meaning the digital record is the original form rather than a later digitized copy (Ries 2022). 
 
 In our experience, collecting data from the web is not a routine skill — even among graduating seniors in data-science programs. Computer science students who are otherwise proficient at data wrangling can still struggle when confronted with unfamiliar file formats, download endpoints, or web-based collection workflows.
 
-Part of the problem is that very few instructional materials teach these practices in a systematic way. Several works exist that outline the history of APIs, conceptualize them as a scholarly artifact, or discuss their significance to digital scholarship (Roued-Cunliffe 2017, Wachowiak 2022). However, they do not demonstrate how to use an API. 
+Part of the problem is that very few instructional materials teach the practices of working with APIs in a systematic way. Several works exist that outline the history of APIs, conceptualize them as a scholarly artifact, or discuss their significance to digital scholarship (Roued-Cunliffe 2017, Wachowiak 2022). However, they do not demonstrate how to use an API. 
 
-Most textbooks treat data as if it were already neatly stored on a local machine, while archivists' how-to guides tend to focus on individual platforms one at a time without offering a transferable workflow. This piecemeal approach may leave analysts adept at navigating a single repository but unprepared to ingest larger, more heterogeneous collections of digital sources at scale. Lessons on accessing one digital archive at a time rarely arms the analyst with the skills they need to feel comfortable ingesting large amounts of data from diverse sources (_Programming Historian_, "Lesson Index: APIs"; _Programming Historian_), "Lesson Index: Web Scraping").
+Most textbooks treat data as if it were already neatly stored on a local machine, while archivists' how-to guides tend to focus on individual platforms one at a time without offering a transferable workflow. A specialized approach may leave analysts adept at navigating a single repository but unprepared to ingest larger, more heterogeneous collections of digital sources at scale. Lessons on accessing one digital archive at a time rarely arms the analyst with the skills they need to feel comfortable ingesting large amounts of data from diverse sources (_Programming Historian_, "Lesson Index: APIs"; _Programming Historian_), "Lesson Index: Web Scraping").
 
 ## Creating a Dataset from an API Endpoint 
 
@@ -108,7 +108,7 @@ An API is a set of rules and protocols that allows one piece of software to inte
 
 Increasingly, public institutions and government agencies have adopted open data initiatives that make datasets accessible through APIs. Many cities, such as the City of Dallas and New York City, provide access to a range of datasets—such as 311 service requests, building permits, and police reports—via their open data portals. 
 
-APIs are a central mechanism through which analysts can access the vast quantities of data available online. In this sense, API endpoints function not merely as technical tools, but as gateways into contemporary digital archives. Large-scale datasets—ranging from open government records to social media content—are often made accessible through these API endpoints, which return data in structured formats such as CSV, or more commonly, JSON and XML.
+APIs are a central mechanism through which analysts can access the vast quantities of data available online. API endpoints function not merely as technical tools, but as gateways into contemporary digital archives. Large-scale datasets—ranging from open government records to social media content—are often made accessible through API endpoints, which return data in structured formats such as CSV, or more commonly, JSON and XML.
 
 Successfully interacting with open APIs—such as those provided by the City of Dallas or New York City—often depends on navigating several technical considerations, including user authentication, rate limits on the number of requests, options for customizing queries, and the specific data formats returned by the API. In what follows, we provide an overview of these considerations. 
 
@@ -142,7 +142,7 @@ Authentication is the process by which a user verifies their identity to the API
 
 ## Practical Exercise: The API in Action
 
-To illustrate how an API works, consider this example from the New York City Open Data portal, "NYC OpenData", which provides access to vast public datasets including population data, budgetary data, and data on city infrastructure. For this exercise we will look at just current and historic 311 service requests. The link below takes us to a webpage for the dataset _311 Call Center Inquiry_, which also provides a direct link to the API endpoint.
+To illustrate how an API works, consider the following example from the New York City Open Data portal, "NYC OpenData", which provides access to vast public datasets including population data, budgetary data, and data on city infrastructure. For this exercise we will look at just current and historic 311 service requests. The link below takes us to a webpage for the dataset _311 Call Center Inquiry_, which also provides a direct link to the API endpoint.
 
 `https://data.cityofnewyork.us/City-Government/311-Call-Center-Inquiry/wewp-mm3p/about_data`.
 
@@ -220,9 +220,9 @@ However, if we return to the dataset’s page —
 
 `https://data.cityofnewyork.us/City-Government/311-Call-Center-Inquiry/wewp-mm3p/about_data` — 
 
-We can see that the site reports the dataset contains millions of records. Technically, nothing went wrong during data extraction. Instead, we were "rate limited." Rate limiting is a common mechanism used by open data APIs to manage server load and prevent abuse. It restricts how many requests a user can make within a given time period. For example, unauthenticated users might be limited to 100 requests per hour, while authenticated users may be allowed significantly more—such as 10,000 requests per hour. This means that even though the data is publicly available, access can still be throttled based on usage patterns and credentials.
+We can see that the site reports the dataset contains millions of records. Technically, nothing went wrong during data extraction. Instead, we were "rate limited." Rate limiting is a common mechanism used by open data APIs to manage server load and prevent abuse. It restricts how many requests a user can make within a given time period. For example, unauthenticated users might be limited to 100 requests per hour, while authenticated users may be allowed significantly more—such as 10,000 requests per hour. Even though the data is publicly available, access can still be throttled based on usage patterns and credentials.
 
-Most platforms open government data websites using the Socrata Open Data API (SODA) limit responses to 1,000 records per request by default. If a dataset exceeds this, only the first 1,000 rows are returned unless pagination is used. In the following example we revise the above code to account for pagination. This code runs two cycles, collecting up to 1,000 records per cycle for a total of up to 2,000 records. This code can be modified to extract additional records. 
+Most platforms open government data websites using the Socrata Open Data API (SODA) limit responses to 1,000 records per request by default. If a dataset exceeds the request limit, only the first 1,000 rows are returned unless pagination is used. In the following example we revise the above code to account for pagination. This code runs two cycles, collecting up to 1,000 records per cycle for a total of up to 2,000 records. This code can be modified to extract additional records. 
 
 ```{r}
 url <- "https://data.cityofnewyork.us/resource/wewp-mm3p.json"
@@ -255,11 +255,11 @@ Importantly, even if you use pagination, you may still violate a website’s Ter
 
 ### Using R Packages to Connect to an API 
 
-The examples above demonstrate basic interactions with APIs that require only a single, fixed URL. However, many APIs--especially those offering more extensive datasets--support more complex queries. These APIs require us to construct URLs, which can be a nontrivial task. This is because URLs often include multiple parameters, such as search terms, filters, authentication keys, and pagination controls, all of which must be formatted correctly to retrieve the desired data. After the data has been via the API, it still needs to be parsed into an R-friendly format. 
+The examples above demonstrate basic interactions with APIs that require only a single, fixed URL. However, many APIs--especially those offering more extensive datasets--support more complex queries. APIs require us to construct URLs, which can be a nontrivial task. Challenges stem from constructnig URLs that often include multiple parameters, such as search terms, filters, authentication keys, and pagination controls, all of which must be formatted correctly to retrieve the desired data. After the data has been via the API, it still needs to be parsed into an R-friendly format. 
 
-Numerous R packages have been developed to simply interactions with APIs. These packages encapsulate the API's functionality within R functions and data structures, abstracting away the more complex tasks such as URL construction and parsing JSON responses. For example, the rOpenGov universe--composed of a community that develops open-source R packages to increase access to government data--offers several packages that simplify working with APIs, including `usdoj` and `oldbailey`. This section demonstrates the use of `usdoj` (2023).
+Numerous R packages have been developed to simply interactions with APIs. These R packages encapsulate the API's functionality within R functions and data structures, abstracting away the more complex tasks such as URL construction and parsing JSON responses. For example, the rOpenGov universe--composed of a community that develops open-source R packages to increase access to government data--offers several packages that simplify working with APIs, including `usdoj` and `oldbailey`. This section demonstrates the use of `usdoj` (2023).
 
-`usdoj` provides more intuitive access to data from the U.S. Department of Justice's API by wrapping complex API interactions into simple R functions. It can be installed direclty from the rOpenGov universe. To do this, we first need to tell R to check the rOpenGov repository, and then we can install the package using `install.packages("usdoj")` as usual. By default, R installs packages from CRAN (the Comprehensive R Archive Network), but by adding this additional repository, we can access a wider range of packages.
+`usdoj` provides more intuitive access to data from the U.S. Department of Justice's API by wrapping complex API interactions into simple R functions. `usdoj` can be installed directly from the rOpenGov universe. To install it, we first need to tell R to check the rOpenGov repository, and then we can install the package using `install.packages("usdoj")` as usual. By default, R installs packages from CRAN (the Comprehensive R Archive Network), but by adding this additional repository, we can access a wider range of packages.
 
 ```{r, echo=FALSE}
 library("usdoj")
@@ -317,7 +317,7 @@ Here we present a list of APIs for scholarly researcher derived from the Univers
 | [Edinburgh University Press](https://www.euppublishing.com/customer-services/librarians/text-and-data-mining-tdm) | Edinburgh University Press supports text and data mining through a licensed crawler-based system that provides institutional researchers with access to full-text XML of books, chapters, and journal articles for non-commercial academic use. It does not offer a public-facing API but rather a web crawler that once enabled, researchers can systematically harvest the XML corpus, making the platform suitable for large-scale linguistic, historical, or computational text analysis while maintaining compliance with publisher licensing terms. |
 | [Elsevier](https://dev.elsevier.com/) | Elsevier provides a suite of research APIs that give programmatic access to citation data, metadata, abstracts, and in some cases full text from its major platforms, including Scopus, ScienceDirect, Reaxys, PharmaPendium, and Engineering Village. These APIs support a wide range of scholarly workflows, from bibliometrics and literature reviews to chemical data retrieval and research evaluation. Most APIs are available at no cost for non-commercial academic users, provided their institution already subscribes to the underlying products. |
 | [HathiTrust](https://babel.hathitrust.org/cgi/mb) | HathiTrust is a large-scale digital library that provides access to millions of digitized books and archival materials from research libraries, with strong coverage of public-domain works and U.S. government documents. For text and data mining, it offers the HathiTrust Research Center (HTRC), which provides computational access to full text through curated datasets and a Data Capsule environment that allows large-scale analysis while protecting copyrighted material. Researchers can download public-domain corpora directly or use controlled infrastructure to analyze in-copyright texts, making HathiTrust one of the most important platforms for scholarly text mining in the humanities and social sciences. |
-| [IEEE Xplore](https://developer.ieee.org/) | Institute of Electrical and Electronics Engineers (IEEE) offers the IEEE Xplore API, a developer toolkit that enables programmatic access to its digital library of engineering, computer science, and technology content. Through this API users can query metadata, abstracts and, in certain cases, full-text articles. Access requires registration and an API key. It supports automated workflows like automated literature discovery and citation analysis. |
+| [IEEE Xplore](https://developer.ieee.org/) | Institute of Electrical and Electronics Engineers (IEEE) offers the IEEE Xplore API, a developer toolkit that enables programmatic access to its digital library of engineering, computer science, and technology content. Through the API users can query metadata, abstracts and, in certain cases, full-text articles. Access requires registration and an API key. It supports automated workflows like automated literature discovery and citation analysis. |
 | [New York Times API](https://developer.nytimes.com/apis) | The New York Times API is a set of publicly documented web APIs that allow developers and researchers to access structured data from the NYT, including articles, metadata, archives, books, reviews, and topical tags. It provides access to the Article Search API (historical and current articles with metadata), Books API (bestsellers and reviews), Archive API (full monthly issue metadata back to 1851), Movie Reviews API, and Top Stories API. Most endpoints return JSON and are designed for metadata-level access rather than full article text, though headlines, abstracts, keywords, and URLs are included. The API is widely used in digital humanities, journalism studies, and computational media research for building corpora, trend analysis, and topic modeling against news metadata, while full-text mining typically requires separate licensed access through ProQuest or NYT institutional agreements. |
 | [Taylor & Francis](https://taylorandfrancis.com/our-policies/textanddatamining/) | Taylor & Francis hosts a very large corpus of scholarly journals and books across the humanities and social sciences as well as STEM fields, with particularly deep coverage in cultural studies, history, education, media studies, and the social sciences. It also includes both contemporary and historical materials and supports programmatic large-scale analysis of full text, which makes it useful for trend analysis, discourse studies, topic modeling, and longitudinal claims about scholarly language or concepts. Because its platform encompasses many influential journals across multiple disciplines. |
 | [Springer / BMC](https://www.biomedcentral.com/getpublished/indexing-archiving-and-access-to-data) | Springer offers a public RESTful API (via the BMC platform) that provides structured access to open-access journal content in JSON or PAM formats, making it easy to integrate into computational workflows in R. The platform also maintains rich article-level metadata and real-time usage and citation metrics, which are especially useful for bibliometrics, scholarly communication research, and longitudinal studies of academic impact. |
@@ -325,7 +325,7 @@ Here we present a list of APIs for scholarly researcher derived from the Univers
 | [ERIC](https://eric.ed.gov/?faq) | ERIC (the Education Resources Information Center) is a major open-access index of research in education, sponsored by the U.S. Department of Education, and it is one of the strongest resources for text and data mining in the learning sciences, education policy, and pedagogy. It offers structured metadata for journal articles, reports, dissertations, curricula, and grey literature from government and nonprofit education organizations, much of it available in full text. Because ERIC aggregates both peer-reviewed research and practitioner-oriented materials, it supports both scholarly analysis and policy-oriented studies, making it ideal for large-scale text analysis of educational trends, terminology shifts, interventions, and discourse over time. |
 | [Chronicling America](https://www.loc.gov/collections/chronicling-america/about-this-collection/technical-information/) | Chronicling America is a major open-access newspaper portal operated by the Library of Congress in partnership with the National Endowment for the Humanities, and it is one of the most important historical text corpora available for large-scale humanities research. It provides digitized U.S. newspapers spanning 1777–1963 along with rich bibliographic metadata and OCR text, making it well-suited for computational analysis of language, place-based reporting, public discourse, and cultural change over time. Because the platform is built for long-term preservation and public access, it is widely used for projects in digital history, media studies, and historical linguistics, particularly those requiring geographically and temporally broad sources. |
 | [Unpaywall](https://unpaywall.org/products/api) | Unpaywall is a powerful resource for large-scale scholarly research because it provides open, programmatic access to metadata about which versions of over 54 million academic articles are freely available on the web. It maintains a massive database of OA copies harvested from repositories, preprint servers, and publisher pages, and its API allows researchers to look up open versions of paywalled articles using DOIs. Rather than hosting the articles itself, Unpaywall acts as a discovery layer for legal open-access versions, which makes it especially useful for building large corpora of scholarly texts without needing direct publisher agreements or subscriptions. |
-| [JSTOR](https://www.jstor.org/ta-support) | JSTOR is one of the largest digital libraries of scholarly journals, books, and primary sources spanning the humanities and social sciences, with particular strength in older journal runs (deep backfiles) and historically oriented scholarship. For computational text analysis, JSTOR provides Data for Research (DfR), a service that allows researchers to obtain structured metadata, n-grams, and full-text datasets derived from its corpus. It enables bulk export of data in machine-readable formats such as JSON or XML. Because JSTOR's core holdings are largely in-copyright, access to full text is controlled: researchers typically begin with n-gram or metadata-level exports, then may apply for privileged access upon IRB-style justification or institutional agreement. This model makes JSTOR valuable for linguistic, conceptual, and discourse analysis over time, especially in fields like history, literature, cultural studies, anthropology, philosophy, feminist theory, political thought, and other disciplines where journals preserved by JSTOR often represent the canonical scholarly record across the 19th–21st centuries. |
+| [JSTOR](https://www.jstor.org/ta-support) | JSTOR is one of the largest digital libraries of scholarly journals, books, and primary sources spanning the humanities and social sciences, with particular strength in older journal runs (deep backfiles) and historically oriented scholarship. For computational text analysis, JSTOR provides Data for Research (DfR), a service that allows researchers to obtain structured metadata, n-grams, and full-text datasets derived from its corpus. It enables bulk export of data in machine-readable formats such as JSON or XML. Because JSTOR's core holdings are largely in-copyright, access to full text is controlled: researchers typically begin with n-gram or metadata-level exports, then may apply for privileged access upon IRB-style justification or institutional agreement. JSTOR is valuable for linguistic, conceptual, and discourse analysis over time, especially in fields like history, literature, cultural studies, anthropology, philosophy, feminist theory, political thought, and other disciplines where journals preserved by JSTOR often represent the canonical scholarly record across the 19th–21st centuries. |
 
 ## RSS Feeds 
 
@@ -357,7 +357,7 @@ print(head(articles, 5))
 
 Bulk downloads from institutional repositories are a common alternative to collecting data through a web service like an API. When working with large datasets, analysts may find bulk download options-—when available-—to be more efficient than relying solely on an API, which can take time to collect the data.
 
-While this option might seem straightforward, it is often overlooked because inconsistencies in how repositories are structured or labeled can make bulk download options difficult to locate. 
+While a bulk download option might seem straightforward, it is often overlooked because inconsistencies in how repositories are structured or labeled can make bulk download options difficult to locate. 
 
 Making use of bulk downloads requires attention to file formats, file size, and licensing restrictions. Data may be packaged in tabular formats like CSV or TSV, which mirror the data frames we have been processing throughout this book. Other common formats include JSON and XML, which store data in hierarchical, nested structures often used for representing complex relationships or metadata. 
 
@@ -380,11 +380,11 @@ Other popular sites for bulk downloads include:
 
 ## Working With Bulk Download Data
 
-Importantly, while bulk data downloads seem straightforward, they can be difficult to work with in practice. Many open data portals offer complete dataset exports in formats such as CSV or JSON. The primary advantage of this approach is the ability to download substantial volumes of data in a single step. 
+Importantly, while bulk data downloads seem straightforward, they can be difficult to work with in practice. Many open data portals offer complete dataset exports in formats such as CSV or JSON. The primary advantage of accessing a bulk download is the ability to collect substantial volumes of data in a single step. 
 
 Size of the download is another concern.  A dataset may appear manageable in size because it is compressed--for example, as a .zip file--but unzipping it can produce gigabytes of text that overwhelm the memory or storage capacity of a typical laptop.Even when extraction is successful, trying to load the entire dataset into R with a single command like `read_csv()` or `fromJSON()` can cause the session to crash or become unresponsive. 
 
-The `hansardr` package was built with this challenge in mind: the full Hansard corpus was broken into smaller partitions to make it possible to load and analyze a large data set without consuming too many resources. But for other datasets, the analyst may need to "chunk" the data manually to make it manageable on a smaller machine.
+The `hansardr` package was built with the challenge of loading large data in mind: the full Hansard corpus was broken into smaller partitions to make it possible to load and analyze a large data set without consuming too many resources. But for other datasets, the analyst may need to "chunk" the data manually to make it manageable on a smaller machine.
 
 "Chunking" data is the key approach for an analyst who needs to break a large dataset down into smaller, more workable sections.
 
@@ -392,7 +392,7 @@ The `hansardr` package was built with this challenge in mind: the full Hansard c
 
 In cases where large dataset has not been partitioned, it is often necessary to process the data in smaller chunks, such as reading one line at a time or loading a subset of rows using functions like `read_csv_chunked()` from the `tidyverse`'s `readr` or `fread(nrows = ...)` from the `"data.table"()` package. 
 
-Below is an example of code for reading a large dataset in 1000 row chunks. For this sake of this practice, we will not download a large dataset onto our computers. We are simply offering a code example. 
+Below is an example of code for reading a large dataset in 1000 row chunks. For the sake of our practice, we will not download a large dataset onto our computers. We are simply offering a code example. 
 
 ```{r, eval=FALSE}
 library("data.table")
@@ -404,7 +404,7 @@ chunk1 <- fread("hansard_large.csv", nrows = 1000, skip = 0)
 chunk2 <- fread("hansard_large.csv", nrows = 1000, skip = 1000)
 ```
 
-This is the same process but automated, so the user will read up to 100,000 rows of the data. 
+Below is the same process but automated, so the user will read up to 100,000 rows of the data. 
 
 ```{r, eval=FALSE}
 # Set parameters for reading data
@@ -434,11 +434,11 @@ Please note that most pdfs that analysts might find on the web are not so well f
 
 ## Practicing with PDFs: Egil's Saga
 
-It is possible to download a PDF file directly to one's computer and extract its text content for text mining. The following example demonstrates how this process can be automated. 
+It is possible to download a PDF file directly to one's computer and extract its text content for text mining. The following example demonstrates how the process of downloading PDFs can be automated. 
 
 We will practice with an 1893 translation of _Egil's Saga,_ or the _Skalla-Grímssonar_, one of the classic Icelandic sagas, thought to be written in the 13th century, likely by Snorri Sturluson. It blends historical narrative, legend, and poetry, focusing on Egill Skallagrímsson, a fierce warrior and gifted poet. The copy of the text that we are using has been previously OCR'd from an original book, rendered as text, cleaned, and output as a machine-readable text with very little noise -- making it an ideal subject on which to practice reading in data from a PDF.
 
-Please note: The code that follows handles downloading and text extraction, but it does not include functionality for deleting the file afterward.  This omission is intentional: to prevent any risk of accidentally deleting important or unrelated files, we have left the task of file deletion to the user’s discretion. If the script is executed, the reader should manually delete the downloaded PDF file from their computer once it is no longer needed.
+Please note: The code that follows handles downloading and text extraction, but it does not include functionality for deleting the file afterward. Our omission is intentional: to prevent any risk of accidentally deleting important or unrelated files, we have left the task of file deletion to the user’s discretion. If the script is executed, the reader should manually delete the downloaded PDF file from their computer once it is no longer needed.
 
 ```{r}
 library("httr")
@@ -508,7 +508,7 @@ tidy_egils_saga_with_metadata <- tidy_egils_saga %>%
          date = "1893")
 ```
 
-This metadata helps an analyst keep track of key information about the book. However, because each row in the author, book, and date columns contains the same values, the metadata is redundantly stored in the data frame. 
+The metadata helps an analyst keep track of key information about the book. However, because each row in the author, book, and date columns contains the same values, the metadata is redundantly stored in the data frame. 
 
 ```{r}
 library("gt")
@@ -538,11 +538,11 @@ Before the widespread availability of APIs, data collection from websites was co
 
 In R, the `rvest` package facilitates web scraping by parsing HTML content into a structured representation, commonly referred to as the HTML tree. 
 
-An additional precaution is to add code to slow down the web scraping process.  To avoid overloading the server hosting the webpage, requests are typically rate-limited during this process.
+An additional precaution is to add code to slow down the web scraping process.  To avoid overloading the server hosting the webpage, requests are typically rate-limited during web scraping. 
 
 ## Practicing Web Scraping: Retrieving the Code for _Text Mining for Historical Analysis_
 
-The following example illustrates the initial step in this process: retrieving the HTML content of the GitHub repository page for this book followed by a snippet of the page's HTML. 
+The following example illustrates the initial step in web scrapings: retrieving the HTML content of the GitHub repository page for this book followed by a snippet of the page's HTML. 
 
 ```{r}
 url <- "https://github.com/stephbuon/text-mining-for-historical-analysis"
@@ -593,7 +593,7 @@ As an example, in the following code the CSS selector `p` would select both para
 </div>
 ```
 
-To extract the content itself, the analyst uses these selectors to locate relevant elements in the HTML tree and then retrieve their text. In practice, this involves three steps: downloading the page’s HTML, parsing it into a structured document, and applying CSS or XPath queries to extract the desired nodes. For example, using the `rvest` package in R, the following code retrieves all paragraph text from a webpage using the `p` tag as the selector:
+To extract the content itself, the analyst uses selectors to locate relevant elements in the HTML tree and then retrieve their text. In practice, scraping involves three major steps: downloading the page's HTML, parsing it into a structured document, and applying CSS or XPath queries to extract the desired nodes. For example, using the `rvest` package in R, the following code retrieves all paragraph text from a webpage using the `p` tag as the selector:
 
 ```{r}
 # Step 1: Read the webpage
@@ -612,17 +612,17 @@ print(paragraphs)
 
 Historic documents pose unique challenges for text mining due to inconsistencies in spelling and the physical degradation of materials over time. Additionally, digitization often introduces errors, such as mistakes from Optical Character Recognition (OCR), which complicate analysis. 
 
-As analysts aim to uncover language patterns and insights within historical texts, data cleaning becomes an important step in preparing these documents for analysis. Data cleaning is the process of identifying and correcting errors, inconsistencies, and inaccuracies in data to ensure its quality and reliability. 
+As analysts aim to uncover language patterns and insights within historical texts, data cleaning becomes an important step in preparing documents for analysis. Data cleaning is the process of identifying and correcting errors, inconsistencies, and inaccuracies in data to ensure its quality and reliability. 
 
-This section provides analysts with the conceptual foundation and practical tools necessary for effective data cleaning. We argue that data cleaning should not be treated as a purely technical task, but rather as an interpretive and methodological decision: analysts must consider whether data should be cleaned for a given analysis, and if so, determine which forms of cleaning are appropriate in light of the research goals. Our aim is to demonstrate the techniques for cleaning data while remaining critical and aware of the editorial decisions involved in this process.
+This section provides analysts with the conceptual foundation and practical tools necessary for effective data cleaning. We argue that data cleaning should not be treated as a purely technical task, but rather as an interpretive and methodological decision: analysts must consider whether data should be cleaned for a given analysis, and if so, determine which forms of cleaning are appropriate in light of the research goals. Our aim is to demonstrate the techniques for cleaning data while remaining critical and aware of the editorial decisions involved.
 
 ## Identifying Messy Data
 
 Defining "messy" is not a straightforward task. Rather, determining what counts as messy is subjective and should be guided by a clear rationale tied to the goals of a given analysis. Throughout _Text Mining for Historical Analysis_, we have made baseline assumptions about what constitutes "messy" in ways we believe support certain forms of computational inquiry. For example, we provide a version of Hansard--via `hansardr`--that has disambiguated speaker names. This column is meant to address inconsistencies and ambiguities in the original records, as well as remove special symbols or other artifacts that may interfere with our research goals, like debate text appended to a speakers name. 
 
-We offer this "cleaned" speaker data because we believe it can help structure the data in a way that allows speech to be attributed to a single member of Parliament. This is particularly useful for analyses that rely on mapping discourse to individual actors. Similarly, we have removed stop words and eliminated symbols such as brackets or asterisks when they appear in discourse. In doing this, we have made certain assumptions about which textual features are considered meaningful for our purposes and which can be treated as noise--assumptions that reflect specific analytical priorities and inevitably shape the kinds of historical arguments that can be made.
+We offer the "cleaned" speaker data because we believe it can help structure the data in a way that allows speech to be attributed to a single member of Parliament. Clean speaker names may be particularly useful for analyses that rely on mapping discourse to individual actors. Similarly, we have removed stop words and eliminated symbols such as brackets or asterisks when they appear in discourse. Through cleaning, we have made certain assumptions about which textual features are considered meaningful for our purposes and which can be treated as noise--assumptions that reflect specific analytical priorities and inevitably shape the kinds of historical arguments that can be made.
 
-Our approach to identifying and managing "messy" data is not shared unilaterally across all domains. Certainly, for some researchers the "mess" we have identified might be considered a rich feature of the historical record that should be considered during an analysis. For instance, Ryan Cordell (2017), has argued that messy data is not a problem to be solved so much as a condition to preserved and engaged critically. He notes that digital artifacts are often treated as though they are meant to serve as faithful replicas of the original texts, as if they are most valuable if they contain the exact words without any OCR errors. Yet, as he argues, when "we treat the digitized object primarily as a surrogate for its analog original, we jettison the most compelling qualities of both media. The unique use of the digital medium, broadly considered, is the capacity to computationally trace patterns across corpora of various sizes" (193). Matthew Kirschenbaum (2008) calls for providing an "account of electronic texts as artifacts—mechanisms—subject to material and historical forms of understanding" (17). In this way, Kirschenbaum challenges the idea that digital texts are immaterial or purely abstract representations. Instead, when we understand electronic texts as artifacts—objects that are produced, stored, and transmitted through specific material mechanisms (like hard drives, servers, or software systems) we can critically engage with the artifact's existence in the world. 
+Our approach to identifying and managing "messy" data is not shared unilaterally across all domains. Certainly, for some researchers the "mess" we have identified might be considered a rich feature of the historical record that should be considered during an analysis. For instance, Ryan Cordell (2017), has argued that messy data is not a problem to be solved so much as a condition to preserved and engaged critically. He notes that digital artifacts are often treated as though they are meant to serve as faithful replicas of the original texts, as if they are most valuable if they contain the exact words without any OCR errors. Yet, as he argues, when "we treat the digitized object primarily as a surrogate for its analog original, we jettison the most compelling qualities of both media. The unique use of the digital medium, broadly considered, is the capacity to computationally trace patterns across corpora of various sizes" (193). Matthew Kirschenbaum (2008) calls for providing an "account of electronic texts as artifacts—mechanisms—subject to material and historical forms of understanding" (17). Kirschenbaum challenges the idea that digital texts are immaterial or purely abstract representations. Instead, when we understand electronic texts as artifacts—objects that are produced, stored, and transmitted through specific material mechanisms (like hard drives, servers, or software systems) we can critically engage with the artifact's existence in the world. 
 
 We do not disagree with these points. Texts--especially historical ones--are mediated through layers of transmission, digitization, and encoding. Depending upon one's approach to analysis, to clean too aggressively is to erase and to normalize to heavily is to flatten. Indeed, a historian's job is not just to extract patterns but to understand data provenance. Here, however, we have defined "messy" in a way that we think is meaningful for computational historical analysis, which engages data through text mining. For our purposes here, common signs of messy data include: 
 
@@ -647,7 +647,7 @@ speaker_metadata_1840 %>%
   filter(sentence_id == "S3V0051P0_728")
 ```
 
-In this example, an apostrophe is included at the beginning of the name "Mr. Speaker" and a hyphen appears before the name "Lord Ashley."
+In the following examples, an apostrophe is included at the beginning of the name "Mr. Speaker" and a hyphen appears before the name "Lord Ashley."
 
 ```{r}
 speaker_metadata_1840 %>% 
@@ -676,11 +676,7 @@ speaker_metadata_1840 %>%
   mutate(speaker = str_replace_all(speaker, "'", ""))
 ```
 
-Many guides exist for defining and using regular expressions. For this reason, we will not include one here and instead suggest reading 
-
-https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html
-
-for a comprehensive encyclopedia of regular expressions in R. 
+Many guides exist for defining and using regular expressions. Therefore, we will not include one here and instead suggest reading CRAN's vignette on regular expressions (https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html) for a comprehensive encyclopedia of regular expressions in R. 
 
 While effective, writing our own regular expression-based approaches to data cleaning can become increasingly intricate and difficult to scale, such as demonstrated by the following code that relies on `stringr` for handling strings. 
 
@@ -703,18 +699,18 @@ clean_string <- messy_string |>
 print(clean_string)
 ```
 
-Writing complex regular expressions can be time-consuming and difficult to manage, making alternative approaches increasingly appealing. Recently, large language models (LLMs) have been explored as tools for data cleaning. Unlike traditional programming methods, LLMs are not bound by rigid symbolic logic. They can instead interpret natural language instructions. This means we can simply describe how we want a messy string cleaned, and the model can perform the task without requiring detailed code.
+Writing complex regular expressions can be time-consuming and difficult to manage, making alternative approaches increasingly appealing. Recently, large language models (LLMs) have been explored as tools for data cleaning. Unlike traditional programming methods, LLMs are not bound by rigid symbolic logic. They can instead interpret natural language instructions. Therefore, we can simply describe how we want a messy string cleaned, and the model can perform the task without requiring detailed code.
 
-However, relying on LLMs to directly clean text introduces certain risks. Unlike traditional programmatic methods, which transform text by manipulating the original content, LLMs generate entirely new text based on probabilistic models. Because the output often closely resembles the input, it is easy to mistake this generated text for a faithful reproduction—when in fact it is newly generated text, not a transference of the original text. This generation makes LLMs more prone to introducing errors or "hallucinations"--that is, producing text that is semantically plausible but factually incorrect. Such risks are heightened when (a) the input text is significantly different from the data the model was trained on--as is often the case with historical or domain-specific texts--or (b) when the model is given an overly large or complex input to process at once.
+However, relying on LLMs to directly clean text introduces certain risks. Unlike traditional programmatic methods, which transform text by manipulating the original content, LLMs generate entirely new text based on probabilistic models. Because the output often closely resembles the input, it is easy to mistake this generated text for a faithful reproduction—when in fact it is newly generated text, not a transference of the original text. Generation makes LLMs more prone to introducing errors or "hallucinations"--that is, producing text that is semantically plausible but factually incorrect. Such risks are heightened when (a) the input text is significantly different from the data the model was trained on--as is often the case with historical or domain-specific texts--or (b) when the model is given an overly large or complex input to process at once.
 
-For this reason, we have found it most effective to use the LLM to identify issues in the text and generate code—such as R scripts or regular expressions—that can then be executed programmatically to clean the data. This approach lets us have our cake and eat it too: we benefit from the LLM’s ability to quickly construct complex cleaning logic, while maintaining the safety, transparency, and reproducibility of programmatic data processing. Rather than asking the LLM to rewrite the passage directly and copying its regenerated output, this approach allows us to preserve the original text while applying transparent, repeatable transformations.
+We have found it most effective to use the LLM to identify issues in the text and generate code—such as R scripts or regular expressions—that can then be executed programmatically to clean the data. Using a LLM to generate code lets us have our cake and eat it too: we benefit from the LLM'ss ability to quickly construct complex cleaning logic, while maintaining the safety, transparency, and reproducibility of programmatic data processing by generating the cleaning code and not perform the cleaning itself. Rather than asking the LLM to rewrite the passage directly and copying its regenerated output, we can preserve the original text while applying transparent, repeatable transformations.
 
-For example, we provided this prompt and string to OpenAI's GPT-4: 
+For example, we provided the following prompt and string to OpenAI's GPT-4: 
 
 > Write regular expression(s) to clean this text. Return your response as R code. 
 > " <p>We!!!   can clean   messy--<b> text using </b>.. ,    regular expressions </p> "
 
-GPT-4 returned this code: 
+GPT-4 returned the following code: 
 
 ```{r}
 library("stringr")
@@ -733,9 +729,9 @@ text <- str_squish(messy_string)
 print(text)
 ```
 
-Since a single regular expression is often insufficient to handle all types of messy input, it may be desirable to apply this approach iteratively, for example, by using a `for` loop that calls the API for a LLM and dynamically generates regular expressions tailored to the specific cleaning needs of the given text. 
+Since a single regular expression is often insufficient to handle all types of messy input, it may be desirable to apply this cleaning approach iteratively, for example, by using a `for` loop that calls the API for a LLM and dynamically generates regular expressions tailored to the specific cleaning needs of the given text. 
 
-Below, we provide an example of what this might look like in pseudo-code, or code that resembles real code in order to communicate an idea, but is not actually intended to run. To use similar code, the reader will need to obtain and configure an API key for access to a LLM. 
+Below, we provide an example of what the iterative steps might look like in pseudo-code, or code that resembles real code in order to communicate an idea, but is not actually intended to run. To use similar code, the reader will need to obtain and configure an API key for access to a LLM. 
 
 ```{eval=FALSE}
 library("stringr")
@@ -758,9 +754,9 @@ for (i in 1:max_iterations) {
 
 # Interpreting Data Format, Type, and Structure
 
-Digital methods are now deeply embedded in many areas of humanities research. As a result, it is increasingly necessary to move beyond a surface-level familiarity with the technical aspects of computational text analysis. We argue it is necessary to approach digital media not merely as "tools," but as complex systems shaped by specific technical features. This shift requires a transition toward computational thinking as an approach that emphasizes the conceptual understanding of how data is structured, processed, and interpreted. We argue that adopting computational thinking is essential for engaging more critically with digital sources, and for integrating these methods into the interpretive practices of the humanities.
+Digital methods are now deeply embedded in many areas of humanities research. As a result, it is increasingly necessary to move beyond a surface-level familiarity with the technical aspects of computational text analysis. We argue it is necessary to approach digital media not merely as "tools," but as complex systems shaped by specific technical features. A conceptual understanding of how data is structured, processed, and interpreted, we suggest, is helpful for engaging more critically with digital sources, and for integrating these methods into the interpretive practices of the humanities.
 
-This section introduces core technical concepts—data format, type, and structure—that shape how textual data is processed and analyzed. In many computational disciplines, these concepts are treated as foundational and are typically addressed early, as they serve as the building blocks to more advanced forms of analysis. In this book, however, we intentionally set these concepts aside because our approach to text mining in R largely handles these data complexities. Most of our work involved character data (e.g., words in a debate) and integer data (e.g., frequency counts of top words), which were stored in data frames compatible with the (primarily) `tidyverse` tools we selected. Our deliberate approach allowed us to move straight into historical analysis without worrying about data complexities. Here, we pause to examine these underlying structures more deliberately, as a deeper understanding of them can inform strategies for different types of analyses. This section thus reframes some technical fluency as a critical component of interpretive practice in computational text analysis. 
+This section introduces core technical concepts—data format, type, and structure—that shape how textual data is processed and analyzed. In many computational disciplines, an understanding of data type, format, and structure are treated as foundational and are typically addressed early, as they serve as the building blocks to more advanced forms of analysis. Throughout _Text Mining for Historical Analysis_ however, we intentionally set these concepts aside because our approach to text mining in R largely handles data complexities. Most of our work involved character data (e.g., words in a debate) and integer data (e.g., frequency counts of top words), which were stored in data frames compatible with the (primarily) `tidyverse` tools we selected. Our deliberate approach allowed us to move straight into historical analysis without worrying about data complexities. Here, we pause to examine the underlying structures more deliberately, as a deeper understanding of them can inform strategies for different types of analyses. This section thus reframes some technical fluency as a critical component of interpretive practice in computational text analysis. 
 
 ## Data Format
 
@@ -772,8 +768,8 @@ Data formats refer to the way information is stored and represented. It has an i
 * JSON (JavaScript Object Notation)– A hierarchical format often used in APIs and web services. It allows for nested values, making it useful for representing complex, structured data such as Reddit posts or metadata-rich archives. JSON data often requires flattening before analysis in tools like R.
 * XML (eXtensible Markup Language) – A tree-structured markup language designed to store richly encoded text and metadata. XML is widely used in scholarly editions and historical datasets (e.g., Old Bailey) and supports deeply nested content like legal documents or manuscripts. It is verbose but highly descriptive. XML is more verbose than JSON, and its verbosity enables more granular control over how texts are described and interpreted—especially when fine distinctions between text types or historical layers matter.
 * HTML (HyperText Markup Language) – The foundational format of web pages. When scraping websites, analysts parse HTML to extract specific content.
-* PDF (Portable Document Format) – A fixed-layout format intended for visual presentation rather than structured analysis. A fixed layout means that the position of text, images, and other elements is preserved exactly as intended across devices and platforms, replicating the appearance of a printed page. This makes PDFs ideal for human reading and archival purposes but challenging for computational analysis. Extracting text from PDFs—especially those with poor OCR (Optical Character Recognition) quality—can be error-prone and often requires additional cleaning. Still, they remain a common format for digitized historical texts.
-* R data files (.rds, .RData) – These are used to store R objects, such as data frames, in a way that preserves their structure and attributes. These are an efficient means of storage and retrieval within the R environment. When using packages like `hansardr`, the analyst loads .RData files. 
+* PDF (Portable Document Format) – A fixed-layout format intended for visual presentation rather than structured analysis. A fixed layout means that the position of text, images, and other elements is preserved exactly as intended across devices and platforms, replicating the appearance of a printed page. PDFs are therefore ideal for human reading and archival purposes but challenging for computational analysis. Extracting text from PDFs—especially those with poor OCR (Optical Character Recognition) quality—can be error-prone and often requires additional cleaning. Still, they remain a common format for digitized historical texts.
+* R data files (`.rds`, `.RData`) – R data files are used to store R objects, such as data frames, in a way that preserves their structure and attributes. These are an efficient means of storage and retrieval within the R environment. When using packages like `hansardr`, the analyst loads `.RData` files. 
 
 Each of these formats has implications for how data can be queried, cleaned, stored, and interpreted and understanding these distinctions equips researchers to navigate the data ecosystem more effectively.
 
@@ -815,7 +811,7 @@ data("hansard_1800")
 typeof("hansard_1800$text")
 ```
 
-Throughout this book, we have primarily worked with character and integer data. For other types of historical analyses, however, we may encounter data types or values we have not addressed in detail. These are some common data types in R: 
+Throughout this book, we have primarily worked with character and integer data. For other types of historical analyses, however, we may encounter data types or values we have not addressed in detail. Below are some common data types in R: 
 
 | Data Type   | Description                                               | Example Code                        | `typeof()` Output |
 |-------------|-----------------------------------------------------------|-------------------------------------|-----------------|
@@ -833,7 +829,7 @@ knitr::include_graphics("pipe.png")
 ```
 
 
-When observing this image, the viewer sees a pipe, despite the instructions emblazoned below the image. If an analyst stares at this image and puzzles for hours, they may still see just a pipe. 
+When observing _The Treachery of Images_, the viewer sees a pipe, despite the instructions emblazoned below the image. If an analyst stares at the image and puzzles for hours, they may still see just a pipe. 
 
 The caption serves to remind us that a representation is an object, different in its nature from the original object represented; the pipe that Magritte held in his hand and painted is different from the picture of the pipe he made. 
 
@@ -842,13 +838,13 @@ Just so, a human analyst may stare at their code for hours while asking themselv
 
 ## When Data Type is Missing: NA and NULL Values
 
-Not all values have a data type. Analysts delving deeper into programming may encounter values like `NA` and `NULL` often appear in datasets with missing records. Engaging datasets with these values can be confusing because they analyst cannot treat them the same as data that have a type, like character or integer data. 
+Not all values have a data type. Analysts delving deeper into programming may encounter values like `NA` and `NULL` often appear in datasets with missing records. Engaging datasets with `NA` and `NULL` values can be confusing because they analyst cannot treat them the same as data that have a type, like character or integer data. 
 
 In R, `NA` (Not Available) represents missing or undefined data. It used when a value is expected but not present, much like a blank cell in a spreadsheet. 
 
 In contrast, `NULL` indicates the absence of an object altogether, meaning the data structure or value does not exist at all. 
 
-Here is just one example of how `NA`'s are treated differently than character values. This is an illustrative, fake historical snippet of a dataset of individuals recorded in an 1850 census table or notarial register, where some people have a listed occupation while others have a blank entry (`NA`). You want to count how many people were "laborers." If you treat NA as a string instead of a missing value, your counts will be wrong, because `NA` is the absence of information, not the word "laborer" misspelled or omitted.
+Here is just one example of how `NA`'s are treated differently than character values. This example is an illustrative, fake historical snippet of a dataset of individuals recorded in an 1850 census table or notarial register, where some people have a listed occupation while others have a blank entry (`NA`). You want to count how many people were "laborers." If you treat NA as a string instead of a missing value, your counts will be wrong, because `NA` is the absence of information, not the word "laborer" misspelled or omitted.
 
 The "occupation" column (which records the species’ conservation status—e.g., endangered, threatened, or of least concern) contains character strings as well as `NA` values. As we will demonstrate, missing values (`NA`) behave yield a different result than text when undergoing string operations. 
 
@@ -879,14 +875,14 @@ census
 
 From printing just the first rows, multiple `NAs` appear.
 
-We can now process the dataset and observe what happens when we try to implement functions that expect a string on these rows. Here, we use `str_detect()` to identify whether or not a value is equal to the word "domesticated." We return our results in a new column named "is_washerwoman." 
+We can now process the dataset and observe what happens when we try to implement functions that expect a string for the value of dataset rows. Here, we use `str_detect()` to identify whether or not a value is equal to the word "domesticated." We return our results in a new column named "is_washerwoman." 
 
 ```{r}
 census %>%
   mutate(is_washerwoman = str_detect(occupation, "washerwoman"))
 ```
 
-`str_detect()` returned `TRUE` if the value in the row is equal to "domesticated" and `FALSE` if it is not. However, multiple rows are left with `NA`, even though the values of those rows were not equal to "domesticated." This is because `NA` is a different data type than a string, and so `str_detect()`, a function that anticipates a string, did not assign a true or false value. 
+`str_detect()` returned `TRUE` if the value in the row is equal to "domesticated" and `FALSE` if it is not. However, multiple rows are left with `NA`, even though the values of those rows were not equal to "domesticated." `NA` is a different data type than a string, and so `str_detect()`, a function that anticipates a string, did not assign a true or false value. 
 
 We must use a different approach to identifying `NA` values:
 
@@ -895,7 +891,7 @@ census %>%
   mutate(is_missing = is.na(occupation))
 ```
 
-If we wish for the `NA` values to be treated like strings--which could be the case if we are analyzing historical records where some individuals’ occupations are missing, and we want to treat "unknown" as a searchable category--we could replace them with the word "missing" or with an empty string (`""`). The following code provides an example for how this can be accomplished: 
+If we wish for the `NA` values to be treated like strings--which could be the case if we are analyzing historical records where some individuals’ occupations are missing, and we want to treat "unknown" as a searchable category--we could replace them with the word "missing" or with an empty string (`""`). The following code provides an example for how we can accomplish treating treating `NA`s as a string: 
 
 ```{r}
 library("tidyverse")
@@ -924,7 +920,7 @@ continents_population <- list('South America', 644.54, 'Africa', 1305, 'Europe',
 typeof(continents_population)
 ```
 
-`continents_population` is the list type. But each item inside the list also has its own type. To see this, we can loop through the list and print each item's type like so: 
+`continents_population` is the list type. But each item inside the list also has its own type. To inspect the data type, we can loop through the list and print each item's type like so: 
 
 ```{r}
 for (item in continents_population) {

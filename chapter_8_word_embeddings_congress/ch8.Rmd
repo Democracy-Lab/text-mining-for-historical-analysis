@@ -46,7 +46,7 @@ congress_daily_climate_change_2020 <- congress_daily_climate_change_2000_2020 %>
 climate_change_text_2020 <- congress_daily_climate_change_2020$content
 ```
 
-These parameters control the behavior of the GloVe word embedding model. The rank (50) sets the dimensionality of the learned word vectors — this is the number of numeric values used to represent a word. Higher dimensionality allows the model to capture more nuance, subtle meaning, and fine-grained semantic distinctions between words, while smaller dimensionality produces simpler models that run faster but encode less detail. The window (5) determines how many neighboring words on each side are considered when learning meaning, based on the idea that words appearing near each other tend to be related. The term_count_min (1) filters out words that appear less than a minimum number of times in the corpus, preventing extremely rare tokens or typos from influencing the model. The x_max (10) parameter downweights extremely frequent filler words so they do not dominate the training process. The n_iter (30) controls how many passes the model makes over the co-occurrence data — more iterations usually improve results but take longer. Finally, the seed (42) ensures reproducibility so the same settings and data produce the same model when rerun.
+The parameters control the behavior of the GloVe word embedding model. The rank (50) sets the dimensionality of the learned word vectors — this is the number of numeric values used to represent a word. Higher dimensionality allows the model to capture more nuance, subtle meaning, and fine-grained semantic distinctions between words, while smaller dimensionality produces simpler models that run faster but encode less detail. The window (5) determines how many neighboring words on each side are considered when learning meaning, based on the idea that words appearing near each other tend to be related. The term_count_min (1) filters out words that appear less than a minimum number of times in the corpus, preventing extremely rare tokens or typos from influencing the model. The x_max (10) parameter downweights extremely frequent filler words so they do not dominate the training process. The n_iter (30) controls how many passes the model makes over the co-occurrence data — more iterations usually improve results but take longer. Finally, the seed (42) ensures reproducibility so the same settings and data produce the same model when rerun.
 
 We do not go into detail about some of these concepts -- ENTER -- here. 
 
@@ -96,7 +96,7 @@ word_embeddings_2010 <- quiet_run(find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 <- quiet_run(find_word_embeddings(climate_change_text_2020))
 ```
 
-While the model is training, GloVe prints progress updates so you can see how training is advancing. These updates include the current timestamp, which training epoch the model is on, and the current loss value. An epoch means one full pass over the entire dataset — so if the console says epoch 10, the model has now processed the corpus 10 times. The loss value tells you how well the model is learning at that point — lower loss generally means the model is improving. So during training, you will see output messages formatted like `INFO [<timestamp>] epoch <k>, loss <value>` appear in the console to show the model’s progress step-by-step.
+While the model is training, GloVe prints progress updates so you can see how training is advancing. The progress updates include the current timestamp, which training epoch the model is on, and the current loss value. An epoch means one full pass over the entire dataset — so if the console says epoch 10, the model has now processed the corpus 10 times. The loss value tells you how well the model is learning at that point — lower loss generally means the model is improving. So during training, you will see output messages formatted like `INFO [<timestamp>] epoch <k>, loss <value>` appear in the console to show the model’s progress step-by-step.
 
 ```{r, eval=FALSE}
 word_embeddings_2000 <- find_word_embeddings(climate_change_text_2000)
@@ -193,7 +193,7 @@ ggplot(coords, aes(PC1, PC2, label = word)) +
 
 ## Vector Subtraction
 
-Vector subtraction in word embeddings asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. This lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
+Vector subtraction in word embeddings asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
 
 ```{r}
 vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
