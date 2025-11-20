@@ -125,8 +125,6 @@ Buongiorno, Steph. hansardr: Access a cleaned version of the c19 Hansard corpus 
 
 Buongiorno, Steph, Serena Di Martino, Ryan Schaefer, Shawn Chen, Alisha Morejon, Hailey DeMark, Francesca La Marca, Grace Schultz, Wes Anderson, Chris Miller, and Matt Swigart. Democracy Viewer, 2023, accessed Nov. 9, 2024. 
 
-Eggers, Andrew C., and Arthur Spirling. “Electoral Security as a Determinant of Legislator Activity, 1832-1918: New Data and Methods for Analyzing British Political Development.” Legislative Studies Quarterly 39, no. 4 (2014): 593–620. http://www.jstor.org/stable/43862507.
-
 Fyfe, Paul. (2016). "An archaeology of Victorian newspapers." Victorian Periodicals Review, 49(4), 546–577.
 
 Garnier, Simon, Noam Ross, and Robert Rudis. viridis: Colorblind-Friendly Color Maps for R. Version 0.6.4, 2024. R package, https://CRAN.R-project.org/package=viridis.
@@ -143,19 +141,21 @@ Spirling, Arthur and Any Eggers. "Electoral Security as a Determinant of Legisla
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. "Welcome to the Tidyverse." _Journal of Open Source Software_, vol. 4, no. 43, 2019, p. 1686. https://doi.org/10.21105/joss.01686.
 
-Winters, Jane and Martin Steer. Digging into Linked Parliamentary Data (DiLiPaD). 2013.
-
 ### Chapter 3
 
 Borges, J. L. 1998. Collected Fictions. New York: Penguin
 
 Buongiorno, Steph. hansardr: Access a cleaned version of the c19 Hansard corpus with improved speaker names in the R environment. 2021. GitHub, R package. https://github.com/stephbuon/hansardr.
 
+Eggers, Andrew C., and Arthur Spirling. “Electoral Security as a Determinant of Legislator Activity, 1832-1918: New Data and Methods for Analyzing British Political Development.” Legislative Studies Quarterly 39, no. 4 (2014): 593–620. http://www.jstor.org/stable/43862507.
+
 Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis using tidy data principles in R." _Journal of Open Source Software_, 1(3), 37. https://doi.org/10.21105/joss.00037
 
 Spinu, Vitalie, Garrett Grolemund, and Hadley Wickham. lubridate: Make Dealing with Dates a Little Easier. Version 1.9.2, 2023. R package, https://CRAN.R-project.org/package=lubridate.
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. "Welcome to the Tidyverse." _Journal of Open Source Software_, vol. 4, no. 43, 2019, p. 1686. https://doi.org/10.21105/joss.01686.
+
+Winters, Jane and Martin Steer. Digging into Linked Parliamentary Data (DiLiPaD). 2013.
 
 ### Chapter 4
 
