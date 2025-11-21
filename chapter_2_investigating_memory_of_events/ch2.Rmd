@@ -2,7 +2,7 @@
 title: 'Chapter 2: Investigating the Memory of Events Using n-grams, Controlled Vocabulary, and Joins'
 output: 
   pdf_document:
-    number_sections: true
+    number_sections: false
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{tcolorbox}
@@ -39,25 +39,27 @@ First we can load the text data from the 1860s speeches, recalling that one of t
  
 ```{r, warning=FALSE, message=FALSE}
 # Use the hansardr library to load the debate text
-library("hansardr")
+library(hansardr)
 
 data("hansard_1860")
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-library("knitr")
-library("kableExtra")
+library(knitr)
+library(kableExtra)
 library(tidyverse)
 
 df_head <- hansard_1860 %>% 
   slice_head(n = 5)
+```
 
+```{r}
 kable(df_head, 
       format = "latex", 
       booktabs = TRUE, 
       linesep = "",
-      caption = "Hansard Speeches 1860") %>%
+      caption = "Sample sentences from 1860s Hansard, including each sentence's unique identifier and the corresponding text as extracted from the debate transcripts.") %>%
   kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
@@ -76,13 +78,13 @@ data("debate_metadata_1860")
 df_head <- debate_metadata_1860 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Hansard Metadata 1860.") %>%
-  kable_styling(
-    latex_options = c("scale_down", "repeat_header"),
-    table.envir = FALSE) %>%
+kable(df_head, 
+      format = "latex", 
+      booktabs = TRUE, 
+      linesep = "",
+      caption = "Debate-level metadata from 1860s Hansard, including each sentence's identifier, the date of the speech, and the title of the corresponding debate.") %>%
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
+                table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
               latex_valign = "top")
@@ -102,13 +104,13 @@ data("speaker_metadata_1860")
 df_head <- speaker_metadata_1860 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Hansard Metadata 1860.") %>%
-  kable_styling(
-    latex_options = c("scale_down", "repeat_header"),
-    table.envir = FALSE) %>%
+kable(df_head, 
+      format = "latex", 
+      booktabs = TRUE, 
+      linesep = "",
+      caption = "Speaker-level metadata for sample sentences from the 1860 Hansard corpus, including the recorded speaker name, the algorithmically suggested speaker match, and indicators for name ambiguity, fuzzy matching, and ignored cases.") %>%
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
+                table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
               latex_valign = "top")
@@ -136,13 +138,15 @@ data("file_metadata_1860")
 df_head <- file_metadata_1860 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
+kable(df_head, 
+    format = "latex", 
     booktabs = TRUE, 
     linesep = "",
-    caption = "Source File Metadata 1860.") %>%
-  kable_styling(
-    latex_options = c("scale_down", "repeat_header"),
-    table.envir = FALSE) %>%
+    caption = "Source-file metadata for selected sentences from the 1860 Hansard corpus, 
+    including the identifiers for the sentence, speech, and debate, as well as the source 
+    file, source image, and original column location.") %>%
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
+                table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
               latex_valign = "top")
@@ -164,9 +168,13 @@ hansard_1860 <- left_join(hansard_1860, debate_metadata_1860)
 hansard_1860 %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%  
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        caption = "Text excerpts from the 1860 Hansard corpus alongside their associated 
+        metadata, including the sentence identifier, speech date, and debate title.") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm") 
+  column_spec(2, width = "6cm") %>%
+  column_spec(4, width = "4cm")
 ```
 
 Notice that the resulting dataset, `hansard_corpus_1860`, has information about speaker and date for each sentence of text. 
@@ -229,13 +237,13 @@ bigrams_1867 <- hansard_1867 %>% # create a new dataset
 df_head <- bigrams_1867 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Hansard Bigrams with Metadata.") %>%
-  kable_styling(
-    latex_options = c("scale_down", "repeat_header"),
-    table.envir = FALSE) %>%
+kable(df_head, 
+      format = "latex", 
+      booktabs = TRUE, 
+      linesep = "",
+      caption = "Raw bigrams extracted from the 1867 Hansard proceedings alongside their associated metadata.") %>%
+  kable_styling(latex_options = c("scale_down", "repeat_header"),
+                table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
               latex_column_spec = "p{12cm}", 
               latex_valign = "top")
@@ -261,10 +269,11 @@ clean_bigrams_1867 <- bigrams_1867 %>%
 df_head <- clean_bigrams_1867 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Clean Hansard Bigrams with Metadata.") %>%
+kable(df_head, 
+      format = "latex", 
+      booktabs = TRUE, 
+      linesep = "",
+      caption = "Cleaned bigrams from the 1867 Hansard corpus together with their metadata. The cleaned bigrams reflect preprocessing steps that remove stopwords.") %>%
   kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
@@ -302,10 +311,11 @@ top_bigrams_1867 <- clean_bigrams_1867 %>%
 df_head <- top_bigrams_1867 %>% 
   slice_head(n = 5)
 
-kbl(df_head, format = "latex", 
+kable(df_head, format = "latex", 
     booktabs = TRUE, 
     linesep = "",
-    caption = "Top Hansard Bigrams for 1867.") %>%
+    caption = "The most frequent bigrams in the 1867 Hansard corpus, ranked 
+    by their number of occurrences.") %>%
   kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
@@ -326,7 +336,12 @@ my_reading %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE,
+        caption = "Sample Hansard text from 1867 containing multiple occurrences 
+        of the phrase “public meetings.”") %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -371,7 +386,12 @@ minds %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE,
+        caption = "Sample Hansard text from 1867 containing multiple 
+        occurrences of the phrase “minds of the people.”") %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -574,7 +594,9 @@ events_1830 <- bigrams_1830 %>% # create a new dataset
 events_1830 %>%
   head() %>%
   mutate(ngram = str_trunc(ngram, 120)) %>%  
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE,
+        caption = "Sample two-word phrase events from the 1830 Hansard debates.") %>%
   kable_styling(full_width = FALSE,
                 position = "left",
                 latex_options = c("hold_position", "scale_down"),
@@ -712,7 +734,11 @@ c15_mentions %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE,
+        caption = "") %>%
   column_spec(1, width = "14cm")
 ```
 

@@ -308,18 +308,19 @@ hansard_1830_w_year <- hansard_1830 %>%
   left_join(debate_metadata_1830) %>%
   mutate(year = year(speechdate))
 
-# look at the first few columns of the dataset
 hansard_1830_w_year %>%
   head() %>%
-  mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
+  mutate(text = str_trunc(text, 120)) %>% 
   kable("latex", booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm")    # wrap the "text" column
+  column_spec(2, width = "6cm") %>% 
+  column_spec(4, width = "4cm")
 ```
 
 Notice that the resulting dataset has a new field, "year."
 
 If we want to count words by year, first we need to tokenize the speeches.  
+
 ```{r, message = F}
 words_1830_w_year <- hansard_1830_w_year %>% 
   left_join(speaker_metadata_1830) %>%
@@ -368,8 +369,14 @@ mrs_walrand_sentences <- left_join(mrs_walrand_speaker_metadata,
   left_join(., hansard_1820, by = "sentence_id") %>%
   select(debate_id, text)
 
-head(mrs_walrand_sentences) %>% 
-  kable()
+mrs_walrand_sentences %>%
+  head() %>%
+  mutate(text = str_trunc(text, 120)) %>% 
+  kable(format = "latex", 
+        booktabs = TRUE,
+        caption = "Sentences uttered by Mrs. Walrand in the 1820 Hansard debates.") %>%
+  kable_styling(full_width = FALSE, position = "left") %>%
+  column_spec(2, width = "10cm") 
 ```
 
 ```{r}
@@ -378,7 +385,16 @@ entire_debate <- hansard_1820 %>%
   filter(debate_id == 5142) %>%
   select("text")
 
-head(entire_debate$text, 20)
+debate_table <- tibble(text = head(entire_debate$text, 20))
+
+debate_table %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        caption = "Excerpt of Debate Text (First 20 Sentences)") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"),
+                full_width = FALSE,
+                position = "left") %>%
+  column_spec(1, width = "16cm")
 ```
 
 ```{r, message = F, warning = F}
@@ -409,40 +425,20 @@ ggplot(data = mrs_walrand_top_words,
 We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. Refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
 
 ```{r, echo = FALSE, message = FALSE}
-name <- c("Mrs. (Mary Ann) Clark", 
-                  "Mrs. Bridgeman", 
-                  "Miss Mary Ann Taylor",
-                  "Louisa Demont",
-                  "Franchette Martigner",
-                  "Mrs. Walrand")
+name <- c("Mrs. (Mary Ann) Clark", "Mrs. Bridgeman", "Miss Mary Ann Taylor", "Louisa Demont",
+          "Franchette Martigner", "Mrs. Walrand")
 
-name_col_2 <- c("Mrs. Disraeli",
-                "Ms. Cunninghame Graham",
-                "Mrs. Dillon",
-                "Mrs. M'Govern",
-                "Mrs. Mitchel-Thomson",
-                "Ms. Cave")
-year <- c("1809", 
-          "1809", 
-          "1809",
-          "1820",
-          "1820",
-          "1824")
+name_col_2 <- c("Ms. Cunninghame Graham", "Mrs. Dillon", "Mrs. M'Govern", 
+                "Mrs. Mitchel-Thomson", "Ms. Cave")
 
-year_col_2 <- c("1856",
-                "1887",
-                "1902",
-                "1902",
-                "1907",
-                "1907")
+year <- c("1809", "1809", "1809", "1820", "1820", "1824")
+
+year_col_2 <- c("1887", "1902", "1902", "1907", "1907")
 
 df <- data.frame(name, year, name_col_2, year_col_2)
 
 df %>%
-  kbl(col.names = c("Name",
-                    "Year",
-                    "Name",
-                    "Year")) %>%
+  kable(col.names = c("Name", "Year", "Name", "Year")) %>%
   kable_styling()
 ```
 
