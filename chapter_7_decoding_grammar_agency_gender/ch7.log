@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.15)  19 NOV 2025 08:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.15)  22 NOV 2025 14:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -529,22 +529,28 @@ Package pdftexcmds Info: \pdfdraftmode found.
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
-)))) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty
+)))) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/chngcntr/chngcntr.sty
+Package: chngcntr 2018/04/09 v1.1a change counter resetting
+Package chngcntr Info: \counterwithout already defined.
+(chngcntr)             Quitting chngcntr on input line 21.
+)
+\c@chapter=\count347
+(/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip64
-\multirow@cntb=\count347
+\multirow@cntb=\count348
 \multirow@dima=\skip65
 \bigstrutjot=\dimen302
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/wrapfig/wrapfig.sty
 \wrapoverhang=\dimen303
 \WF@size=\dimen304
-\c@WF@wrappedlines=\count348
+\c@WF@wrappedlines=\count349
 \WF@box=\box87
 \WF@everypar=\toks43
 Package: wrapfig 2003/01/31  v 3.6
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count349
+\c@float@type=\count350
 \float@exts=\toks44
 \float@box=\box88
 \@float@everytoks=\toks45
@@ -553,7 +559,7 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 Package: colortbl 2024/10/29 v1.0k Color table columns (DPC)
 \everycr=\toks46
 \minrowclearance=\skip66
-\rownum=\count350
+\rownum=\count351
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape.sty
 Package: pdflscape 2025-06-23 v0.14 Display of landscape pages in PDF
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/pdflscape/pdflscape-nometadata.sty
@@ -567,17 +573,17 @@ Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/varwidth/varwidth.sty
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box90
-\sift@deathcycles=\count351
+\sift@deathcycles=\count352
 \@vwid@loff=\dimen305
 \@vwid@roff=\dimen306
 )
 ==> First Aid for varwidth.sty applied!
-\c@taburow=\count352
-\tabu@nbcols=\count353
-\tabu@cnt=\count354
-\tabu@Xcol=\count355
-\tabu@alloc=\count356
-\tabu@nested=\count357
+\c@taburow=\count353
+\tabu@nbcols=\count354
+\tabu@cnt=\count355
+\tabu@Xcol=\count356
+\tabu@alloc=\count357
+\tabu@nested=\count358
 \tabu@target=\dimen307
 \tabu@spreadtarget=\dimen308
 \tabu@naturalX=\dimen309
@@ -606,7 +612,7 @@ Package: threeparttablex 2013/07/23 v0.3 by daleif
 \UL@skip=\skip69
 \UL@hook=\toks49
 \UL@height=\dimen316
-\UL@pe=\count358
+\UL@pe=\count359
 \UL@pixel=\dimen317
 \ULC@box=\box98
 Package: ulem 2019/11/18
@@ -614,7 +620,7 @@ Package: ulem 2019/11/18
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/makecell/makecell.sty
 Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 \rotheadsize=\dimen319
-\c@nlinenum=\count359
+\c@nlinenum=\count360
 \TeXr@lab=\toks50
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
@@ -635,11 +641,11 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count360
+\c@section@level=\count361
 )
 \@linkdim=\dimen320
-\Hy@linkcounter=\count361
-\Hy@pagecounter=\count362
+\Hy@linkcounter=\count362
+\Hy@pagecounter=\count363
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -647,7 +653,7 @@ Now handling font encoding PD1 ...
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count363
+\Hy@SavedSpaceFactor=\count364
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -661,7 +667,7 @@ Package hyperref Info: Plain pages OFF on input line 4210.
 Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count364
+\c@Hy@tempcnt=\count365
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
@@ -673,7 +679,7 @@ Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count365
+\Fld@menulength=\count366
 \Field@Width=\dimen322
 \Fld@charsize=\dimen323
 Package hyperref Info: Hyper figures OFF on input line 6078.
@@ -683,15 +689,15 @@ Package hyperref Info: backreferencing OFF on input line 6093.
 Package hyperref Info: Link coloring OFF on input line 6098.
 Package hyperref Info: Link coloring with OCG OFF on input line 6103.
 Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count366
-\c@Item=\count367
-\c@Hfootnote=\count368
+\Hy@abspage=\count367
+\c@Item=\count368
+\c@Hfootnote=\count369
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
-\Fld@listcount=\count369
-\c@bookmark@seq@number=\count370
+\Fld@listcount=\count370
+\c@bookmark@seq@number=\count371
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
@@ -702,35 +708,35 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 \Hy@SectionHShift=\skip70
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
-\BKM@id=\count371
+\BKM@id=\count372
 ))
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 139.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 143.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count372
+\l__color_backend_stack_int=\count373
 ) (./ch7.aux)
 \openout1 = `ch7.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 139.
-LaTeX Font Info:    ... okay on input line 139.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 143.
+LaTeX Font Info:    ... okay on input line 143.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -771,64 +777,64 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count373
-Package hyperref Info: Link coloring OFF on input line 139.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 141.
+\c@lstlisting=\count374
+Package hyperref Info: Link coloring OFF on input line 143.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 141.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 141.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 141.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 141.
+(Font)              <12> on input line 145.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 141.
+(Font)              <8> on input line 145.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 141.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 141.
+(Font)              <6> on input line 145.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 141.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 145.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/home/stephbuongiorno/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}] [2] [3]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 348.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 352.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 369.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 373.
 [4] [5]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 432.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 436.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 470.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 475.
 [6{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 521.
+(Font)              <10.95> on input line 526.
 [7] [8]
-<pos_spacy_tmha_example.jpg, id=56, 6707.0575pt x 938.50626pt>
+<pos_spacy_tmha_example.jpg, id=55, 6707.0575pt x 938.50626pt>
 File: pos_spacy_tmha_example.jpg Graphic file (type jpg)
 <use pos_spacy_tmha_example.jpg>
-Package pdftex.def Info: pos_spacy_tmha_example.jpg  used on input line 665.
+Package pdftex.def Info: pos_spacy_tmha_example.jpg  used on input line 670.
 (pdftex.def)             Requested size: 6707.04123pt x 938.50397pt.
 
-Overfull \hbox (6237.28621pt too wide) in paragraph at lines 665--665
+Overfull \hbox (6237.28621pt too wide) in paragraph at lines 670--670
  [] 
  []
 
@@ -837,121 +843,99 @@ Overfull \vbox (360.34396pt too high) has occurred while \output is active []
 
 [10 <./pos_spacy_tmha_example.jpg>] [11] [12] [13]
 ignored error: Infinite glue shrinkage found in box being split [14]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 921.
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 926.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [15] [16]
-<ch7_files/figure-latex/unnamed-chunk-13-1.pdf, id=95, 469.755pt x 325.215pt>
+<ch7_files/figure-latex/unnamed-chunk-13-1.pdf, id=94, 469.755pt x 325.215pt>
 File: ch7_files/figure-latex/unnamed-chunk-13-1.pdf Graphic file (type pdf)
 <use ch7_files/figure-latex/unnamed-chunk-13-1.pdf>
-Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-13-1.pdf  used on input line 1011.
+Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-13-1.pdf  used on input line 1016.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [17 <./ch7_files/figure-latex/unnamed-chunk-13-1.pdf>] [18]
-Underfull \vbox (badness 1622) detected at line 1129
+Underfull \vbox (badness 1622) detected at line 1134
  []
 
 [19]
-<ch7_files/figure-latex/unnamed-chunk-16-1.pdf, id=117, 469.755pt x 325.215pt>
+<ch7_files/figure-latex/unnamed-chunk-16-1.pdf, id=116, 469.755pt x 325.215pt>
 File: ch7_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type pdf)
 <use ch7_files/figure-latex/unnamed-chunk-16-1.pdf>
-Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-16-1.pdf  used on input line 1160.
+Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-16-1.pdf  used on input line 1165.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [20] [21 <./ch7_files/figure-latex/unnamed-chunk-16-1.pdf>] [22]
-<ch7_files/figure-latex/unnamed-chunk-20-1.pdf, id=137, 469.755pt x 325.215pt>
+<ch7_files/figure-latex/unnamed-chunk-20-1.pdf, id=136, 469.755pt x 325.215pt>
 File: ch7_files/figure-latex/unnamed-chunk-20-1.pdf Graphic file (type pdf)
 <use ch7_files/figure-latex/unnamed-chunk-20-1.pdf>
-Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-20-1.pdf  used on input line 1279.
+Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-20-1.pdf  used on input line 1294.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [23] [24 <./ch7_files/figure-latex/unnamed-chunk-20-1.pdf>]
-Underfull \vbox (badness 10000) detected at line 1348
+Underfull \vbox (badness 10000) detected at line 1363
  []
 
 
-Overfull \vbox (0.47781pt too high) detected at line 1348
+Overfull \vbox (0.47781pt too high) detected at line 1363
  []
 
 [25]
-<ch7_files/figure-latex/unnamed-chunk-21-1.pdf, id=159, 578.16pt x 867.24pt>
+<ch7_files/figure-latex/unnamed-chunk-21-1.pdf, id=158, 578.16pt x 867.24pt>
 File: ch7_files/figure-latex/unnamed-chunk-21-1.pdf Graphic file (type pdf)
 <use ch7_files/figure-latex/unnamed-chunk-21-1.pdf>
-Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-21-1.pdf  used on input line 1350.
+Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-21-1.pdf  used on input line 1365.
 (pdftex.def)             Requested size: 578.15858pt x 867.2379pt.
 [26] [27 <./ch7_files/figure-latex/unnamed-chunk-21-1.pdf>]
-Underfull \vbox (badness 10000) detected at line 1412
+Underfull \vbox (badness 10000) detected at line 1427
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1412
+Underfull \vbox (badness 10000) detected at line 1427
  []
 
 [28]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 1423.
+(Font)              <7> on input line 1438.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 1423.
+(Font)              <5> on input line 1438.
 
-LaTeX Warning: Float too large for page by 446.45937pt on input line 1549.
-
-
-LaTeX Warning: Float too large for page by 446.45937pt on input line 1686.
+LaTeX Warning: Float too large for page by 446.45937pt on input line 1564.
 
 
-LaTeX Warning: Float too large for page by 446.45937pt on input line 1823.
+LaTeX Warning: Float too large for page by 446.45937pt on input line 1701.
+
+
+LaTeX Warning: Float too large for page by 446.45937pt on input line 1838.
 
 [29] [30] [31] [32]
 
-LaTeX Warning: Float too large for page by 2379.93631pt on input line 2135.
+LaTeX Warning: Float too large for page by 2379.93631pt on input line 2150.
 
 
-LaTeX Warning: Float too large for page by 1117.79013pt on input line 2287.
+LaTeX Warning: Float too large for page by 1117.79013pt on input line 2302.
 
 [33] [34] [35] [36] [37] [38] [39]
-<ch7_files/figure-latex/unnamed-chunk-33-1.pdf, id=226, 469.755pt x 325.215pt>
+<ch7_files/figure-latex/unnamed-chunk-33-1.pdf, id=225, 469.755pt x 325.215pt>
 File: ch7_files/figure-latex/unnamed-chunk-33-1.pdf Graphic file (type pdf)
 <use ch7_files/figure-latex/unnamed-chunk-33-1.pdf>
-Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-33-1.pdf  used on input line 2574.
+Package pdftex.def Info: ch7_files/figure-latex/unnamed-chunk-33-1.pdf  used on input line 2589.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 2574--2580
-[][]
- []
-
-[40] [41 <./ch7_files/figure-latex/unnamed-chunk-33-1.pdf>] [42] [43] [44]
-Overfull \hbox (12.73961pt too wide) in paragraph at lines 2793--2794
-[]\T1/lmr/m/n/10.95 keyword  
- []
-
-ignored error: Infinite glue shrinkage found in box being split [45]
-ignored error: Infinite glue shrinkage found in box being split [46]
-ignored error: Infinite glue shrinkage found in box being split [47]
-ignored error: Infinite glue shrinkage found in box being split [48]
-ignored error: Infinite glue shrinkage found in box being split [49]
-ignored error: Infinite glue shrinkage found in box being split [50]
-ignored error: Infinite glue shrinkage found in box being split [51]
-ignored error: Infinite glue shrinkage found in box being split [52]
-ignored error: Infinite glue shrinkage found in box being split [53]
-ignored error: Infinite glue shrinkage found in box being split [54]
-ignored error: Infinite glue shrinkage found in box being split [55]
-ignored error: Infinite glue shrinkage found in box being split [56]
-ignored error: Infinite glue shrinkage found in box being split [57] [58] [59] [60] [61] (./ch7.aux)
+[40] [41 <./ch7_files/figure-latex/unnamed-chunk-33-1.pdf>] [42] [43] [44] [45] [46] [47] [48] (./ch7.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-06>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 27208 strings out of 469519
- 513297 string characters out of 5468986
- 1059824 words of memory out of 5000000
- 55282 multiletter control sequences out of 15000+600000
+ 27216 strings out of 469519
+ 513838 string characters out of 5468986
+ 964689 words of memory out of 5000000
+ 55299 multiletter control sequences out of 15000+600000
  677690 words of font info for 88 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  98i,9n,108p,889b,645s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ch7.pdf (61 pages, 817455 bytes).
+Output written on ch7.pdf (48 pages, 789348 bytes).
 PDF statistics:
- 450 PDF objects out of 1000 (max. 8388607)
- 351 compressed objects within 4 object streams
- 85 named destinations out of 1000 (max. 500000)
+ 391 PDF objects out of 1000 (max. 8388607)
+ 305 compressed objects within 4 object streams
+ 72 named destinations out of 1000 (max. 500000)
  155 words of extra memory for PDF output out of 10000 (max. 10000000)
 

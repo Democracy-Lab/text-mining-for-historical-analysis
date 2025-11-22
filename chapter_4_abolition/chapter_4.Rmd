@@ -208,7 +208,8 @@ top_slavery_speakers_1833 <- slavery_debates_1833 %>%
 top_slavery_speakers_1833 %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>% 
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(4, width = "4cm") 
 ```
@@ -558,7 +559,8 @@ buckingham_sentences <- slavery_debates_1833 %>%
 buckingham_sentences %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%   # optional: shorten long lines
-  kable("latex", booktabs = TRUE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(4, width = "4cm")    # wrap the "text" column
 ```
@@ -570,7 +572,10 @@ buckingham_sentences %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -605,7 +610,7 @@ buck_speeches <- buck_speech_ids %>%
 buck_speeches %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%
-  kable("latex", 
+  kable(format = "latex", 
         booktabs = TRUE,
         col.names=NULL,
         caption="Speeches by Buckingham about Slavery that invoke the word 'wages'") %>%
@@ -641,7 +646,10 @@ buckingham_sentences_2 %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -659,7 +667,10 @@ buckingham_sentences_3 %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -679,7 +690,10 @@ buckingham_sentences_4 %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -699,7 +713,10 @@ buckingham_sentences_5 %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
@@ -722,11 +739,14 @@ missing_context %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
-In Sentence #5, Buckingham is talking about how workers will pursue dangerous and difficult jobs when motivated by desire ("gain, honour, promotion, and prize-money.") For this reason, Buckingham concluded that "promotion was the desire of all," and that, if allowed to pursue them, the prospect of wages would incentivize formerly enslaved people as it had incentivized British navvvies to work hard in the pursuit of earnings.
+In Sentence #5, Buckingham is talking about how workers will pursue dangerous and difficult jobs when motivated by desire ("gain, honour, promotion, and prize-money.") For this reason, Buckingham concluded that "promotion was the desire of all," and that, if allowed to pursue them, the prospect of wages would incentivize formerly enslaved people as it had incentivized British navies to work hard in the pursuit of earnings.
 
 ### Pulling Together an Analysis
 
@@ -797,16 +817,17 @@ peel_sentences %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  kable(format = "latex", 
+        booktabs = TRUE, 
+        longtable = TRUE, 
+        escape = FALSE) %>%
   column_spec(1, width = "14cm")
 ```
 
 Here again we must read the sentences in their original speeches to make sense of it. 
 
-```{r, message = F}
+```{r, message=FALSE}
 # moving from a list of sentences to the full speeches for context
-library("kableExtra")
-
 # Trim each source to just the fields you need
 peel_base <- peel_sentences %>%
   select(sentence_id)
@@ -838,7 +859,7 @@ peel_speeches <- peel_base %>%
 peel_speeches %>%
   head() %>%
   mutate(text = str_trunc(speech, 120)) %>% 
-  kable("latex", 
+  kable(format = "latex", 
         booktabs = TRUE, 
         caption = "Three Speeches by Buckingham about Slavery Invoking the Word 'Wages'") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
@@ -890,9 +911,8 @@ freedom_collocates_before_1833 <- slavery_debates_before_1833 %>%
   mutate(when = "1830-32") %>%
   filter(str_detect(tolower(text), "labour")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>%
- # anti_join(custom_stop_words) %>%
- group_by(when, word) %>%
+  anti_join(stop_words) %>%
+  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
 
@@ -910,9 +930,8 @@ freedom_collocates_after_1833 <- slavery_debates_after_1833 %>%
   mutate(when = "1834-36") %>%
   filter(str_detect(tolower(text), "free")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>%
- # anti_join(custom_stop_words) %>%
- group_by(when, word) %>%
+  anti_join(stop_words) %>%
+  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
 
@@ -929,9 +948,8 @@ freedom_collocates_before_1833 <- slavery_debates_before_1833 %>%
   mutate(when = "1830-32") %>%
   filter(str_detect(tolower(text), "free")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>% 
- # anti_join(custom_stop_words) %>%
- group_by(when, word) %>%
+  anti_join(stop_words) %>% 
+  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
 
@@ -939,9 +957,8 @@ freedom_collocates_after_1833 <- slavery_debates_after_1833 %>%
   mutate(when = "1834-36") %>%
   filter(str_detect(tolower(text), "free")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>%
- # anti_join(custom_stop_words) %>%
- group_by(when, word) %>%
+  anti_join(stop_words) %>%
+  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
 
@@ -973,7 +990,7 @@ kable(tf_idf_freedom_collocates_after, caption = "1834-36")
 
 Let's look to see if freedom's meaning changed across everything.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 hansard_before_1833 <- hansard_1830 %>% 
   left_join(debate_metadata_1830, by = "sentence_id") %>%
   mutate(year = year(speechdate)) %>%
@@ -989,8 +1006,7 @@ freedom_collocates_before_1833 <- hansard_before_1833 %>%
   mutate(when = "before 1833") %>%
   filter(str_detect(tolower(text), "freedom")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>% 
- # anti_join(custom_stop_words) %>%
+  anti_join(stop_words) %>% 
  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
@@ -1000,8 +1016,7 @@ freedom_collocates_after_1833 <- hansard_after_1833 %>%
   mutate(when = "after 1833") %>%
   filter(str_detect(tolower(text), "freedom")) %>%
   unnest_tokens(word, text) %>%
- # anti_join(stop_words) %>%
- # anti_join(custom_stop_words) %>%
+  anti_join(stop_words) %>%
  group_by(when, word) %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
@@ -1021,7 +1036,6 @@ tf_idf_freedom_collocates_before <- tf_idf_freedom_collocates %>%
 tf_idf_freedom_collocates_after <- tf_idf_freedom_collocates %>%
   filter(when == "after 1833") %>%
   select(-when) %>%
-  #filter(n>10) %>%
   top_n(15, wt = tf_idf)
 ```
 

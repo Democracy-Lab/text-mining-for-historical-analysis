@@ -2,7 +2,7 @@
 title: "Chapter 7: Decoding Grammar to Uncover the Language of Agency"
 output:
   pdf_document:
-    number_sections: true
+    number_sections: false
 fontsize: 11pt
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
@@ -203,7 +203,7 @@ library(hansardr)
 data("hansard_1860")
 
 hansard_woman_1860 <- hansard_1860 %>%
-  filter(str_detect(text, regex("woman|women", ignore_case = T)))
+  filter(str_detect(text, regex("woman|women", ignore_case = TRUE)))
 ```
 
 We then provide our filtered hansard data to the `spacy_parse()` function to tokenize just the text column. From the text column, we extract linguistic features like part-of-speech tags by specifying `dep = TRUE`. To save computational resources and focus on only the features relevant to our analysis, we then disable lemmatization (`lemma = FALSE`) and named entity recognition (`entity = FALSE`).
@@ -430,10 +430,21 @@ adjective_noun_pair_counts_man <- adjective_noun_pairs_man %>%
 ```
 
 ```{r}
-grid.arrange(tableGrob(adjective_noun_pair_counts_man[1:15, ]), 
-             tableGrob(adjective_noun_pair_counts_man[15:30, ]), 
-             tableGrob(adjective_noun_pair_counts_man[31:45, ]),
-             ncol = 3)
+#library(gridExtra)
+#library(grid)
+
+small <- ttheme_minimal(
+  core = list(fg_params = list(cex = 0.9)),
+  colhead = list(fg_params = list(cex = 0.9))
+)
+
+grid.arrange(
+  tableGrob(adjective_noun_pair_counts_man[1:15, ], theme = small),
+  tableGrob(adjective_noun_pair_counts_man[16:30, ], theme = small),
+  tableGrob(adjective_noun_pair_counts_man[31:45, ], theme = small),
+  ncol = 3
+)
+
 ```
 
 To compare the words used of each gender, the appropriate next step is to make a list of just the adjectives and to subtract the counts for one gender from the counts for the other.  This step, known as "vector subtraction," will reveal the words that are most distinctive of each gender.
@@ -501,7 +512,8 @@ filtered_df %>%
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
 
-# take the top adjectives unique to men; because there are so many with a max of 2, sample some positives
+# take the top adjectives unique to men; because 
+# there are so many with a max of 2, sample some positives
 positive_sample <- comparison %>%
   filter(count_diff > 0) %>%
   arrange(desc(count_diff)) %>%
@@ -758,12 +770,13 @@ ggplot(triples_counts_1870,
        title = "Top 20 Most Frequent SVO Triples") +
   theme_minimal()
 ```
+
 If the phrases look ungrammatical, remember that we have lemmatized the words previous to analyzing their grammatical dependencies. Thus "I asked him" is rendered "I ask he," because we have gathered instances like "I ask him," "I am asking him," etc., counting them all the same.  
 
 Extracted triples allow the analyst to aggregate a great deal of information about the actions of women as described by speakers in Parliament: how often this triple uttered; who uses it; and what other language is used in a similar context. 
-In this exercise, we see that many of the most prevelant SVO phrases have to do with reporting -- someone says "he told us such and such facts," or "we heard a great deal about this," or "I am saying that..."  Women as well as men are being reported on.  Someone is saying, "they saw women [doing something]."
+In this exercise, we see that many of the most prevalent SVO phrases have to do with reporting -- someone says "he told us such and such facts," or "we heard a great deal about this," or "I am saying that..."  Women as well as men are being reported on.  Someone is saying, "they saw women [doing something]."
 
-We read many sentences in this chart where gender and rights are foregrounded, including "woman have vote," "woman hae right," and "woman have knowledge." They seem to indicate that some members of parliament are talking about the empowerment of women -- a different perspective than that suggested by our previous exercises. 
+We read many sentences in this chart where gender and rights are foregrounded, including "woman have vote," "woman have right," and "woman have knowledge." They seem to indicate that some members of parliament are talking about the empowerment of women -- a different perspective than that suggested by our previous exercises. 
 
 We could perform different kinds of analyses with our extracted triples. We could compare times in which women and men are imagined to have the vote. But perhaps the first thing we should do is to call up some context for the handful of phrases alluding to women having rights or the vote.  
 
@@ -825,7 +838,7 @@ Here, women are seen, interviewed, searched for, talked about, and prevented fro
 
 ## Looking for the Verb 'Vote'
 
-One last exercise with Hansard. We can also look for SVO triples where the verb is "vote," and see who is doing the voting. In the code below, we  use the `kwic()` (Key Word in Context) function from the `quanteda` library (introduced in earlier chapters) to revisit the original documents and provide context for our analysis. By specifying "vote" as the pattern to match, we focus on instances of this word in the text. Additionally, we can define the size of the window, which determines the number of words displayed before and after each occurrence of the pattern, giving us insight into its surrounding context. To ensure we capture all instances of the word "vote" regardless of capitalization (e.g., "Vote" or "VOTE"), we can enable case-insensitive matching. 
+One last exercise with Hansard. We can also look for SVO triples where the verb is "vote," and see who is doing the voting. In the code below, we  use the `kwic()` (Key Word in Context) function from the `quanteda` library (introduced in earlier chapters) to revisit the original documents and provide context for our analysis. By specifying "vote" as the pattern to match, we focus on instances of this word in the text. Additionally, we can define the size of the window, which determines the number of words displayed before and after each occurrence of the pattern, giving us insight into its surrounding context. To ensure we capture all instances of the word "vote" regardless of capitalization (e.g., "Vote" or "VOTE"), we can enable case-insensitive matching. We will use `sample()` to show just 20 of the results, randomly selected. Therefore, your 20 results might look different from ours. Using `sample()` multiple times could reveal more interesting results. 
 
 ```{r, message=FALSE, warning=FALSE}
 library(quanteda)
@@ -833,7 +846,9 @@ library(quanteda)
 hansard_woman_1870_corpus <- corpus(hansard_woman_1870, 
                                     text_field = "text")
 
-vote_kwic <- kwic(tokens(hansard_woman_1870_corpus),
+hansard_woman_1870_corpus_sample <- sample(hansard_woman_1870_corpus, 20)
+
+vote_kwic <- kwic(tokens(hansard_woman_1870_corpus_sample),
                   pattern = "vote",
                   window = 8,
                   case_insensitive = TRUE)

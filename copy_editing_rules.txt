@@ -26,6 +26,17 @@ make sure all titles are title case
 Headers / subtitles: ## size 
 
 
+
+TRUE 
+
+FALSE 
+
+same with 
+
+l = left 
+
+r = right 
+
 make sure book titles are italic
 
 
@@ -57,3 +68,6 @@ TMHA should be Text Mining for Historiacal Analysis
 
 
 Call it a textbook not a book 
+
+
+look for any situtaion where the table does not print 
