@@ -1,5 +1,5 @@
 ---
-title: 'Chapter 2: Investigating the Memory of Events Using n-grams, Controlled Vocabulary, and Joins'
+title: 'Chapter 2: Investigating the Memory of Events Using N-Grams, Controlled Vocabulary, and Joins'
 output: 
   pdf_document:
     number_sections: false
@@ -59,7 +59,8 @@ kable(df_head,
       format = "latex", 
       booktabs = TRUE, 
       linesep = "",
-      caption = "Sample sentences from 1860s Hansard, including each sentence's unique identifier and the corresponding text as extracted from the debate transcripts.") %>%
+      caption = "Sample sentences from 1860s Hansard, including each sentence's 
+                unique identifier and the corresponding text as extracted from the debate transcripts.") %>%
   kable_styling(latex_options = c("scale_down", "repeat_header"),
                 table.envir = FALSE) %>%
   column_spec(which(colnames(df_head) == "text"), 
@@ -171,7 +172,8 @@ hansard_1860 %>%
   kable(format = "latex", 
         booktabs = TRUE, 
         caption = "Text excerpts from the 1860 Hansard corpus alongside their associated 
-        metadata, including the sentence identifier, speech date, and debate title.") %>%
+                  metadata, including the sentence identifier, speech date, and 
+                  debate title.") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(2, width = "6cm") %>%
   column_spec(4, width = "4cm")
@@ -496,7 +498,7 @@ top_events_1867_w_speech_metadata <- top_events_1867 %>%
 head(top_events_1867_w_speech_metadata)
 ```
 
-```{r, fig.fullwidth=TRUE, fig.asp = 0.8, fig.width = 7}
+```{r, fig.cap= "Plot showing the frequency with which Parliament in 1867 referred to major past events—including famines, wars, riots, and public meetings—across the months from February to August. Each square represents a day on which a speech mentioned a given event bigram; larger and brighter squares indicate higher numbers of mentions.", fig.fullwidth=TRUE, fig.asp = 0.8, fig.width = 7}
 # Load the viridis color palette library for colorblind-friendly colors
 library("viridis")
 
@@ -655,7 +657,7 @@ head(indexed_events)
 left_range <- max(events_1830$speechdate) + 8
 ```
 
-```{r, fig.width=7,fig.height=10, fig.fullwidth=TRUE}
+```{r, fig.cap="Plot of how often nineteenth-century MPs invoked earlier historical events in the debates of the 1830s. The x-axis shows when speeches were delivered (1830–1840), while the y-axis shows the historical date of the event being named. Each square marks at least one speech mentioning that event; larger and brighter squares indicate more frequent references, highlighting especially intensive discussion of late eighteenth- and early nineteenth-century events such as the Corn Laws, the French Revolution, and the American Constitution.", fig.width=7,fig.height=10, fig.fullwidth=TRUE}
 # create a bubble plot showing when historical events were mentioned in parliament
 # x-axis shows the date of mention; y-axis shows the historical date of the event
 # bubble size and color represent frequency of mentions

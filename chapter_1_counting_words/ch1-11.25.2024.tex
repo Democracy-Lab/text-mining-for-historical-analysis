@@ -448,7 +448,8 @@ Below is an excerpt from \texttt{hansardr}:
       \AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
       \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
       \AttributeTok{linesep =} \StringTok{""}\NormalTok{,}
-      \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing sentence{-}level text with associated sentence ID values."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing }
+\StringTok{                 sentence{-}level text with associated sentence ID values."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"scale\_down"}\NormalTok{, }\StringTok{"repeat\_header"}\NormalTok{),}
                 \AttributeTok{table.envir =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\FunctionTok{which}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(df\_head) }\SpecialCharTok{==} \StringTok{"text"}\NormalTok{), }
@@ -459,7 +460,8 @@ Below is an excerpt from \texttt{hansardr}:
 
 \begin{table}
 \centering
-\caption{\label{tab:unnamed-chunk-5}Excerpt from the 1850 Hansard corpus showing sentence-level text with associated sentence ID values.}
+\caption{\label{tab:hansard_corpus_sentence_text}Excerpt from the 1850 Hansard corpus showing 
+                 sentence-level text with associated sentence ID values.}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{tabular}[t]{lp{12cm}}
@@ -1225,7 +1227,9 @@ throughout this book.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-26-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/visualize_coal_context-1} \caption{Top words in sentences mentioning coal (Hansard, 1850)}\label{fig:visualize_coal_context}
+\end{figure}
 
 The resulting bar chart shows us the number of times ``coal'' was
 mentioned, as well as the top words that appear with coal. Note that
@@ -1317,7 +1321,9 @@ makes this context easier to apprehend.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-28-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/visualize_corn_context-1} \caption{Top words in sentences mentioning corn (Hansard, 1850)}\label{fig:visualize_corn_context}
+\end{figure}
 
 Comparison between the words used in the context of coal and corn gives
 us a foothold for beginning to think about how taxation was discussed in
@@ -1413,16 +1419,20 @@ speeches are aligned with their correct dates.
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_trunc}\NormalTok{(text, }\DecValTok{120}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# optional: shorten long lines}
   \FunctionTok{kable}\NormalTok{(}\AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
         \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{,}
-        \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing sentence{-}level text joined with debate{-}level metadata, including speech dates and debate titles."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+        \AttributeTok{caption =} \StringTok{"Excerpt from the 1850 Hansard corpus showing sentence{-}level }
+\StringTok{                  text joined with debate{-}level metadata, including speech dates }
+\StringTok{                  and debate titles."}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{position =} \StringTok{"left"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"6cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# wrap the "text" column}
+  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"6cm"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-30}Excerpt from the 1850 Hansard corpus showing sentence-level text joined with debate-level metadata, including speech dates and debate titles.}
+\caption{\label{tab:show_hansard_1850_with_metadata}Excerpt from the 1850 Hansard corpus showing sentence-level 
+                  text joined with debate-level metadata, including speech dates 
+                  and debate titles.}
 \begin{tabular}[t]{l>{\raggedright\arraybackslash}p{6cm}l>{\raggedright\arraybackslash}p{4cm}}
 \toprule
 sentence\_id & text & speechdate & debate\\
@@ -1499,7 +1509,9 @@ them using \texttt{kable()}, which formats the table neatly.
 
 \NormalTok{corn\_df }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{head}\NormalTok{(}\DecValTok{15}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{align =} \StringTok{"l"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable}\NormalTok{(}\AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
+        \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{, }
+        \AttributeTok{align =} \StringTok{"l"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{latex\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"hold\_position"}\NormalTok{, }\StringTok{"scale\_down"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
@@ -1608,7 +1620,9 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-35-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/generate_plot_foreign-1} \caption{Top words in sentences mentioning foreign (Hansard, 1850)}\label{fig:generate_plot_foreign}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1617,7 +1631,9 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-36-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/generate_plot_colonial-1} \caption{Top words in sentences mentioning colonial (Hansard, 1850)}\label{fig:generate_plot_colonial}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1626,7 +1642,9 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-37-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/generate_plot_savage-1} \caption{Top words in sentences mentioning savage (Hansard, 1850)}\label{fig:generate_plot_savage}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1635,7 +1653,9 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-38-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/generate_plot_native-1} \caption{Top words in sentences mentioning native (Hansard, 1850)}\label{fig:generate_plot_native}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1644,7 +1664,9 @@ forces from beyond Britain.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/unnamed-chunk-39-1}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{ch1-11.25.2024_files/figure-latex/generate_plot_barbarian-1} \caption{Top words in sentences mentioning barbarian (Hansard, 1850)}\label{fig:generate_plot_barbarian}
+\end{figure}
 
 Producing many graphs in succession can be useful for exploratory data
 analysis. Performing a comparative analysis of graphs side-by-side is
@@ -1745,7 +1767,8 @@ which may be irrelevant to our current query.
 \NormalTok{hansard\_1850\_with\_metadata }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{head}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{mutate}\NormalTok{(}\AttributeTok{text =} \FunctionTok{str\_trunc}\NormalTok{(text, }\DecValTok{120}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}   \CommentTok{\# optional: shorten long lines}
-  \FunctionTok{kable}\NormalTok{(}\StringTok{"latex"}\NormalTok{, }\AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable}\NormalTok{(}\AttributeTok{format =} \StringTok{"latex"}\NormalTok{, }
+        \AttributeTok{booktabs =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{position =} \StringTok{"left"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{width =} \StringTok{"4cm"}\NormalTok{)    }\CommentTok{\# wrap the "text" column}
 \end{Highlighting}

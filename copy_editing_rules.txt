@@ -31,11 +31,8 @@ TRUE
 
 FALSE 
 
-same with 
+Instead of saying "above" or "below", the following plot, say Figure X 
 
-l = left 
-
-r = right 
 
 make sure book titles are italic
 
@@ -62,6 +59,8 @@ get rid of sstudent teacher dichotomy
 
 should be no "selecting by" or "joining by" notes 
 
+
+make keyword in plots CAPS
 
 
 TMHA should be Text Mining for Historiacal Analysis 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  22 NOV 2025 15:23
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  24 NOV 2025 13:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1484,21 +1484,21 @@ Library (tcolorbox): 'tcblistings.code.tex' version '6.8.0'
 \lst@lineno=\count357
 \lst@maxwidth=\dimen304
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/lstpatch.sty
-File: lstpatch.sty 2025/11/14 1.11a (Carsten Heinz)
+File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2025/11/14 1.11a (Carsten Heinz)
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
 \c@lstnumber=\count358
 \lst@skipnumbers=\count359
 \lst@framebox=\box86
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2025/11/14 1.11a listings configuration
+File: listings.cfg 2025/11/14 1.11b listings configuration
 ))
-Package: listings 2025/11/14 1.11a (Carsten Heinz)
+Package: listings 2025/11/14 1.11b (Carsten Heinz)
 ==> First Aid for listings.sty no longer applied!
     Expected:
         2024/09/23 1.10c (Carsten Heinz)
     but found:
-        2025/11/14 1.11a (Carsten Heinz)
+        2025/11/14 1.11b (Carsten Heinz)
     so I'm assuming it got fixed.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/tcolorbox/tcblistingscore.code.tex
 Library (tcolorbox): 'tcblistingscore.code.tex' version '6.8.0'
@@ -1723,7 +1723,13 @@ File: bkm-dvipdfm.def 2023-12-10 v1.31 bookmark driver for dvipdfm (HO)
 \BKM@id=\count390
 )) (./ch5.aux
 
-LaTeX Warning: Label `tab:unnamed-chunk-12' multiply defined.
+LaTeX Warning: Label `tab:tfidf-tables' multiply defined.
+
+
+LaTeX Warning: Label `tab:tfidf-tables' multiply defined.
+
+
+LaTeX Warning: Label `tab:tfidf-tables' multiply defined.
 
 )
 \openout1 = `ch5.aux'.
@@ -2051,39 +2057,29 @@ LaTeX Font Info:    Font shape `TU/NotoSerif(0)/b/n' will be
 [1
 
 ] [2] [3]
-LaTeX Font Info:    Font shape `TU/NotoSerif(0)/b/n' will be
-(Font)              scaled to size 10.0pt on input line 343.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 8.70535pt on input line 344.
+(Font)              scaled to size 8.70535pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
-(Font)              scaled to size 6.21811pt on input line 344.
+(Font)              scaled to size 6.21811pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 12.43744pt on input line 344.
+(Font)              scaled to size 12.43744pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.7062pt on input line 344.
+(Font)              scaled to size 8.7062pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.21872pt on input line 344.
+(Font)              scaled to size 6.21872pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 12.43484pt on input line 344.
+(Font)              scaled to size 12.43484pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 8.70439pt on input line 344.
+(Font)              scaled to size 8.70439pt on input line 356.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.21742pt on input line 344.
-[4] [5]
-Underfull \vbox (badness 10000) detected at line 530
- []
-
-
-Underfull \vbox (badness 10000) detected at line 530
- []
-
-[6] [7]
-Underfull \hbox (badness 2617) in paragraph at lines 586--600
+(Font)              scaled to size 6.21742pt on input line 356.
+[4] [5] [6] [7]
+Underfull \hbox (badness 2617) in paragraph at lines 595--609
 []\TU/NotoSerif(0)/m/n/10 The ways in which we decide to process and analyse data—whether through distance or
  []
 
 [8] [9] [10] [11]
-Underfull \hbox (badness 1466) in paragraph at lines 838--841
+Underfull \hbox (badness 1466) in paragraph at lines 847--850
 []\TU/NotoSerif(0)/m/n/10 Next, we prepare a table of counts that are necessary for the distinctiveness algorithm: *
  []
 
@@ -2095,8 +2091,8 @@ Missing character: There is no ߞ (U+07DE) in font Noto Sans Mono Regular/OT:scr
 Missing character: There is no ߞ (U+07DE) in font Noto Sans Mono Regular/OT:script=latn;language=dflt;!
 Missing character: There is no ઠ (U+0AA0) in font Noto Sans Mono Regular/OT:script=latn;language=dflt;!
 [27] [28] [29]
-File: ch5_files/figure-latex/unnamed-chunk-31-1.pdf Graphic file (type pdf)
-<use ch5_files/figure-latex/unnamed-chunk-31-1.pdf>
+File: ch5_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
+<use ch5_files/figure-latex/unnamed-chunk-30-1.pdf>
 [30] [31] [32] (./ch5.aux)
  ***********
 LaTeX2e <2025-11-01>
@@ -2110,12 +2106,12 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 35123 strings out of 470195
- 700010 string characters out of 5477908
- 1231450 words of memory out of 5000000
- 63137 multiletter control sequences out of 15000+600000
- 634494 words of font info for 121 fonts, out of 8000000 for 9000
+ 35087 strings out of 470195
+ 699602 string characters out of 5477908
+ 1232440 words of memory out of 5000000
+ 63102 multiletter control sequences out of 15000+600000
+ 634486 words of font info for 120 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 98i,15n,116p,455b,534s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,11n,116p,455b,533s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on ch5.pdf (32 pages).

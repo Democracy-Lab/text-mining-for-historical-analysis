@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  20 NOV 2025 08:08
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.11.15)  23 NOV 2025 11:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -807,21 +807,21 @@ Library (tcolorbox): 'tcblistings.code.tex' version '6.8.0'
 \lst@lineno=\count362
 \lst@maxwidth=\dimen307
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/lstpatch.sty
-File: lstpatch.sty 2025/11/14 1.11a (Carsten Heinz)
+File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2025/11/14 1.11a (Carsten Heinz)
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
 \c@lstnumber=\count363
 \lst@skipnumbers=\count364
 \lst@framebox=\box90
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2025/11/14 1.11a listings configuration
+File: listings.cfg 2025/11/14 1.11b listings configuration
 ))
-Package: listings 2025/11/14 1.11a (Carsten Heinz)
+Package: listings 2025/11/14 1.11b (Carsten Heinz)
 ==> First Aid for listings.sty no longer applied!
     Expected:
         2024/09/23 1.10c (Carsten Heinz)
     but found:
-        2025/11/14 1.11a (Carsten Heinz)
+        2025/11/14 1.11b (Carsten Heinz)
     so I'm assuming it got fixed.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/tcolorbox/tcblistingscore.code.tex
 Library (tcolorbox): 'tcblistingscore.code.tex' version '6.8.0'
@@ -1371,30 +1371,29 @@ LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 321.
 [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14]
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-26-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-26-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/visualize_coal_context-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/visualize_coal_context-1.pdf>
 [15] [16]
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-28-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-28-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/visualize_corn_context-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/visualize_corn_context-1.pdf>
 [17] [18] [19] [20]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [21] [22]
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-35-1.pdf>
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-36-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/generate_plot_foreign-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/generate_plot_foreign-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/generate_plot_colonial-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/generate_plot_colonial-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/generate_plot_savage-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/generate_plot_savage-1.pdf>
+File: ch1-11.25.2024_files/figure-latex/generate_plot_native-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/generate_plot_native-1.pdf>
 [23]
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-37-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-37-1.pdf>
-[24]
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-38-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-38-1.pdf>
-File: ch1-11.25.2024_files/figure-latex/unnamed-chunk-39-1.pdf Graphic file (type pdf)
-<use ch1-11.25.2024_files/figure-latex/unnamed-chunk-39-1.pdf>
-[25] [26]
-Overfull \hbox (7.95932pt too wide) in paragraph at lines 1754--1767
+File: ch1-11.25.2024_files/figure-latex/generate_plot_barbarian-1.pdf Graphic file (type pdf)
+<use ch1-11.25.2024_files/figure-latex/generate_plot_barbarian-1.pdf>
+[24] [25] [26]
+Overfull \hbox (7.95932pt too wide) in paragraph at lines 1777--1790
 [][] 
  []
 
@@ -1405,10 +1404,10 @@ L3 programming layer <2025-11-06>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 35290 strings out of 470195
- 733559 string characters out of 5477908
- 1314616 words of memory out of 5000000
- 63292 multiletter control sequences out of 15000+600000
+ 35300 strings out of 470195
+ 734268 string characters out of 5477908
+ 1315172 words of memory out of 5000000
+ 63302 multiletter control sequences out of 15000+600000
  634741 words of font info for 102 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  98i,12n,116p,481b,440s stack positions out of 10000i,1000n,20000p,200000b,200000s

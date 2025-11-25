@@ -288,7 +288,7 @@ head(blog_entries$teaser, 5)
 
 From this point, it is easy to analyze words. 
 
-```{r}
+```{r, fig.cap="Top 10 words in United States Department of Justice Blog Entries, retrieved on November 24th, 2025."}
 library("tidyverse")
 library("tidytext")
 
@@ -441,7 +441,9 @@ Please note that most pdfs that analysts might find on the web are not so well f
 
 It is possible to download a PDF file directly to one's computer and extract its text content for text mining. The following example demonstrates how the process of downloading PDFs can be automated. 
 
-We will practice with an 1893 translation of _Egil's Saga,_ or the _Skalla-Grímssonar_, one of the classic Icelandic sagas, thought to be written in the 13th century, likely by Snorri Sturluson. It blends historical narrative, legend, and poetry, focusing on Egill Skallagrímsson, a fierce warrior and gifted poet. The copy of the text that we are using has been previously OCR'd from an original book, rendered as text, cleaned, and output as a machine-readable text with very little noise -- making it an ideal subject on which to practice reading in data from a PDF.
+We will practice with an 1893 translation of _Egil's Saga,_ or the _Skalla-Grímssonar_, one of the classic Icelandic sagas, thought to be written in the 13th century, likely by Snorri Sturluson. We will download _Egil's Saga_ from The Icelandic Saga Database, an online resource that has published a large body of medieval Icelandic literature that describes the events that took place among the Norse and Celtic inhabitants of Iceland during the 10th and 11th centuries CE (Thordarson).
+
+Egil's Saga blends historical narrative, legend, and poetry, while focusing on Egill Skallagrímsson, a fierce warrior and gifted poet. The copy of the text that we are using has been previously OCR'd from an original book, rendered as text, cleaned, and output as a machine-readable text with very little noise -- making it an ideal subject on which to practice reading in data from a PDF.
 
 Please note: The code that follows handles downloading and text extraction, but it does not include functionality for deleting the file afterward. Our omission is intentional: to prevent any risk of accidentally deleting important or unrelated files, we have left the task of file deletion to the user’s discretion. If the script is executed, the reader should manually delete the downloaded PDF file from their computer once it is no longer needed.
 
@@ -480,7 +482,7 @@ tidy_egils_saga %>%
 
 With just a few lines of code to locate, download, and scrape the PDF file, it is now easy to count the top words in _Egil's Saga_.
 
-```{r}
+```{r, fig.cap="Top 20 words in Egil's Saga with stop words removed."}
 library("tidyverse")
 library("tidytext")
 

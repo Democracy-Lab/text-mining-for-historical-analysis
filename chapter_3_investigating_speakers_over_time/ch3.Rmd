@@ -2,7 +2,7 @@
 title: "Chapter 3: Investigating Speakers and Change Over Time Using Grouped Data"
 output: 
   pdf_document:
-    number_sections: true
+    number_sections: false
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{chngcntr}
@@ -250,7 +250,8 @@ Note that in the table above, the "word" is annotated with information about the
 
 Next, let's visualize the data so that we can see how many words are spoken. 
 
-```{r, message = F}
+```{r, fig.cap="Most frequently used words by each Chancellor of the Exchequer in the 1830s. Bars show the top repeated terms spoken by Henry Goulburn (left panel) and Thomas Spring Rice (right panel). Counts on the x-axis represent the number of times each word appeared in that Chancellor's speeches during the decade.", message = F}
+
 chancellor_of_the_exchequeur <- chancellor_of_the_exchequeur %>%
   mutate(word = reorder_within(word, n, suggested_speaker)) 
   
@@ -397,7 +398,8 @@ debate_table %>%
   column_spec(1, width = "16cm")
 ```
 
-```{r, message = F, warning = F}
+```{r, fig.cap="Most frequently used content words in Mrs. Walrand’s speech. The horizontal bars show the 30 most common words in her speech, ordered by their frequency of use, with counts on the x-axis.", message = F, warning = F}
+
 mrs_walrand_top_words <- left_join(mrs_walrand_speaker_metadata, hansard_1820) %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
@@ -429,11 +431,11 @@ name <- c("Mrs. (Mary Ann) Clark", "Mrs. Bridgeman", "Miss Mary Ann Taylor", "Lo
           "Franchette Martigner", "Mrs. Walrand")
 
 name_col_2 <- c("Ms. Cunninghame Graham", "Mrs. Dillon", "Mrs. M'Govern", 
-                "Mrs. Mitchel-Thomson", "Ms. Cave")
+                "Mrs. Mitchel-Thomson", "Ms. Cave", "")
 
 year <- c("1809", "1809", "1809", "1820", "1820", "1824")
 
-year_col_2 <- c("1887", "1902", "1902", "1907", "1907")
+year_col_2 <- c("1887", "1902", "1902", "1907", "1907", "")
 
 df <- data.frame(name, year, name_col_2, year_col_2)
 

@@ -2,7 +2,7 @@
 title: "Chapter 4: Text Mining British Concepts in the 1833 Debates About the Abolition of Slavery"
 output: 
   pdf_document:
-    number_sections: true
+    number_sections: false
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{chngcntr}
@@ -75,7 +75,7 @@ In a previous chapter, we looked into the top speakers in parliament in a given 
 
 If you are new to code, take a moment to notice how changing only one line in the code below produces a different angle of analysis.  The code below is otherwise very similar to the code in the previous chapters. One of the great pleasures of coding is the facility with which a few skills can quickly become powerful in the hands of an analyst who has many questions.
 
-```{r, message = F}
+```{r, warning=FALSE, message=FALSE}
 # load packages
 library("tidyverse")
 library("tidytext")
@@ -97,7 +97,7 @@ slavery_1830 <- hansard_1830 %>%  # Create a new dataset called 'debates_1830'
   mutate(year = year(speechdate)) # Extract and add the year from the 'speechdate' column
 
 slavery_debates_1830 <- slavery_1830 %>%
-  left_join(speaker_metadata_1830) %>% # join datasets 
+  left_join(speaker_metadata_1830, by = "sentence_id") %>% # join datasets 
   select(sentence_id, speaker, suggested_speaker, text, year) %>% # keep relevant columns 
   filter(suggested_speaker != "") # remove any lines with missing speaker information
 
@@ -137,7 +137,9 @@ words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new
 # find the words per speaker per year for just the top speakers
 top_words_pspy_slavery_1830 <- words_per_speaker_per_year_slavery_1830 %>%
   filter(speaker %in% unique(top_slavery_speakers$speaker)) # retain only relevant rows
+```
 
+```{r, fig.cap="Number of words spoken about slavery by individual members of Parliament from 1830 to 1838. Each point represents a speaker in a given year, plotted by the total number of words they contributed on the topic.", warning=FALSE, message=FALSE}
 # visualize who spoke about slavery in 1830, how much they said, and when they spoke.
 # each point represents a speaker's total words for a given year
 # the x-axis shows years (rounded to whole numbers), and the y-axis shows word counts.
@@ -152,8 +154,7 @@ ggplot(top_words_pspy_slavery_1830, # make a graph
   scale_x_continuous(breaks = # whole number x axis
                        function(x) 
                          unique(floor(pretty(seq(min(x), 
-                                                 (max(x) + 1) * 1))))) +  
-  theme_light() # light theme styling
+                                                 (max(x) + 1) * 1))))) 
 ```
 
 You may notice that we have produced a different sort of visualization than the bar charts of the previous chapter. The ggplot library of graphics is a highly flexible language for producing many visualizations from the same data. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. With this plot we also introduce another library, `ggrepel`, which gives us tools for enhancing the readability of our plot by making sure that labels do not overlap.
@@ -177,7 +178,7 @@ slavery_debates_1833 <- slavery_debates_1830 %>%
 
 # count how many times each speaker says each word in the slavery debates of 1833
 words_per_speaker_slavery_1833 <- slavery_debates_1833 %>%
-  unnest_tokens(word, text) %>% # break up into words the contents of the column 'text', creating a new column called 'word'
+  unnest_tokens(word, text) %>% # tokenize the text column and create a new column called word
   group_by(speaker) %>% # group the data by speaker
   summarize(words_per_speaker = n()) %>% # create a new column for how many words each speaker says
   arrange(desc(words_per_speaker)) %>% # arrange in descending order
@@ -246,13 +247,12 @@ kable(top_words_per_abolition_speaker)
 
 Now visualize: 
 
-```{r, echo=FALSE}
+```{r, fig.cap="Top words used by six major speakers in the 1833 debates on the abolition of slavery.", echo=FALSE}
 # create a plot of each speakers' favorite words 
 top_words_per_abolition_speaker %>% 
   mutate(word = reorder_within(word, n, speaker)) %>% # within the grouping by speaker, rearrange the words in order by n
-  ggplot( # create a plot 
-    aes(x = word, # word is on the x axis
-        y = n)) + # n (count) is on the y axis
+  ggplot(aes(x = word, # word is on the x axis
+             y = n)) + # n (count) is on the y axis
   geom_col() + # make a bar chart
   facet_wrap(~speaker, # break the chart up into faceted charts, one for each speaker
              scales = "free") + # label each x and y axis separately, so that we only see the words used by that speaker on his axis
@@ -380,7 +380,8 @@ Before we get too excited about any of these words, however, we also need to thi
 
 We can check the significance of our distinctiveness measure by another kind of representation of the same data, one that brings both distinctiveness and count into the same graphic. 
 
-```{r, message = F}
+```{r, fig.cap="Distinctive vocabulary across six key speakers in the 1830s abolition debates. Words shown are those that appear significantly more often in one speaker’s speeches than compared with the other speakers.", message = F}
+
 most_distinctive_words_per_abolition_speaker <- most_distinctive_words_per_abolition_speaker %>%
   mutate(word = reorder_within(word, n, speaker)) 
 
@@ -434,7 +435,8 @@ most_distinctive_words_per_abolition_speaker2 <- tfidf_per_top_slavery_speaker_1
 most_distinctive_words_per_abolition_speaker
 ```
 
-```{r, message = F}
+```{r, fig.cap="Most distinctive words used by six major speakers in the 1830s debates on the abolition of slavery, filtered to include only terms appearing more than five times. Pale bars indicate words that are more distinctive to each speaker relative to each other speaker.", message = F}
+
 ggplot(data = most_distinctive_words_per_abolition_speaker2, 
        aes(x = word, y = n, fill = factor(tf_idf) )) +
   geom_col() +
@@ -458,7 +460,7 @@ At this point, we may want to choose one speaker to inspect in greater detail. O
 
 Suppose we choose to investigate Mr. Buckingham. He is, after all, the outlier -- a new arrival in parliament, elected by the evangelical middle class who obtained a presence in parliament only after 1832. We can use this information to investigate certain aspects of his speech. We might decide to grow curious about what he had to say about "enjoyment," "wage," "bonage," and "america," to take a smattering of his most distinctive words for this view. 
 
-What might we learn if we looked at Mr. Buckingham's words in greater detail?  The visualizations above limit us to a small number of words per speaker; but we might learn a great deal more by looking at Mr. Buckingham's favorite words, whether by count of by tf-idf. In fact, computation is cheap, so let's do both. 
+What might we learn if we looked at Mr. Buckingham's words in greater detail?  The visualizations above limit us to a small number of words per speaker; but we might learn a great deal more by looking at Mr. Buckingham's favorite words, whether by count of by tf-idf. In fact, the computation for this problem is cheap, so let's do both. 
 
 ```{r, warning=FALSE, message=FALSE}
 mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>%
@@ -469,18 +471,19 @@ mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>%
 mr_buckingham_slavery_debates
 ```
 
-```{r}
+```{r, fig.cap="The most frequently used words in Mr. Buckingham’s speeches during the 1833 debates on the abolition of slavery. Bar shading reflects each word’s TF-IDF score, indicating how distinctive the term is relative to other abolitionist speakers. Dark coloring means the term is less distinctive, whereas the light coloring means the term is more distinctive."}
+
 ggplot(data = mr_buckingham_slavery_debates,
-       aes(x = reorder(word, n), # the x axis will show words ordered by their count 
-           y = n),
-          fill = factor(tf_idf)) + # the y axis will show n 
+  aes(x = reorder(word, n),
+      y = n,
+      fill = factor(tf_idf))) +
+  geom_col() +
   scale_fill_grey() +
-  scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), 
-                            (max(x) + 1) * 1))))) + # use whole numbers for the x-axis
-  geom_col() + # create a bar graph 
-  coord_flip() + # switches the x and y axis for a more elegant presentation 
-  labs(title = "Mr Buckingham\'s Most Frequenlty Spoken Words",
+  scale_y_continuous(
+    breaks = function(x) unique(
+      floor(pretty(seq(min(x), max(x)))))) +
+  coord_flip() +
+  labs(title = "Mr Buckingham's Most Frequently Spoken Words",
        subtitle = "From the 1833 Debates on the Abolition of Slavery",
        x = "Word",
        y = "Count")
@@ -492,7 +495,8 @@ But none of these words are particularly distinctive of Mr. Buckingham, at least
 
 If we want to see the words that Buckingham used more than other speakers, we can return to the tf-idf scores that we generated a moment ago. In fact, all we have to do is change a single line of code to produce a visualization showing the top forty most distinctive words and their counts.
 
-```{r, warning=FALSE, message=FALSE}
+```{r, fig.cap="Mr. Buckingham’s most distinctive words in the 1833 debate on the abolition of slavery, showing the terms that appear disproportionately often in his speeches compared to the rest of the abolitionist speakers.", warning=FALSE, message=FALSE}
+
 mr_buckingham_slavery_debates2 <- tfidf_per_top_slavery_speaker_1833 %>%
   filter(speaker == "Mr. Buckingham") %>%
   arrange(desc(tf_idf)) %>% # <------- the only line that changed
@@ -858,12 +862,12 @@ peel_speeches <- peel_base %>%
 
 peel_speeches %>%
   head() %>%
-  mutate(text = str_trunc(speech, 120)) %>% 
+  mutate(speech = str_trunc(speech, 120)) %>% 
   kable(format = "latex", 
         booktabs = TRUE, 
         caption = "Three Speeches by Buckingham about Slavery Invoking the Word 'Wages'") %>%
   kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "4cm") 
+  column_spec(1, width = "14cm") 
 ```
 
 In the three speeches above, we find Peel invoking the colonial assemblies of the West Indies in order to defend the principle of independent democracies being entitled to make their own laws, unhindered by empire -- even when the laws contained principles so odious as that of the enslavement of human beings. 

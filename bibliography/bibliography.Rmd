@@ -11,63 +11,63 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Introduction
 
-Ahnert, Ruth, Emma Griffin, Mia Ridge, and Giorgia Tolfo. Collaborative Historical Research in the Age of Big Data: Lessons from an Interdisciplinary Project. Elements in Historical Theory and Practice. Cambridge: Cambridge University Press, January 26, 2023. https://doi.org/10.1017/9781009175548.
+Ahnert, Ruth, Emma Griffin, Mia Ridge, and Giorgia Tolfo. *Collaborative Historical Research in the Age of Big Data: Lessons from an Interdisciplinary Project*. Elements in Historical Theory and Practice. Cambridge: Cambridge University Press, 2023. https://doi.org/10.1017/9781009175548.
 
-Algee-Hewitt, Mark. "Computing Criticism: Humanities Concepts and Digital Methods." _Computational Humanities_, edited by Lauren Tilton, David Mimno, and Jessica Marie Johnson, University of Minnesota Press, 2024.
+Algee-Hewitt, Mark. “Computing Criticism: Humanities Concepts and Digital Methods.” In *Computational Humanities*, edited by Lauren Tilton, David Mimno, and Jessica Marie Johnson. Minneapolis: University of Minnesota Press, 2024.
 
-Arnold, Taylor, and Lauren Tilton. _Distant Viewing: Computational Exploration of Digital Images_. MIT Press, 2023. https://doi.org/10.7551/mitpress/14046.001.0001.
+Arnold, Taylor, and Lauren Tilton. *Distant Viewing: Computational Exploration of Digital Images*. Cambridge, MA: MIT Press, 2023. https://doi.org/10.7551/mitpress/14046.001.0001.
 
-Alvarado, Rafael. "The Differences between Digital Humanities and Digital History." Debates in the Digital Humanities 2016, edited by Stephen Robertson, University of Minnesota Press, 2016, https://dhdebates.gc.cuny.edu/projects/debates-in-the-digital-humanities-2016.
+Alvarado, Rafael. “The Differences between Digital Humanities and Digital History.” In *Debates in the Digital Humanities 2016*, edited by Stephen Robertson. Minneapolis: University of Minnesota Press, 2016. https://dhdebates.gc.cuny.edu/projects/debates-in-the-digital-humanities-2016.
 
-Berry, David M., ed. Understanding Digital Humanities. Basingstoke, UK: Palgrave Macmillan, 2012.
+Berry, David M., ed. *Understanding Digital Humanities*. Basingstoke, UK: Palgrave Macmillan, 2012.
 
-Blaxill, Luke. "A Feminized Language of Democracy? The Representation of Women at Westminster since 1945." Twentieth Century British History, vol. 27, no. 3, Sept. 2016, pp. 412–449. Oxford University Press, https://doi.org/10.1093/tcbh/hww028.
+Blaxill, Luke. “A Feminized Language of Democracy? The Representation of Women at Westminster since 1945.” *Twentieth Century British History* 27, no. 3 (September 2016): 412–49. https://doi.org/10.1093/tcbh/hww028.
 
-Blaxill, Luke. (2023), Why do Historians Ignore Digital Analysis? Bring on the Luddites. The Political Quarterly, 94: 279-289. https://doi.org/10.1111/1467-923X.13267
+Blaxill, Luke. “Why Do Historians Ignore Digital Analysis? Bring on the Luddites.” *The Political Quarterly* 94 (2023): 279–89. https://doi.org/10.1111/1467-923X.13267.
 
-Blaxill, Luke. The War of Words: The Language of British Elections, 1880–1914. Royal Historical Society Studies in History New Series, vol. 104, Boydell Press, 2020.
+Blaxill, Luke. *The War of Words: The Language of British Elections, 1880–1914*. Royal Historical Society Studies in History New Series, vol. 104. Woodbridge, UK: Boydell Press, 2020.
 
-Buongiorno, Steph. hansardr: Access a cleaned version of the c19 Hansard corpus with improved speaker names in the R environment. 2021. GitHub, R package. https://github.com/stephbuon/hansardr.
+Buongiorno, Steph. *hansardr: Access a Cleaned Version of the C19 Hansard Corpus with Improved Speaker Names in the R Environment*. R package. GitHub, 2021. https://github.com/stephbuon/hansardr.
 
-Buongiorno, Steph, Robert Kalescky, Omar Alexander Cerpa, Jo Guldi, 2022, "The Hansard 19th-Century British Parliamentary Debates with Improved Speaker Names: Parsed Debates, N-Gram Counts, Special Vocabulary, Collocates, and Topics", https://doi.org/10.7910/DVN/ZCYJH8, Harvard Dataverse. 
+Buongiorno, Steph, Robert Kalescky, Omar Alexander Cerpa, and Jo Guldi. “The Hansard 19th-Century British Parliamentary Debates with Improved Speaker Names: Parsed Debates, N-Gram Counts, Special Vocabulary, Collocates, and Topics.” Harvard Dataverse, 2022. https://doi.org/10.7910/DVN/ZCYJH8.
 
-Buongiorno, Steph, Ryan Schaefer, Alisha Morejon, Serena Di Martino, Shawn Chen, Wes Anderson, Matt Swigart, Chris Miller, Hailey DeMark, Grace Schultz, Francesca La Marca, Jo Guldi, Tommy Ottolin. "Democracy Viewer." https://democracyviewer.com/. 2024. 
+Buongiorno, Steph, Ryan Schaefer, Alisha Morejon, Serena Di Martino, Shawn Chen, Wes Anderson, Matt Swigart, Chris Miller, Hailey DeMark, Grace Schultz, Francesca La Marca, Jo Guldi, and Tommy Ottolin. *Democracy Viewer*. 2024. https://democracyviewer.com/.
 
-Colley, Linda. _Britons: Forging the Nation, 1707–1837_. Yale University Press, 1992.
+Colley, Linda. *Britons: Forging the Nation, 1707–1837*. New Haven, CT: Yale University Press, 1992.
 
-Davidson, Cathy N. "Humanities 2.0: Promise, Perils, Predictions." In Debates in the Digital Humanities, edited by Matthew K. Gold. Minneapolis: University of Minnesota Press, 2012. https://dhdebates.gc.cuny.edu/read/untitled-88c11800-9446-469b-a3be-3fdb36bfbd1e/section/c6fc3cc1-5751-4c6b-aac5-b9890206930f#ch28.
+Davidson, Cathy N. “Humanities 2.0: Promise, Perils, Predictions.” In *Debates in the Digital Humanities*, edited by Matthew K. Gold. Minneapolis: University of Minnesota Press, 2012. https://dhdebates.gc.cuny.edu/read/untitled-88c11800-9446-469b-a3be-3fdb36bfbd1e/section/c6fc3cc1-5751-4c6b-aac5-b9890206930f#ch28.
 
-Fischer, David Hackett. _Historians' Fallacies: Toward a Logic of Historical Thought_. Harper & Row, 1970.
+Fischer, David Hackett. *Historians’ Fallacies: Toward a Logic of Historical Thought*. New York: Harper & Row, 1970.
 
-Grimmer, Justin, Margaret E. Roberts, and Brandon M. Stewart. _Text as Data: A New Framework for Machine Learning and the Social Sciences_. Princeton University Press, 2022.
+Grimmer, Justin, Margaret E. Roberts, and Brandon M. Stewart. *Text as Data: A New Framework for Machine Learning and the Social Sciences*. Princeton, NJ: Princeton University Press, 2022.
 
-Guldi, Jo. _The Dangerous Art of Text Mining: A Methodology for Digital History_. Cambridge University Press, 2023.
+Guldi, Jo. *The Dangerous Art of Text Mining: A Methodology for Digital History*. Cambridge: Cambridge University Press, 2023.
 
-Guldi, Jo. "Critical Search: A Procedure for Guided Reading in Large-Scale Textual Corpora." _Journal of Cultural Analytics_, vol. 3, no. 1, 2018, https://doi.org/10.22148/16.030.
+Guldi, Jo. “Critical Search: A Procedure for Guided Reading in Large-Scale Textual Corpora.” *Journal of Cultural Analytics* 3, no. 1 (2018). https://doi.org/10.22148/16.030.
 
-Jockers, Matthew L., and Ted Underwood. "Text-Mining the Humanities." A New Companion to Digital Humanities, edited by Susan Schreibman, Ray Siemens, and John Unsworth, Wiley, 2015, https://doi.org/10.1002/9781118680605.ch20.
+Jockers, Matthew L., and Ted Underwood. “Text-Mining the Humanities.” In *A New Companion to Digital Humanities*, edited by Susan Schreibman, Ray Siemens, and John Unsworth. Hoboken, NJ: Wiley, 2015. https://doi.org/10.1002/9781118680605.ch20.
 
-Kirschenbaum, Matthew G. Mechanisms: New Media and the Forensic Imagination. MIT Press, 2012.
+Kirschenbaum, Matthew G. *Mechanisms: New Media and the Forensic Imagination*. Cambridge, MA: MIT Press, 2012.
 
-Piper, Andrew. *Enumerations: Data and Literary Study*. University of Chicago Press, 2018.
+Piper, Andrew. *Enumerations: Data and Literary Study*. Chicago: University of Chicago Press, 2018.
 
-Said, Edward W. Orientalism. Pantheon Books, 1978.
+Said, Edward W. *Orientalism*. New York: Pantheon Books, 1978.
 
-Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis using tidy data principles in R." _Journal of Open Source Software_, 1(3), 37. https://doi.org/10.21105/joss.00037
+Silge, Julia, and David Robinson. “tidytext: Text Mining and Analysis Using Tidy Data Principles in R.” *Journal of Open Source Software* 1, no. 3 (2016): 37. https://doi.org/10.21105/joss.00037.
 
-Hayles, N. Katherine. How We Think: Digital Media and Contemporary Technogenesis. University of Chicago Press, 2012.
+Hayles, N. Katherine. *How We Think: Digital Media and Contemporary Technogenesis*. Chicago: University of Chicago Press, 2012.
 
-Hicks, Michael Townsen, James Humphries, and Joe Slater. "ChatGPT Is Bullshit." _Ethics and Information Technology_, vol. 26, no. 38, 2024, https://doi.org/10.1007/s10676-024-09753-z.
+Hicks, Michael Townsen, James Humphries, and Joe Slater. “ChatGPT Is Bullshit.” *Ethics and Information Technology* 26, no. 38 (2024). https://doi.org/10.1007/s10676-024-09753-z.
 
-Lubanovic, Bill. _Introducing Python_. 2nd ed., O'Reilly Media, 2019.
+Lubanovic, Bill. *Introducing Python*. 2nd ed. Sebastopol, CA: O’Reilly Media, 2019.
 
-Luhmann, Jan, and Manuel Burghardt. "Digital Humanities—A Discipline in Its Own Right? An Analysis of the Role and Position of Digital Humanities in the Academic Landscape." Journal of the Association for Information Science and Technology, vol. 73, no. 1, 2022, pp. 148–162. Wiley, https://doi.org/10.1002/asi.24533.
+Luhmann, Jan, and Manuel Burghardt. “Digital Humanities—A Discipline in Its Own Right? An Analysis of the Role and Position of Digital Humanities in the Academic Landscape.” *Journal of the Association for Information Science and Technology* 73, no. 1 (2022): 148–62. https://doi.org/10.1002/asi.24533.
 
-Matthes, Eric. _Python Crash Course: A Hands-on, Project-based Introduction to Programming_. 3rd ed., No Starch Press, 2023.
+Matthes, Eric. *Python Crash Course: A Hands-On, Project-Based Introduction to Programming*. 3rd ed. San Francisco: No Starch Press, 2023.
 
-Metcalf, Thomas R. Ideologies of the Raj. Cambridge University Press, 1995.
+Metcalf, Thomas R. *Ideologies of the Raj*. Cambridge: Cambridge University Press, 1995.
 
-Mullen, Lincoln A. _Computational Historical Thinking: With Applications in R_ (2018–): https://dh-r.lincolnmullen.com.
+Mullen, Lincoln A. *Computational Historical Thinking: With Applications in R*. 2018–. https://dh-r.lincolnmullen.com.
 
 Ramsay, Stephen. Reading Machines: Toward an Algorithmic Criticism. Champaign: University of Illinois Press, 2011.
 
@@ -95,7 +95,7 @@ Wineburg, Sam. _Historical Thinking and Other Unnatural Acts: Charting the Futur
 
 Zumel, Nina, and John Mount. "Practical Data Science with R." 2nd ed., Manning Publications, 2019. 
 
-### Chapter 1
+### Chapter 1: Counting Words in the 19th-Century British Parliamentary Debates
 
 Buongiorno, Steph. hansardr: Access a cleaned version of the c19 Hansard corpus with improved speaker names in the R environment. 2021. GitHub, R package. https://github.com/stephbuon/hansardr.
 
@@ -119,7 +119,7 @@ Wickham, Hadley, Jim Hester, and Winston Chang. "devtools: Tools to Make Develop
 
 Williams, Raymond. _Keywords: A Vocabulary of Culture and Society._ Revised ed., Oxford University Press, 1985.
 
-### Chapter 2
+### Chapter 2: Investigating the Memory of Events Using N-Grams, Controlled Vocabulary, and Joins
 
 Buongiorno, Steph. hansardr: Access a cleaned version of the c19 Hansard corpus with improved speaker names in the R environment. 2021. GitHub, R package. https://github.com/stephbuon/hansardr.
 
@@ -141,7 +141,7 @@ Spirling, Arthur and Any Eggers. "Electoral Security as a Determinant of Legisla
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. "Welcome to the Tidyverse." _Journal of Open Source Software_, vol. 4, no. 43, 2019, p. 1686. https://doi.org/10.21105/joss.01686.
 
-### Chapter 3
+### Chapter 3: Investigating Speakers and Change Over Time Using Grouped Data
 
 Borges, J. L. 1998. Collected Fictions. New York: Penguin
 
@@ -157,7 +157,9 @@ Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino 
 
 Winters, Jane and Martin Steer. Digging into Linked Parliamentary Data (DiLiPaD). 2013.
 
-### Chapter 4
+### Chapter 4: Text Mining British Concepts in the 1833 Debates About the Abolition of Slavery
+
+### Chapter 5: Using Distinctiveness and Distance for Comparative Analyses of Historical Data
 
 Belkin, Nicholas J., and W. Bruce Croft. "Information Filtering and Information Retrieval: Two Sides of the Same Coin?" _Communications of the ACM_, vol. 35, no. 12, Dec. 1992, pp. 29–38. https://doi.org/10.1145/138859.138861.
 
@@ -195,18 +197,16 @@ Wilke, Claus O. _Fundamentals of Data Visualization: A Primer on Making Informat
 
 Xiang, Lin. "Application of an Improved TF-IDF Method in Literary Text Classification", _Advances in Multimedia_, 2022. https://doi.org/10.1155/2022/9285324 
 
-### Chapter 5
 
+### Chapter 7: Decoding Grammar to Uncover the Language of Agency
 
 ADD THESE:
 
 Rackley and Auchmuty 2019
+
 Kent 1999
 
 Griffin 2012
-
-
-(Tangherlini 2016, 
 
 Franzosi 2024).
 
@@ -215,8 +215,6 @@ Franzosi 2024).
 
 (Arnold 2019)
 
-
-Kraicer and Piper 2018, 
 
 Underwood et. al 2018)
 
@@ -260,7 +258,7 @@ Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis u
 
 Spinu, Vitalie, Garrett Grolemund, and Hadley Wickham. lubridate: Make Dealing with Dates a Little Easier. Version 1.9.2, 2023. R package, https://CRAN.R-project.org/package=lubridate.
 
-Tangherlini, Timothy R., et al. "'Mommy Blogs' and the Vaccination Exemption Narrative: Results From a Machine-Learning Approach for Story Aggregation on Parenting Social Media Sites." JMIR Public Health and Surveillance, vol. 2, no. 2, 2016, doi:10.2196/publichealth.5054.
+Tangherlini, T. R., Roychowdhury, V., Glenn, B., Crespi, C. M., Bandari, R., Wadia, A., Falahi, M., Ebrahimzadeh, E., & Bastani, R. (2016). "Mommy Blogs" and the Vaccination Exemption Narrative: Results From A Machine-Learning Approach for Story Aggregation on Parenting Social Media Sites. JMIR public health and surveillance, 2(2), e166. https://doi.org/10.2196/publichealth.6586
 
 Underwood, Ted, David Bamman, and Sabrina Lee. "The Transformation of Gender in English-Language Fiction." Journal of Cultural Analytics, 2018, https://doi.org/10.22148/16.036.
 
@@ -272,7 +270,7 @@ Wittig, Monique. The Straight Mind and Other Essays. Translated by Monique Witti
 
 Zeldes, Amir, and Caroline T. Schroeder. “Computational Methods for Coptic: Developing and Using Part-of-Speech Tagging for Digital Scholarship in the Humanities.” Digital Scholarship in the Humanities, vol. 30, suppl. 1, Dec. 2015, pp. i164–i176. Oxford University Press, https://doi.org/10.1093/llc/fqv043.
 
-### Chapter 6 
+### Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record
 
 Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis using tidy data principles in R." _Journal of Open Source Software_, 1(3), 37. https://doi.org/10.21105/joss.00037
 
@@ -280,7 +278,7 @@ Spinu, Vitalie, Garrett Grolemund, and Hadley Wickham. lubridate: Make Dealing w
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. "Welcome to the Tidyverse." _Journal of Open Source Software_, vol. 4, no. 43, 2019, p. 1686. https://doi.org/10.21105/joss.01686.
 
-### Chapter 7 
+### Chapter 9: Data 
 
 BBC News. BBC News RSS Feed. https://feeds.bbci.co.uk/news/rss.xml. Accessed 22 Mar. 2025.
 
@@ -326,11 +324,14 @@ Programming Historian. "Lesson Index: APIs." _The Programming Historian_. Access
 
 Programming Historian. "Lesson Index: Web Scraping." _The Programming Historian_. Accessed October 20, 2025. https://programminghistorian.org/en/lessons/?topic=web-scraping
 
-Reddit. “API Documentation.” https://www.reddit.com/dev/api/.
+Reddit. "API Documentation." https://www.reddit.com/dev/api/.
 
 Roued-Cunliffe, Henriette. “Open Heritage Data and APIs.” Chapter. In Participatory Heritage, edited by Henriette Roued-Cunliffe and Andrea Copeland, 195–204. Facet, 2017.
 
 Ries, Thorsten. "Digital History and Born-Digital Archives: The Importance of Forensic Methods." _Journal of the British Academy_ 10 (2022): 157–185.
+
+Thordarson, Sveinbjorn, ed. _Egil's Saga_. Reykjavík: Icelandic Saga Database. Accessed November 24, 2025. https://sagadb.org/files/pdf/egils_saga.en.pdf
+
 
 Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis using tidy data principles in R." _Journal of Open Source Software_, 1(3), 37. https://doi.org/10.21105/joss.00037
 

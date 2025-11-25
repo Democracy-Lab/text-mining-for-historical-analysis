@@ -9,47 +9,155 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Troubleshooting Code with Chatbots
 
-Chatbots like ChatGPT are now commonly used to troubleshoot and debug code. Sometimes they supplement traditional approachces to scanning and interpreting documentation, but in cases where the code is popular and lots are in the model training data, Chatbots may replace traditional approaches to debugging altogether. However, while they can recognize patterns, they do not know our exact intentions. If our problem looks similar to another issue, is uncommon and poorly represented in the chatbot's training data, or arises from a new use case, the chatbot may misinterpret our problem or offer a solution meant for a different situation. 
+Chatbots backed by large language models (LLMs), like ChatGPT, are now commonly used to troubleshoot and debug code. Sometimes chatbots are used to supplement traditional approaches to scanning and interpreting Software documentation. Other times, Chatbots might be used to replace traditional approaches to troubleshooting, such as in cases where a programming language or library has a wide internet presence—such as R's tidyverse or base Python. Large amounts of code, documentation, and common usage patterns are included in LLM training data. As a result, the chatbot can often replace traditional troubleshooting methods by providing an interactive, conversational style of debugging that adapts to the user's questions and code in real time.
 
-The following section introduces a repeatable troubleshooting cycle designed specifically for working with code. In doing so, it provides some context for how chatbots process information that way we can anticipate where misalignments might occur and correct them. The goal is to make interactions with a chatbot more predictable and productive by structuring the conversation: clearly stating the task, providing minimal reproducible code and screenshots of the data, showing the exact error, asking a focused question, testing the suggestions locally, and iterating until the issue resolves. This cyclical workflow helps minimize the gap between what we might intend and what the chatbot thinks we are asking, turning the debugging process into a human-guided loop.
+We do this by providing what is called a "prompt" to the chatbot, or a written out set of instructions that tells the model what task to perform. The prompt establishes the initial context the chatbot uses to generate a response, and guides how it will respond to the problem.
+
+Important to note, while chatbots can generate responses to patterns, they do not understand our intentions. If the problem we present a chatbot looks similar to another issue, is not common and poorly represented in the chatbot's training data, or arises from a new use case, the chatbot may misinterpret our problem or offer a solution meant for a different situation. 
+
+The following sections introduces a repeatable, human-guided troubleshooting framework designed specifically for troubleshooting code with a chatbot, including practices for writing prompts. The following sections also provide a basic explanation for how chatbots process information, with the goal of providing insight to help anticipate where conversational misalignments might lead to incorrect responses—and how to prevent or correct those mistakes. Our aim is to present a framework that makes interactions with a chatbot more predictable and productive by structuring the conversation: clearly stating the problem, providing minimal reproducible code and screenshots of the data, showing the exact error, asking a focused question, testing the suggestions, and iterating until the issue resolves. This cyclical framework helps minimize the gap between what we might intend and what the chatbot thinks we are asking, turning the debugging process into a human-guided loop.
 
 ## A Troubleshooting Cycle for Working with ChatGPT
 
-1. Describe the Task
+1\. __Describe the problem__. During this stage we can ask ourselves: what are we hoping to achieve? We can then provide a description of the problem in plain language. For example, we can write a prompt to the chatbot saying: 
 
-What are we hoping to achieve? Provide a description in plain language
-(“I am trying to extract bigrams from 1850 Hansard debates…”)
-The expected type of output (“…and return a dataframe with bigram counts per speaker.”)
+> "Count each speaker's words in the 1850 Hansard debates . . ." 
 
-This helps to not just perform the task, extracting bigrams, which could result in many different paths. While most things in R are in dataframes, in another language bigrams could be given back in a different format. 
+However, stating what we want to do is not enough, because the output can take many different forms. For example, we might want the result returned as a data frame because we are working within a `tidyverse` workflow, but the chatbot does not automatically understand our intentions. Without guidance, the chatbot might return the output in a different structure, such as a nested list. To avoid this, we can specify the format we expect directly in the prompt:
+
+> " . . . and return a data frame showing the words they used and how many times they used them." 
+
+2\. __Provide a code example__. If the issue remains unresolved, we can give the chatbot more context by including some amount of the code that is causing the problem. Supplying code where the problem occurs allows the chatbot to match patterns, check syntax, and generate a response about the code structure more reliably than it can from a verbal description alone. Providing a code example often produces more accurate suggestions and reduces irrelevant or incorrect responses, especially when our description of the problem does not necessarily capture more granular, code-level patterns that cause the problem. 
+
+3\. __Provide the exact warning or error message__. 
 
 
-2. Provide the Minimal Code
+Copy-paste error output verbatim, including:
+The first line (most important)
+Any traceback shown
+This helps ChatGPT see what the interpreter saw.
 
-If possible, aim for a small example—a few lines only:
 
-Include the function or chunk generating the error.
 
-Exclude unrelated steps.
 
-This helps ChatGPT reason accurately and prevents “hallucinated” fixes.
+In this example we return an error 
+
+```{r, error=TRUE}
+library(dplyr)
+library(hansardr)
+
+data("hansard_1830")
+data("debate_metadata_1830")
+
+slavery_1830 <- hansard_1830 %>%  # Create a new dataset called 'debates_1830'
+  left_join(debate_metadata_1830) %>% #, by = "sentence_id") %>% # Join with the debate metadata 
+  filter(str_detect(tolower(debate), "slavery")) %>% # filter title for 'slavery' 
+  mutate(year = year(speechdate)) # Extract and add the year from the 'speechdate' column
+
+peel_sentences <- slavery_1830 %>%
+  left_join(speaker_metadata_1830) %>%
+  filter(speaker == "Sir Robert Peel",
+         str_detect(text, "Assembl|assembl"))
+
+peel_base <- peel_sentences %>%
+  select(sentence_id)
+
+hansard_trim <- hansard_1830 %>%
+  select(sentence_id, text)
+
+debate_meta_trim <- debate_metadata_1830 %>%
+  select(sentence_id, speechdate)
+
+speaker_meta_trim <- speaker_metadata_1830 %>%
+  select(sentence_id, speaker)
+
+file_meta_trim <- file_metadata_1830 %>%
+  select(sentence_id, speech_id)
+
+peel_speeches <- peel_base %>%
+  left_join(hansard_trim) %>% #,  by = "sentence_id") %>%
+  left_join(speaker_meta_trim) %>% #,  by = "sentence_id") %>%
+  left_join(file_meta_trim) %>% #, by = "sentence_id") %>% 
+  left_join(debate_meta_trim) %>% #, by = "sentence_id") %>%
+  group_by(speech_id, speaker, speechdate) %>%
+  summarise(speech = paste(text, collapse = " "), .groups = "drop") %>%
+  mutate(speech = paste0(speechdate, ": ", toupper(speaker), " ", speech)) %>%
+  select(speech)
+```
+
+
+
+```{r}
+# 1. Combine text + metadata
+h <- hansard_1830 %>%
+  left_join(debate_metadata_1830, by = "sentence_id")
+
+# 2. Select a single speech date (e.g., the first date)
+one_date <- h %>%
+  filter(speechdate == first(speechdate)) %>%
+  select(sentence_id, text, speechdate)
+
+# 3. Select a single debate (e.g., the first debate)
+one_debate <- h %>%
+  filter(debate == first(debate)) %>%
+  select(sentence_id, text, speechdate, debate)
+
+# 4. ❌ Incorrect join:
+#    Student thinks: "join all sentences from the same date"
+one_date %>%
+  left_join(
+    one_debate,
+    by = "speechdate",
+    relationship = "one-to-many"   # <-- wrong on purpose → ERROR
+  )
+
+```
+
+
+4\. __Provide a screenshot of snippet of the dataset__. 
 
 Sometimes provide it with a script or dataset, however, this can exceed the chatbot's memory, causing ___ 
 
 
-3. Provide a Screenshot or Snippet of the Dataset 
+The following code does not return a warning or an error. Instead we can diagnose the problem by inspecting the data. We can even provide a screenshot of the data to a chatbot to help provide context for what we want fixed 
 
+```{r}
+library(dplyr)
+library(hansardr)
 
+data("hansard_1830")
+data("debate_metadata_1830")
 
-4. Provide the Exact Error Message
+# 1. Correct join: add metadata to a small sample of sentences
+h_small <- hansard_1830 %>%
+  slice(1:50) %>%                            # keep it tiny for demo
+  left_join(debate_metadata_1830, by = "sentence_id")
 
-Copy-paste error output verbatim, including:
+nrow(h_small)
+# [1] 50  (no duplicates yet; one row per sentence)
 
-The first line (most important)
+# 2. Create two realistic summary-ish tables that both use `speechdate`
 
-Any traceback shown
+# Table A: sentence_id + speechdate  (think: sentence-level data)
+sentences_by_date <- h_small %>%
+  select(sentence_id, speechdate)
 
-This helps ChatGPT see what the interpreter saw.
+# Table B: debate + speechdate       (think: debate-level info per date)
+debates_by_date <- h_small %>%
+  select(debate, speechdate)
+
+# 3. WRONG join: match them only on speechdate (many sentences & many debates per date)
+dup_result <- sentences_by_date %>%
+  left_join(debates_by_date, by = "speechdate")
+
+nrow(dup_result)
+# > 50  (rows are duplicated because of the many-to-many join)
+
+head(dup_result, 10)
+```
+
+A prompt accompanied with a screenshot or snippet of the dataset 
+
 
 5. Ask a Specific Question
 
@@ -63,7 +171,6 @@ Examples:
 
 “How do I get this to run in PDF LaTeX?”
 
-Precise questions lead to precise help.
 
 5. Receive the Explanation, Try the Fix
 

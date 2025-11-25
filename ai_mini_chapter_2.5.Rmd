@@ -1,11 +1,15 @@
 ---
-title: "ai_mini_chapter_2.5"
+title: "AI Interlude 1"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+# Iteration as Method in Digital History Research
+
+This AI mini-chapter is about the iterative process of writing and revising code, such as by refining prompts, testing and critiquing AI results, and revisiting corpus context to use close reading to iterate on our understanding. 
 
 
 

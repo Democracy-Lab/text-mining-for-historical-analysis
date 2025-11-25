@@ -3,7 +3,7 @@ title: "Chapter 5: Using Distinctiveness and Distance for Comparative Analyses o
 output:
   pdf_document:
     latex_engine: xelatex
-    number_sections: true
+    number_sections: false
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{fontspec}
@@ -123,31 +123,65 @@ filtered_tfidf <- tfidf_table %>%
   select(term, tf_idf)
 ```
 
+
+
+```{r two-pane, results='asis', message=FALSE, warning=FALSE}
+library(kableExtra)
+
+filtered_tfidf <- as_tibble(filtered_tfidf)
+
+left <- filtered_tfidf %>%
+  select(term, tf_idf) %>%
+  slice(1:6) %>%
+  mutate(tf_idf = round(as.numeric(tf_idf), 6))
+
+right <- filtered_tfidf %>%
+  select(term, tf_idf) %>%
+  slice(7:12) %>%
+  mutate(tf_idf = round(as.numeric(tf_idf), 6))
+
+combined <- tibble(beatrix_term = left$term,
+                   beatrix_tfidf = left$tf_idf,
+                   carroll_term = right$term,
+                   carroll_tfidf = right$tf_idf)
+
+combined %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        col.names = c("Beatrix Word", "TF-IDF", 
+                      "Lewis Carroll Word", "TF-IDF")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+
+
+
+
 ```{r}
-library(knitr)
+#library(knitr)
 
-make_tab <- function(df) {
-  df %>%
-    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
-    kable(format = "latex", booktabs = TRUE, caption = NULL,
-          col.names = c("Word", "TF-IDF")) %>%
-    as.character() }
+#make_tab <- function(df) {
+#  df %>%
+#    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
+#    kable(format = "latex", booktabs = TRUE, caption = NULL,
+#          col.names = c("Word", "TF-IDF")) %>%
+#    as.character() }
 
-left_tab  <- make_tab(filtered_tfidf[1:6, ])
-right_tab <- make_tab(filtered_tfidf[7:12, ])
+#left_tab  <- make_tab(filtered_tfidf[1:6, ])
+#right_tab <- make_tab(filtered_tfidf[7:12, ])
 
-two_pane_table <- paste0(
-    "\\noindent
-    \\begin{minipage}[t]{0.48\\textwidth}
-    \\raggedright\\textbf{Some Beatrix Potter Words}\\\\[3pt]", 
-    left_tab, "
-    \\end{minipage}\\hfill
-    \\begin{minipage}[t]{0.48\\textwidth}
-    \\raggedright\\textbf{Some Lewis Carroll Words}\\\\[3pt]", 
-    right_tab, "
-    \\end{minipage}")
+#two_pane_table <- paste0(
+#    "\\noindent
+#    \\begin{minipage}[t]{0.48\\textwidth}
+#    \\raggedright\\textbf{Some Beatrix Potter Words}\\\\[3pt]", 
+#    left_tab, "
+#    \\end{minipage}\\hfill
+#    \\begin{minipage}[t]{0.48\\textwidth}
+#    \\raggedright\\textbf{Some Lewis Carroll Words}\\\\[3pt]", 
+#    right_tab, "
+#    \\end{minipage}")
 
-asis_output(two_pane_table)
+#asis_output(two_pane_table)
 ```
 
 We can use distinctiveness to quickly identify the words that are frequently in Carroll's book but not Potter's. We might expect the results to include a list of words that includes "Jabberwock" (a fearsome creature), the "Snark" (an elusive entity), the "Bandersnatch" (a fast and dangerous beast), and other terms from his peculiar universe. Indeed, many of these words have rarely, if ever, appeared in publications not authored by Carroll himself. 
@@ -163,13 +197,10 @@ distinctively_carroll <- tfidf_table %>%
 kable(head(distinctively_carroll, 15),
       format = "latex",
       booktabs = TRUE,
-      caption = paste0("\\textbf{\\large Lewis Carroll's Most 
-                       Distinctive Words}\\\\", 
-                       "\\textit{(when \\textit{Alice} is compared with 
-                       \\textit{Peter Rabbit})}"),
+      caption = "Lewis Carroll's Most Distinctive Words when Alice 
+                is compared with Peter Rabbit",
       col.names = c("Word", "TF-IDF"),
-      escape = FALSE) %>%
-  kable_styling(full_width = TRUE)
+      escape = FALSE)
 ```
 
 Interestingly, the Jabberwock, Bandersnatch, and Snark are outranked in this comparison by relatively simple characters -- Alice, the Queen, the Red Knight, and Humpty-Dumpty -- because none of these characters appear in _Peter Rabbit_, while all of those characters are mentioned more than the Jabberwock. 
@@ -433,28 +464,38 @@ Let's make a fancy table using `kableExtra` to inspect the data.
 library("knitr")
 library("kableExtra")
 
+# Make sure this is a tibble/data frame and really has `decade`
+top_hansard_tf_idf <- as_tibble(top_hansard_tf_idf)
+stopifnot("decade" %in% names(top_hansard_tf_idf))
+
+# Function to build a LaTeX kable for one decade
 make_kable <- function(df, dec_label) {
   df %>%
     select(word, tf_idf) %>%
     arrange(desc(tf_idf)) %>%
     mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
-    kbl(format = "latex",
-        booktabs  = TRUE,
-        col.names = c("Word", "TF--IDF Score"),
-        align = c("l", "r"),
-        caption = paste0("Top TF--IDF Words — ", dec_label),
-        escape = TRUE) %>%
+    kable(format = "latex",
+          booktabs = TRUE,
+          col.names = c("Word", "TF--IDF Score"),
+          align = c("l", "r"),
+          caption = paste0("Top TF--IDF Words — ", dec_label),
+          label = paste0("tab:tfidf-", dec_label),  # unique label per decade
+          escape = TRUE) %>%
     kable_styling(full_width = FALSE) }
 
-target_decades <- if_else(is.numeric(top_hansard_tf_idf$decade),
-                          list(c(1830, 1860)),
-                          list(c("1830s", "1860s"))) %>% 
-  unlist()
+# Decide which values to filter on depending on how `decade` is stored
+if (is.numeric(top_hansard_tf_idf$decade)) {
+  target_decades <- c(1830, 1860) } else {
+  target_decades <- c("1830s", "1860s") }
 
+# Filter to target decades and print one table per decade
 top_hansard_tf_idf %>%
   filter(decade %in% target_decades) %>%
   group_by(decade) %>%
-  group_walk(~ print(make_kable(.x, unique(.x$decade))))
+  group_walk(~ {
+    dec_label <- .y$decade[1]
+    print(make_kable(.x, dec_label))
+    cat("\n\n") })
 ```
 
 Words that were distinctive in the 1830s, compared to later decades, often reference the Carlist Wars—a series of civil wars in Spain that began in 1833 over the dispute regarding the rightful successor to the throne. Portugal, France and the United Kingdom supported the regency, and even intervened in the conflict by sending forces to confront the Carlist army. Subsequently, the reference to "Carlist" can possibly explain the number of Spanish names/words listed in the bar plot, including "Miguel," "Pedro," and "Terceira."
@@ -551,7 +592,7 @@ most_dist_hansard_words <- hansard_words_1830_to_1870 %>%
   slice_max(tf_idf, n = 15) # keep top 15 tf-idf words per group
 ```
 
-```{r, results='asis'}
+```{r tfidf-tables, results='asis'}
 library("knitr")
 library("kableExtra")
 
@@ -563,7 +604,7 @@ make_kable <- function(df, dec_label) {
     kable(format = "latex",
           booktabs = TRUE,
           col.names = c("Word", "TF--IDF Score"),
-          align = c("left", "right"),
+          align = c("l", "r"),
           caption = paste0("Top TF--IDF Words — ", dec_label),
           escape = TRUE) %>%
     kable_styling(full_width = FALSE) }
@@ -850,7 +891,7 @@ Partial JSD can be interpreted as follows:
 
 One effective way of visualizing the results from Partial JSD is with a diverging bar chart, like in the following visualization. Higher Partial JSD values (e.g., war, india, government) indicate words whose relative importance changed significantly between 1840 and 1850 whereas lower Partial JSD values (e.g., noble, stated, foreign) suggest words that remained relatively stable in their frequency distribution across both decades. 
 
-```{r}
+```{r, fig.cap="Partial Jensen–Shannon divergence (JSD) values for the top words distinguishing the 1840 and 1850 Hansard debates."}
 # create a mirrored bar chart showing which words contribute 
 # most to linguistic shift
 # between 1840 and 1850 

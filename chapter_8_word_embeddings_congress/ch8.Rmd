@@ -2,14 +2,13 @@
 title: "Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record"
 output:
   pdf_document:
-    number_sections: true
+    number_sections: false
   html_document: default
 header-includes:
   - \usepackage{chngcntr}
   - \newcounter{chapter}
   - \setcounter{chapter}{8}
   - \counterwithin{table}{chapter}
-
 ---
 
 ```{r setup, include=FALSE}
@@ -136,7 +135,8 @@ most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
 ```{r}
 tbl_2000 <- most_similar_climate %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(caption = 'Words Most Related to "Climate": 2000s Congressional Records',
+  kable(format = "latex",
+    caption = 'Words Most Related to "Climate": 2000s Congressional Records',
         col.names = c("Word", "Cosine similarity"),
         align = c("l", "r"),
     booktabs = TRUE) %>%
@@ -149,7 +149,7 @@ tbl_2000
 ```{r}
 tbl_2010 <- most_similar_emissions %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(caption = 'Words Most Related to "Emissions": 2010s Congressional Records',
+  kable(format = "latex", caption = 'Words Most Related to "Emissions": 2010s Congressional Records',
     col.names = c("Word", "Cosine similarity"),
     align = c("l", "r"),
     booktabs = TRUE) %>%
@@ -159,21 +159,24 @@ tbl_2010
 ```
 
 ```{r}
-tbl_2020 <- most_similar_coal %>%
+table_2020 <- most_similar_coal %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(caption = 'Words Most Related to "Coal": 2020s Congressional Records',
-    col.names = c("Word", "Cosine similarity"),
-    align = c("l", "r"),
-    booktabs = TRUE) %>%
-  kable_styling(full_width = FALSE)
+  kable(format = "latex",
+        caption = 'Words Most Related to "Coal": 2020s Congressional Records',
+        col.names = c("Word", "Cosine similarity"),
+        align = c("l", "r"),
+        booktabs = TRUE) %>%
+  kable_styling(full_width = FALSE,
+                latex_options = c("hold_position"))
 
-tbl_2020
+table_2020
 ```
 
 
 
 
-```{r}
+```{r, fig.cap="Two-dimensional projection of word embeddings showing the terms most semantically similar to coal in the Climate Change Congressional corpus."}
+
 library(ggrepel)
 
 # take the top N words returned by most_similar_coal
@@ -185,17 +188,16 @@ words <- c("coal", words)
 # subset embedding matrix to just those words
 emb_small <- word_embeddings_2000[words, ]
 
-# reduce high dimensions → 2D PCA
+# reduce high dimensions to 2D PCA for visualization purposes
 pca <- prcomp(emb_small, center = TRUE, scale. = TRUE)
 coords <- as_tibble(pca$x[,1:2]) %>%
   mutate(word = words)
 
-# plot
 ggplot(coords, aes(PC1, PC2, label = word)) +
   geom_point(size = 3) +
   geom_text_repel() +
   theme_minimal() +
-  ggtitle("Words close to 'coal' in embedding space (2D PCA)")
+  ggtitle("Words close to COAL in embedding space (2D PCA)")
 ```
 
 ## Vector Subtraction
@@ -249,7 +251,7 @@ vector_addition <- function(word1, word2, embeddings, top_n = 10) {
 
 If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
 
-```{r}
+```{r, error=TRUE}
 vector_addition("man", "woman", congress_daily_climate_change_2000)
 ```
 
@@ -266,34 +268,28 @@ congress_daily_climate_change_enter <- congress_daily_climate_change_enter %>%
 ```
 
 
-```{r}
+```{r, fig.cap="Cosine similarity between coal and emissions across five-year periods, showing how their semantic relationship shifts over time in the U.S. Congressional records mentioning climate change."}
 
-# 0) Make 5-year periods (2000–2004, 2005–2009, 2010–2014, 2015–2019, 2020)
+# Make 5-year periods (2000–2004, 2005–2009, 2010–2014, 2015–2019, 2020)
 congress_5 <- congress_daily_climate_change_2000_2020 %>%
-  mutate(
-    date = ymd(date),
-    year = year(date),
-    period_5 = paste0(floor(year/5)*5, "-", floor(year/5)*5 + 4),
-    period_5 = ifelse(year == 2020, "2020", period_5)
-  )
+  mutate(date = ymd(date),
+         year = year(date),
+         period_5 = paste0(floor(year/5)*5, "-", floor(year/5)*5 + 4),
+         period_5 = ifelse(year == 2020, "2020", period_5) )
 
-# 1) Split text by 5-year period -> named list of character vectors
+# Split text by 5-year period 
 texts_by_period <- congress_5 %>%
   filter(!is.na(content), str_squish(content) != "") %>%
   split(.$period_5) %>%
   map(~ .x$content)
 
-# 2) Build embeddings per 5-year period
-# Assumes you already have a function:
-#   find_word_embeddings(text_vec) -> matrix with rownames = words
+# Build embeddings per 5-year period
 embeddings_by_period <- texts_by_period %>%
-  imap(~ {
-    if (length(.x) == 0) return(NULL)
-    find_word_embeddings(.x)
-  }) %>%
+  imap(~ {if (length(.x) == 0) return(NULL)
+    find_word_embeddings(.x)}) %>%
   discard(is.null)
 
-# 3) Similarity trajectory over 5-year periods
+# Similarity trajectory over 5-year periods
 similarity_trajectory <- function(word_a, word_b, embs = embeddings_by_period) {
 
   # order the x-axis by the numeric start year of each label
@@ -305,33 +301,25 @@ similarity_trajectory <- function(word_a, word_b, embs = embeddings_by_period) {
     pull(lbl)
 
   tibble(period = factor(names(embs), levels = order_levels)) %>%
-    mutate(
-      similarity = map_dbl(as.character(period), \(p) {
-        W <- embs[[p]]
-        if (is.null(W))                          return(NA_real_)
-        if (!all(c(word_a, word_b) %in% rownames(W))) return(NA_real_)
-        as.numeric(sim2(
-          W[word_a, , drop = FALSE],
-          W[word_b, , drop = FALSE],
-          method = "cosine", norm = "l2"
-        ))
-      })
-    )
-}
+    mutate(similarity = map_dbl(as.character(period), \(p) {
+      W <- embs[[p]]
+      if (is.null(W)) 
+        return(NA_real_)
+      if (!all(c(word_a, word_b) %in% rownames(W))) 
+        return(NA_real_)
+      as.numeric(sim2(W[word_a, , drop = FALSE],
+                      W[word_b, , drop = FALSE],
+                      method = "cosine", norm = "l2"))}))}
 
-# 4) Example
 df_sim <- similarity_trajectory("coal", "emissions")
 
 ggplot(df_sim, aes(period, similarity, group = 1)) +
   geom_line(linewidth = 1) +
   geom_point(size = 3) +
   theme_minimal() +
-  labs(
-    title = "Cosine similarity across 5-year periods",
-    subtitle = "coal  ~  emissions",
-    x = "5-year period", y = "Cosine similarity (−1 to 1)"
-  )
-
-
+  labs(title = "Cosine similarity across 5-year periods",
+       subtitle = "coal  ~  emissions",
+       x = "5-year period", 
+       y = "Cosine similarity")
 ```
 
