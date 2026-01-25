@@ -830,7 +830,6 @@ Although it is poossible clean the entire dataset before narrowing it down, doin
 1) In the code above, we searched for 5-word phrases that reference "the people." Use the code to find two-word phrases in 1830, 1840, 1850, and 1860 that reference "meeting."  Write a paragraph, quoting at least 10 phrases from each decade.  For each of the phrases mentioned more than five times, describe what prejudices, positive or negative, the phrase encapsulates. Use your evidence to answer the question: how did parliamentary references to meetings change between 1830 and 1860?  
 
 Tips: Instead of joining every decade together, process the decades separately to avoiding using all your computer's resources. 
-
 2) In the code above, we created two kinds of timelines, one for 1867 using a controlled vocabulary of words such as "meeting" and the other for the 1830s using the list of historical events, `eventlist`. Make two more timelines.  Apply the controlled vocabulary to the 1830s, and search for the items in `eventlist` in the 1860s. Use the code above to graph the results. Keep in mind that you will need to adjust your controlled vocabulary to what you find in the data.  
 
 3) Analyze the results of your timelines.  Use iterative investigations of phrases, as modeled above, to conduct a distant reading of the parliamentary speeches.  Using at least ten examples, compose a one-page essay investigating the question: how did parliamentary speakers use references to contemporary and historical events to make arguments for or against political change?

@@ -1,24 +1,66 @@
 ---
-title: "AI Interlude 1"
+title: "AI Mini Chapter: Iteration as Method in Exploratory Data Analysis"
 output: pdf_document
+header-includes:
+  - \usepackage{tcolorbox}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Iteration as Method in Digital History Research
+Iteration is a core method in digital humanities (DH) research, positioning inquiry as a cyclical process in which writing code, inspecting data, and interpreting visualizations are repeatedly undergone in response to an analyst's emerging insights. With the introduction of generative AI-based tools, iteration in DH extends beyond the cyclical processes of writing code and inspecting visualizations. Large language models (LLMs) can be used to generate content--such as code or suggestions for brainstorming--requiring a new approach to iteration to incorporate critical reflection on prompt refinement, model behavior, and evaluation of AI-generated outputs.
 
-This AI mini-chapter is about the iterative process of writing and revising code, such as by refining prompts, testing and critiquing AI results, and revisiting corpus context to use close reading to iterate on our understanding. 
+In this section, iteration is introduced as a method in computational humanities research (Tabak 2017). This approach emphasizes using AI to generate content while performing repeated returns to corpus context, showing how computational analysis and close reading work together to inform and reshape interpretation. Iteration will be paired with Exploratory Data Analysis (EDA), a process through which we construct a high-level overview of the corpus, engage in iterative refinement, and draw upon preliminary findings to inform more focused, in-depth investigations. 
 
+Up to this point we have written our own code without use of generative AI-based tools like a LLM. Working through the process of writing one's own code step-by-step provides knowledge of the underlying concepts and processes behind working with text as data. Understanding the premise behind code syntax, functions, and how they tie back to data processing enables us to translate research questions into code and actualize our analytic goals. With an established foundation knowledge of data processing we can begin to use generative AI-based tools, like AI chatbots, in a productive and critical way. In this "AI minichapter" we use ChatGPT, though a similar approach could be applied to other AI-based chatbots, including open-source models such as Meta's LLaMA.
 
+# Iteration and Exploratory Data Analysis with AI 
 
-Working through the process of writing your own code step-by-step provides insight into the underlying concepts and processes behind working with text as data. Understanding the premise behind syntax, functions, and how they tie back to data processing enables us to actualize our analytic goals. With this knowledge of data processing we can begin to use AI chatbots in a meaningful and critical away. Here, we iterate on our analyses by practicing with the AI chatbot, ChatGPT. In future chapters we will engage different AI chatbots, like open source ones. 
+In practice, exploratory data analysis often begins with diagnostic step: generating simple summaries that reveal dominant patterns, repetitions, and sources of noise in the corpus before any interpretive claims are made. Here, counting words serves a different purpose than in interpretive text analysis. Rather than being used to support historical interpretation, we will think of word counts as functioning diagnostically, helping us understand the attributes of the dataset and informing later decisions about preprocessing and analysis.
 
-This chapter has demonstrated how to perform exploratory data analysis, a process through which we construct a high-level overview of the corpus, engage in iterative refinement, and draw upon preliminary findings to inform more focused, in-depth investigations. We can also use AI chatbots in this process by facilitating brainstorming and supporting iterative analysis through the automation of tasks. For instance, in this chapter we removed stop words (e.g., "the" or "and") from our dataset, which significantly improved the clarity of our results. We can also use ChatGPT to generate additional stop words, specifically attuned to the linguistic characteristics of 19th-century Hansard.
+While we have already counted words, here it serves a different purpose. As an initial step in exploratory data analysis, we ask a deliberately simple diagnostic question: Which words appear most frequently in the 1850 Hansard debates? By applying minimal preprocessing, we aim to observe the corpus in an unfiltered state and identify dominant structural patterns rather than interpretive themes.
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(hansardr)
+library(kableExtra)
+
+data(hansard_1850)
+
+tokenized_hansard_1850 <- hansard_1850 %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  slice_max(n, n = 20)
+
+tokenized_hansard_1850
+```
+
+At this exploratory stage, a raw word count is not intended to produce interpretation. Instead, it exposes a central characteristic of the corpus: the abundance of articles and function words. This diagnostic result signals the need for preprocessing steps—such as stop-word removal—to clarify patterns relevant to historical inquiry.
+
+```{r}
+data(stop_words)
+
+tokenized_hansard_1850 <- hansard_1850 %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  count(word, sort = TRUE) %>%
+  slice_max(n, n = 20)
+
+tokenized_hansard_1850
+```
+
+We can also use AI chatbots in this process by facilitating brainstorming and supporting iterative analysis through the automation of tasks. For instance, while we already removed stop words (e.g., "the" or "and") from our dataset, which significantly improved the clarity of our results. We can also use ChatGPT to generate additional stop words, specifically attuned to the linguistic characteristics of 19th-century Hansard. 
+
+At this exploratory stage, patterns in the data raise new questions rather than provide answers. The prominence of procedural and honorific language suggests that additional preprocessing may be necessary to clarify topical signals. Rather than relying on a fixed or generic stop-word list, we can treat this decision itself as part of the exploratory process.
+
+## Exploratory Exercise: Proposing Corpus-Specific Stop Words
+
+Here we use ChatGPT for brainstorming during exploratory data analysis, not to produce authoritative responses, but to suggest stop words that can then be evaluated, refined, or rejected through our knowledge of the corpus and by reflecting on our research direction. 
 
 \begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt]
-Act like an R Programmer and generate a list of stopwords to be removed for an analysis of the 19th-century Hansard corpus.
+Generate a list of stopwords to be removed for an analysis of the 19th-century Hansard corpus.
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=ChatGPT-4o Response]
@@ -30,9 +72,15 @@ custom_stopwords <- c("lord", "lords", "hon", "mr", "sir", "gentleman", "gentlem
 \end{verbatim}
 \end{tcolorbox}
 
-Before removing the stop words, we can think critically about whether or not the generated results align with our own analytic goals. We may, for example, want to keep the word "government" if we wanted to analyze this word's collocates. 
+Before removing the stop words, we can think critically about whether or not the generated results align with our own analytic goals. For example, the word "government" appears frequently in parliamentary debate and may function as procedural language in some contexts that can be safely removed for analysis. However, if the research question involves examining how political authority is framed, contested, or attributed, retaining this word becomes necessary in order to analyze its collocates and surrounding rhetorical patterns.
 
-Throughout this book we will explore multiple different ways we can use AI chatbots to the benefit of our workflows. For example, we can also use it during brainstorming to help us decide which keywords we may want to analyze. 
+This reflective step reinforces an important principle of exploratory data analysis: preprocessing decisions are provisional and question-dependent rather than fixed or universal. Words that operate as noise in one analysis may serve as signal in another. AI-generated stop-word lists should therefore be treated as hypotheses to be tested through inspection, rather than rules to be applied automatically.
+
+In practice, this means iteratively revisiting preprocessing choices like stop words removal as analytic focus sharpens. A researcher may begin by removing a broad set of procedural terms, then selectively reintroduce specific words—such as government—to examine their contextual usage, collocates, or shifts in meaning across debates. This back-and-forth movement between diagnostic exploration and focused analysis exemplifies how exploratory data analysis supports interpretive work in digital history.
+
+## Exploratory Exercise: From Overview to Focus
+
+Building on the exploratory data analysis practices introduced above, this exercise demonstrates another way AI chatbots can support analytical workflows during the early stages of research by suggesting topics to further explore. As with diagnostic word counts, the goal here is not interpretation but orientation and exploration of the data. We use AI as a brainstorming tool to help scope potential areas of inquiry by proposing candidate words for further investigation. These suggestions serve as provisional starting points that guide subsequent analysis, rather than as definitive claims about historical significance.
 
 \begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=User Prompt]
 I want to text mine and analyze heated topics from within the 1850 Hansard Parliamentary debates. Suggest several keywords that might be interesting.
@@ -64,7 +112,7 @@ When analyzing the 1850 Hansard Parliamentary debates for heated topics, you'll 
 These keywords should help you identify debates that were particularly heated or significant during that time. You can further refine your analysis by focusing on specific phrases or related terms within these broader topics.
 \end{tcolorbox}
 
-This response provides us with an overview of other critical, interrelated topics. Treating these debate topics as keywords can lead to additional, meaningful analyses. To demonstrate this, we will use the code introduced previously in the chapter to identify the context for the word "Irish" 
+This response offers a high-level overview of potentially interesting topics within the corpus. Treating these themes as candidate keywords allows us to move from exploratory scoping to more focused analysis. To demonstrate this transition, we use the code introduced earlier in an earlier chapter to examine the lexical context surrounding the term Irish in the 1850 Hansard debates.
 
 ```{r, warning=FALSE, message=FALSE}
 irish_context <- hansard_1850 %>% 
@@ -91,25 +139,28 @@ ggplot(data = top_irish) +
        y = "Count") 
 ```
 
-In this chapter, we used computational historical thinking as a method for examining change over time. We integrated historical theory, code, and artificial intelligence (AI) in a hybrid method of analysis. This method is co-creative: it brings attention to how data processing techniques shape historical analysis, while also recognizing that interpretive insights can lead us to revise our computational approach. In doing so, it emphasizes the dynamic interplay between computation and historical interpretation.
+[Needs more analysis -- do students have feedback?]
 
-In the chapters that follow, we will build on this foundation by introducing more advanced techniques. We will also critically examine how AI is used in historical research. A key question we will explore is whether current AI chatbots can generate meaningful historical interpretations of 19th-century Parliamentary debates.
+## Exploratory Exercise: Brainstorming Historical Events
 
-While AI offers powerful tools for exploratory analysis, we will also examine the limitations of using AI chatbots as an approach to computational text analysis, including the conditions under which they may produce inaccurate or misleading interpretations of history. 
+We can use AI chatbots to assist with identifying additional historical events for analysis by working within a controlled vocabulary. Rather than generating open-ended interpretations, the chatbot is guided to propose candidate events that align with previously defined analytic criteria. This approach supports iterative exploration while ensuring that the scope of inquiry remains grounded in the analyst's existing interests. 
 
+Here, we prompt the chatbot to suggest events that may be relevant to the study of war-related language in the year 1840. To constrain and focus the response, we provide examples drawn from the an eventslist dataset, which functions as a reference vocabulary for the types of events of interest.
 
+```{r}
+data(hansard_1840)
+data("events")
 
+eventslist <- events %>% 
+distinct(event_name, scholar_assigned_date) %>% 
+filter(!scholar_assigned_date > 1840) %>% 
+mutate(event_name = tolower(event_name)) %>%
+select(event_name, scholar_assigned_date) 
 
+head(eventslist)
+```
 
-## Practicing with AI 
-
-Throughout this book, we emphasize the importance of an iterative approach to analysis. During this iterative process we can refine one's own understanding of the data by revisiting the original records, or by questioning one's assumptions of historical interpretation through interrogative processes that build upon one-another. 
-
-AI chatbots can support iterative research, too, by supporting an interactive bnrainstorming process. Analysts can ask questions, review responses, and adjust their queries, engaging in a cycle of exploration and refinement. When used this way, an AI chatbot is guided by the analyst to generate focused, relevant responses. The analyst must also critique the chatbot’s output to ensure it is accurate and useful. This approach allows analysts to use AI chatbots as a tool for inquiry while maintaining control over the research process.
-
-In the following example, we use our queries from earlier in the chapter to guide an AI chatbot in helping us to brainstorm additional events that we might want to explore. Specifically, we ask the chatbot to generate additional events that might be of interest to someone studying language relating to war in the 1860 Hansard debates. We will guide the chatbot's response by giving it an example of the types of events that interest us taken from the `eventslist` dataset.
-
-The template we provide the chatbot (e.g. "return your answer in this fomrat...") instructs it to return its response in the specified format. 
+To structure working with ChatGPT, we provide it with a template specifying the required output format. Providing this constraint in the prompt helps standardize the output, making it easier to inspect. 
 
 \begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Analyst Prompt] I am providing you with a list of events followed by their year. The purpose of this list is to analyze key events that were mentioned in the 1860 Hansard debates. Name some different events that might be relevant based on the list I provide you. Don't mention the same as provided by the list. Also provide a reason for why the events are relevant. 
 
@@ -305,3 +356,17 @@ print(event_counts)
 ```
 
 
+# Conclusion 
+
+In this chapter, we operationalized iteration as a core method in digital humanities research by integrating historical theory, code, exploratory data analysis, and artificial intelligence into a single, cyclical workflow. Rather than treating AI as a replacement for scholarly interpretation, we positioned generative AI-based tools as participants in an iterative process that requires repeated inspection of data, returns to corpus context, and critical evaluation of AI-generated outputs.
+
+By pairing iteration with exploratory data analysis, we demonstrated how high-level diagnostic exploration can inform subsequent analytic decisions, and how provisional findings can guide more focused investigations. Throughout the chapter, AI was used to support this process—assisting with brainstorming, proposing preprocessing strategies, and accelerating iteration—while interpretive judgment remained grounded in close reading and historical expertise.
+
+The chapters that follow build on this foundation by introducing more advanced computational techniques and by examining, in greater depth, how generative AI reshapes iterative research practices in the humanities. A central question we pursue is whether—and under what conditions—current AI chatbots can meaningfully contribute to the interpretation of nineteenth-century Parliamentary debates, and how scholars might critically assess those contributions.
+
+While generative AI offers tools for exploratory analysis and iteration, it also introduces new methodological and epistemic risks. Accordingly, we will continue to examine the limitations of AI-assisted approaches to computational text analysis, paying particular attention to the moments when AI-generated suggestions must be interrogated, revised, or rejected in order to sustain historically grounded and responsible interpretation.
+
+New citations for cabot: 
+
+Tabak, Edin. 2017. “A Hybrid Model for Managing Digital Humanities Projects.” Digital Humanities Quarterly 11 (1).
+Roopika risam new digital worlds 
