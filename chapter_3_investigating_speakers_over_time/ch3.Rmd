@@ -3,6 +3,7 @@ title: "Chapter 3: Investigating Speakers and Change Over Time Using Grouped Dat
 output: 
   pdf_document:
     number_sections: false
+always_allow_html: true
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{chngcntr}
@@ -307,12 +308,16 @@ data("debate_metadata_1830")
 
 hansard_1830_w_year <- hansard_1830 %>% 
   left_join(debate_metadata_1830) %>%
-  mutate(year = year(speechdate))
+  mutate(year = year(speechdate)) 
+
+hansard_1830_w_year %>%
+  head() %>% 
+  kable()
 
 hansard_1830_w_year %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>% 
-  kable("latex", booktabs = TRUE) %>%
+  kable("html", booktabs = TRUE) %>%
   kable_styling(full_width = FALSE, position = "left") %>%
   column_spec(2, width = "6cm") %>% 
   column_spec(4, width = "4cm")
@@ -419,6 +424,496 @@ ggplot(data = mrs_walrand_top_words,
        x = "Word",
        y = "Count")
 ```
+## Investigating an Event
+
+Next, let's move towards investigating an event.
+
+First, let's organize the data into two groupings -- the words spoken prereform and those spoken postreform.
+
+```{r, echo=FALSE}
+# make two categories, pre- and post-reform
+
+debate_metadata_1820 <- debate_metadata_1820 %>% 
+  mutate(speechdate = as.Date(as.character(speechdate)))
+
+debate_metadata_1830 <- debate_metadata_1830 %>% 
+  mutate(speechdate = as.Date(as.character(speechdate)))
+
+debate_metadata_1840 <- debate_metadata_1840 %>% 
+  mutate(speechdate = as.Date(as.character(speechdate)))
+
+hansard_1820 <- hansard_1820 %>%
+  left_join(speaker_metadata_1820) %>%
+  left_join(debate_metadata_1820) 
+
+hansard_1830 <- hansard_1830 %>%
+  left_join(speaker_metadata_1830) %>%
+  left_join(debate_metadata_1830) 
+
+hansard_1840 <- hansard_1840 %>%
+  left_join(speaker_metadata_1840) %>%
+  left_join(debate_metadata_1840) 
+
+hansard <- bind_rows(hansard_1820, hansard_1830, hansard_1840)
+
+# find all the prereform text and speaker names
+prereform <- hansard %>% #hansard_1830 %>%
+  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+  filter(speechdate <= as.Date("1832-6-4")) %>%
+  filter(speechdate >= as.Date("1822-6-4")) %>%
+  mutate(year = year(speechdate)) %>%
+  mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>% # the "coalesce" function replaces a NA in the suggested_speaker column with whatever is in the speaker column
+   # filter(!is.na(speaker)) %>% ## a different count will result if we use this line as an alternative to the above
+  mutate(period = "prereform")
+
+# find all the postreform text and speaker names
+postreform <- hansard %>% #hansard_1830 %>% 
+  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+  filter(speechdate >= as.Date("1832-6-4")) %>%
+  filter(speechdate <= as.Date("1842-6-4")) %>%
+  mutate(year = year(speechdate)) %>%
+  mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>% # the "coalesce" function replaces a NA in the suggested_speaker column with whatever is in the speaker column
+  #filter(!is.na(speaker)) %>% ## a different count will result if we use this line as an alternative to the above
+  mutate(period = "postreform")
+```
+
+Let's break the data up into individual words and count how many words are in each category.
+
+```{r, echo=FALSE}
+# tokenize words (this may be slow -- give it time)
+prereform_words <- prereform %>% 
+  unnest_tokens(word, text) 
+  
+postreform_words <- postreform %>% 
+  unnest_tokens(word, text) 
+
+# count the words
+prereform_word_count <- prereform_words %>%
+  anti_join(stop_words) %>%
+  group_by(word) %>%
+  summarise(wordcount = n()) %>%
+  ungroup() %>% 
+  arrange(desc(wordcount))  %>%
+  mutate(period = "prereform")
+
+postreform_word_count <- postreform_words %>%
+  anti_join(stop_words) %>%
+  group_by(word) %>%
+  summarise(wordcount = n()) %>%
+  ungroup() %>%
+  arrange(desc(wordcount)) %>%
+  mutate(period = "postreform")
+
+# glue the data together 
+both_periods_word_count <- bind_rows(prereform_word_count, postreform_word_count) 
+
+# tell the computer to put the periods in the correct order
+both_periods_word_count$period <- factor(both_periods_word_count$period, levels = c("prereform", "postreform"))
+
+# add up the total words for each period
+both_periods_word_count_totals <- both_periods_word_count %>%
+  group_by(period) %>%
+  summarize(total = sum(wordcount))
+
+
+# create a bar chart
+library(scales) # a library useful for formatting numbers
+
+ggplot(both_periods_word_count_totals, aes(x = period, y = total)) +
+  geom_col((aes(fill = period))) +
+  scale_fill_grey() +
+  scale_y_continuous(label=comma) +
+  geom_text(aes(label = (paste0(scales::comma(total), " words"))),
+            colour = "white",
+            vjust = 1.5) +
+  labs(title = "How Many Words Were Spoken in Each Period?", x = "", y = "words")
+
+```
+
+Many more words were spoken in the ten years after the reform than the ten years before. How many more? Text mining means we never have to guess.
+
+
+```{r, echo=FALSE}
+# subtract the prereform total wordcount from the postreform total word count to find the difference
+both_periods_word_count_totals$total[2] - both_periods_word_count_totals$total[1]
+```
+
+Next, let's look at the actual words spoken in each period and see how they compare.
+
+```{r, echo=FALSE}
+# top words
+top_words <- both_periods_word_count %>% 
+  group_by(period) %>%
+  slice_max(order_by = wordcount, # put the words in descending order by "wordcount," the column for the count
+            n = 10) # the argument "n" for the function "slice_max" takes the number of positions from the top to retain
+
+library(gt)
+# make a table
+top_words %>%
+  gt() %>% # we're using the "great tables" package to make an elegant table
+  fmt_number( # format the numbers in the table
+    columns = everything(), # apply to all numbers
+    decimals = 0, # no decimals
+    use_seps = TRUE # use commas
+  ) %>%
+  tab_header(title = "The Top Ten Words Spoken in Prereform and Postreform Parliament") %>%
+  tab_style(
+    style = list(cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) %>%
+  tab_style( # format the column labels
+     style = list(
+        cell_fill(color = "black"),
+        cell_text(weight = "bold", color = "white")
+        ),
+      locations = cells_column_labels()
+     ) %>%
+    tab_style( # format the title
+      style = list(
+        cell_fill(color = "lightgray"),
+        cell_text(weight = "bold")
+        ),
+      locations = cells_title()
+      )
+```
+
+The analyst will discern that there are only very minor differences between the top words of both categories. What are we to make of that?  
+
+We should begin by admitting that these words tell us little that's new about parliament or history. The word "house" was frequently used in parliament to refer to the House of Commons and House of Lords, the two chambers of parliament. Members of the houses traditionally addressed each other as "honorable sir" (abbreviated "hon" in Hansard) and (when addressing peers of the realm) "noble sir," "noble sirs," or "my lord." The general matters of parliament concerned the state of the "country," the passing of "bills" into law, the activities of the "goverment," various other "subjects," and the official matter of "questions" -- a formal category of address about the business of parliament. To find the top words offers no real insight to any analyst who understands the basic business of parliament. 
+
+The only apparent difference in this table occurs in the words "time" -- a top-ten word prereform but not postreform -- and "Ireland" -- a top-ten word postreform and prereform. If we looked at more than the top-ten words, even these differences would likely appear slight; the two words missing in this table are almost surely in the top twenty list for both periods -- something we can easily check by adjusting the command *slice_head(n=10)* from 10 to 20.
+
+In short, this step provides us with what data scientists refer to as a "validation" -- that is, we have confirmed that the method of counting words tells us that the speech of parliament concerns the business of parliament. 
+
+This kind of validation step is crucial to knowing that we are on the right track. If our attempt at counting (or any other statistical analysis) suggested that parliamentary speech in general concerned squids, whales, and cephalopods, or even obscure names of towns in Ireland, we would guess that something had gone wrong. Throughout the process of data analysis, we should use basic statistical measures as validation that the general idea is working. If our analysis tells us anything that doesn't make sense, we should rush to check our method -- not revisit the laws of history. 
+
+### Strategies for Reaching Insight 
+How do we move from validation to insight?  There are many strategies. Let's think through several:
+
+* 1) We can read a longer list of top words for each period, for instance the top 500 instead of the top 10. Keeping track of minute changes may tell us something. On the other hand, there will be a great many words to look at. If the differences are slight (like a #9 vs a #12 position for a certain word from one period to the next) we risk losing track of which words are important for which periods.
+* 2) We can look at other aspects of the dataset, for instance the speaker column, asking how many words were spoken by each speaker in the prereform and postreform periods.
+* 3) We can use a variety of statistical methods to aggregate information about the speakers that were the most different and the words whose expression was most different in the prereform and postreform periods.
+
+In the sections that follow, we will undertake each of these steps in turn. They will give us different answers.
+
+Step #1 is easily accomplished by a quick adjustment in code, tweaking the command *slice_head(n=10)* from 10 to 500. Please change the command for youself and inspect the results. Is it easy to interpret them?
+
+Step #2 is easily accomplished by revisiting the code in greater depth. We won't need any new commands, but we will need to apply the functions we've already seen -- group_by, summarize, and n() -- to the "speaker" field rather than the "year" field. 
+
+Let's do that now to answer the question, how many words did each speaker speak in the prereform and postreform period?
+
+## Investigating Speakers' Wordcounts, Pre- and Post-Reform
+
+```{r, echo=FALSE}
+# count words per speaker per year 
+prereform_speakers_wordcount <- prereform_words %>%
+  filter(str_trim(suggested_speaker) != "") %>%
+  group_by(suggested_speaker, year) %>%
+  summarize(wordcount = n()) %>%
+  ungroup() %>%
+  mutate(period = "prereform")
+
+postreform_speakers_wordcount <- postreform_words %>%
+  filter(str_trim(suggested_speaker) != "") %>%
+  group_by(suggested_speaker, year) %>%
+  summarize(wordcount = n()) %>%
+  ungroup() %>%
+  mutate(period = "postreform")
+
+# glue them together
+both_periods_speakers <- rbind(prereform_speakers_wordcount, postreform_speakers_wordcount)
+
+# inspect the data
+head(both_periods_speakers)
+```
+### Questions About Data Quality
+
+***STEPH -- some notes about speaker data quality would be good here.  Lots of variation in quality -- including "A Member" who only spoke 8 words. Maybe give a history of how we cleaned the data, how good it is, and the mechanisms available for improving the data. 
+We could also use this opportunity to help users to analyze what's strong, what's less strong about the data. Looks like there are some irregularities that the team could have found if they'd just deleted punctuation (e.g. "A Member" and "A Member. ---"; presumably "The Earl of Carnarvon" ).
+
+Because the team concentrated on speakers who sopke frequently, the data is much better if we look at the speakers who contributed more than a few sentences.
+
+```{r, echo=FALSE}
+# take the top speakers by wordcount
+words_per_speaker <- both_periods_speakers %>%
+  group_by(suggested_speaker) %>%
+  summarize(wordsperspeaker = sum(wordcount)) 
+
+top_speakers <- words_per_speaker %>%
+  slice_max(wordsperspeaker,
+            n = 5)
+
+# inspect the data      
+top_speakers
+```
+Here we can see one potential problem -- Lord Henry Brougham appears both as "Lord Brougham" and as "henry_brougham_1679" when in reality these are both the same person. The majority of speakers look much better, though.
+
+## Investigating Speaker Wordcount With Joins
+
+With the data frame both_periods_speakers, we have wordcounts for each speaker for pre- and postreform. There's a great deal we can do with this data. First, let's perform some basic counts to help us to understand, in raw numbers, the basic features of prereform and postreform parliament.  
+
+We'll start by asking how many members of parliament stood for the ten years pre and post reform. We will label each with a "class" called "prereform only," "postreform only," or "continuous speakers." Note that these "classes" are fundamentally different than the "period" categorization we applied above, where we labeled speeches given before the 1832 reform law as "prereform" and those after the law as "postreform." Instead of labeling the years, we want to identify the speakers that spoke only in one period or the other, and those who spoke in both. 
+
+To identify these speakers, we will begin by returning to an earlier data frame -- "prereform_speakers_wordcount" -- and using a process called a "join" to exclude those speakers who also appear in the dataset "postreform_speakers_wordcount."  
+
+Information scientists theorize several ways to combine data through what is called "set theory." Two of the simplest joins are known as the "union" of two sets -- what they have in common -- and the "difference" between two sets -- what is in one but not the other. 
+
+To find the prereform-only and postreform-only speakers, we will find the "difference" between the two sets by using a function named "anti_join()."  The anti_join() function excludes from one dataset all the data that appear in a second dataset.  If we begin with a dataset of all members of parliament who spoke prereform and perform an "anti-join" with the set of speakers who spoke postreform, the resulting dataset is a list of speakers who *only* spoke prereform.
+
+```{r, echo=FALSE}
+# Use counting to investigate how many distinct speakers are in the data, pre and postreform
+
+# How many speakers were there prereform?
+prereform_only_speakers <- prereform_speakers_wordcount %>%
+  select(suggested_speaker) %>%
+  anti_join(postreform_speakers_wordcount, by = "suggested_speaker") %>%
+  mutate(class = "prereform only") 
+
+# inspect the data
+head(prereform_only_speakers)
+```
+How many speakers are there in our dataset? To answer the question, we just need to know the number of rows, given that the dataset lists one distinct speaker for each row. The function *nrow()* will provide an answer to how many rows there are in any dataset.
+
+```{r, echo=FALSE}
+# count the number of speakers in the dataset
+nrow(prereform_only_speakers)
+```
+
+Performing the same operation again, beginning with postreform speeches and removing the rows of data that appear prereform, yields a dataset of speakers who *only* spoke after the reform.
+
+```{r, echo=FALSE}
+# How many speakers were there postreform?
+postreform_only_speakers <- postreform_speakers_wordcount %>% 
+  select(suggested_speaker) %>%
+  anti_join(prereform_speakers_wordcount) %>%
+  mutate(class = "postreform only") 
+
+# inspect the data
+head(postreform_only_speakers)
+```
+
+How many speakers were there postreform?
+
+```{r, echo=FALSE}
+# count the number of speakers in the dataset
+nrow(postreform_only_speakers)
+```
+
+
+We now have two sets of numbers -- the count of unique speakers who spoke 1822-32 and 1832-42. These numbers are new to history; there has never before been a count of these speakers. We can learn something from them. Before text mining, it was impossible to get a real impression of how many speakers were active in parliament before and after 1832.  But the simple ability to count allows us to add detail to our accounts of the reform and its mechanisms.
+
+
+The basic finding is that there were more speakers after the reform period. This makes sense, because the reforms of 1832 introduced more popular consent into the democratic process. No longer were members appointed in "pocket buroughs" by aristocrats who held the sole authority for electing the representative. Now, all seats were open to a popular vote (albeit of those rich enough to pay at least £10 per year in taxes -- no mean sum). If we know that the number of seats  in the House of Commons were set at 658 before and after the reform (which we learn by consulting a secondary source, XXXXXX), the numbers tell us that this reform introduced more variation and turnover in who occupied the seats of parliament.
+
+Substantively more different members of parliament were elected in the ten years following 1832 than in the decade before. *How many more members were there among the postreform only members than the prereform only members?*
+
+```{r, echo=FALSE}
+nrow(postreform_only_speakers) - nrow(prereform_only_speakers)
+```
+
+
+We can also investigate speakers from a third category -- those who were continuously in parliament, who held office before the reform and who were able to secure election after the reform as well. How many such speakers were there? 
+
+Please note that we do not have the data to ask which members of parliament who held office before 1832 were *elected* to office after 1832. We do not have the data to support that question. What we have in Hansard is only a record of who was recorded as having *spoken.* This is a rather more discrete query, because not every elected member actually speaks when they are in office, and some of those who spoke might have spoken so little that the clerks recording speeches took no notice of what they said. 
+
+Because recorded parliamentary speech is an index of importance, the members who were recorded as having spoken before and after 1832 offers a list of those members who were important enough to have taken notice of the public in both periods. This is a good proxy for which members mattered in the public imagination *and* met the criterion for having been elected both before and after the reform.  Do we imagine this number to have been large or small? 
+
+We might guess that it was vanishingly small, because a reform of historical significance could have swept away all incumbents. On the other hand, many historians of the 1832 Reform Bill have pointed out that it didn't shift the election process so drastically as had once been assumed. 
+
+In any case, to identify the speakers who appear in both the prereform and postreform datasets, we will use another function -- inner_join() -- to identify what is known as the "intersection" of the two datasets. That is, we are looking for speakers who occupy a row in both the *prereform_speakers_wordcount* data frame and the *postreform_speakers_wordcount* data frame. The syntax for inner_join() is just like that of anti_join(), but the result is to *keep* rows that appear in both datasets, not to exclude those rows.
+
+```{r, echo=FALSE}
+# How Many Members of Parliament Spoke Both Prereform and Postreform?
+continuous_speakers <- prereform_speakers_wordcount %>%
+  distinct(suggested_speaker) %>%
+  inner_join(postreform_speakers_wordcount) %>%
+  ungroup() %>%
+  mutate(class = "both periods") %>%
+  distinct(suggested_speaker, class)
+
+nrow(continuous_speakers)
+```
+
+We now have actual numbers for the members of parliament recorded as only having spoken before the reform, those who were recorded as only having spoken after the reform, and those who were recorded as having spoken both before and after the reform.
+Let's represent our results visually.
+
+```{r, echo=FALSE}
+# Count the number of speakers in each category
+
+# glue together the data from each smaller dataset
+all_classes <- rbind(prereform_only_speakers, postreform_only_speakers, continuous_speakers)
+
+# group by period and count the number of speakers
+all_classes_count <- all_classes %>%
+  group_by(class) %>%
+  summarize(speakercount = n()) %>%
+  arrange(desc(class))
+
+# tell the computer to put the periods in the correct order
+all_classes_count$class <- factor(all_classes_count$class, levels = c("prereform only", "postreform only", "both periods"))
+
+# create a bar chart
+ggplot(all_classes_count, aes(x = class, y = speakercount)) +
+  geom_col((aes(fill = class))) +
+  scale_fill_grey() +
+  geom_text(aes(label = paste0(speakercount, " speakers")),
+            colour = "white",
+            vjust = 1.5) +
+  labs(title = "How Many Speakers are in Each Category?", x = "", y = "speakers")
+```
+
+Certain caveats are important for interpreting this number. While the speaker data gives us reliable insights into relative trends in membership and speech, the numbers are only so good as our dataset. 
+
+One of the great advantages of text mining is that we can analyze not just the speakers in parliament, but the consequences of the 1832 Reform Act for what was spoken about in parliament. Let's begin by asking what parliament spoke about before and after the reform.
+
+
+## Working With Word Count
+
+```{r, echo=FALSE}
+## Using Word Count: 
+## How much did speakers speak before and after the reform act?
+
+# glue the data together for processing
+all_per_speaker_wordcounts <- bind_rows(prereform_speakers_wordcount, postreform_speakers_wordcount) %>%
+  ungroup() 
+
+# create a database of speaker, year, and wordcount
+all_speakers_annotated <- all_per_speaker_wordcounts %>%
+  left_join(all_classes) %>%
+  filter(!is.na(suggested_speaker)) %>%
+  ungroup() 
+
+# inspect the data
+all_speakers_annotated
+```
+Note that we have created two columns that annotate the speeches and speakers in different ways. The "period" column refers to the year in question -- were the n words said in 1831 prereform or postreform?  The "class" column sorts the speakers themselves -- did this speaker only speak in the prereform years, the postreform years, or in both periods? 
+
+We also have a *wordcount* column that reflects the words each speaker spoke per year. 
+
+Next, let's sort the data to find the speakers who spoke the most per year within each category -- prereform, postreform, and continuously through the periods.  
+
+To do this, we'll want to first create a new column, *wordcount_per_speaker*, which adds together each speaker's total wordcount. If we have multiple "wordcount" columns, we should add information about what each refers to.  To make it less confusing, we'll rename our previous *wordcount* column *wordcount_per_year*. It's good practice to keep renaming fields in our datasets for clarity so that we don't get confused about what they mean. To calculate *wordcount_per_speaker*, we'll use the *group_by()* and *mutate()* functions that we've seen before. Note that we won't use *summarize()* in this case because we still want to keep the *wordcount_per_year()* field upon which the new count is based.
+
+we'll use *group_by()* to group the data by "class," then use the *arrange()* and *slice_head()* functions to take the top wordcounts for each category.  
+
+
+
+
+```{r, echo=FALSE}
+
+# find the total wordcount_per_speaker
+wordcount_per_speaker <-  all_speakers_annotated %>%
+  rename(wordcount_per_speaker_per_year = wordcount) %>% 
+  group_by(class, suggested_speaker) %>%
+  summarize(wordcount_per_speaker = sum(wordcount_per_speaker_per_year)) 
+
+# find the most prolific n speakers of each period
+top_speakers <- wordcount_per_speaker %>%
+  filter(!is.na(suggested_speaker)) %>%
+  group_by(class) %>%
+  arrange(desc(wordcount_per_speaker)) %>%
+  slice_head(n=5) %>%
+  mutate(top = TRUE)
+
+#inspect the data
+top_speakers
+```
+
+## Annotating Our Data
+
+Before we go any further, let's do some work to make the speaker names more elegant. Because of the structure of our data, names that were algorithmically cleaned are labeled with a standardized name and number, e.g. "robert_peel_1665." When we make a graph to share, we'd like to substitute one of Robert Peel's names as given in the text for this awkward string. The names as given in the text are in the *hansard* dataset under the *speaker* column. We can grab any one of them -- minus the titles like "Lord Chancellor" with which some speakers are referenced  -- and it will read like a normal name. The *str_detect()* function is useful for searching for a string. In this case, *!str_detect()* will allow us to throw out names that include titles we don't want to use. The *sample_n()* function is useful here as it tells the computer to select a random pick from a set; in other words, if we've grouped Robert Peel's many possible names, and we have the set "Robert Peel," "Sir Robert Peel," and "Mr. Robert Peel," the computer is instructed to pull out one of these at random.  
+
+After we choose one name to use from the full Hansard list of literal speaker references, we can use these names to annotate the previous dataset, *all_speakers_annotated*, which has the *wordcount* (per speaker per year) and speaker class. 
+
+
+Let's try it.
+
+```{r, echo=FALSE}
+# clean up speaker names
+speaker_key <- rbind(prereform, postreform) %>%
+  select(speaker, suggested_speaker) %>%
+  filter(!str_detect(speaker, "Secretary")) %>%
+  filter(!str_detect(speaker, "Chancellor")) %>%
+  filter(!str_detect(speaker, "Minister")) %>%
+  group_by(suggested_speaker) %>%
+  sample_n(1)
+
+# inspect the data
+speaker_key %>% filter(str_detect(suggested_speaker, "peel_")) 
+
+```
+The results may not be impressive for the vast majority of speakers who spoke very little. But for major speakers like Robert Peel, this *speaker_key* dataset will help us reconcile the many names with which they appeared in the text with one numeric id number, then reconciling that numeric id with one recognizable name from the Hansard transcription.
+
+# Using Left Join to Annotate the Data
+We've previously used set theory and "joins" to find the intersection and difference between two datasets. Here, we'll use another kind of join -- the "union" -- to annotate one dataset with information from another dataset. 
+
+That is, in *all_speakers_annotated*, we have a list of speakers and how many words they spoke every year. If we use *left_join()* to merge that dataset with the dataset *top_speakers()*, we'll have a record of whether each speaker was one of the most prolific speakers in their category. If we use *left_join()* to merge the dataset again with the dataset *speakers_key()*, we'll be able to use the literal transcriptions of speaker names to annotate the visualization later.
+
+The function *left_join()* takes as its first argument the name of the dataset with which we're merging our data. A second optional argument is the "by" argument, which allows us to specify a column or set of columns to use for matching. In the case of the first join, we'll specify two fields, concatenated into a list, using the syntax *by = c("suggested_speaker", "class").* 
+
+```{r, echo=FALSE}
+speakers_w_top_and_speaker_key <- all_speakers_annotated %>%
+  rename(wordcount_per_speaker_per_year = wordcount) %>%
+  left_join(top_speakers, by = c("suggested_speaker", "class")) %>%
+  left_join(speaker_key) %>%
+  distinct()
+
+#*********** STEPH this process generates multiple entires, which is why i resort to distinct(). do you have a more elegant solution? thanks! JG
+
+#inspect the data
+speakers_w_top_and_speaker_key %>% 
+  filter(str_detect(suggested_speaker, "peel_")) %>% 
+  select(speaker, top, year, wordcount_per_speaker_per_year, class) %>%
+  kable()
+```
+
+# Visualize the Results
+
+Sometimes the most effective way of analyzing data is to "inspect" the results of counting, as we have done henceforth. For simple results, like a list of names or words, we prefer a table. 
+
+But for questions about information when several dimensions of data are related to each other -- for instance speaker words over time when speakers have been categorized in three "classes" -- visualization may be useful for conveying how many factors are related to each other. Next, we'll use *ggplot()* to create a visualization of the results as a timeline. 
+
+In the case of the data about speakers before and after 1832, we have rich information that deserves to be represented in an interesting way. We have three categories of speakers -- prereform, postreform, and continuous speakers -- and information about how many speakers are in each category. We also have information about how much each speaker spoke each year.  Can we model this information together and learn something from the result?
+
+in the code block below, we'll create a "dot plot," mapping one point for each of the 10,810 speakers in the data frame. We will use the color and shape of the dots to map the three classes of speakers -- prereform, postreform, and continuous. 
+
+### Contingent labeling
+Because labeling all the speakers would result in an unreadable graphic, we will tell the computer to only label those speakers who are classified as "TRUE" in the column *top*, where we annotated if a speaker was among the top n speakers of each class by wordcount. The syntax for this operation is given inside the parentheses of *geom_label_repel()*, where the coder has an opportunity to point to a new dataset as the source of the text in the labels.  Here, we tell the computer which dots to label and which to leave blank with  the use of *subset(graph_ready, top == TRUE)*. Operations of this type are relatively advanced for visualization, but they are extremely useful for the kind of dense, text-forward information that implementors of text mining often want from their analysis.
+
+If you are new to visualization with *ggplot()*, we encourage you to play around with the code below to understand how the components work. Try changing the size of the dots by adjusting the "size" parameter inside *geom_jitter()*.  Or try changing from a *geom_jitter()* plot to a *geom_point()* plot. For an in-depth tutorial about the powerful *ggplot()* library and the philosophy of the "grammar of graphics" behind it, we encourage you to consult Hadley Wickham, *A Layered Grammar of Graphics,"  *Journal of Computational and Graphical Statistics,* vol. 19, no. 1, pp. 3–28, 2010. 
+
+```{r, echo=FALSE}
+# graph it 
+library(ggrepel) # load a useful package for labeling a dense plot
+
+ggplot(speakers_w_top_and_speaker_key, aes(x = year, y = wordcount_per_speaker_per_year, color = class, shape = class)) +
+  geom_jitter( # it's worth replacing the geom_jitter with geom_point here and in the next line to see the stakes of diff representations
+    size = 3
+    ) +
+  scale_color_grey(guide = guide_legend()) +
+  geom_label_repel(data=subset(speakers_w_top_and_speaker_key, top == TRUE),
+                      aes(label=speaker, color = class)) +
+  guides(fill = "none", label = "none", size = "none") + 
+  theme(legend.position="bottom") +
+  labs(title = "How Much Did Speakers Speak", 
+  subtitle = "Before and After the Second Reform Act of 1832?") 
+```
+# ********* HEY STEPH -- Lord Brougham shows up as both a "both periods" speaker and a "postreform only" speaker, presumably because of a data quality issue. Can you have a look at this and help make sure that the resulting chart doesn't have errors?  And/or maybe include a module on correcting Brougham by hand?
+
+
+What do we learn from this plot?  A great deal. One is about the relatively higher counts of speeches in the 1830s than the 1820s, irrespective of the reform Act.  Speeches by lord Althorp, Robert Peel, and Henry Brougham regularly reached into range of 150,000 to 200,000 words -- which if delivered at breakneck speed would have taken a stunning *fifteen hours* to deliver.  
+
+Even the speeches of lesser speakers were longer in the new decade, stretching towards 50,000 words instead of 20,000 words as the upper limit for most rank-and-file speakers -- meaning that after the reform, multiple speakers each year addressed the house for *five hours* or more at a time. 
+
+We also learn that by and large it was the continuous speakers -- not the prereform-only aristocratic appointees or the postreform-only members elected by the middle class -- who spoke at the greatest length. Represented with black dots, these men included prime ministers like Robert Peel. 
+
+We can also use this visualization to note the few prereform-only speakers who delivered relatively long speeches, for instance Mr. Canning and Mr. Huskisson, the latter important to the Board of Trade, represented by light gray squares. 
+
+Equally exceptional were the few members of parliament elected only after 1832 who spoke with prominence, among them John Roebuck and Frederick Shaw.  These men whose careers were endorsed by reform swam in a sea of seasoned representatives who had first joined parliament in an earlier era.
+
+Note that our visualization is only as good as the quality of the data. Where speakers have not been reconciled correctly -- as is the case with "Lord Brougham" (classified as postreform only), who in reality is the same as "Henry Brougham" (classified as a continuous speaker) -- they may appear as discrete speakers when indeed they are the same. 
+
+
 
 ## Exercises
 
@@ -457,3 +952,14 @@ To get you started, here are a few office positions:
 - Lord Chancellor
 
 4) At the beginning of this chapter, we compared counts are based on the "speaker" column with counts based on the "suggested_speaker" column.  Expand each table to show 30 rows.  How are the two tables different? What are some pros and cons about visualizing the original speaker names and the disambiguated speaker names?  Identify a future research question based on what you learn. 
+
+5) Find the speakers who were referred to by the greatest variety of names in the 1830s. Share the results. Investigate; what characteristics do you think they had in common? AI’s are great for tasks involving linked data — that is , background about individuals — especially for the individuals who are well known and who had published obituaries and biographies, like many members of parliament.  Feed the resulting list to an AI and ask it for input about what they had in common. What did you learn? 
+
+6) Find the speakers who held the highest number of offices in the 1830s.  Share the results.  Then, investigate with AI: what do these individuals have in common? Tell us what you learned.
+
+7) We’ve used a list of speakers’ words over time to investigate many aspects of the data, but let’s go further. For the continuous speakers, almost everyone talks more after the reform. But for whom is the difference how much they spoke pre reform and post reform the greatest? Share your results. Again, use AI to investigate what those speakers have in common. Tell us what you learned.
+
+8) Use your code to identify the continuous speakers who have the greatest difference between the year during which they spoke the most and the year during which they spoke the least.   Share your results. Again, use AI to investigate what those speakers have in common. Tell us what you learned. 
+
+9) Rework the final visualization so that what is labeled are not the top speakers overall, but the top speakers in the prereform and postreform categories.  Show your results.  
+

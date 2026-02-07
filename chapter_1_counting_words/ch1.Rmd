@@ -31,7 +31,9 @@ Recognizing words as evolving and changing--rather than fixed--allows us to glea
 
 The data processing techniques we foreground will lead to our first visualization, where we transform individual utterances or debates into high-level visualizations depicting the frequencies of keywords and their associations.^3^ To achieve this end, we will introduce three basic techniques for processing text. We will: a) access data for the British parliamentary debates of the House of Lords and House of Commons, 1850-59 using the `hansardr` library, b) filter a relevant decade for keywords of interest, and c) count the words that appear in the same context as our keywords in order to study the associations of the keywords in more detail.^4^  
 
-Importantly, the techniques presented in this chapter have both promise and limits.  As our companion volume, _The Dangerous Art of Text Mining_, makes clear, simple word counts are almost never sufficient on their own to support an in-depth analysis of culture.^5^  Nevertheless, knowing how to count words and compare the context with which different concepts are used is a first step to using text as data. Recognizing that langauge contains keywords that can, for example, be chosen by an analyst to guide data processing is a first step towards producing meaning from text data. 
+One common way to study a word's context is through collocate analysis—the identification of words that frequently appear near a given keyword within a specified textual window. These neighboring words, or collocates, provide clues about how a term is used, what associations cluster around it, and how its meaning may shift across time or social settings. For historians, collocates can help reveal implicit assumptions embedded in language: whether a group is discussed in economic, moral, or political terms; whether a concept is framed positively or negatively; or how competing synonyms develop distinct connotations. At the same time, collocates offer only a partial view of meaning. They highlight patterns of association, but they do not by themselves show how words function within sentences or arguments. For that reason, researchers often pair collocate analysis with concordance-style approaches such as Keywords in Context (KWIC), which allow closer inspection of usage in specific passages.
+
+Each of the techniques presented in this chapter have both promise and limits.  As our companion volume, _The Dangerous Art of Text Mining_, makes clear, simple word counts are almost never sufficient on their own to support an in-depth analysis of culture.^5^ Before we count words, we need to decide which words are worth counting. Words are not neutral objects: they are historically conditioned artifacts, shaped by the institutions, conflicts, and assumptions of their time. In nineteenth-century Britain, Parliament was not primarily concerned with tables and chairs; it was actively debating gender, property, citizenship, and empire. Questions such as whether a woman could divorce her husband and retain control over her property, how foreigners and colonial subjects should be classified, or how passports and refugee protections ought to function were not peripheral—they were central to parliamentary business. As a result, the vocabulary of parliamentary debate reflects these struggles. The words we choose to examine in this chapter are therefore guided not only by computational convenience, but by historical judgment: we attend to terms associated with gender, class, nationality, and empire because these concepts structured the problems Parliament was trying to solve. Word counting, in this sense, is not a purely technical exercise; it is an entry point into historically situated questions about power, governance, and social change.
 
 ## R Versions
 
@@ -66,6 +68,24 @@ print("Hello World")
 
 This should display the phrase “Hello World” beneath your code, confirming that R executed the command.
 
+## Getting Help on Functions
+
+When working in R, you will frequently encounter functions you have not used before. A simple way to learn what a function does is to open its documentation. We can read its documentation in RStudio by typing two question marks followed by the function name:
+
+```{r eval=FALSE}
+??function_name
+```
+
+For example, to read the documentation for the `library()` function, run:
+
+```{r}
+??library
+```
+
+This opens a page in RStudio’s Help pane that shows a description of the function and examples of how to use it. 
+
+Learning to consult documentation early will make it much easier to follow the examples in this book and to experiment on your own.
+
 ## Loading the Hansard Data
 
 First we will load the data we wish to analyze. Analysts, programmers, researchers, and the like routinely import software packages developed by others to expand the range of tools available to them.  
@@ -74,7 +94,9 @@ The authors developed a data package to go with this book, `hansardr`, to give r
 
 R also has a large ecosystem of libraries—which are bundles of additional functions, example data, and notes created by the wider R community. Think of libraries as add-ons that expand what R can do. If base R is the core toolkit, libraries contain all the specialty tools others have built for tasks like text analysis, mapping, visualization, or cleaning messy historical data.
 
-To load these specialty tools, we use `library()`, like this. Loading only works after the package has been installed—something we walk through in the "Computer Specifications and Setup" section.
+To load these specialty tools, we use `library()`, like this. Loading only works after the package has been installed—something we walk through in the "Computer Specifications and Setup" section. 
+
+We also placed a hashtag (`#`) followed by text; in R, this indicates a comment, meaning that we included text for explanation that is ignored when the code runs. We use comments to describe what the code does, explain why we made certain choices, or leave notes for our future selves. Here, we included a comment noting that this line of code loads the `hansardr` data package into the R session so its data is ready for use. 
 
 ```{r load_hansardr, message=FALSE}
 # load the hansardr package
@@ -166,38 +188,7 @@ library("tidyverse")
 library("tidytext")
 ```
 
-## Using Functions to Process Data
-
-The primary purpose of a function is to create reusable code, allowing analysts to avoid repeating the same data processing steps over and over. 
-
-From this point on we are going to use more complicated functions from different R packages to process our data. Before we take this next step, however, we first want to provide a basic understanding of a function's underlying components, by creating our own simple function: 
-
-```{r function_demo}
-# define a custom function to add two numbers
-add_numbers <- function(a, b) { 
-  result <- a + b 
-  return(result) }
-```
-
-The above code can be broken down into these core parts: 
-
-1. Function Name: The name given to the function. In this example, the function is named `add_numbers`.
-2. Parameters: The variables listed in the function definition that will accept arguments, for instance, `function(a, b)`.
-3. Body: The code that is executed when the function is called, written here as `result <- a + b`. 
-4. Return Value: The output produced by the function, for example, `return(result)`. 
-
-Every function in R encapsulates a code body, even when it is hidden from the analyst.
-
-We can now use our new `add_numbers()` function by passing arguments to the specified parameters. In this example, the "a" parameter is passed the number 2, and the "b" parameter is passed the number 3. The two numbers are added in the body, and then the results are returned. 
-
-Now that we have defined this function, we can call upon it whenever we need to add two numbers without rewriting the steps involved. This kind of reuse becomes especially important in historical analysis, which is often iterative and rarely linear. As our interpretations shift and our questions evolve, we often return to the same operations with new purposes. Having stable tools like functions allows us to revisit and revise our analyses without starting from scratch each time.
-
-```{r apply_function}
-# use the new function we created to add 2 and 3
-print(add_numbers(2, 3))
-```
-
-To count words in Hansard, we will use a different function, the `unnest_tokens()` function from `tidytext`. While there are many ways to count words over time, one way to do this--that is also very human readable--is to put our data into a format where each word of the text is on a separate row. These individual words are called "tokens." The process of splitting chunks of text into individual units is called "tokenization." While singular words are often called "tokens," a common term used to instead describe multi-word phrases is "n-gram" (such as using the term "bigrams" to describe sequential, two-word phrases). 
+To count words in Hansard, we will use the `unnest_tokens()` function from `tidytext`. While there are many ways to count words over time, one way to do this--that is also very human readable--is to put our data into a format where each word of the text is on a separate row. These individual words are called "tokens." The process of splitting chunks of text into individual units is called "tokenization." While singular words are often called "tokens," a common term used to instead describe multi-word phrases is "n-gram" (such as using the term "bigrams" to describe sequential, two-word phrases). 
 
 In this one-token-per-row format we can easily process our data. This approach to data processing is common in the humanities and handles text using the "Bags of Words" (BoW) approach, where text data is treated as a collection (or "bag") of individual words without regard to grammar, order, or context.^9^ The focus is instead on word frequency or occurrence.
 
@@ -212,7 +203,7 @@ tokenized_hansard <- hansard_1850 %>% # create a new data frame
 
 The above code also has new symbols, called "operators." Operators are essential for data processing. Throughout the course of this book we will introduce multiple different kinds of operators. 
 
-The assignment operator, `<-`, sometimes translated as "gets," points to the output of a function and is followed by the name of an original dataset. The `%>%` operator, called a "pipe," and translated as "next," is used to chain together successive transformations of a dataset. This will make more sense when we cover more examples later in the book.
+The assignment operator, `<-`, sometimes translated as "gets," points to the output of a function and is followed by the name of an original dataset. The `%>%` operator, called a "pipe," and translated as "next," is used to chain together successive transformations of a dataset. We will continue to use operators for data processing throughout the book, and they will begin to make more sense when we cover more examples.
 
 If this is your first time using a programming language for analysis, it can be useful to practice reading each line of code as a sentence of instructions that tells the computer what output to make, what input to use, and what processes to go through in a certain order. We sometimes suggest that first time programmers translate code into a series of English sentences, using their knowledge of the `<-` and `%>%` operators, the names of variables, and their understanding of distinct commands.  The code above be read as follows: "Create a new variable called `tokenized_hansard`.  Start with the dataset `hansard_1850`.  Next, unnest the tokens in the "text" column of `hansard_1850`, unpacking those strings of text into individual words."
 
@@ -239,6 +230,49 @@ head(tokenized_hansard, n=15)
 As part of our data transformation, the output data has a column named "word" for each individual token of the corpus. Notice that the words in `tokenized_hansard` look just like the words in the first sentence of the first speech in `hansard_1850`. Those speeches have been split into individual words, but the words are still in the same order. Notice that the command `unnest_tokens()` has also transformed all the words to lower-case and removed punctuation marks such as commas and periods. This transformation, often called "data cleaning" will make the words easier to count because the computer will not treat words differently based on capitalization or the presence of symbols. 
 
 As we inspect the results of unnesting, one might note that the input to `unnest_tokens()` was "tidy" in format -- that is, it had two columns, one for "sentence_id" and one for "text". After working with `unnest_tokens()`, the resulting output, `tokenized_hansard`, also is "tidy" in format.  That is, it has two columns, one for `sentence_id` and one for `word`.  This tidy format is both easily human readable and also easy to process and count. 
+
+## Lowercasing and Stripping Punctuation
+
+While `unnest_tokens()` automatically converted all tokens to lowercase and removed punctuation for us, there may be situations where we want to perform these steps ourselves—for example, when processing text before tokenization or when applying our own custom cleaning rules. Lowercasing our words ensures they are not treated differently by the computer because of capitalization (e.g., Parliament vs. parliament), and removing punctuation prevents symbols such as commas or periods from being counted as part of a word.
+
+These preprocessing steps help to standardize the corpus, making subsequent analysis—such as counting words—more consistent. FFor example, in `hansard_1850`, sentences often include commas and periods attached to words, and the same word may appear with different capitalization. Both punctuation and case variation can impact our analysis unless punctuation is removed and capitalization is standardized.
+
+```{r}
+hansard_1850 %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>% # wrap long text for readable table output
+  select(sentence_id, text) %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        longtable = TRUE,
+        escape = FALSE) %>%
+  column_spec(2, width = "14cm")
+```
+
+Now we can transform the text to lowercase and strip punctuation. 
+
+```{r}
+# mutate() modifies variables in a dataframe, or creates new ones
+# str_to_lower() transforms text to lowercase
+# str_remove_all() removes all matches of a pattern (here, punctuation) from text
+hansard_1850_clean <- hansard_1850 %>%
+  mutate(text = str_to_lower(text), # lowercase
+         text = str_remove_all(text, "[[:punct:]]")) # strip punctuation
+```
+
+```{r}
+hansard_1850_clean %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>% # wrap long text for readable table output
+  select(sentence_id, text) %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        longtable = TRUE,
+        escape = FALSE) %>%
+  column_spec(2, width = "14cm")
+```
+
+While the cleaning performed by `unnest_tokens()` or `str_to_lower` are important, they can also be deceptive. For instance, if we are interested in how many times speakers refer to the Bank of England (capital B, capital E), we do not want all text lowercased because we want to be able to look for instances of "the Bank" with capitalization preserved. 
 
 ## Counting Words
 
@@ -494,6 +528,8 @@ ggplot(data = top_corn) +
 
 Comparison between Figure 1.1, the words used in the context of coal, and Figure 1.2, the words used in the context of coal, gives us a foothold for beginning to think about how taxation was discussed in different contexts.  For instance, the context of both keywords reference the role of "time", "duties", "taxes", and the "government", but debates over corn are more linked to the question of Britain's dependence "foreign" powers, whereas debates over coal are more crucially related to the condition of "England" itself. 
 
+Discussions of coal and corn (the grain trade) both exhibit common references to taxation, duties, and time. But gaining insight about these discussions requires us to look more carefully at what separates the two discourses. "Coal" is bound up with the word "public" to a greater degree than "corn," an intriguing fact. Historian Fredrik Jonsson reminds us that coal early became a sacred calf to members of parliament as the increasing popularity of heating, even by very poor families, made it became anathema for politicians to threaten to tax coal. We see that discussions of coal strongly represent allusions to vessels and mines. That's because coal required a completely separate infrastructure from other forms of commerce. Coal was heavy enough that it had to be shipped on boats on canals. The canals and railroads had to reach to the remote regions where coal was located. We can see that this infrastructural dimension defines the discussion of coal as distinct from that around the grain trade. Grain could be shipped via wagon, rail, or canal. It could be grown anywhere. It therefore required much less by way of a parliamentary discussion of the oddities of sustaining coal. As Jonsson explains, understanding the public and infrastructural dimensions of coal is crucial, because the large-scale collective investments subsidized by parliament explain how fossil fuels became a "ratchet" -- that is, how once they were adopted it was almost impossible to step back from them, even though contemporaries understood many of the problems that a fossil-fuel economy would pose to health.
+
 Further research would be necessary for an analyst to decide whether comparing these two commodities as keywords is worthwhile, and which collocates offer insight. Nevertheless, at this point we have demonstrated a preliminary process with which most of the analyses in this book will start: by loading data, inspecting data, breaking that data into words, and counting those words. Later chapters will complicate this process, giving us more sophisticated approaches to understanding historical change and change over time. 
 
 This foundational workflow, loading, inspecting, tokenizing, and counting words, lays the groundwork for more nuanced textual inquiries. One such method, which begins to address the limitations of mere frequency counts, is the “Keywords in Context” (KWIC) approach.
@@ -585,11 +621,40 @@ corn_df %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 ```
 
-## Critical Thinking With Collocates
+##  Critical Thinking With Collocates
 
 When is collocate analysis the right method? Researchers of conceptual history frequently use collocates to understand the subtle differences between synonyms.  For instance, historian Ruben Ros has investigated the way that Dutch newspapers in the nineteenth century began to use terms such as "foreign," "overseas," and "strange" in the process of constructing a narrative that increasingly linked the dangers of foreign influence and suspicion of ethnic minorities.^11^  
 
 With collocate analysis alone, we cannot trace discourses over time -- a crucial step in understanding the construction of political and cultural positions. But we can begin to tease apart the meanings of closely-related ideas at various points in the past. We can recreate Ro's approach in miniature here, asking the question: how did British members of parliament in the 1850s talk about foreigners and colonial subjects?
+
+## Creating Functions 
+
+Our research questions might necessitate analytical steps that go beyond the built-in functions provided to us in R packages alone. We may want to create our own functions to customize how words are identified, filtered, or visualized so that the analysis reflects our specific research goals. Or, we might want to create reusable code that keeps us from rewriting the same data processing steps over and over. To demonstrate our point, we are going to write a basic, reusable function for counting and visualizing words. First, however, we want to provide a basic understanding of a function's underlying components, by creating a simple function: 
+
+```{r function_demo}
+# define a custom function to add two numbers
+add_numbers <- function(a, b) { 
+  result <- a + b 
+  return(result) }
+```
+
+The above code can be broken down into these core parts: 
+
+1. Function Name: The name given to the function. In this example, the function is named `add_numbers`.
+2. Parameters: The variables listed in the function definition that will accept arguments, for instance, `function(a, b)`.
+3. Body: The code that is executed when the function is called, written here as `result <- a + b`. 
+4. Return Value: The output produced by the function, for example, `return(result)`. 
+
+Every function in R encapsulates a code body, even when it is hidden from the analyst.
+
+We can now use our new `add_numbers()` function by passing arguments to the specified parameters. In this example, the "a" parameter is passed the number 2, and the "b" parameter is passed the number 3. The two numbers are added in the body, and then the results are returned. 
+
+Now that we have defined this function, we can call upon it whenever we need to add two numbers without rewriting the steps involved. This kind of reuse becomes especially important in historical analysis, which is often iterative and rarely linear. As our interpretations shift and our questions evolve, we often return to the same operations with new purposes. Having stable tools like functions allows us to revisit and revise our analyses without starting from scratch each time.
+
+```{r apply_function}
+# use the new function we created to add 2 and 3
+print(add_numbers(2, 3))
+```
 
 In the following code we create a function for filtering the Hansard data for a keyword, and visualizing the top 20 words. These are the same series of steps we have performed already, but here we are using our function to produce a series of related graphs in succession without writing out the same instructions multiple times.  
 
@@ -603,7 +668,8 @@ Creating a function will allow us to automatically create a series of graphs for
 generate_word_plot <- function(keyword, hansard_data) {
     
     filtered_hansard_1850 <- hansard_data %>%
-      filter(str_detect(text, paste0("\\b", keyword, "\\b"))) %>% # filter rows
+      filter(str_detect(text, regex(paste0("\\b", keyword, "\\b"), 
+                                    ignore_case = TRUE))) %>% # filter rows
       unnest_tokens(word, text) %>% # tokenize text
       anti_join(stop_words) %>% # remove stop words
       filter(!str_detect(word, "[:digit:]")) %>% # remove numeric tokens
@@ -656,7 +722,6 @@ In the results, we see several closely related terms which compose a field of in
 With these terms, a set of binaries is set up by the speakers of Parliament, dividing the world into "barbarian" cultures and "christian" "civilisations," a distinction that may have been analyzed in terms of "rights," "treaties," "war," "rents," "passions," "liberty," and "energies.  The distinctions between the "foreign" and the "barbarian" are invoked in relationship to the same abstractions we saw typifying the "foreign," including  "law," the "country," and "treaties."  We also see the "barbarian" being invoked in discussions of many commodities, including "woolens," "forage," and "rent."  Indeed, the frequent invocation of law, rights, and foreignness alongside discussions of the barbarian and the savage suggests that the judgments ascribed to race actually bled into conversations about law, tariffs, trade, and protectionism, perhaps as justification for invoking British superiority. 
 
 Some readers may assume that we are performing contemporary prejudices about racism, but the point of this exercise is that it is grounded in a detailed and careful examination of the words counted by computational methods. The paragraph above is not concocted out of thin air; it is an objective description of the prejudices on display in a quantitative reading of how British members of parliament spoke about the world beyond their nation.  We emphasize that this analysis of the related language of the "foreign" and the "barbarian" is not concocted on the basis of our readings of contemporary theories about racism, but is actually derived from a careful reading of the language of Hansard, as well as immersion in writing about the history of empire.    
-
 In general, descriptions of arguments made on the basis of word counts tend to be more persuasive when they take on every word in a list.  Critical thinking about the meaning of proximate keywords is enhanced when the analyst slows down, taking the trouble to examine the distinctiveness of each individual keyword and its context.  In a further analysis, the scholar might ask questions that require examining the results in more detail.  They might ask: What biases does each term convey?  Where do the terms overlap?  What new information is encapsulated by some words but not others?  We could continue this line of inquiry to trace the keyword-context pairs back to their original context in sentences and speeches on the page, showing how speakers used these words to formulate actual arguments with consequences for the development of nations and their economies.  
 
 Examining collocates provides the basis for critical thinking about the changing and overlapping meaning of shared concepts in the human past.  Skillful analysts can use approaches of this kind to examine the meaning of language about categories beyond those of gender, race, nationality, and commodities, asking questions about the intellectual categories that governed how members of parliament understood governance itself, economics, truth, science, virtue, economics, and reason itself.  In every case, the approach would be the same: to examine not merely one or two keywords, but many related keywords, drawing attention to the subtle overlap and differences between the terms in usage, and how those overlapping concepts together work to produce a field of meaning. 
@@ -741,12 +806,16 @@ Expand your grasp of the code and your powers of critical reflection by trying t
 
 1) Alter the code above to compare the context for the keywords "girl" and "woman."  Do you expect the context to be similar for both?  Does anything surprise you about the results?
 
-2) Use your powers of inspecting data to move from the keyword context back to the individual sentences.  Cut and paste twenty sentences from the context of each keyword into a word processor.  What do you learn from these sentences that you did not learn from counting keywords?  Does your analysis become more persuasive when quantitative graphs are accompanied with readings of particular speeches where the words are examined in their original context?  
+2) Some of the terms for women and men on your list may be slangy and pejorative, even offensive. Given our intention of understanding how parliament — a body of privileged white men — talked about the individuals ruled by parliament, do we need to understand the frequency of those terms? Or conversely should they be filtered out because they are insensitive? What is the best approach for your readers?
 
-3) We have examined 'coal' and 'corn' in the 1850s.  Now, search for the words 'coal' and 'corn' in dataset `hansard_1820`.  Were they being used in the same way?  What changed?
+3) Use your powers of inspecting data to move from the keyword context back to the individual sentences.  Cut and paste twenty sentences from the context of each keyword into a word processor.  What do you learn from these sentences that you did not learn from counting keywords?  Does your analysis become more persuasive when quantitative graphs are accompanied with readings of particular speeches where the words are examined in their original context?  
 
-4) Above, we created the list of words called `identifiers_for_woman`.  Use the operator `%in%` with the command `filter()` to create a list of the words in the context of discussions of women.  Create another list called `identifiers_for_man` and do the same for discussions of men.  Create visualizations for the top terms used in discussions of men and women.
+4) We have examined 'coal' and 'corn' in the 1850s.  Now, search for the words 'coal' and 'corn' in dataset `hansard_1820`.  Were they being used in the same way?  What changed?
 
-5) Reflect on your work so far -- in which you have compared words for gender, the concept of the foreign, and the context of discussions of different commodities. You have made comparisons over time and comparisons of lists.  Which of the comparisons do you find the most productive of insight about how certain words were being used in political debate?  Are you persuaded by large numbers?  Are you persuaded by subtle variations in the context of different words?  Write a paragraph explaining for yourself wherein constitutes the most persuasive usage of comparisons between keyword in context.  
+5) In "Tailoring our Word Count Analysis", we created the list of words called `identifiers_for_woman`.  Create another list called `identifiers_for_man` and do the same for discussions of men. Create visualizations for the top terms used in discussions of men and women.
 
-6) For the visualizations of the terms associated with different terms for the "foreign," tell us: What biases does each term convey?  Where do the terms overlap?  What new information is encapsulated by some words but not others?  What do we learn from this exercise about the prejudices of Britain's members of parliament in the 1850s?
+6) Query an AI—such as ChatGPT—for alternative words referring to men and women. Then evaluate the results critically. Do the suggested terms seem appropriate for the historical context you are studying? Do they improve your search results, or do they introduce irrelevant or misleading matches? When you use these additional terms in your corpus search, do you retrieve more relevant examples, or simply more noise? Finally, consider whether some suggested words may be anachronistic or culturally inappropriate for the nineteenth century, which could affect the validity of your analysis.
+
+7) Reflect on your work so far -- in which you have compared words for gender, the concept of the foreign, and the context of discussions of different commodities. You have made comparisons over time and comparisons of lists.  Which of the comparisons do you find the most productive of insight about how certain words were being used in political debate?  Are you persuaded by large numbers?  Are you persuaded by subtle variations in the context of different words?  Write a paragraph explaining for yourself wherein constitutes the most persuasive usage of comparisons between keyword in context.  
+
+8) For the visualizations of the terms associated with different terms for the "foreign," tell us: What biases does each term convey?  Where do the terms overlap?  What new information is encapsulated by some words but not others?  What do we learn from this exercise about the prejudices of Britain's members of parliament in the 1850s?
