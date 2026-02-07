@@ -237,15 +237,14 @@ While `unnest_tokens()` automatically converted all tokens to lowercase and remo
 
 These preprocessing steps help to standardize the corpus, making subsequent analysis—such as counting words—more consistent. FFor example, in `hansard_1850`, sentences often include commas and periods attached to words, and the same word may appear with different capitalization. Both punctuation and case variation can impact our analysis unless punctuation is removed and capitalization is standardized.
 
-```{r}
+```{r, results='asis'}
 hansard_1850 %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>% # wrap long text for readable table output
   select(sentence_id, text) %>%
   kable(format = "latex",
         booktabs = TRUE,
-        longtable = TRUE,
-        escape = FALSE) %>%
+        longtable = TRUE) %>%
   column_spec(2, width = "14cm")
 ```
 
@@ -260,15 +259,14 @@ hansard_1850_clean <- hansard_1850 %>%
          text = str_remove_all(text, "[[:punct:]]")) # strip punctuation
 ```
 
-```{r}
+```{r, results='asis'}
 hansard_1850_clean %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>% # wrap long text for readable table output
   select(sentence_id, text) %>%
   kable(format = "latex",
         booktabs = TRUE,
-        longtable = TRUE,
-        escape = FALSE) %>%
+        longtable = TRUE) %>%
   column_spec(2, width = "14cm")
 ```
 
