@@ -1184,3 +1184,31 @@ tidyverse_tools_tbl %>%
 # Conclusion
 
 No single book can prepare the analyst for all possible variations of data they may encounter, but the major kinds of data used as of the writing of this book are encompassed by the the methods we have set out here -- using API calls and RSS feeds, bulk downloads, and pdf's; cleaning data, and paying attention to data type and structure. With practice, a data analyst may soon acquire the fluency with these methods needed to wrangle data from across the web and to engage with multiple software packages, each of which have their strengths and weaknesses.
+
+
+# Exercise 
+
+1. Why do scholars sometimes build their own archives instead of relying solely on canonical texts or curated corpora?
+
+2. Explain the differences between data format, data type, and data structure, and discuss how misunderstandings about these distinctions could lead to errors or misinterpretations in computational analysis.
+
+3. When used for historical research, why isn't data cleaning a purely technical task but an interpretive one? 
+
+4. Large language models are exceptionally handy tools, but they come with their own risks. What risks are associated with using large language models directly to clean text?
+
+5. Find a dataset online. What is the source of your dataset? Is it from an API, bulk download, RSS feed, PDF, or scraped webpage? Why did you choose this source? 
+
+If your dataset comes from an API:
+- What endpoint are you using?
+- What parameters control the size or scope of the data returned?
+- Are you encountering rate limits?
+
+If your dataset is a bulk download:
+- What format is it in (CSV, JSON, XML, etc.)?
+- Is it compressed?
+- How large is it?
+
+If you scraped your data:
+- What HTML elements did you target?
+
+6. In the dataset you have identified, what counts as messy? Be specific. 

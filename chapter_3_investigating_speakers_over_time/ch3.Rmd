@@ -95,8 +95,7 @@ words_per_speaker_1830 <- words_1830 %>%
   group_by(speaker) 
 ```
 
-
-Alternatively, we could group_by suggested_speaker:
+Alternatively, we could group by suggested_speaker:
 
 ```{r, message = F}
 words_per_speaker_1830 <- words_1830 %>%
@@ -241,7 +240,6 @@ chancellor_of_the_exchequeur <- words_1830 %>%
    top_n(35) %>%
    ungroup()
 
-
 chancellor_of_the_exchequeur %>% 
   sample_n(5) %>% 
   head()
@@ -310,24 +308,32 @@ hansard_1830_w_year <- hansard_1830 %>%
   left_join(debate_metadata_1830) %>%
   mutate(year = year(speechdate)) 
 
-hansard_1830_w_year %>%
-  head() %>% 
-  kable()
-
+# Create a table preview of the dataset
+# - Select the first rows (head())
+# - Shorten long text for readability (str_trunc())
+# - Format the table for PDF output (kable(), kable_styling())
+# - Adjust column widths for better layout (column_spec())
 hansard_1830_w_year %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>% 
-  kable("html", booktabs = TRUE) %>%
-  kable_styling(full_width = FALSE, position = "left") %>%
+  kable("latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"),
+                full_width = FALSE,
+                position = "left") %>%
   column_spec(2, width = "6cm") %>% 
   column_spec(4, width = "4cm")
 ```
 
 Notice that the resulting dataset has a new field, "year."
 
-If we want to count words by year, first we need to tokenize the speeches.  
+At this point in the chapter, we already created `words_1830`, a tokenized dataset with one row per word. That dataframe is very large, and we will not use it again. If we keep it while also creating a second tokenized dataset (this time with a year column), we may run into memory limits. So to continue our analysis, we will do two things:
+- Remove the old tokenized dataset (`words_1830`) to free memory.
+- Tokenize the speeches again, but now we keep the year column so we can count words by year (and by speaker within each year).
 
 ```{r, message = F}
+rm(words_1830)
+gc()
+
 words_1830_w_year <- hansard_1830_w_year %>% 
   left_join(speaker_metadata_1830) %>%
   select(speaker, suggested_speaker, text, year) %>%
@@ -432,90 +438,168 @@ First, let's organize the data into two groupings -- the words spoken prereform 
 
 ```{r, echo=FALSE}
 # make two categories, pre- and post-reform
+# data("hansard_1840")
+# 
+# hansard_1820 <- hansard_1820 %>%
+#   left_join(speaker_metadata_1820) %>%
+#   left_join(debate_metadata_1820) 
+# 
+# hansard_1830 <- hansard_1830 %>%
+#   left_join(speaker_metadata_1830) %>%
+#   left_join(debate_metadata_1830) 
+# 
+# hansard_1840 <- hansard_1840 %>%
+#   left_join(speaker_metadata_1840) %>%
+#   left_join(debate_metadata_1840) 
+# 
+# hansard <- bind_rows(hansard_1820, hansard_1830, hansard_1840)
+# 
+# # find all the prereform text and speaker names
+# prereform <- hansard %>% #hansard_1830 %>%
+#   select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+#   filter(speechdate <= as.Date("1832-6-4")) %>%
+#   filter(speechdate >= as.Date("1822-6-4")) %>%
+#   mutate(year = year(speechdate)) %>%
+#   mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>% 
+#   mutate(period = "prereform")
+# 
+# # find all the postreform text and speaker names
+# postreform <- hansard %>%
+#   select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+#   filter(speechdate >= as.Date("1832-6-4")) %>%
+#   filter(speechdate <= as.Date("1842-6-4")) %>%
+#   mutate(year = year(speechdate)) %>%
+#   mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>%
+#   mutate(period = "postreform")
 
-debate_metadata_1820 <- debate_metadata_1820 %>% 
-  mutate(speechdate = as.Date(as.character(speechdate)))
 
-debate_metadata_1830 <- debate_metadata_1830 %>% 
-  mutate(speechdate = as.Date(as.character(speechdate)))
+data("hansard_1840")
+data("speaker_metadata_1840")
+data("debate_metadata_1840")
 
-debate_metadata_1840 <- debate_metadata_1840 %>% 
-  mutate(speechdate = as.Date(as.character(speechdate)))
+# A helper function to (1) join metadata, (2) keep only needed columns,
+# (3) filter to the window of interest, and (4) add year + prereform/postreform labels.
+prep_hansard <- function(hansard_df, speaker_meta, debate_meta) {
+  hansard_df %>%
+    # Keep the smallest set of columns before joins to reduce memory pressure
+    select(sentence_id, text) %>%
+    # Explicit join keys to avoid accidental many-to-many blowups
+    left_join(speaker_meta, by = "sentence_id") %>%
+    left_join(debate_meta,  by = "sentence_id") %>%  # change if debate_meta uses another key
+    # Keep only what we will analyze downstream
+    select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+    # Restrict the corpus to our analytical time window (filter early)
+    filter(
+      speechdate >= as.Date("1822-06-04"),
+      speechdate <= as.Date("1842-06-04")
+    ) %>%
+    mutate(
+      year = year(speechdate),
+      # Prefer curated suggested_speaker; fall back to raw speaker when missing/blank
+      suggested_speaker = coalesce(na_if(suggested_speaker, ""), speaker),
+      # Label prereform vs postreform
+      period = if_else(
+        speechdate < as.Date("1832-06-04"),
+        "prereform",
+        "postreform"
+      )
+    )
+}
 
-hansard_1820 <- hansard_1820 %>%
-  left_join(speaker_metadata_1820) %>%
-  left_join(debate_metadata_1820) 
+# Build one combined dataset (more memory-efficient than making hansard then duplicating it)
+hansard_periods <- bind_rows(
+  prep_hansard(hansard_1820, speaker_metadata_1820, debate_metadata_1820),
+  prep_hansard(hansard_1830, speaker_metadata_1830, debate_metadata_1830),
+  prep_hansard(hansard_1840, speaker_metadata_1840, debate_metadata_1840)
+)
 
-hansard_1830 <- hansard_1830 %>%
-  left_join(speaker_metadata_1830) %>%
-  left_join(debate_metadata_1830) 
+# Optional: if you no longer need the decade objects, remove them to free RAM
+rm(hansard_1820, hansard_1830, hansard_1840,
+   speaker_metadata_1820, speaker_metadata_1830, speaker_metadata_1840,
+   debate_metadata_1820, debate_metadata_1830, debate_metadata_1840)
+gc()
 
-hansard_1840 <- hansard_1840 %>%
-  left_join(speaker_metadata_1840) %>%
-  left_join(debate_metadata_1840) 
-
-hansard <- bind_rows(hansard_1820, hansard_1830, hansard_1840)
-
-# find all the prereform text and speaker names
-prereform <- hansard %>% #hansard_1830 %>%
-  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
-  filter(speechdate <= as.Date("1832-6-4")) %>%
-  filter(speechdate >= as.Date("1822-6-4")) %>%
-  mutate(year = year(speechdate)) %>%
-  mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>% # the "coalesce" function replaces a NA in the suggested_speaker column with whatever is in the speaker column
-   # filter(!is.na(speaker)) %>% ## a different count will result if we use this line as an alternative to the above
-  mutate(period = "prereform")
-
-# find all the postreform text and speaker names
-postreform <- hansard %>% #hansard_1830 %>% 
-  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
-  filter(speechdate >= as.Date("1832-6-4")) %>%
-  filter(speechdate <= as.Date("1842-6-4")) %>%
-  mutate(year = year(speechdate)) %>%
-  mutate(suggested_speaker = coalesce(suggested_speaker, speaker)) %>% # the "coalesce" function replaces a NA in the suggested_speaker column with whatever is in the speaker column
-  #filter(!is.na(speaker)) %>% ## a different count will result if we use this line as an alternative to the above
-  mutate(period = "postreform")
+# Optional: create separate prereform/postreform datasets only if needed
+prereform  <- hansard_periods %>% filter(period == "prereform")
+postreform <- hansard_periods %>% filter(period == "postreform")
 ```
 
 Let's break the data up into individual words and count how many words are in each category.
 
 ```{r, echo=FALSE}
-# tokenize words (this may be slow -- give it time)
-prereform_words <- prereform %>% 
-  unnest_tokens(word, text) 
-  
-postreform_words <- postreform %>% 
-  unnest_tokens(word, text) 
 
-# count the words
-prereform_word_count <- prereform_words %>%
-  anti_join(stop_words) %>%
-  group_by(word) %>%
-  summarise(wordcount = n()) %>%
-  ungroup() %>% 
-  arrange(desc(wordcount))  %>%
-  mutate(period = "prereform")
+# LETS TRY THIS: 
 
-postreform_word_count <- postreform_words %>%
-  anti_join(stop_words) %>%
-  group_by(word) %>%
-  summarise(wordcount = n()) %>%
-  ungroup() %>%
-  arrange(desc(wordcount)) %>%
-  mutate(period = "postreform")
+# --- 1) Build a single, trimmed dataset with a prereform/postreform label ---
+prep_hansard <- function(hansard_df, speaker_meta, debate_meta) {
+  hansard_df %>%
+    select(sentence_id, text) %>%                                # keep minimal cols pre-join
+    left_join(speaker_meta, by = "sentence_id") %>%              # explicit join key
+    left_join(debate_meta,  by = "sentence_id") %>%              # adjust key if needed
+    select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>%
+    filter(
+      speechdate >= as.Date("1822-06-04"),
+      speechdate <= as.Date("1842-06-04")
+    ) %>%
+    mutate(
+      year = year(speechdate),
+      suggested_speaker = coalesce(na_if(suggested_speaker, ""), speaker),
+      period = if_else(speechdate < as.Date("1832-06-04"),
+                       "prereform", "postreform")
+    )
+}
 
-# glue the data together 
-both_periods_word_count <- bind_rows(prereform_word_count, postreform_word_count) 
+hansard_periods <- bind_rows(
+  prep_hansard(hansard_1820, speaker_metadata_1820, debate_metadata_1820),
+  prep_hansard(hansard_1830, speaker_metadata_1830, debate_metadata_1830),
+  prep_hansard(hansard_1840, speaker_metadata_1840, debate_metadata_1840)) %>%
+  mutate(period = factor(period, levels = c("prereform", "postreform")))
 
-# tell the computer to put the periods in the correct order
-both_periods_word_count$period <- factor(both_periods_word_count$period, levels = c("prereform", "postreform"))
+# Optional: drop big source objects if you won't reuse them
+rm(hansard_1820, hansard_1830, hansard_1840,
+   speaker_metadata_1820, speaker_metadata_1830, speaker_metadata_1840,
+   debate_metadata_1820, debate_metadata_1830, debate_metadata_1840)
+gc()
 
-# add up the total words for each period
+# --- 2) Memory-efficient word counts by period (NO prereform_words/postreform_words objects) ---
+both_periods_word_count <- hansard_periods %>%
+  select(period, text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  count(period, word, name = "wordcount", sort = TRUE)
+
+# --- 3) Total (stopword-removed) word volume per period ---
 both_periods_word_count_totals <- both_periods_word_count %>%
   group_by(period) %>%
-  summarize(total = sum(wordcount))
+  summarize(total = sum(wordcount), .groups = "drop")
 
+# --- 4) (Recommended for DH) compare relative frequency across periods ---
+# This controls for corpus size differences.
+word_props <- both_periods_word_count %>%
+  group_by(period) %>%
+  mutate(prop = wordcount / sum(wordcount)) %>%
+  ungroup()
 
+word_diff <- word_props %>%
+  select(period, word, prop) %>%
+  pivot_wider(names_from = period, values_from = prop, values_fill = 0) %>%
+  mutate(diff = postreform - prereform) %>%
+  arrange(desc(diff))
+
+# Examples: most distinctive words in each direction
+top_postreform <- word_diff %>% slice_head(n = 25)   # postreform-leaning
+top_prereform  <- word_diff %>% slice_tail(n = 25)   # prereform-leaning
+
+# Optional: inspect
+head(both_periods_word_count)
+both_periods_word_count_totals
+head(top_postreform)
+head(top_prereform)
+```
+
+Now we can create a basic bar chart. 
+
+```{r}
 # create a bar chart
 library(scales) # a library useful for formatting numbers
 
@@ -526,8 +610,9 @@ ggplot(both_periods_word_count_totals, aes(x = period, y = total)) +
   geom_text(aes(label = (paste0(scales::comma(total), " words"))),
             colour = "white",
             vjust = 1.5) +
-  labs(title = "How Many Words Were Spoken in Each Period?", x = "", y = "words")
-
+  labs(title = "How Many Words Were Spoken in Each Period?", 
+       x = "", 
+       y = "words")
 ```
 
 Many more words were spoken in the ten years after the reform than the ten years before. How many more? Text mining means we never have to guess.
@@ -547,34 +632,17 @@ top_words <- both_periods_word_count %>%
   slice_max(order_by = wordcount, # put the words in descending order by "wordcount," the column for the count
             n = 10) # the argument "n" for the function "slice_max" takes the number of positions from the top to retain
 
-library(gt)
-# make a table
+
 top_words %>%
-  gt() %>% # we're using the "great tables" package to make an elegant table
-  fmt_number( # format the numbers in the table
-    columns = everything(), # apply to all numbers
-    decimals = 0, # no decimals
-    use_seps = TRUE # use commas
+  kable(
+    caption = "The Top Ten Words Spoken in Prereform and Postreform Parliament",
+    digits = 0,
+    booktabs = TRUE
   ) %>%
-  tab_header(title = "The Top Ten Words Spoken in Prereform and Postreform Parliament") %>%
-  tab_style(
-    style = list(cell_text(weight = "bold")),
-    locations = cells_row_groups()
-  ) %>%
-  tab_style( # format the column labels
-     style = list(
-        cell_fill(color = "black"),
-        cell_text(weight = "bold", color = "white")
-        ),
-      locations = cells_column_labels()
-     ) %>%
-    tab_style( # format the title
-      style = list(
-        cell_fill(color = "lightgray"),
-        cell_text(weight = "bold")
-        ),
-      locations = cells_title()
-      )
+  kable_styling(full_width = FALSE, position = "left") %>%
+  row_spec(0, bold = TRUE, background = "black", color = "white") %>%  # column labels
+  add_header_above(c(" " = ncol(top_words))) %>%  # placeholder if grouping needed
+  column_spec(1:ncol(top_words), bold = FALSE)
 ```
 
 The analyst will discern that there are only very minor differences between the top words of both categories. What are we to make of that?  
@@ -606,22 +674,28 @@ Let's do that now to answer the question, how many words did each speaker speak 
 
 ```{r, echo=FALSE}
 # count words per speaker per year 
-prereform_speakers_wordcount <- prereform_words %>%
-  filter(str_trim(suggested_speaker) != "") %>%
-  group_by(suggested_speaker, year) %>%
-  summarize(wordcount = n()) %>%
-  ungroup() %>%
-  mutate(period = "prereform")
+# prereform_speakers_wordcount <- prereform_words %>%
+#   filter(str_trim(suggested_speaker) != "") %>%
+#   group_by(suggested_speaker, year) %>%
+#   summarize(wordcount = n()) %>%
+#   ungroup() %>%
+#   mutate(period = "prereform")
+# 
+# postreform_speakers_wordcount <- postreform_words %>%
+#   filter(str_trim(suggested_speaker) != "") %>%
+#   group_by(suggested_speaker, year) %>%
+#   summarize(wordcount = n()) %>%
+#   ungroup() %>%
+#   mutate(period = "postreform")
 
-postreform_speakers_wordcount <- postreform_words %>%
-  filter(str_trim(suggested_speaker) != "") %>%
-  group_by(suggested_speaker, year) %>%
-  summarize(wordcount = n()) %>%
-  ungroup() %>%
-  mutate(period = "postreform")
+both_periods_speakers <- hansard_periods %>%
+  filter(!is.na(suggested_speaker),
+         str_trim(suggested_speaker) != "") %>%
+  count(period, suggested_speaker, year, name = "wordcount") %>%
+  mutate(period = factor(period, levels = c("prereform", "postreform")))
 
 # glue them together
-both_periods_speakers <- rbind(prereform_speakers_wordcount, postreform_speakers_wordcount)
+#both_periods_speakers <- rbind(prereform_speakers_wordcount, postreform_speakers_wordcount)
 
 # inspect the data
 head(both_periods_speakers)
@@ -664,10 +738,19 @@ To find the prereform-only and postreform-only speakers, we will find the "diffe
 # Use counting to investigate how many distinct speakers are in the data, pre and postreform
 
 # How many speakers were there prereform?
-prereform_only_speakers <- prereform_speakers_wordcount %>%
+prereform_only_speakers <- both_periods_speakers %>%
+  filter(period == "prereform") %>%
   select(suggested_speaker) %>%
-  anti_join(postreform_speakers_wordcount, by = "suggested_speaker") %>%
-  mutate(class = "prereform only") 
+  distinct() %>%
+  anti_join(
+    both_periods_speakers %>%
+      filter(period == "postreform") %>%
+      select(suggested_speaker) %>%
+      distinct(),
+    by = "suggested_speaker"
+  ) %>%
+  mutate(class = "prereform only")
+
 
 # inspect the data
 head(prereform_only_speakers)
@@ -683,10 +766,18 @@ Performing the same operation again, beginning with postreform speeches and remo
 
 ```{r, echo=FALSE}
 # How many speakers were there postreform?
-postreform_only_speakers <- postreform_speakers_wordcount %>% 
+postreform_only_speakers <- both_periods_speakers %>%
+  filter(period == "postreform") %>%
   select(suggested_speaker) %>%
-  anti_join(prereform_speakers_wordcount) %>%
-  mutate(class = "postreform only") 
+  distinct() %>%
+  anti_join(
+    both_periods_speakers %>%
+      filter(period == "prereform") %>%
+      select(suggested_speaker) %>%
+      distinct(),
+    by = "suggested_speaker"
+  ) %>%
+  mutate(class = "postreform only")
 
 # inspect the data
 head(postreform_only_speakers)
@@ -724,12 +815,19 @@ In any case, to identify the speakers who appear in both the prereform and postr
 
 ```{r, echo=FALSE}
 # How Many Members of Parliament Spoke Both Prereform and Postreform?
-continuous_speakers <- prereform_speakers_wordcount %>%
-  distinct(suggested_speaker) %>%
-  inner_join(postreform_speakers_wordcount) %>%
-  ungroup() %>%
-  mutate(class = "both periods") %>%
-  distinct(suggested_speaker, class)
+continuous_speakers <- both_periods_speakers %>%
+  filter(period == "prereform") %>%
+  select(suggested_speaker) %>%
+  distinct() %>%
+  inner_join(
+    both_periods_speakers %>%
+      filter(period == "postreform") %>%
+      select(suggested_speaker) %>%
+      distinct(),
+    by = "suggested_speaker"
+  ) %>%
+  mutate(class = "both periods")
+
 
 nrow(continuous_speakers)
 ```
@@ -773,18 +871,13 @@ One of the great advantages of text mining is that we can analyze not just the s
 ## Using Word Count: 
 ## How much did speakers speak before and after the reform act?
 
-# glue the data together for processing
-all_per_speaker_wordcounts <- bind_rows(prereform_speakers_wordcount, postreform_speakers_wordcount) %>%
-  ungroup() 
-
-# create a database of speaker, year, and wordcount
-all_speakers_annotated <- all_per_speaker_wordcounts %>%
-  left_join(all_classes) %>%
+all_speakers_annotated <- both_periods_speakers %>%
   filter(!is.na(suggested_speaker)) %>%
-  ungroup() 
+  left_join(all_classes, by = "suggested_speaker") %>%
+  ungroup()
 
-# inspect the data
 all_speakers_annotated
+
 ```
 Note that we have created two columns that annotate the speeches and speakers in different ways. The "period" column refers to the year in question -- were the n words said in 1831 prereform or postreform?  The "class" column sorts the speakers themselves -- did this speaker only speak in the prereform years, the postreform years, or in both periods? 
 
@@ -855,10 +948,7 @@ The function *left_join()* takes as its first argument the name of the dataset w
 speakers_w_top_and_speaker_key <- all_speakers_annotated %>%
   rename(wordcount_per_speaker_per_year = wordcount) %>%
   left_join(top_speakers, by = c("suggested_speaker", "class")) %>%
-  left_join(speaker_key) %>%
-  distinct()
-
-#*********** STEPH this process generates multiple entires, which is why i resort to distinct(). do you have a more elegant solution? thanks! JG
+  left_join(speaker_key) 
 
 #inspect the data
 speakers_w_top_and_speaker_key %>% 

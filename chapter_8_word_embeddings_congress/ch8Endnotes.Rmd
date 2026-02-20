@@ -323,3 +323,21 @@ ggplot(df_sim, aes(period, similarity, group = 1)) +
        y = "Cosine similarity")
 ```
 
+
+
+# Exercises
+
+1. Word embeddings reveal statistical associations, not intent. Reflect on:
+
+ - What kinds of historical nuance might be lost in this approach?
+ - What biases could arise from using Congressional records as the corpus?
+ - How might political power shape what appears in the archive?
+
+Write 4–6 sentences considering the strengths and limitations of computational textual analysis for historians.
+
+2. Select one word identified as strongly associated with "climate" (for example: change, global, or warming). Then, locate one or two original speeches or documents from the Congressional Record containing that word, compare the close reading with the computational result, does the statistical association match the rhetorical context?
+
+3. Examine the cosine similarity trajectory between two terms over a chosen range of time (for example, coal and emissions). What historical events might correspond to rises or declines in similarity? How could this quantitative signal guide further research?
+
+4. Word embeddings reveal patterns of association in language, but they are only one analytical lens. What other historical research methods could be paired with this approach to deepen interpretation? Explain how combining at least two methods could produce a richer understanding of climate discourse in Congressional records.
+
