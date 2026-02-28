@@ -34,6 +34,8 @@ FALSE
 Instead of saying "above" or "below", the following plot, say Figure X 
 
 
+Help with floating tables in chapter 2
+
 make sure book titles are italic
 
 

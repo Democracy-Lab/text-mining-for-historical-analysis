@@ -19,7 +19,7 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Computational methods support inquiry into how the discourses and events in the past shape current-day political change. It is common in speeches for political actors to reference the events of the past -- whether American politicians reference the Tea Party or British parliamentarians reference the events of the Second World War.  Speakers in parliament also acknowledge contemporary public protests as a source of political legitimacy.  But the number, intensity, and specific events referenced change over time.  What can we learn about how political reforms were made in the past from reviewing how politicians of the past referenced events? 
+Computational methods support inquiry into how the discourses and events in the past shape current-day political change. It is common in speeches for political actors to reference the events of the past -- whether American politicians reference the Boston Tea Party or British parliamentarians reference the events of the Second World War.  Speakers in parliament also acknowledge contemporary public protests as a source of political legitimacy.  But the number, intensity, and specific events referenced change over time.  What can we learn about how political reforms were made in the past from reviewing how politicians of the past referenced events? 
 
 In this chapter, we will explore questions such as these:  In the lead-up to the Great Reform Act of 1832, when the middle class got the vote in Britain, which historical references were on the table?  Which members of parliament contributed the most to the debate about the Abolition of Slavery in 1833, and of these speakers, whose language reflected the most on the lived experience of toil and cruelty in the system of slavery?  Which historical and contemporary events were referenced the most by members of parliament in the era of the Second Reform Act of 1867, when working-class people got the vote for the first time? 
 
@@ -459,6 +459,8 @@ events_1867 <- clean_bigrams_1867 %>%
 head(events_1867)
 ```
 
+
+
 If we look carefully at the events list so generated, we will recognize only a few of the references as actual events.  Many of the bigrams including our controlled vocabulary are simply descriptions, for example, "disorderly riot."  A few are references to actual events and meetings specified by the name of an event, for instance, the "Bristol Riot" or a "Yorkshire meeting."  Far more frequent are general references to a "public meeting" or "recent meeting."  All of the results are interesting, of course, because as we have seen members of parliament leaned on each other to acknowledge the public sentiment for expanding the vote.  
 
 How did references to meetings vary over time? By this time, you will have noticed that searching for a controlled vocabulary, visualization, guided reading, and deliberation about the meaning of the data is an iterative process that we engage over many rounds -- not an automatic process where the analyst looks for a word like "riot" and immediately finds meaningful results.  We can search for our key phrases and visualize them.  
@@ -478,10 +480,11 @@ controlled_vocab_events = c("yorkshire meeting", "clontarf meeting", "recent mee
 # group the matched events and count their occurrences
 # keep only the top 10 most frequently mentioned events
 top_events_1867 <- events_1867 %>%
-  filter(bigram %in% controlled_vocab_events) %>% # match exact event bigrams
-  group_by(bigram) %>% # group by event phrase
-  summarize(total = n()) %>% # count occurrences
-  top_n(10) # keep top 10 events
+  filter(bigram %in% controlled_vocab_events) %>%
+  group_by(bigram) %>%
+  summarize(total = n()) %>%
+  slice_max(total, n = 10) %>%   # modern replacement for top_n()
+  arrange(desc(total))
 
 head(top_events_1867)
 ```
@@ -815,15 +818,15 @@ Throughout this chapter, we worked with large datasets and showed how to handle 
 
 Here is a typical workflow for handling large data like Hansard:
 
-- Load the Dataset: Import the dataset into your R environment using appropriate functions like `read_csv()`.
+- Load the Dataset: Import the dataset into your R environment using appropriate functions like `data()`.
 
 - Filter or Subset the Dataset: Narrow down the dataset to include only the data relevant to your analysis. For example, if we are analyzing speeches by William Gladstone, we can filter rows where the speaker is Gladstone using functions like `filter()` from the `dplyr` package. Similarly, we could filter for speeches belonging to a specific debate by filtering the data based on a title. Subsetting early in the process reduces the amount of data that will be processed later, saving processing time and computational resources. 
 
 - Clean the Dataset: After subsetting, clean the dataset to prepare it for analysis. Cleaning typically involves handling missing values, removing stop words, and normalizing text (e.g., converting text to lowercase). We can clean data with functions like `mutate()` from `dplyr`, or string processing functions like `str_to_lower()`, which transforms text to lower case, from the `stringr` package.
 
-- Analyze the Dataset: Now that you have just the needed data, perform your analysis by applying metrics. 
+- Analyze the Dataset: Now that the data has been filtered, apply analytical metrics to identify patterns and answer your research question. This may include counting occurrences, calculating averages or proportions, or using statistical methods to examine trends and relationships in the data.
 
-Although it is poossible clean the entire dataset before narrowing it down, doing so can strain our computer's processing power or even exceed its available memory. It is often more desirable to filter the dataset first, then clean the smaller, more manageable portion. Following the order: Load -> Subset -> Clean -> Analyze can optimize data processing, which may be especially useful when analyzing change over decades or centuries of data. 
+Although it is possible clean the entire dataset before narrowing it down, doing so can strain our computer's processing power or even exceed its available memory. It is often more desirable to filter the dataset first, then clean the smaller, more manageable portion. Following the order: Load -> Subset -> Clean -> Analyze can optimize data processing, which may be especially useful when analyzing change over decades or centuries of data. 
 
 ## Exercises
 

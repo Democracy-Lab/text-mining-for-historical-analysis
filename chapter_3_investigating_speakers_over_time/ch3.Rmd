@@ -1053,3 +1053,5 @@ To get you started, here are a few office positions:
 
 9) Rework the final visualization so that what is labeled are not the top speakers overall, but the top speakers in the prereform and postreform categories.  Show your results.  
 
+10) In the section, "Did the Concept of "Freedom" Change After the Debates of 1833?," we don’t give an interpretation of the tables showing the collocates of the word "freedom" over time. Examining the results, what do you see? Did the meaning of freedom change in these years? How? Specify as many words as possible in your answer. Adjust the number of words displayed to do your research.
+

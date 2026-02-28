@@ -886,7 +886,6 @@ The existence of slavery thus became the basis for arguing that the West Indies 
 
 >"When a state of slavery is that upon which we are to work, the very means which lead to liberty must partake of compulsion. The minds of men being crippled with that restraint, can do nothing for themselves; every thing must be done for them. The regulations can owe little to consent."
 
-
 When we compare Buckingham's arguments about the "universal" with Peel's arguments about "assembly," what we see is a standoff between two versions of the enlightenment, both full of faith for hope in humanity and the power of reason, but which worked against each other in a dramatic standoff.
 
 The first version -- Buckingham's -- defined freedom in economic terms. It found slavery abhorrent and declared that it must be immediately desired. Buckingham's contention that the laws of unfreedom, once righted, would turned former slaves into productive subjects was premised upon faith in the laws of the free market and the ordered workings of desire, which envisioned formerly enslaved persons becoming free and going on to pursue dangerous and rewarding work alongside the British working class.
@@ -1015,7 +1014,6 @@ freedom_collocates_before_1833 <- hansard_before_1833 %>%
   reframe(n = n()) %>%
   arrange(desc(n)) 
 
-
 freedom_collocates_after_1833 <- hansard_after_1833 %>%
   mutate(when = "after 1833") %>%
   filter(str_detect(tolower(text), "freedom")) %>%
@@ -1050,3 +1048,61 @@ kable(tf_idf_freedom_collocates_before, caption = "1820-32")
 ```{r}
 kable(tf_idf_freedom_collocates_after, caption = "1834-39")
 ```
+
+
+## Exercises
+
+1. How does shifting attention from Westminster debates to enslaved peoples’ resistance change what counts as a “cause” of abolition?
+
+2. Which concepts are most "contested" in 1833 (e.g., freedom, labour, property, compensation), and how can frequency and distinctiveness help us tell the difference?
+
+3. Test whether enslaved people appear as political actors or passive subjects. Do MPs talk about enslaved people differently than they talk about planters or parliament? Which actors appear most often? Are enslaved people described as agents or objects?
+
+```{r}
+library(tidyverse)
+library(tidytext)
+
+actor_terms <- c(
+  "slave", "slaves", "negro", "negroes", "planter", "planters", "assembly", 
+  "parliament")
+
+actor_pattern <- str_c("\\b(", str_c(actor_terms, collapse = "|"), ")\\b")
+
+actor_mentions <- slavery_debates_1833 %>%
+  unnest_tokens(word, text) %>%
+  filter(word %in% actor_terms) %>%
+  count(word, sort = TRUE)
+
+actor_mentions
+```
+
+```{r}
+actor_sentences <- slavery_debates_1833 %>%
+  mutate(
+    text_lower = tolower(text),
+    actor = str_extract(text_lower, actor_pattern)) %>%
+  filter(!is.na(actor)) %>%
+  select(sentence_id, speaker, actor, text)
+
+actor_sentences %>%
+  mutate(text = str_wrap(text, 90)) %>%
+  slice(1:20)
+
+actor_sentences_all_matches <- slavery_debates_1833 %>%
+  mutate(text_lower = tolower(text)) %>%
+  filter(str_detect(text_lower, actor_pattern)) %>%
+  mutate(actor = str_extract_all(text_lower, actor_pattern)) %>%
+  unnest(actor) %>%
+  distinct(sentence_id, actor, .keep_all = TRUE) %>%
+  select(sentence_id, speaker, actor, text)
+
+actor_sentences_all_matches %>%
+  head() %>%
+  mutate(text = str_wrap(text, 80)) %>%
+  select(actor, text) %>%
+  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
+  column_spec(2, width = "14cm")
+```
+
+
+
