@@ -15,8 +15,6 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-
 The output is a data frame with the top words for each keyword ("climate", "woman", "environmentalist", and "government")
 
 ```{r, warning=FALSE, message=FALSE}
@@ -324,6 +322,79 @@ ggplot(df_sim, aes(period, similarity, group = 1)) +
 ```
 
 
+
+
+
+
+
+
+
+
+```{r}
+library(tidyverse)
+library(plotly)
+
+# assumes these already exist:
+# get_similar()
+# vector_subtraction()
+
+plot_neighbors_over_decades <- function(embeddings_by_decade,
+                                        mode = c("similar","subtract"),
+                                        word1,
+                                        word2 = NULL,
+                                        top_n = 15) {
+
+  mode <- match.arg(mode)
+
+  out <- purrr::imap_dfr(embeddings_by_decade, function(W, decade) {
+
+    df <- if (mode == "similar") {
+      get_similar(word1, W, top_n)
+    } else {
+      vector_subtraction(word1, word2, W, top_n)
+    }
+
+    mutate(df, decade = as.integer(decade))
+  })
+
+  title_txt <- if (mode == "similar") {
+    paste0('Words Most Associated with "', word1, '"')
+  } else {
+    paste0('Words Associated with "', word1,
+           '" not "', word2, '" (', word1, " - ", word2, ")")
+  }
+
+  plot_ly(out,
+          x = ~decade,
+          y = ~similarity,
+          text = ~word,
+          type = "scatter",
+          mode = "markers+text",
+          textposition = "center right",
+          height = 650) %>%
+    layout(
+      title = title_txt,
+      xaxis = list(
+        tickmode = "array",
+        tickvals = sort(unique(out$decade))
+      )
+    )
+}
+
+embeddings_by_decade <- list(
+  "2000" = word_embeddings_2000,
+  "2010" = word_embeddings_2010,
+  "2020" = word_embeddings_2020
+)
+```
+
+```{r}
+plot_neighbors_over_decades(embeddings_by_decade, "similar",  "america", top_n = 20)
+```
+
+```{r}
+plot_neighbors_over_decades(embeddings_by_decade, "subtract", "america", "empire", top_n = 20)
+```
 
 # Exercises
 

@@ -65,6 +65,9 @@ install.packages("ggrepel")
 
 # For accessible and colorblind-friendly palettes for visualizations
 install.packages("viridis")
+
+# For creating interactive and aesthetically pleasing visualizations
+install.packages("plotly")
 ```
 
 Packages for document formatting and communicating data in tables: 
