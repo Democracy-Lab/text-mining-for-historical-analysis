@@ -11,7 +11,9 @@ Before beginning any analysis, we can make sure the computing environment is rea
 
 The setup and tools introduced here reflect one of the central challenges of the book itself. Our aim is to teach how to perform text mining at scale, an approach that, at the time of writing, remains inaccessible and largely unwritten about in the practice of digital history. We hope to prepare readers with the knowledge to handle the practical constraints involved in working with large historical corpora.
 
-Because historical datasets vary widely in size—and because readers will be working on many different types of computers or have access to vastly different computational resources—this chapter also offers guidance for managing limited memory or processing power. When necessary, readers can load smaller samples of the data to practice the methods. These sampled outputs may differ from the full visualizations and results presented in the book, but they will still allow readers to follow the workflow and understand the techniques.
+Because historical datasets vary widely in size—and because readers will be working on many different types of computers or have access to vastly different computational resources—this chapter also offers guidance for managing limited memory or processing power. When necessary, readers can load smaller samples of the data to practice the methods. These sampled outputs may differ from the full visualizations and results presented in the book, but they will still allow readers to follow the workflow and understand the techniques. 
+
+Additionally, it is worth closing out of other tabs or programs when running the code in this book to free up computer memory and help the analyses run smoothly, especially when working with large datasets.
 
 ## Installing Packages
 
