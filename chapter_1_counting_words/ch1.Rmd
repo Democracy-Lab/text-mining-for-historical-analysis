@@ -35,57 +35,6 @@ One common way to study a word's context is through collocate analysis—the ide
 
 Each of the techniques presented in this chapter have both promise and limits.  As our companion volume, _The Dangerous Art of Text Mining_, makes clear, simple word counts are almost never sufficient on their own to support an in-depth analysis of culture.^5^ Before we count words, we need to decide which words are worth counting. Words are not neutral objects: they are historically conditioned artifacts, shaped by the institutions, conflicts, and assumptions of their time. In nineteenth-century Britain, Parliament was not primarily concerned with tables and chairs; it was actively debating gender, property, citizenship, and empire. Questions such as whether a woman could divorce her husband and retain control over her property, how foreigners and colonial subjects should be classified, or how passports and refugee protections ought to function were not peripheral—they were central to parliamentary business. As a result, the vocabulary of parliamentary debate reflects these struggles. The words we choose to examine in this chapter are therefore guided not only by computational convenience, but by historical judgment: we attend to terms associated with gender, class, nationality, and empire because these concepts structured the problems Parliament was trying to solve. Word counting, in this sense, is not a purely technical exercise; it is an entry point into historically situated questions about power, governance, and social change.
 
-## R Versions
-
-Before we get started, we need to make sure we have an up-to-date version of R installed in order to use the packages and functions in this book.
-
-To check which version of R is currently running on your computer, run:
-
-```{r check_version}
-R.version.string
-```
-
-If your version is more than one major release behind (e.g., anything below 4.3 while the current version is 4.4), you should update R from:
-
-https://cran.r-project.org
-
-Keeping R up to date helps ensure that your code runs smoothly—especially when installing or loading packages, which often require the latest versions of R to work correctly.
-
-## Running a Line of Code 
-
-The first step in learning R is understanding how to run a line of code. 
-
-Here are some exercises to learn how to run code on your computer. Try each and decide which ones feel most comfortable to you:
-- You can type a command directly into the Console pane and press Enter.
-- You can write it in an R script and execute it by placing your curser on the line you want to run and press `Ctrl + Enter` on Windows or Linux (or `Cmd + Enter` on a Mac).
-- You can also highlight one or more lines of code and click the green Run button at the top of the script editor. 
-
-Try to run the code now by typing the following into your Console and pressing Enter, or by highlighting it and clicking Run:
-
-```{r hello_world}
-print("Hello World")
-```
-
-This should display the phrase “Hello World” beneath your code, confirming that R executed the command.
-
-## Getting Help on Functions
-
-When working in R, you will frequently encounter functions you have not used before. A simple way to learn what a function does is to open its documentation. We can read its documentation in RStudio by typing two question marks followed by the function name:
-
-```{r eval=FALSE}
-??function_name
-```
-
-For example, to read the documentation for the `library()` function, run:
-
-```{r}
-??library
-```
-
-This opens a page in RStudio’s Help pane that shows a description of the function and examples of how to use it. 
-
-Learning to consult documentation early will make it much easier to follow the examples in this book and to experiment on your own.
-
 ## Loading the Hansard Data
 
 First we will load the data we wish to analyze. Analysts, programmers, researchers, and the like routinely import software packages developed by others to expand the range of tools available to them.  
