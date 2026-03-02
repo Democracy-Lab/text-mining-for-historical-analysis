@@ -646,7 +646,6 @@ top_words %>%
 ```
 
 The analyst will discern that there are only very minor differences between the top words of both categories. What are we to make of that?  
-
 We should begin by admitting that these words tell us little that's new about parliament or history. The word "house" was frequently used in parliament to refer to the House of Commons and House of Lords, the two chambers of parliament. Members of the houses traditionally addressed each other as "honorable sir" (abbreviated "hon" in Hansard) and (when addressing peers of the realm) "noble sir," "noble sirs," or "my lord." The general matters of parliament concerned the state of the "country," the passing of "bills" into law, the activities of the "goverment," various other "subjects," and the official matter of "questions" -- a formal category of address about the business of parliament. To find the top words offers no real insight to any analyst who understands the basic business of parliament. 
 
 The only apparent difference in this table occurs in the words "time" -- a top-ten word prereform but not postreform -- and "Ireland" -- a top-ten word postreform and prereform. If we looked at more than the top-ten words, even these differences would likely appear slight; the two words missing in this table are almost surely in the top twenty list for both periods -- something we can easily check by adjusting the command *slice_head(n=10)* from 10 to 20.
@@ -790,7 +789,6 @@ How many speakers were there postreform?
 nrow(postreform_only_speakers)
 ```
 
-
 We now have two sets of numbers -- the count of unique speakers who spoke 1822-32 and 1832-42. These numbers are new to history; there has never before been a count of these speakers. We can learn something from them. Before text mining, it was impossible to get a real impression of how many speakers were active in parliament before and after 1832.  But the simple ability to count allows us to add detail to our accounts of the reform and its mechanisms.
 
 
@@ -877,8 +875,8 @@ all_speakers_annotated <- both_periods_speakers %>%
   ungroup()
 
 all_speakers_annotated
-
 ```
+
 Note that we have created two columns that annotate the speeches and speakers in different ways. The "period" column refers to the year in question -- were the n words said in 1831 prereform or postreform?  The "class" column sorts the speakers themselves -- did this speaker only speak in the prereform years, the postreform years, or in both periods? 
 
 We also have a *wordcount* column that reflects the words each speaker spoke per year. 
@@ -978,8 +976,7 @@ library(ggrepel) # load a useful package for labeling a dense plot
 
 ggplot(speakers_w_top_and_speaker_key, aes(x = year, y = wordcount_per_speaker_per_year, color = class, shape = class)) +
   geom_jitter( # it's worth replacing the geom_jitter with geom_point here and in the next line to see the stakes of diff representations
-    size = 3
-    ) +
+    size = 3) +
   scale_color_grey(guide = guide_legend()) +
   geom_label_repel(data=subset(speakers_w_top_and_speaker_key, top == TRUE),
                       aes(label=speaker, color = class)) +
@@ -988,6 +985,7 @@ ggplot(speakers_w_top_and_speaker_key, aes(x = year, y = wordcount_per_speaker_p
   labs(title = "How Much Did Speakers Speak", 
   subtitle = "Before and After the Second Reform Act of 1832?") 
 ```
+
 # ********* HEY STEPH -- Lord Brougham shows up as both a "both periods" speaker and a "postreform only" speaker, presumably because of a data quality issue. Can you have a look at this and help make sure that the resulting chart doesn't have errors?  And/or maybe include a module on correcting Brougham by hand?
 
 
@@ -1002,8 +1000,6 @@ We can also use this visualization to note the few prereform-only speakers who d
 Equally exceptional were the few members of parliament elected only after 1832 who spoke with prominence, among them John Roebuck and Frederick Shaw.  These men whose careers were endorsed by reform swam in a sea of seasoned representatives who had first joined parliament in an earlier era.
 
 Note that our visualization is only as good as the quality of the data. Where speakers have not been reconciled correctly -- as is the case with "Lord Brougham" (classified as postreform only), who in reality is the same as "Henry Brougham" (classified as a continuous speaker) -- they may appear as discrete speakers when indeed they are the same. 
-
-
 
 ## Exercises
 

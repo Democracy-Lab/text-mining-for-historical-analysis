@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.7)  28 FEB 2026 13:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.7)  2 MAR 2026 11:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -626,11 +626,11 @@ File: ch3_files/figure-latex/unnamed-chunk-19-1.pdf Graphic file (type pdf)
 Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-19-1.pdf  used on input line 1252.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [19 <./ch3_files/figure-latex/unnamed-chunk-19-1.pdf>] [20]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1346.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1345.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [21]
-Overfull \hbox (16.60127pt too wide) in paragraph at lines 1461--1465
+Overfull \hbox (16.60127pt too wide) in paragraph at lines 1460--1464
 []\T1/lmr/m/n/10 To iden-tify these speak-ers, we will be-gin by re-turn-ing to an ear-lier data frame -- ``pre-re-form_speakers_wordcount''
  []
 
@@ -638,16 +638,16 @@ Overfull \hbox (16.60127pt too wide) in paragraph at lines 1461--1465
 <ch3_files/figure-latex/unnamed-chunk-30-1.pdf, id=147, 469.755pt x 325.215pt>
 File: ch3_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
 <use ch3_files/figure-latex/unnamed-chunk-30-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-30-1.pdf  used on input line 1597.
+Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-30-1.pdf  used on input line 1596.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [24] [25 <./ch3_files/figure-latex/unnamed-chunk-30-1.pdf>] [26] [27] [28]
 <ch3_files/figure-latex/unnamed-chunk-35-1.pdf, id=179, 469.755pt x 325.215pt>
 File: ch3_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
 <use ch3_files/figure-latex/unnamed-chunk-35-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 1865.
+Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 1864.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1865--1871
+Underfull \hbox (badness 10000) in paragraph at lines 1864--1870
 [][]
  []
 
@@ -666,7 +666,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  89i,12n,93p,965b,640s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ch3.pdf (33 pages, 783190 bytes).
+Output written on ch3.pdf (33 pages, 782864 bytes).
 PDF statistics:
  330 PDF objects out of 1000 (max. 8388607)
  264 compressed objects within 3 object streams
