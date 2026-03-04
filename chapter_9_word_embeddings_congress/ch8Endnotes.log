@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.7)  20 FEB 2026 13:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.7)  3 MAR 2026 22:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -595,28 +595,25 @@ File: ch8Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf Graphic file (type p
 <use ch8Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf>
 Package pdftex.def Info: ch8Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf  used on input line 610.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 629.
-(/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [8] [9 <./ch8Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf>] [10] (./ch8Endnotes.aux)
+[8] [9 <./ch8Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf>] [10] (./ch8Endnotes.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 13387 strings out of 469514
- 207601 string characters out of 5468931
+ 13352 strings out of 469514
+ 206651 string characters out of 5468931
  633431 words of memory out of 5000000
- 41766 multiletter control sequences out of 15000+600000
- 678800 words of font info for 87 fonts, out of 8000000 for 9000
+ 41734 multiletter control sequences out of 15000+600000
+ 678435 words of font info for 86 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,9n,93p,587b,541s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 89i,9n,93p,587b,543s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ch8Endnotes.pdf (10 pages, 241007 bytes).
+Output written on ch8Endnotes.pdf (10 pages, 241889 bytes).
 PDF statistics:
  150 PDF objects out of 1000 (max. 8388607)
- 113 compressed objects within 2 object streams
- 25 named destinations out of 1000 (max. 500000)
+ 114 compressed objects within 2 object streams
+ 26 named destinations out of 1000 (max. 500000)
  51 words of extra memory for PDF output out of 10000 (max. 10000000)
 
