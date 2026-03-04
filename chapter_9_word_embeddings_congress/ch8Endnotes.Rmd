@@ -283,7 +283,11 @@ For researchers interested in working with larger collections, one of the author
 
 Apps like Congress Viewer are helpful for digital history research for several reasons. They support rapid iteration, where researchers can quickly test ideas by searching for different words and immediately seeing the results. Such accessibility allows analysts to move fluidly between hypothesis and exploration. Because these steps can be performed quickly through an interface, the researcher can perform much more exploration than would be practical if every step required rewriting and rerunning code to process large datasets. 
 
-The first plot we will look at from the Congress Viewer shows the semantic association of words over time. The visualization is a type of scatter plot where the x-axis is a timeline ranging from 1900 to 2025. The following visualization examines the word "democracy." For most of the twentieth century, the words most closely associated with democracy are fairly unsurprising: terms such as "patriotism," "freedom," "liberty," "victory," and "win." These associations largely carry a positive tone, and many are connected to words like "unity" and "peace."
+The first plot we will look at from the Congress Viewer shows the semantic association of words over time. The visualization is a type of scatter plot where the x-axis is a timeline ranging from 1900 to 2025. 
+
+Our guiding question will be: How do the semantic associations between "democracy" and "Iraq" evolve over time in Congressional debate? When approaching a question like this, historians often begin with a working hypothesis. Based on historical knowledge of major turn-of-the-millennium events, one might reasonably expect that the association between "democracy" and "Iraq" becomes stronger during the period surrounding the Iraq War. Political leaders frequently supported military intervention by framing it as an effort to defend or promote democracy. If that linguistic framing was common in Congressional debate, we would expect the language surrounding these two words to become more similar during that period. The purpose of this analysis, however, is not simply to confirm what historians may already know about the Iraq war, but to demonstrate that the associations between Iraq and democracy is measurable, and to demonstrate how that rhetorical connection appears in the broader corpus of the Congressional debate.  
+
+The first visualization we created examines the word "democracy." For most of the twentieth century, the words most closely associated with democracy are fairly unsurprising: terms such as "patriotism," "freedom," "liberty," "victory," and "win." These associations largely carry a positive tone, and many are connected to words like "unity" and "peace."
 
 By 2000, however, the pattern of associations shifts. During the period surrounding the Iraq War, the words most closely associated with "democracy" include "defend" (as the most associated word), "war," "troops," and "terror." The language surrounding democracy becomes suddenly tied to military action, reflecting the political language of the period.
 
@@ -303,7 +307,7 @@ Perhaps most interesting is that we have measured the extent to which the words 
 knitr::include_graphics("iraq.jpg")
 ```
 
-### Analyzing Association Between Two Words Over Time using Congress Viewer
+### Analyzing the Association Between Two Words Over Time using Congress Viewer
 
 Another type of visualization we can produce using the Congress Viewer is a line chart showing the association between two words over time (see: https://shinyviz.smu.edu/shiny/public/congress-viewer-demo/, navigate to the tab "Difference"). 
 
