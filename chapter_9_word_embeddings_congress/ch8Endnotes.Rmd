@@ -1,9 +1,7 @@
 ---
 title: "Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record"
 output:
-  pdf_document:
-    number_sections: false
-  html_document: default
+  html_document
 header-includes:
   - \usepackage{chngcntr}
   - \newcounter{chapter}
@@ -48,7 +46,7 @@ climate_change_text_2020 <- congress_daily_climate_change_2020$content
 
 When a computer analyzes language, it cannot work with words directly. Instead, it represents each word as a list of numbers, called a vector. For example, instead of storing the word "climate" as text, the model might represent it like this:
 
-> **climate → [0.21, -0.44, 0.88, 0.13, ...]**
+> **climate : [0.21, -0.44, 0.88, 0.13, ...]**
 
 Each number in the vector captures a small piece of the word's meaning based on how the word appears next to other words in the corpus. By examining these patterns across large amounts of text, it becomes possible for a computer to estimate the numeric representations that reflect relationships between words. To do this, we will use a technique called machine learning. 
 
@@ -68,10 +66,10 @@ It is also important to note that word embeddings capture statistical associatio
 
 In the following sections, we will create a word embedding model records from the United States Congressional Record that mention the word "climate." Rather than simply generating a word cloud, we will build functions that allow us to add and subtract word vectors and examine patterns of word association. Because our personal computers may have limited computing power, we will then use Congress Viewer, an application developed by one of the authors of this book, to analyze the Stanford Corpus of the Congressional Record at a much larger scale and to quickly test hypotheses about the language of the United States Congressional Records.
 
-The following code demonstrates how to use the word embeddings model, GloVe. 
+The following code demonstrates how to use the word embeddings model, GloVe.  
 
 ```{r}
-# A function that trains GloVe word embeddings from a vector of text.
+# A function that trains GloVe word embeddings from text.
 # The parameters control model size, context window, vocabulary filtering,
 # training iterations, and reproducibility.
 find_word_embeddings <- function(data,
@@ -139,7 +137,7 @@ These settings control how the GloVe model learns relationships between words.
 
 The rank determines how many numbers are used to represent each word. Representing words using more numbers allows the model to detect more subtle differences between words, while fewer numbers make the model simpler and faster but less precise.
 
-The window (5) tells the model how many nearby words to pay attention to when learning meaning. The basic idea is that words that appear close together in sentences are often related, so the model looks at the five words on either side of each word.
+The window tells the model how many nearby words to pay attention to when learning meaning. The basic idea is that words that appear close together in sentences are often related, so the model looks at the five words on either side of each word.
 
 The term_count_min (1) setting decides which words are included in the analysis. Words that appear fewer times than this threshold are ignored. This helps prevent extremely rare words, spelling mistakes, or noise in the data from influencing the model.
 
@@ -188,7 +186,7 @@ most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
 
 
 ```{r}
-tbl_2000 <- most_similar_climate %>%
+table_2000 <- most_similar_climate %>%
   mutate(similarity = round(similarity, 3)) %>%
   kable(format = "latex",
     caption = 'Words Most Related to "Climate": 2000s Congressional Records',
@@ -197,12 +195,12 @@ tbl_2000 <- most_similar_climate %>%
     booktabs = TRUE) %>%
   kable_styling(full_width = FALSE)
 
-tbl_2000
+table_2000
 ```
 
 
 ```{r}
-tbl_2010 <- most_similar_emissions %>%
+table_2010 <- most_similar_emissions %>%
   mutate(similarity = round(similarity, 3)) %>%
   kable(format = "latex", caption = 'Words Most Related to "Emissions": 2010s Congressional Records',
     col.names = c("Word", "Cosine similarity"),
@@ -210,7 +208,7 @@ tbl_2010 <- most_similar_emissions %>%
     booktabs = TRUE) %>%
   kable_styling(full_width = FALSE)
 
-tbl_2010
+table_2010
 ```
 
 ```{r}
