@@ -15,25 +15,16 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The output is a data frame with the top words for each keyword ("climate", "woman", "environmentalist", and "government")
+[Needs introduction]
 
 ```{r, warning=FALSE, message=FALSE}
 library(tmha.data)
-```
-
-we will take just the `content` column 
-
-```{r, warning=FALSE, message=FALSE}
 library(text2vec)
 library(tidyverse)
 library(kableExtra)
 
 data("congress_daily_climate_change_2000_2020")
-```
 
-Create new variables that filter the `congress_daily_climate_change_2000_2020` data for the decade and take just the `content` column.^1^ 
-
-```{r}
 congress_daily_climate_change_2000 <- congress_daily_climate_change_2000_2020 %>% 
   filter(decade == "2000")
 
@@ -50,11 +41,26 @@ congress_daily_climate_change_2020 <- congress_daily_climate_change_2000_2020 %>
 climate_change_text_2020 <- congress_daily_climate_change_2020$content
 ```
 
-The parameters control the behavior of the GloVe word embedding model. The rank (50) sets the dimensionality of the learned word vectors — this is the number of numeric values used to represent a word. Higher dimensionality allows the model to capture more nuance, subtle meaning, and fine-grained semantic distinctions between words, while smaller dimensionality produces simpler models that run faster but encode less detail. The window (5) determines how many neighboring words on each side are considered when learning meaning, based on the idea that words appearing near each other tend to be related. The term_count_min (1) filters out words that appear less than a minimum number of times in the corpus, preventing extremely rare tokens or typos from influencing the model. The x_max (10) parameter downweights extremely frequent filler words so they do not dominate the training process. The n_iter (30) controls how many passes the model makes over the co-occurrence data — more iterations usually improve results but take longer. Finally, the seed (42) ensures reproducibility so the same settings and data produce the same model when rerun.
+When a computer analyzes language, it cannot work with words directly. Instead, it represents each word as a list of numbers, called a vector. For example, instead of storing the word "climate" as text, the model might represent it like this:
 
-We do not go into detail about some of these concepts -- ENTER -- here. 
+> *climate → [0.21, -0.44, 0.88, 0.13, ...]*
+
+Each number in the vector captures a small piece of the word's meaning based on how the word appears next to other words in the corpus. By examining these patterns across large amounts of text, it becomes possible for a computer to estimate the numeric representations that reflect relationships between words. To do this, we will use a technique called machine learning. 
+
+Machine learning refers to computational methods that identify patterns in data and use those patterns to create numerical representations. These numerical represenations are improved through repeated calculations over the dataset. In this chapter, the specific machine learning approach used to represent words numerically is called word embeddings. 
+
+Word embeddings represent each word as a point in a numeric space. Words that appear in similar contexts tend to be placed near one another in this space. Because the words are represented numerically, the distance between them can be measured, allowing analysts to identify which words are most closely associated with a given term. The following image illustrates this idea. The word “fossil” appears closer to "fuels" than to "nuclear." These associations are intuitive, reflecting the idea that fossil fuels commonly appear together in discussions of climate, whereas fossil is less association with nuclear, as two different forms of energy. 
 
 ```{r}
+knitr::include_graphics("coal.png")
+```
+
+The following code demonstrates how to use a word embeddings model, GloVe. 
+
+```{r}
+# A function that trains GloVe word embeddings from a vector of text.
+# The parameters control model size, context window, vocabulary filtering,
+# training iterations, and reproducibility.
 find_word_embeddings <- function(data,
                                  rank=50,
                                  window=5L,
@@ -63,23 +69,39 @@ find_word_embeddings <- function(data,
                                  n_iter=30,
                                  seed=42) {
   
+  # Tokenize the text: convert to lowercase and split sentences into words
   tokens <- word_tokenizer(str_to_lower(data))
+  
+  # Create an iterator over the tokenized text for efficient processing
   it <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE)
   
+  # Build the vocabulary from the tokens and remove very rare words
   vocab <- create_vocabulary(it) %>%
     prune_vocabulary(term_count_min = term_count_min)
   
+  # Convert the vocabulary into a vectorizer that maps words to indices
   vectorizer <- vocab_vectorizer(vocab)
+  
+  # Create a term–co-occurrence matrix showing which words appear near each other
+  # within the specified window size
   tcm <- create_tcm(it, vectorizer, skip_grams_window = window)
 
+  # Set the random seed so the results can be reproduced
   set.seed(seed)
+  
+  # Initialize the GloVe model with the chosen dimensionality and weighting parameter
   glove <- GlobalVectors$new(rank = rank, x_max = x_max)
+  
+  # Train the model on the co-occurrence matrix for the specified number of iterations
   wv_main <- glove$fit_transform(tcm, n_iter = n_iter)
+  
+  # Extract the context vectors learned during training
   wv_context <- glove$components
-  word_embeddings <- wv_main + t(wv_context) }
+  
+  # Combine the main and context vectors to produce the final word embeddings
+  word_embeddings <- wv_main + t(wv_context)
+}
 ```
-
-
 
 ```{r, echo=FALSE}
 quiet_run <- function(expr) {
@@ -100,7 +122,27 @@ word_embeddings_2010 <- quiet_run(find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 <- quiet_run(find_word_embeddings(climate_change_text_2020))
 ```
 
-While the model is training, GloVe prints progress updates so you can see how training is advancing. The progress updates include the current timestamp, which training epoch the model is on, and the current loss value. An epoch means one full pass over the entire dataset — so if the console says epoch 10, the model has now processed the corpus 10 times. The loss value tells you how well the model is learning at that point — lower loss generally means the model is improving. So during training, you will see output messages formatted like `INFO [<timestamp>] epoch <k>, loss <value>` appear in the console to show the model’s progress step-by-step.
+These settings control how the GloVe model learns relationships between words.
+
+The rank determines how many numbers are used to represent each word. Representing words using more numbers allows the model to detect more subtle differences between words, while fewer numbers make the model simpler and faster but less precise.
+
+The window (5) tells the model how many nearby words to pay attention to when learning meaning. The basic idea is that words that appear close together in sentences are often related, so the model looks at the five words on either side of each word.
+
+The term_count_min (1) setting decides which words are included in the analysis. Words that appear fewer times than this threshold are ignored. This helps prevent extremely rare words, spelling mistakes, or noise in the data from influencing the model.
+
+The x_max (10) setting reduces the influence of very common words. Words like “the,” “and,” or “of” appear so frequently that they could otherwise dominate the training process, so this parameter limits how much weight they receive.
+
+The n_iter (30) parameter controls how many times the model goes through the data to refine its understanding of word relationships. More iterations usually improve the results, but they also make the process take longer.
+
+Finally, the seed (42) ensures that the model produces the same results every time it runs with the same data and settings. This is important for reproducibility, especially in research.
+
+GloVe prints short progress messages so it is possible to see how training is progressing. These messages include three pieces of information: the time, how many times the model has gone through the dataset (the epoch), and a number that indicates how well the model is learning (the loss value).
+
+Model training happens iteratively. The term epoch refers to one complete pass through the entire dataset. This iteration is necessary because the model cannot capture the patterns in the data in a single pass. Instead, the training procedure gradually adjusts the model's parameters each time the data is processed. If the console shows epoch 10, it means the training process has gone through the entire corpus ten times, allowing the model to better capture statistical relationships between words.
+
+The output also includes a loss value, which is a number that measures how well the model’s current predictions match the patterns observed in the data. During training, the model compares the relationships between words it predicts with the relationships that actually appear in the corpus. The loss value summarizes how different these two are. As training continues and the model’s parameters are updated, the loss typically becomes smaller, indicating that the predictions are aligning more closely with the patterns in the text.
+
+During training, messages such as INFO [<timestamp>] epoch <k>, loss <value> appear in the console. These updates allow the user to watch the model’s progress as it repeatedly studies the corpus and gradually improves its understanding of relationships between words.
 
 ```{r, eval=FALSE}
 word_embeddings_2000 <- find_word_embeddings(climate_change_text_2000)
@@ -129,6 +171,8 @@ most_similar_climate <- get_similar("climate", word_embeddings_2000, 10)
 most_similar_emissions <- get_similar("emissions", word_embeddings_2000, 10)
 most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
 ```
+
+
 
 ```{r}
 tbl_2000 <- most_similar_climate %>%
@@ -170,34 +214,6 @@ table_2020 <- most_similar_coal %>%
 table_2020
 ```
 
-
-
-
-```{r, fig.cap="Two-dimensional projection of word embeddings showing the terms most semantically similar to coal in the Climate Change Congressional corpus."}
-
-library(ggrepel)
-
-# take the top N words returned by most_similar_coal
-words <- most_similar_coal$word
-
-# include the anchor term too
-words <- c("coal", words)
-
-# subset embedding matrix to just those words
-emb_small <- word_embeddings_2000[words, ]
-
-# reduce high dimensions to 2D PCA for visualization purposes
-pca <- prcomp(emb_small, center = TRUE, scale. = TRUE)
-coords <- as_tibble(pca$x[,1:2]) %>%
-  mutate(word = words)
-
-ggplot(coords, aes(PC1, PC2, label = word)) +
-  geom_point(size = 3) +
-  geom_text_repel() +
-  theme_minimal() +
-  ggtitle("Words close to COAL in embedding space (2D PCA)")
-```
-
 ## Vector Subtraction
 
 Vector subtraction in word embeddings asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
@@ -222,8 +238,11 @@ vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
 vector_subtraction("renewable", "fossil", word_embeddings_2000)
 ```
 
-If you get an error like `Error in embeddings[word2, , drop = FALSE] : subscript out of bounds` then that means the word was not in the dataset. 
+If a query returns an error like: 
 
+> `Error in embeddings[word2, , drop = FALSE] : subscript out of bounds` 
+
+then that means the word was not in the dataset. 
 
 ```{r}
 vector_subtraction("renewable", "fossil", word_embeddings_2010)
@@ -253,79 +272,13 @@ If one of the words does not exist in the corpus, we will see the error `Error i
 vector_addition("man", "woman", congress_daily_climate_change_2000)
 ```
 
-### Vectors Over Time
-
-```{r}
-congress_daily_climate_change_enter <- congress_daily_climate_change_2000_2020 %>%
-  mutate(date = ymd(date), 
-         year = year(date),
-         period_5 = paste0(floor(year/5)*5, "-", floor(year/5)*5 + 4))
-
-congress_daily_climate_change_enter <- congress_daily_climate_change_enter %>%
-  mutate(period_5 = ifelse(year == 2020, "2020", period_5))
-```
-
-
-```{r, fig.cap="Cosine similarity between coal and emissions across five-year periods, showing how their semantic relationship shifts over time in the U.S. Congressional records mentioning climate change."}
-
-# Make 5-year periods (2000–2004, 2005–2009, 2010–2014, 2015–2019, 2020)
-congress_5 <- congress_daily_climate_change_2000_2020 %>%
-  mutate(date = ymd(date),
-         year = year(date),
-         period_5 = paste0(floor(year/5)*5, "-", floor(year/5)*5 + 4),
-         period_5 = ifelse(year == 2020, "2020", period_5) )
-
-# Split text by 5-year period 
-texts_by_period <- congress_5 %>%
-  filter(!is.na(content), str_squish(content) != "") %>%
-  split(.$period_5) %>%
-  map(~ .x$content)
-
-# Build embeddings per 5-year period
-embeddings_by_period <- texts_by_period %>%
-  imap(~ {if (length(.x) == 0) return(NULL)
-    find_word_embeddings(.x)}) %>%
-  discard(is.null)
-
-# Similarity trajectory over 5-year periods
-similarity_trajectory <- function(word_a, word_b, embs = embeddings_by_period) {
-
-  # order the x-axis by the numeric start year of each label
-  order_levels <- names(embs) %>%
-    as_tibble() %>%
-    rename(lbl = value) %>%
-    mutate(start = as.integer(str_replace(lbl, "-.*$", ""))) %>%
-    arrange(start) %>%
-    pull(lbl)
-
-  tibble(period = factor(names(embs), levels = order_levels)) %>%
-    mutate(similarity = map_dbl(as.character(period), \(p) {
-      W <- embs[[p]]
-      if (is.null(W)) 
-        return(NA_real_)
-      if (!all(c(word_a, word_b) %in% rownames(W))) 
-        return(NA_real_)
-      as.numeric(sim2(W[word_a, , drop = FALSE],
-                      W[word_b, , drop = FALSE],
-                      method = "cosine", norm = "l2"))}))}
-
-df_sim <- similarity_trajectory("coal", "emissions")
-
-ggplot(df_sim, aes(period, similarity, group = 1)) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 3) +
-  theme_minimal() +
-  labs(title = "Cosine similarity across 5-year periods",
-       subtitle = "coal  ~  emissions",
-       x = "5-year period", 
-       y = "Cosine similarity")
-```
+# Word Association and the Congress Viewer
 
 For the purposes of this book, we work with a limited subset of the data: three decades of Congressional Records. This smaller window allows analysts to run the data on a personal computer while still providing the tools to demonstrate the research strategies used throughout the book. 
 
 For researchers interested in working with larger collections, one of the authors of this book has also developed a web application called "Congress Viewer" (see: https://shinyviz.smu.edu/shiny/public/congress-viewer-demo/, navigate to the tab "Word Context"). The application provides access to the Stanford Corpus of the Congressional Record, allowing users to explore debates spanning 1900 to 2000 without needing to download or process the full dataset. 
 
-Apps like Congress Viewer are helpful for digital history research for several reasons. They support rapid iteration, where researchers can quickly test ideas by searching for different words and immediately seeing the results. Such accessibility allows scholars to move fluidly between hypothesis and exploration. Because these steps can be performed quickly through an interface, the researcher can explore a much larger conceptual space than would be practical if every step required rewriting and rerunning code to process large datasets. 
+Apps like Congress Viewer are helpful for digital history research for several reasons. They support rapid iteration, where researchers can quickly test ideas by searching for different words and immediately seeing the results. Such accessibility allows analysts to move fluidly between hypothesis and exploration. Because these steps can be performed quickly through an interface, the researcher can perform much more exploration than would be practical if every step required rewriting and rerunning code to process large datasets. 
 
 Consider the visualizations generated using the Congress Viewer. The first visualization examines the word "democracy." For most of the twentieth century, the words most closely associated with democracy are fairly unsurprising: terms such as "patriotism," "freedom," "liberty," "victory," and "win." These associations largely carry a positive tone, and many are connected to words like "unity" and "peace."
 
@@ -347,17 +300,28 @@ Perhaps most interesting is that we have measured the extent to which the words 
 knitr::include_graphics("iraq.jpg")
 ```
 
+### Analyzing Association Between Two Words Over Time using Congress Viewer
+
+
+
+```{r}
+knitr::include_graphics("democracy_to_iraq.jpg")
+```
+
+
 # Exercises
 
 1. Word embeddings reveal patterns of association in language, but they are only one analytical lens. What other historical research methods could be paired with this approach to deepen interpretation? Explain how combining at least two methods could produce a richer understanding of climate discourse in Congressional records.
 
-2. Select one word strongly associated with "climate" (for example: change, global, or warming). Then, locate one or two original speeches or documents from the Congressional Record containing that word. Compare the close reading with the computational result, does the statistical association match the rhetorical context?
+2. Select one word strongly associated with "climate" (for example: change, global, or warming). Then, locate one or two speeches or documents from the Congressional Record containing that word. Compare your close reading of these records with the computational result. Does the statistical association match the context of the Congressional Records?
 
-3. Examine the cosine similarity trajectory between two terms over a chosen range of time (for example, coal and emissions). What historical events might correspond to rises or declines in similarity? How could this quantitative signal guide further research?
+3. In "Vectors Over Time," we analyze two words and their growing or lessing association with one-another. Examine the cosine similarity trajectory between two terms over a chosen range of time (for example, coal and emissions). What historical events might correspond to rises or declines in similarity? How could this quantitative signal guide further research?
 
 4. Choose a decade and examine which climate-related terms are missing or unusually rare. Are there words you would expect but do not see? Does silence itself signal political positioning? How might archival absence complicate computational interpretation? Write a short reflection on how historians might interpret silence differently than data scientists based on their training.
 
 5. Come up with five words that you think are signals of debates on climate (for example: regulation, China, hurricane, jobs). For each word, write code and use the `tmha.data` to compute the similarity of the word to climate. Which decade shows the strongest link to climate for each word? What's your speculation for why this association might exist?
 
 6. Use Congress Viewer to search for your own words. Do you notice any trends when you compare multiple words side-by-side? For example, in the chapter we compared "democracy" and "Iraq" and saw that by the early 2000s the language around democracy increasingly included words like war, troops, and defend. Do similar patterns appear in the words you choose? Write a few sentences describing what you observe and what historical events might explain any word associations. 
+
+7. Like the example in this chapter—where “Iraq” appears associated with words such as "Danish" or "Rhine"—word embeddings sometimes produce associations that seem surprising or historically unrelated. Find another example in Congress Viewer where a word is associated with terms that seem unexpected. Why might these unexpected associations occur in the data? Could the result be explained by politician's rhetorical framing, or by sparse data? 
 
