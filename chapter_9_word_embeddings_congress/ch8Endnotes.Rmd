@@ -181,14 +181,22 @@ The resulting word embedding model will also be similar, but slightly different 
 
 ## Finding Words with the Greatest Association
 
-Now that we have a word embeddings representation of our decades, we can define a function to find words that are most similar to 
+Now that we have created word embedding representations for each decade, we can define a function that identifies the words most strongly associated with a term of interest. For example, we can find the ten words most closely associated with "climate" in the `word_embeddings_2000` subset. We could also examine the associations for other words, such as "emissions" or "coal." Researchers can also use the function to explore associations for any other word of choice. 
+
+The function works by implementing "cosine similarity", a mathematical measure that finds the distance of two word vectors in the embedding space (recall the image of the scatter plot above). Words with similar contexts producing higher cosine similarity scores, and vice-versa. 
 
 ```{r}
 get_similar <- function(keyword, word_embeddings, top_n = top_n_default) {
   
+  # Extract the vector that represents the position of the keyword in space.
   kw_vec <- word_embeddings[keyword, , drop = FALSE]
+  
+  # Calculate the cosine similarity between the word of choice and all other words.
   cos_sim <- sim2(word_embeddings, kw_vec, method = "cosine", norm = "l2")[, 1]
 
+  # Convert the similarity scores into a table 
+  # sort the words by similarity
+  # return the top most similar words.
   tibble(word = names(cos_sim), similarity = unname(cos_sim)) %>%
     filter(word != keyword) %>%
     arrange(desc(similarity)) %>%
@@ -196,6 +204,8 @@ get_similar <- function(keyword, word_embeddings, top_n = top_n_default) {
 ```
 
 ```{r}
+# Find the words that are most associated with the analyst provided word of interest
+# The number at the end indicates how many data points to return
 most_similar_climate <- get_similar("climate", word_embeddings_2000, 10)
 most_similar_emissions <- get_similar("emissions", word_embeddings_2000, 10)
 most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
@@ -230,7 +240,7 @@ table_2020
 
 ## Vector Subtraction
 
-Vector subtraction in word embeddings asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
+Vector subtraction asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
 
 ```{r}
 vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
