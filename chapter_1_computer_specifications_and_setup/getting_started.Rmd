@@ -1,6 +1,6 @@
 ---
 title: "Chapter 1: Getting Started"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}

@@ -1,0 +1,930 @@
+---
+title: "Chapter 5: Using Distinctiveness and Distance for Comparative Analyses of Historical Data"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: false
+geometry: "left=1in,right=1in,top=2in,bottom=1in"
+header-includes:
+  - \usepackage{fontspec}
+  - \usepackage{ucharclasses}
+  - \setmainfont{Noto Serif}
+  - \setsansfont{Noto Sans}
+  - \setmonofont{Noto Sans Mono}
+  - \newfontfamily\NkoFont{Noto Sans NKo}
+  - \setTransitionsFor{Nko}{\NkoFont}{}
+  - \usepackage{tcolorbox}
+  - \tcbuselibrary{listingsutf8}
+  - \usepackage{listings}
+  - \usepackage{xcolor}
+  - \usepackage{caption}
+  - \usepackage{booktabs}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{5}
+  - \counterwithin{table}{chapter}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Up to now, this book has focused on simple measurements such as word counts. In this chapter, we shift our attention to statistical methods. Specifically, we explore two key concepts widely used in the natural sciences, information sciences, and digital humanities for capturing the defining traits of systems: distinctiveness, which measures how characteristic a word is within a specific context, and distance, which compares the similarity or difference between texts. 
+
+Distinctiveness may be used as a way of identifying unique features or patterns within a dataset (e.g., distinguishing words or features that are characteristic of a specific text or corpus compared to another). We will explore "term frequency-inverse document frequency" abbreviated to tf-idf. 
+
+Distance measurements are typically used to assign a metric to the similarity or dissimilarity of two sets of data. Just a few distance measurements include Jensen-Shannon Divergence (JSD), Euclidean distance, or cosine similarity. 
+
+To understand how these metrics might work in research, imagine that our task is comparing two famous children's authors.  First, let's use some code to grab two texts, Lewis Carroll's _Through the Looking Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^
+
+```{r}
+# URLs for plain text versions
+looking_glass_url <- "https://www.gutenberg.org/files/12/12-0.txt"
+peter_url <- "https://www.gutenberg.org/cache/epub/14838/pg14838.txt"
+
+# Extract "Through the Looking-Glass" and save it to RStudio's global 
+# environment
+looking_glass_text <- readLines(looking_glass_url, 
+                                encoding = "UTF-8", 
+                                warn = FALSE)
+
+# Extract "The Tale of Peter Rabbit" and save it to RStudio's global 
+# environment
+peter_text <- readLines(peter_url, 
+                        encoding = "UTF-8", 
+                        warn = FALSE)
+```
+
+You can now see the texts we collected in the Global Environment panel. 
+
+## Vectorising as Preparation for Measurement
+
+If we wanted a comprehensive list of words used frequently by Lewis Carroll but rarely by Beatrix Potter, we would begin by representing each book as a frequency count of all the words they contain (e.g., "rabbit," "tea," "queen" for  _Through the Looking Glass_, and "rabbit," "garden," "jacket" for _The Tale of Peter Rabbit_). Here is code to tokenize, clean, and count the words for each text:
+
+```{r, message=FALSE, warning=FALSE}
+# Load required libraries
+library("tidyverse")
+library("tidytext")
+
+# Convert to data frames
+looking_glass_df <- tibble(writer = "Lewis Carroll", text = looking_glass_text)
+
+peter_df <- tibble(writer = "Beatrix Potter", text = peter_text)
+
+# Combine both texts
+books <- bind_rows(looking_glass_df, peter_df)
+
+# Tokenize text by spliting it into individual words
+tokens <- books %>%
+  unnest_tokens(word, text) %>%
+  filter(str_detect(word, "^[a-z']+$"))  # keep only alphabetic words
+
+# Calculate word frequencies per author
+word_counts <- tokens %>%
+  count(writer, word) %>%
+  pivot_wider(names_from = word, values_from = n, values_fill = 0)
+
+# Focus on selected words of interest  
+target_words <- c("rabbit", "she", "little", "chortled", "shed", 
+                  "the", "hoe", "slithy", "galumph")
+selected <- word_counts %>%
+  select(writer, any_of(target_words))
+
+# View the table
+print(selected)
+```
+
+In advanced text mining, this entire set of steps is described as "vectorising" the text, because each text is converted into a list of numerical values corresponding to its word frequencies. 
+
+The vectors allow us to compute many different measurements, including distinctiveness, distance, and all of their variants, because all of the difference metrics we will apply begin with these words.
+
+## Using Distinctiveness to Compare Two Authors
+
+Distinctiveness measures score the relationships between words and documents across two or more sets of texts. Distinctiveness measures can identify words that are characteristic of a specific author, document, year, or political group. Take, for example, Lewis Carroll, a renowned British author of children's literature. Carroll, who had a background in mathematics and logic, was famously inventive with language, especially in his use of nonsense and portmanteau words. He had a strong preference for whimsical and linguistically playful terms—words that stretch meaning or defy conventional usage—such as "slithy," "chortle," and "galumph," -- especially visible in his poem _Jabberwocky,_ which enriches the dreamlike world of _Through the Looking Glass_.^2^
+
+If we're using distinctiveness algorithms, we would choose tf-idf or log likelihood, which assigns high values to each author–word pair. The pairs _Carroll–slithy_ and _Potter–shed_ should get a very high score, because these words are very unique to the respective authors. In contrast, _Carroll–she, Carroll–the, Potter–the,_ and _Potter–she_ would each get a very low distinctiveness score, as these common words are not unique to either author.
+
+We will explain the code required later, but for now, simply observe the difference between the tf-idf measurements for each author. Which word-writer pairs get a high tf-idf score -- which is to say, they are highly distinctive? Which word-author pairs get a low tf-idf score?
+
+```{r}
+# Count word frequencies per author (long format)
+word_counts2 <- tokens %>%
+  count(writer, word, sort = TRUE) %>%
+  rename(document = writer, term = word)
+
+# Compute tf-idf values
+tfidf_table <- word_counts2 %>%
+  bind_tf_idf(term = term, document = document, n = n)
+
+# View top distinctive words for each author
+filtered_tfidf <- tfidf_table %>%
+  filter(term %in% target_words) %>%
+  arrange(document, desc(tf_idf)) %>%
+  select(term, tf_idf)
+```
+
+
+
+```{r two-pane, results='asis', message=FALSE, warning=FALSE}
+library(kableExtra)
+
+filtered_tfidf <- as_tibble(filtered_tfidf)
+
+left <- filtered_tfidf %>%
+  select(term, tf_idf) %>%
+  slice(1:6) %>%
+  mutate(tf_idf = round(as.numeric(tf_idf), 6))
+
+right <- filtered_tfidf %>%
+  select(term, tf_idf) %>%
+  slice(7:12) %>%
+  mutate(tf_idf = round(as.numeric(tf_idf), 6))
+
+combined <- tibble(beatrix_term = left$term,
+                   beatrix_tfidf = left$tf_idf,
+                   carroll_term = right$term,
+                   carroll_tfidf = right$tf_idf)
+
+combined %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        col.names = c("Beatrix Word", "TF-IDF", 
+                      "Lewis Carroll Word", "TF-IDF")) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+```
+
+
+
+
+
+```{r}
+#library(knitr)
+
+#make_tab <- function(df) {
+#  df %>%
+#    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
+#    kable(format = "latex", booktabs = TRUE, caption = NULL,
+#          col.names = c("Word", "TF-IDF")) %>%
+#    as.character() }
+
+#left_tab  <- make_tab(filtered_tfidf[1:6, ])
+#right_tab <- make_tab(filtered_tfidf[7:12, ])
+
+#two_pane_table <- paste0(
+#    "\\noindent
+#    \\begin{minipage}[t]{0.48\\textwidth}
+#    \\raggedright\\textbf{Some Beatrix Potter Words}\\\\[3pt]", 
+#    left_tab, "
+#    \\end{minipage}\\hfill
+#    \\begin{minipage}[t]{0.48\\textwidth}
+#    \\raggedright\\textbf{Some Lewis Carroll Words}\\\\[3pt]", 
+#    right_tab, "
+#    \\end{minipage}")
+
+#asis_output(two_pane_table)
+```
+
+We can use distinctiveness to quickly identify the words that are frequently in Carroll's book but not Potter's. We might expect the results to include a list of words that includes "Jabberwock" (a fearsome creature), the "Snark" (an elusive entity), the "Bandersnatch" (a fast and dangerous beast), and other terms from his peculiar universe. Indeed, many of these words have rarely, if ever, appeared in publications not authored by Carroll himself. 
+
+```{r, message=FALSE, warning=FALSE}
+library("kableExtra")
+
+distinctively_carroll <- tfidf_table %>% 
+  filter(document == "Lewis Carroll") %>%
+  arrange(desc(tf_idf)) %>%
+  select(term, tf_idf)  
+
+kable(head(distinctively_carroll, 15),
+      format = "latex",
+      booktabs = TRUE,
+      caption = "Lewis Carroll's Most Distinctive Words when Alice 
+                is compared with Peter Rabbit",
+      col.names = c("Word", "TF-IDF"),
+      escape = FALSE)
+```
+
+Interestingly, the Jabberwock, Bandersnatch, and Snark are outranked in this comparison by relatively simple characters -- Alice, the Queen, the Red Knight, and Humpty-Dumpty -- because none of these characters appear in _Peter Rabbit_, while all of those characters are mentioned more than the Jabberwock. 
+
+If we were to compare _Through the Looking Glass_ with a broader corpus of children's writing, we would get different results. Then, words like "queen," "knight," and even "Humpty-Dumpty" might appear outside of Carroll's corpus, but "Bandersnatch" is likely to remain distinctively Carroll-esque.  
+
+## Using Distance to Compare Two Authors
+
+Measuring distance can offer insight into different types of questions than distinctiveness does. Suppose, instead of looking for particular words, we wish to assess how overall linguistically different the profile of any two authors is.  
+
+By measuring distance, we can compare the distribution of words in the two books. We would begin with a word-frequency vector, as above. Next, we apply a distance measure to the word counts. The result will be one measurement. A low distance value would indicate that _Alice's Adventures_ and _Peter Rabbit_ are linguistically similar. A high distance value would suggest that the texts are very dissimilar. However, if we were to compare _Alice's Adventures_ to another Carroll book, such as _Through the Looking-Glass_, the calculated distance would be smaller, reflecting the stylistic and lexical similarities between the two texts.^3^
+
+Again, don't worry about the code, but pay attention to the scores in the results:
+
+```{r}
+library("text2vec")             # Load the package
+
+# define a function for jsd
+jsd <- function(p, q) {
+  # Ensure p and q are probability distributions
+  p <- p / sum(p)
+  q <- q / sum(q)
+  m <- 0.5 * (p + q)
+  
+  # Define a helper function for KL divergence
+  kl_div <- function(a, b) {
+    a <- ifelse(a == 0, 1, a)  # Avoid log(0)
+    b <- ifelse(b == 0, 1, b)
+    sum(a * log2(a / b)) }
+  
+  0.5 * kl_div(p, m) + 0.5 * kl_div(q, m) }
+
+# load Alice in Wonderland
+alice_url <- "https://www.gutenberg.org/files/11/11-0.txt"
+alice_text <- readLines(alice_url, encoding = "UTF-8", warn = FALSE)
+
+# Combine into one data frame
+books <- bind_rows(
+  tibble(booktitle = "Alice", text = alice_text),
+  tibble(booktitle = "Peter", text = peter_text),
+  tibble(booktitle = "LookingGlass", text = looking_glass_text))
+
+# Tokenise and count
+word_freqs <- books %>%
+  unnest_tokens(word, text) %>%
+  filter(str_detect(word, "^[a-z']+$")) %>%
+  count(booktitle, word) %>%
+  group_by(booktitle) %>%
+  mutate(freq = n / sum(n)) %>%
+  ungroup()
+
+# Create a frequency matrix (book x word)
+freq_matrix <- word_freqs %>%
+  select(booktitle, word, freq) %>%
+  pivot_wider(names_from = word, values_from = freq, values_fill = 0) %>%
+  column_to_rownames("booktitle") %>%
+  as.matrix()
+
+# Compute JSD for each pair of books
+book_names <- rownames(freq_matrix)
+n_books <- nrow(freq_matrix)
+
+jsd_matrix <- matrix(0, n_books, n_books)
+rownames(jsd_matrix) <- book_names
+colnames(jsd_matrix) <- book_names
+
+for (i in 1:n_books) {
+  for (j in 1:n_books) {
+    jsd_matrix[i, j] <- jsd(freq_matrix[i, ], freq_matrix[j, ]) } }
+
+# View results
+kable(jsd_matrix)
+```
+
+Distance measurements give us a score for how "distant" each book is from each other book. With Jensen-Shannon Distance (JSD), smaller values mean more similar texts. _Alice's Adventures in Wonderland_ has a distance of 0 from _Alice's Adventures in Wonderland_ because they are the same text.  Meanwhile, _Alice_ has the highest distance from _Peter Rabbit_, while _Alice_ is much closer in writing style to _Through the Looking Glass_.
+
+## Using Distance to Analyze A Large Corpus
+
+Now, imagine we had access to a large repository of books. Instead of comparing two specific authors, we might wish to discover which writers use vocabularies similar to Lewis Carroll’s. For instance, we could search for books with a comparable ratio of playful or invented words to conventional ones.
+
+We might be interested in identifying the top ten authors who make frequent use of neologisms or poetic nonsense. If we were doing distance comparisons on a larger set, Carroll might score closer to authors like Edward Lear, Roald Dahl, or Spike Milligan, who also play with absurdity and sound, and farther from Beatrix Potter, whose style is more naturalistic and pastoral.
+
+In sum, distance is useful for quantifying how far apart texts are in terms of their overall linguistic patterns. Variants of distance measurements could make it another alternative for pinpointing the specific features (like "chortle" or "jabberwock") that make a text unique -- but in general, we leave this task to distinctiveness (for more on the nuances of each approach, please see Guldi's _The Dangerous Art of Text Mining_).^4^ 
+
+## Distinctiveness and Distance Compared
+
+While distinctiveness identifies the unique lexical features of a writer’s vocabulary, distance focuses on measuring the relationships and proximities between entire sets of features. We suggest that both of these methods of measurement invite a broader reflection on computational methods by foregrounding the importance of the processes through which we produce historical knowledge.
+
+The ways in which we decide to process and analyse data—whether through distance or distinctiveness—are shaped by the questions we pose. Yet the choices we make during data processing directly influence the interpretive lenses we apply to a corpus. The computational steps involved in data processing are as much a part of knowledge creation as the act of historical interpretation itself. The methods we choose mediate our access to historical records, and their respective affordances and limitations may lead us to shift our analytical focus—for instance, from emphasizing distinctiveness as an indicator of uniqueness in a corpus, to using distance to reveal relational patterns, or to adopting an entirely different metric more suitable to the historical material at hand. Both methodological decisions are interpretive acts in their own right, as they shape how we understand and conceptualize the data before us. 
+
+While there are different mathematical formulas for measuring distinctiveness or distance, this chapter introduces a function called term frequency-inverse document frequency (abbreviated "tf-idf") for measuring distinctiveness, and Jensen-Shannon divergence (abbreviated as "JSD") for measuring distance.^5^ 
+As we will show, both tf-idf and JSD allow analysts to answers questions like: which words are characteristic of one speaker and not another? Which words are most symptomatic of the 1860s, a decade characterized by an economic crisis related to the cotton industry as well as labor disputes, and what can we learn about the 1860s from applying methods of distance or divergence?  
+
+We will first demonstrate tf-idf to compare multiple decades back-to-back to surface the words that are most unique to one decade and not the others. We will then use JSD to explore the lexical features of debates surrounding the use of the word "cotton" measured against other decades. The results will demonstrate how changes in the way in which difference is measured reveal different dimensions of a corpus. We will encourage readers to reflect on these differences, using them as a way of expanding their insight into the nature of difference, the use of comparable algorithms as different tools in a process of analysis, and the beginning of a process of critically thinking about data, algorithm, and historical truth. 
+
+## Distinctiveness applied to History
+
+For the domain of history, distinctiveness measures offer a valuable tool for analyzing political language, allowing analysts to identify which words or patterns set a particular speaker, party, or historical period apart from another.
+
+Here are some examples for how an analyst might think through the lens of distinctiveness when working with the Hansard corpus: 
+
+* An analyst might use distinctiveness measures to identify words that were frequently used by Gladstone but not by other prime ministers. The results could highlight the linguistic patterns, priorities, or recurring concerns that made Gladstone a distinctive political figure. For example, if Gladstone consistently used words related to reform more often than others, Gladstone's discourse might reveal key characteristics of his political or rhetorical strategy.
+* An analyst might apply distinctiveness to find out the words used by Gladstone early in his career, but not later, and later in his career, but not earlier.
+* An analyst could use distinctiveness measures to analyze political parties and the words they used that were excluded from use by other parties at the time. By comparing the vocabulary used by members of different parties, the analyst might uncover terms that were uniquely associated with one party's rhetoric and thereby gain insight into the rhetorical strategies emphasized by each group. Our analytic approach can help trace how party identities were constructed and communicated through language. 
+* An analyst might use distance to compare units of time -- weeks, months, or years -- with all other units of weeks, months, or years -- in order to answer the question, "when were new ideas and concerns coming to parliament's attention?  In _The Dangerous Art of Text Mining_, Guldi explains how distinctiveness can be used to investigate the most distinctive years, months, weeks, and days of any century, with the end of highlighting exceptional conversations that are unlike the day-to-day business that is the matter of any institution.^6^
+
+As these examples indicate, one of the most powerful ways of applying distinctiveness for the historian is about understanding change over time.
+
+## Distinctiveness as an approach to change over time
+
+Distinctiveness is a powerful concept for understanding historical change, because it allows the analyst to understand which words are most unique to any given political moment in time. 
+
+If the word "cotton" appears frequently in the years 1860-69, but cotton is almost never mentioned in the years 1806-1859 or 1970-1911, then "cotton" can be considered distinctive of the 1860s. If the word "cotton" appears with a similar frequency in speeches from each decade in the nineteenth century, it is not distinctive of any given decade but rather a reoccurring concern throughout each decade. 
+
+## Unpacking Distinctiveness: The tf-idf algorithm
+
+Among the most common algorithms used to understand distinctiveness is "tf-idf.".^7^ The way tf-idf measurements reveal distinctiveness is by ranking the uniqueness of a word-document pair in respect to other words and other documents in a corpus. The algorithm was originally developed by mathematician Karen Spärk-Jones in 1972, and it has been used routinely in library science as a tool for automatically assigning keywords to articles on the basis of how unique a keyword is to the author's article and how unusual the term is for the field as a whole.^8^ 
+
+At a high level, the guiding principle of tf-idf is to assign a high weight to terms that are frequent within a given document but relatively infrequent across the entire collection of documents. In our context, a high weight indicates that a term is particularly distinctive to a specific document, meaning it appears often in that document but is rare in the rest of the corpus. Consider an application to the word "cotton" when tf-idf is used to rank the distinctiveness of terms over time. "Term frequency" (TF) measures how often a term appears in a document, reflecting its local importance. "Inverse document frequency" (IDF) measures how rare a term is across the entire corpus, reducing the weight of common words. Multiplying these values yields the tf-idf score, which quantifies a term's distinctiveness in a given document.
+
+There are multiple ways to define term frequency (TF) in a tf-idf equation. A common and straightforward method is to use the raw count of how many times a word appears in a document. Another approach normalizes term frequency by adjusting for document length, dividing the raw count by the total number of words in the document. Normalization is useful when comparing texts of different lengths, such as speeches from two individuals--one who spoke frequently and one who did not--or when analyzing decades with varying numbers of records. 
+
+Several variations of tf-idf exist and may be used for analysis. For this chapter, however, we will use just raw counts for our tf-idf calculations for the sake of simplicity.^9^ 
+
+Inverse document frequency (IDF) measures how common or rare a word is within a corpus. It is calculated by dividing the total number of documents in the corpus by the number of documents that contain the term, then taking the logarithm of that ratio. The primary purpose of IDF is to downweigh very common words, making infrequent terms more distinctive. While this lesson removes stop words, doing so is not always necessary because IDF naturally reduces the influence of highly frequent terms while emphasizing those that are more unique to specific documents.
+
+## Measuring the Distinctiveness of Debates Speeches from the 1830s and 1860s using tf-idf
+
+We will begin our work on Hansard by measuring the distinctiveness of language by decade. The first time we walk through the code, we will use a "toy" example in which we have intentionally downsized the data with the intention of showing how the algorithm works, using the minimal amount of data possible. Later, we will scale the toy code up to a larger corpus, applying distinctiveness to each decade between 1830 and 1870. 
+
+The code that follows will use distinctiveness to compare the words used by parliamentary speakers in the 1830s against the 1860s.  
+
+First we will load our libraries and our data, which includes the `stop_words` data from `tidytext` and the 1830 and 1860 Hansard debates. We will then use a version of tf-idf from `tidytext`. To implement this version of tf-idf, we are going to combine these data frames into one. To track the association of words with their respective decades, we will add a column named "decade" and assign each entry to its corresponding decade.^10^
+
+We can use `bind_rows()` to combine `hansard_1830` and `hansard_1860` into a new data frame by stacking them vertically. Stacking two data frames differs from using a join function such as `left_join()` or `inner_join()`, which merge data frames by matching rows based on common columns. `bind_rows()` does not merge columns; it instead appends the rows of one data frame to the other, even if their column names do not fully align.
+
+```{r, warning=FALSE, message=FALSE}
+# Load our needed R packages
+library("hansardr")
+library("tidyverse")
+library("lubridate")
+library("tidytext")
+library("gt")
+
+# Load tidytext's built-in list of stop words for filtering out common words
+data("stop_words")
+
+# Load the Hansard debates from the 1830s and 1860s
+data("hansard_1830")
+data("hansard_1860")
+
+# Add a 'decade' column to hansard_1830 to tag all rows with the value 1830
+hansard_1830 <- hansard_1830 %>%
+  mutate(decade = 1830)
+
+# Add a 'decade' column to hansard_1860 to tag all rows with the value 1860
+hansard_1860 <- hansard_1860 %>%
+  mutate(decade = 1860)
+
+# Combine the two Hansard datasets by stacking their rows into one data frame
+# 1830 will be stacked above 1860
+hansard_data <- bind_rows(hansard_1830, hansard_1860)
+
+# Inspect the data
+hansard_data[, 2:3] %>%
+  sample_n(5) %>%
+  kable(format = "latex", 
+        booktabs = TRUE,
+        caption = "Sample from Hansard Data") %>%
+  column_spec(1, width = "14cm")
+```
+
+We can now further process our dataset to prepare it for tf-idf analysis. The following code applies a series of transformations: it tokenizes the text into a one-word-per-row format, removes stop words using the predefined list from the `tidytext` package, and filters out digits using a regular expression. While chaining multiple functions together, we ensure that the data is cleaned and structured appropriately for tf-idf calculations.
+
+Since the following code applies multiple functions at once to a larger subset of decades, it may take longer to finish running.
+
+Next, we prepare a table of counts that are necessary for the distinctiveness algorithm:
+* _words_per_decade_, a count of how many times each individual word was used per decade
+
+From this table, the tf-idf function will be able to calculate the various components fo the tf-idf algorithm, including:
+* the number of total unique words for the 1830s
+* the number of total unique words for the 1860s
+* the number of total unique words for the corpus overall
+
+## Sidenote: Minimizing the Impact of Data Messiness
+
+For the sake of our analysis, we are only keeping words that appear more than once per decade--an operation that we perform with `filter(n > 1)`. One reason we make this choice is because words appearing only once in the 19th-century Hansard corpus are often the result of OCR errors. When the transcripts were digitized, poor image quality resulted in a mismatch between the digitized word and the word as it was recorded on the transcript. The letter "O," for example, may have been interpreted as the number zero, or the letter "h" might have been interpreted as two "i's" such as "ii."  Future versions of the digital Hansard corpus may address OCR errors. 
+
+In the meantime, however, analysts often have to make judgment calls that entail narrowing a corpus to words, whether to eliminate OCR errors or simply to identify more common words. Tweaking the value of the number `x` in the expression `filter(n > x)` will alter the final results of this chapter in ways that may be meaningful by removing more low frequency words. 
+
+```{r, echo = F, message = F}
+# Code does not show, just output 
+tokenized_hansard_data <- suppressMessages(
+  hansard_data %>%
+    unnest_tokens(word, text) %>%
+    anti_join(stop_words) %>%
+    filter(!str_detect(word, "[[:digit:]]")))
+
+# tokenize the 'text' column into individual words, 
+# remove stop words, and filter out tokens that contain digits
+tokenized_hansard_data <- hansard_data %>%
+  unnest_tokens(word, text) %>% # break text into one word per row
+  anti_join(stop_words) %>% # remove stop words like 'the' or 'and'
+  filter(!str_detect(word, "[:digit:]")) # remove words with digits
+
+# count how often each word appears per decade,
+# sort by frequency, and remove words that appear only once
+words_per_decade <- tokenized_hansard_data %>%
+  count(decade, word, sort = TRUE, name = "word_count_per_decade") %>%  # count word frequency by decade
+  filter(word_count_per_decade > 1)  # keep words that appear more than once
+
+# Inspect the data
+words_per_decade %>% 
+  rename(hansard_word = word, hansard_decade = decade) %>%
+    sample_n(8) %>% 
+  arrange(desc(word_count_per_decade)) %>%
+  pivot_wider(names_from = hansard_word, values_from = word_count_per_decade,
+              values_fill = 0) 
+
+
+```
+
+The results are ready to be passed to the distinctiveness algorithm so that the tf-idf metric can be computed for each word-decade pair. 
+
+We use the function `bind_tf_idf()` to calculate distinctiveness for any word-document pair, using the arguments _word_, _document_, and _n_. To calculate distinctiveness by decade, we set the argument _document_ as "decade."
+
+```{r, message = F}
+# calculate tf-idf (term frequency–inverse document frequency) 
+# for each word by decade using word frequency and total count
+hansard_tf_idf <- words_per_decade %>%
+  bind_tf_idf(word, decade, word_count_per_decade)  # compute tf-idf
+```
+
+```{r}
+hansard_tf_idf %>% 
+  sample_n(5) %>% 
+  arrange(desc(tf_idf))
+```
+
+Please note that the output of `bind_tf_idf()` includes the component calculations we mentioned:
+- one row for each decade in which each word appears
+- the total number of times each word appears in this decade (given in `word_count_per_decade`, the product of our calculation to produce the `words_per_decade` data frame)
+- the "term frequency" calculation, a metric of how often each word appears per decade, normalized against the total number of words in each decade. A high TF means that the word appears frequently in a given decade.
+- the "inverse document frequency" metric, a calcuation of how uncommon the word is across the entire corpus. A high IDF means that a word is rare across the corpus.
+- the tf-idf score -- the most important score for interpreting the results.  A high tf-idf score means that a word is highly distinctive of a decade, i.e., it scarcely appears in the other decade(s) of a corpus.  
+
+Now that we have a tf-idf metric for each word-decade pair, we can use these scores to interpret the differences between the 1830s and 1860s.
+
+```{r}
+# keep top 15 tf-idf words per decade
+top_hansard_tf_idf <- hansard_tf_idf %>%
+  group_by(decade) %>% # group by decade
+  slice_max(tf_idf, n = 15) %>% # keep top 15 words
+  arrange(decade, desc(tf_idf)) %>%
+  ungroup()
+```
+
+Let's make a fancy table using `kableExtra` to inspect the data.
+
+```{r, results='asis'}
+library("knitr")
+library("kableExtra")
+
+# Make sure this is a tibble/data frame and really has `decade`
+top_hansard_tf_idf <- as_tibble(top_hansard_tf_idf)
+stopifnot("decade" %in% names(top_hansard_tf_idf))
+
+# Function to build a LaTeX kable for one decade
+make_kable <- function(df, dec_label) {
+  df %>%
+    select(word, tf_idf) %>%
+    arrange(desc(tf_idf)) %>%
+    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
+    kable(format = "latex",
+          booktabs = TRUE,
+          col.names = c("Word", "TF--IDF Score"),
+          align = c("l", "r"),
+          caption = paste0("Top TF--IDF Words — ", dec_label),
+          label = paste0("tab:tfidf-", dec_label),  # unique label per decade
+          escape = TRUE) %>%
+    kable_styling(full_width = FALSE) }
+
+# Decide which values to filter on depending on how `decade` is stored
+if (is.numeric(top_hansard_tf_idf$decade)) {
+  target_decades <- c(1830, 1860) } else {
+  target_decades <- c("1830s", "1860s") }
+
+# Filter to target decades and print one table per decade
+top_hansard_tf_idf %>%
+  filter(decade %in% target_decades) %>%
+  group_by(decade) %>%
+  group_walk(~ {
+    dec_label <- .y$decade[1]
+    print(make_kable(.x, dec_label))
+    cat("\n\n") })
+```
+
+Words that were distinctive in the 1830s, compared to later decades, often reference the Carlist Wars—a series of civil wars in Spain that began in 1833 over the dispute regarding the rightful successor to the throne. Portugal, France and the United Kingdom supported the regency, and even intervened in the conflict by sending forces to confront the Carlist army. Subsequently, the reference to "Carlist" can possibly explain the number of Spanish names/words listed in the bar plot, including "Miguel," "Pedro," and "Terceira."
+
+Other terms that appear as distinctive of the 1830s in comparison to the 1860s are references to individuals and places whose names punctuated routine debates of the period. The year 1831 marked the death of the 1st Earl of Mulgrave, a distinguished politician who had served as Foreign Secretary and was subsequently memorialized in many speeches. From 1830-2, Charles Wetherell represented Boroughbridge in Parliament, explaining the inclusion of his name and the constituency he served. In 1839 the recently colonized city of Gosford, in New South Whales, Australia, is given its name after the 2nd Earl of Gosford, a friend of the governor of New South Whales. 
+
+Words distinctive of the 1860s include several references to contemporary matters of foreign affairs unique to the decade, for instance, "schleswig," a reference to the Second Schleswig War (1864), wherein Germany and Denmark commenced an altercation over disputed territory that included the province of Schleswig-Hollsteine. "Fenian" references the 1867 Fenian Uprising, a failed rebellion against British rule in Ireland. The name "Disraeli" marks the prime minister who oversaw the 1867 Reform Act that enfranchised much of Britain's working class.  The term "Crimean" references the Crimean War, which broke from 1853-56. "Sewage" references contemporary questions of the rebuilding of London's water supply.
+
+This simple exercise demonstrates tf-idf in action, providing a concrete example of how the method identifies terms that are unique to each document, with minimal overlap between them. 
+
+This toy analysis is limited in implication, however, because historians rarely want to compare two distant periods of time. Far more instructive will be the results of analyzing each decade between 1830 to 1860 against each other.
+
+## Analyzing the Distinctiveness of Decades Over a Half-Century, from 1830 to 1870
+
+The following code loads the 1840 and 1850 Hansard debates and combines them into a single data frame that will be used to measure tf-idf. 
+
+```{r}
+# Load Hansard data for the 1840s and 1850s
+data("hansard_1840")
+data("hansard_1850")
+
+# Add a "decade" column to the 1840s dataset
+hansard_1840 <- hansard_1840 %>%
+  mutate(decade = 1840)
+
+# Add a "decade" column to the 1850s dataset
+hansard_1850 <- hansard_1850 %>%
+  mutate(decade = 1850)
+
+# Append the 1840s and 1850s data to the existing hansard_data
+hansard_data_1830_to_1870 <- hansard_data %>%
+  bind_rows(hansard_1840) %>% # Add 1840s data
+  bind_rows(hansard_1850) # Add 1850s data
+```
+
+In preparation for using tf-idf across multiple decades, we use the following codes to generate word frequencies in text data across specific time periods (e.g., decades). It uses a `for()` loop to iterate through each decade for preprocessing. It preprocesses the text by tokenizing it into words, removing stop words, and filtering out irrelevant tokens (like numbers), then counts the most frequently used words for each decade. The results are stored in a new data frame, `hansard_count`.
+
+While a `for` loop is not needed to perform these actions, we have chosen to use one here to process text data separately for each decade in the dataset. Otherwise, tokenizing all four decade subsets simultaneously could exceed available computer memory. The code may run slow on older or more limited machines -- give it time to run.
+
+```{r, message=FALSE}
+# define the list of decades to analyze. each value will be used to 
+# filter the main dataset, enabling decade-by-decade processing.
+decades <- c(1830, 1840, 1850, 1860)
+
+# create an empty data frame to hold word frequency counts from each decade.
+# this object will be built up by appending results from within the loop.
+hansard_words_1830_to_1870 <- data.frame()
+
+# iterate through each specified decade to perform tokenization, 
+# filtering, and word frequency counting
+# results are combined into a single table.
+for(d in decades) {
+  
+  # filter the full hansard dataset for just the current decade (d)
+  new_decade <- hansard_data_1830_to_1870 %>%
+    filter(decade == d)  # keep only rows from this decade
+  
+  # tokenize the text column into individual words, remove stop words, 
+  # and exclude any tokens that contain numeric digits (e.g., years)
+  tokenized_new_decade <- new_decade %>%
+    unnest_tokens(word, text) %>%  # convert text to one word per row
+    anti_join(stop_words) %>%      # remove stop words
+    filter(!str_detect(word, "[:digit:]"))  # remove words with digits
+  
+  # count the frequency of each remaining word in the current decade
+  # then filter to retain only words appearing more than 20 times
+  new_decade_count <- tokenized_new_decade %>%
+    count(decade, word, sort = TRUE) %>%  # count word frequencies
+    filter(n > 20)  # keep words with frequency > 20
+  
+  # append the word counts from this decade to the overall results table
+  hansard_words_1830_to_1870 <- bind_rows(hansard_words_1830_to_1870, 
+                                          new_decade_count)}  # combine rows
+```
+
+We now have a dataset, `hansard_count`, which includes each word along with the number of times it appears in a given decade.
+
+```{r}
+# Inspect the Data
+hansard_words_1830_to_1870 %>% group_by(decade) %>% 
+  sample_n(2) %>% 
+  ungroup() %>% 
+  arrange(desc(decade)) %>% 
+  head()
+```
+
+We can now apply tf-idf and visualize our results, in this case, the first 15 words that appear for each decade. 
+
+```{r}
+# compute tf-idf values and keep top 15 words by tf-idf for each decade
+most_dist_hansard_words <- hansard_words_1830_to_1870 %>%
+  bind_tf_idf(word, decade, n) %>% # compute tf-idf for each word by decade
+  group_by(decade) %>% # group by decade
+  slice_max(tf_idf, n = 15) # keep top 15 tf-idf words per group
+```
+
+```{r tfidf-tables, results='asis'}
+library("knitr")
+library("kableExtra")
+
+make_kable <- function(df, dec_label) {
+  df %>%
+    select(word, tf_idf) %>%
+    arrange(desc(tf_idf)) %>%
+    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
+    kable(format = "latex",
+          booktabs = TRUE,
+          col.names = c("Word", "TF--IDF Score"),
+          align = c("l", "r"),
+          caption = paste0("Top TF--IDF Words — ", dec_label),
+          escape = TRUE) %>%
+    kable_styling(full_width = FALSE) }
+
+df_in <- most_dist_hansard_words
+
+df_in %>%
+  group_by(decade) %>%
+  group_walk(~ {dec_label <- .y$decade[1]
+  print(make_kable(.x, dec_label))
+  cat("\n\n") })
+```
+
+By analyzing the words most characteristic of each decade (the 1830s, 40s, 50s, and 60s), we can easily see a link between those terms and historical events.
+
+Some of the words may key the analyst into rhetorical shifts, like the old-fashioned spelling "shew," discarded after the 1830s. Others attune us to seemingly minor issues that neverthless were discussed frequently in their time. For instance, the distinctive words of the 1830s now include the term "impropriators," a designation of a layperson who held the income rights of a church benefice.  The improprietors' rights dated from the Tudor dissolution of the monasteries. Lay impropriators became a target of tithe reform in the 1830s. Other words suggest known turning points of history, for example the governance of railway gauges in the 1840s, the Crimean War in the 1850s, and the prominence of Fenian terrorism and the rifle in the 1860s. Still other words may lead us to new research questions -- for instance, asking what is the relevance of "differential" in the 1840s? Our question might lead us to discussions of the "differential duty" discussed by the House of Lords in April 1840, when they mooted making foreign exporters pay higher duties, so as to protect  domestic interests tied to monopolies.
+
+## Cleaning Out the Cache so as to Preserve Memory
+
+At this stage of our analysis, we are working with several datasets. Working with multiple datasets at a given time can provide us with a richer overview of the historical records, however, it can consume a significant amount of memory on our computer. To free memory, we can remove some of the large datasets from our Global Environment before going to our next examples and analyses. 
+
+We can remove data using `rm()` while passing the variables you wish to clear. For example, `rm()` can be passed a single variable name or multiple variable names. 
+
+```{r}
+# Remove both datasets from the global environment
+rm(hansard_1830, hansard_1840)
+```
+
+Or, if instead we wish to remove all variables, `rm()` can be passed the output of `ls()`, a function that lists all the variables from the Global Environment. 
+
+```{r}
+# List all objects currently in the global environment
+ls()
+```
+
+```{r}
+# List all objects currently in the global environment
+all_variables <- ls()
+# Print the names of all objects (optional, for confirmation)
+print(all_variables)
+# Remove all objects from the global environment
+rm(list = all_variables)
+```
+
+Following `rm()` with `gc()` (which stands for "garbage collection") ensures that memory occupied by removed objects is fully reclaimed. When an object is deleted using `rm()`, R does not immediately free up the associated memory; instead, the memory remains allocated until the garbage collector runs. By calling `gc()`, we force R to release unused memory, preventing excessive memory consumption. Releasing unused memory may be particularly important when working with large datasets or performing memory-intensive operations, as it helps reduce the risk of running out of the computer crashing or being unable to process additional data.
+
+```{r}
+# Run garbage collection to reclaim memory
+gc()
+```
+
+The output from the `gc()` function provides a snapshot of memory usage and triggers garbage collection. The Ncells store internal structures, like lists, while the Vcells store numerical, character, and logical data. The gc trigger values indicate the memory thresholds that, when exceeded, will automatically initiate garbage collection. 
+
+Sometimes, due to memory fragmentation, R may not be able to release memory back to the operating system, even after running `gc()`.Memory fragmentation occurs when R allocates memory in multiple small chunks over the course of a session. As objects are created and removed, chunks of data become scattered throughout the computer's memory. R's garbage collector (`gc()`) can free memory, but it cannot always merge these scattered memory blocks into a single large block that the operating system can reclaim. As a result, memory usage can remain high, even if most objects have been removed. 
+
+Memory consumption can be seen in RStudio above the Global Environment panel. If a significant amount of memory remains reserved, it may be necessary to restart R to fully release fragmented memory. We can restart RStudio by closing out of RStudio and without saving the work space, or by running `q()` with the parameter `save` set to "no". 
+Important: Running the following code block will quit RStudio. 
+
+```{r, eval=FALSE}
+# Quit the R session without saving the current workspace
+q(save = "no")
+```
+
+If you quit RStudio, you will need to reload the required libraries: 
+
+```{r, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("tidytext")
+library("hansardr")
+```
+
+## Distance for Historical Analysis
+
+Distance is used to compare the distributions of words in any two corpora.  In general, it is less used to identify the variables that are most characteristic of a corpus, and more frequently used when the analyst needs to position different corpora on a "magic ruler" that ranks them from most similar to least similar to some text.
+
+A historian might use distance for the following applications:
+* An analyst might choose to identify the speakers whose overall use of political vocabulary most closely resembles Gladstone's. They might then ask whether those speakers were all members of his political party, or whether some came from across the political divide. An analysis could tell us who shared his linguistic style, and whether that style aligned with partisan boundaries or not. 
+* An analyst might use distance to rank the individual speeches that sound the most like any one of a set political passages excerpted from contemporary novels, including those of Charles Dickens, which frequently engage political phenomena. This process might help the analyst to discover the likeliest speeches that Dickens was attending to when he wrote various novels.
+* An analyst might compare parliamentary speeches and newspaper stories over time to ask questions about when the lines of influence run from parliament to the newspaper, and when questions are first raised in the newspaper and later in parliament
+* An analyst might apply party distance by decade to inform research on how party identities shifted over time in response to political events or ideological realignments.
+
+In the sections that follow, we will only address the first of these queries -- the matter of how to compare two decades of time to highlight what was coming into parliament's attention and what was fading over a twenty-year period.  
+
+The method introduced, however, once mastered, can be applied to all other problems of analysis.  Indeed, comparing subcorpora with distance underlies a great many possible programs of analysis, each of which can be accomplished by applying distance measurements to different corpora -- that is, to comparing one decade against all other decades, one week to all other weeks, one speaker to all other speakers, and one speech to all other speeches. A great many problems of abstract analysis can be rendered into text-mining problems by recognizing the impulse of comparison at their heart, and translating this basic comparison into distance measurements. 
+
+## Jenson-Shannon Divergence (JSD)
+
+Any algorithm emphasizes certain aspects of a corpus while de-emphasizing others. Investigating the implications of adopting different algorithms is a critical approach to working with data. To illustrate this point, we introduce another metric for measuring a corpus: a modified form of divergence known as Partial Jensen-Shannon Divergence (Partial JSD). Jensen-Shannon Divergence (JSD) is a measure from information theory that quantifies the similarity between probability distributions by calculating the divergence between their averaged distributions. Unlike other distinctiveness measures, which often highlight exceptional words or phrases between two documents, JSD provides a general framework for comparing textual data by treating documents as probability distributions over words. This approach allows us to use Partial JSD to quantify how "close" or "distant" the language between two datasets are. 
+
+Distance is a quantitative measure that captures the degree of similarity or difference in the distribution of a word’s occurrence across two or more groups. In text analysis, distance measures assess how consistently or variably a word appears in different datasets, helping to determine whether its usage patterns align or diverge. These measures allow for ranking datasets based on the extent to which words are expressed at comparable rates across them, providing a structured way to compare linguistic patterns, such as by identifying patterns of relative similarity or dissimilarity based on word frequencies, term distributions, or other textual features.
+
+In the following section, we will use the partial Jensen-Shannon Divergence (JSD)—specifically, one-half of the full JSD equation. We have chosen to use partial JSD because we have chosen to focus our analysis on how the distribution of words in one dataset differs from another without averaging both sides of the comparison. Comparing distributions is useful for seeing how much one dataset deviates from a reference point (for example, the decade 1850 against the previous decade, 1840, and vice-versa) rather than measuring a balanced difference. It simplifies the calculation while still highlighting key differences, making it easier to interpret. JSD is especially helpful when comparing texts from different time periods without averaging changes in both directions or masking asymmetrical shifts in word usage.
+
+We hope that readers will become comfortable with the idea that algorithmic approaches to measuring key characteristics of a corpus are varied, and that the analyst can learn from comparing the results of working with different measurements. 
+
+## Measuring Distance Between Words in a Corpus using JSD
+
+First we will load our data and prepare it for our partial JSD function. The following code tokenizes and cleans both decades. 
+
+```{r, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("hansardr")
+library("tidytext")
+
+# Load Hansard data for the 1840s and 1850s
+data("hansard_1840")
+data("hansard_1850")
+
+# preprocess the 1840s hansard data:
+# tokenize the text column into words, remove stop words, 
+# and filter out tokens that contain digits
+hansard_1840 <- hansard_1840 %>% # create a new dataset
+  unnest_tokens(word, text) %>% # convert text into one word per row
+  anti_join(stop_words) %>% # remove common stop words
+  filter(!str_detect(word, "[:digit:]"))  # remove words with digits
+
+# preprocess the 1850s hansard data using the same steps:
+# tokenize, remove stop words, and exclude numeric tokens
+hansard_1850 <- hansard_1850 %>% # create a new dataset
+  unnest_tokens(word, text) %>% # tokenize text
+  anti_join(stop_words) %>% # remove stop words
+  filter(!str_detect(word, "[:digit:]"))  # exclude tokens with digits
+```
+
+We have defined a partial JSD function below. The code defines two functions that measure how much word usage changed between 1840 and 1850. Each function compares the word frequencies from one decade to an average of both decades. One function looks at how much 1840’s word usage differs from this average, while the other does the same for 1850. Leveraging JSD helps identify words that became more or less common over time without mixing both decades together.
+
+```{r}
+# Function to calculate one-sided KL divergence component of JSD
+partial_jsd_1840_to_1850 <- function(p, q) {
+  m <- 0.5 * (p + q) # Midpoint distribution
+  return(p * log2(p / m))} # 1830 deviation from midpoint
+
+partial_jsd_1850_to_1840 <- function(p, q) {
+  m <- 0.5 * (p + q) # Midpoint distribution
+  return(q * log2(q / m))} # 1860 deviation from midpoint
+
+
+# define a function for jsd
+jsd <- function(p, q) {
+  # Ensure p and q are probability distributions
+  p <- p / sum(p)
+  q <- q / sum(q)
+  m <- 0.5 * (p + q)
+  
+  # Define a helper function for KL divergence
+  kl_div <- function(a, b) {
+    a <- ifelse(a == 0, 1, a)  # Avoid log(0)
+    b <- ifelse(b == 0, 1, b)
+    sum(a * log2(a / b))
+  }
+  
+  0.5 * kl_div(p, m) + 0.5 * kl_div(q, m)
+}
+
+
+```
+
+The difference in the return statements—one using `p` and the other using `q`—ensures that each function measures the directional change in word usage for a specific decade. By using `p` in one function and `q` in the other, we avoid blending the two distributions. Instead, we get a clearer, one-sided measure of how word usage changed over time. The measurement allows us to distinguish words that declined after 1840 from those that rose in prominence by 1850.
+
+In both functions, `m = 0.5 * (p + q)` represents the average probability distribution between the two periods, and the return value calculates the information gain when approximating `p` (or `q`) with `m`. Partial JSD ensures that we capture asymmetrical shifts in word frequency over time. 
+
+At this stage we can calculate word frequencies. Calculating word frequencies is an essential step because JSD operates on probability distributions. By counting how often each word appears in a given decade (e.g., 1840 and 1850), we can transform these counts into probabilities, which are required to measure divergence. Since Partial JSD specifically focuses on how one decade’s word distribution deviates from another without averaging both directions, accurate word frequencies ensure that we capture asymmetrical changes in language use. An asymmetrical change occurs when a word's usage shifts more in one direction than the other. For example, if a word was common in 1840 but became rare in 1850, this is an asymmetrical change because the decrease is not balanced by an equivalent increase elsewhere. Partial JSD captures these one-sided shifts, helping identify words that either faded out or emerged over time rather than averaging both directions.
+
+```{r}
+# Count word frequencies for both decades 
+freq_1840 <- hansard_1840 %>% 
+  count(word, name = "count_1840")
+
+freq_1850 <- hansard_1850 %>% 
+  count(word, name = "count_1850")
+
+freq_1840
+```
+
+In the following code, we take additional steps to focus our analysis on the frequent words from each decade while avoiding rarer terms. Our approach will provide us with an overview of both decades. 
+
+```{r}
+# define how many top words to extract from each decade's corpus.
+# this number controls the vocabulary size for comparison.
+top_n <- 50  # number of top words to extract
+
+# extract the top n most frequent words from the 1840s word frequency table.
+# keep only the word column and return it as a character vector.
+top_words_1840 <- freq_1840 %>%
+  slice_max(order_by = count_1840, n = top_n) %>%  # select top n by count
+  select(word) %>%  # keep only the word column
+  deframe()  # convert to a character vector
+
+# extract the top n most frequent words from the 1850s word frequency table.
+# repeat the same steps to prepare for cross-decade comparison.
+top_words_1850 <- freq_1850 %>%
+  slice_max(order_by = count_1850, n = top_n) %>%  # select top n by count
+  select(word) %>%  # keep only the word column
+  deframe()  # convert to a character vector
+```
+
+Combining the top words from both decades ensures that words that were dominant in either period are included in the analysis, preventing the exclusion of key terms that may have gained or lost prominence.
+
+```{r}
+# Combine top words from both decades and keep only unique words
+all_top_words <- unique(c(top_words_1840, top_words_1850))
+```
+
+We can further prepare and processes the word frequency data to compute Partial JSD, identifying words that changed the most between 1840 and 1850.
+
+The following code works by: 
+* Merging and Cleaning Data: We create a dataset (`word_dist`) that includes the top words from both decades and their frequencies. We use `left_join()` to merge the word counts from 1840 and 1850, ensuring that every word in either decade is included. Missing values (for words that appear in only one decade) are replaced with zeros to avoid computational issues.
+* Normalizing Word Frequencies: The word counts are converted into probabilities by dividing each count by the total number of words in that decade. Normalization ensures that word usage is compared proportionally, rather than based on absolute counts.
+* Handling Logarithmic Calculations: Since logarithms are undefined for zero, words with a probability of 0 are replaced with a small constant (1e-10) to prevent errors in divergence calculations.
+
+```{r}
+# Combine the top words from both decades with their frequency tables
+# Create a dataset containing the union of all top words
+# Join the 1840s word counts
+# Join the 1850s word counts
+# Replace missing counts with zeros so the two decades can be compared directly
+word_dist <- data.frame(word = all_top_words) %>%
+  left_join(freq_1840, by = "word") %>%
+  left_join(freq_1850, by = "word") %>%
+  replace_na(list(count_1840 = 0, count_1850 = 0))
+
+# normalize raw word counts to probabilities by dividing each word's count 
+# by the total count from its respective decade. this prepares data 
+# for comparison using divergence or distance metrics.
+word_dist <- word_dist %>%
+  mutate(p_1840 = count_1840 / sum(count_1840),  # normalize 1840 counts
+         p_1850 = count_1850 / sum(count_1850))  # normalize 1850 counts
+
+# Taking the log of zero isn’t allowed
+# Therefore, we replace any zeros with a tiny number
+# This keeps the math stable without changing the results in a meaningful way.
+word_dist$p_1840[word_dist$p_1840 == 0] <- 1e-10
+word_dist$p_1850[word_dist$p_1850 == 0] <- 1e-10
+
+head(word_dist)
+```
+
+With our word distributions calculated, we are now able to compute Partial JSD and discover the most significant changes between the two decades. 
+
+The following code works by: 
+* Computing Partial JSD: The script applies the Partial JSD functions to compute how much each word's probability in 1840 deviates from the midpoint distribution (1840 to 1850) and vice versa (1850 to 1840). The partial JSD step captures asymmetrical shifts in word usage.
+* Assigning Direction of Change: Each word is assigned to only one direction of change, depending on which Partial JSD score is higher. If a word's usage declined after 1840, it is assigned "1840 to 1850" with a negative score. If a word became more common in 1850, it is assigned "1850 to 1840" with a positive score.
+* Selecting the Most Significant Changes: Finally, we sort words by their absolute Partial JSD score and selects the top 30 most dramatically shifting words.
+
+```{r}
+# Compute Partial Jensen-Shannon Divergence (JSD) for each word 
+# in both directions:
+# - From the 1840 distribution to the 1850 distribution
+# - And from 1850 to 1840
+# This captures how much each word contributes to the overall 
+# divergence between decades, depending on the direction of comparison.
+word_dist <- word_dist %>%
+  rowwise() %>%
+  mutate(Partial_JSD_1840 = partial_jsd_1840_to_1850(p_1840, p_1850),
+         Partial_JSD_1850 = partial_jsd_1850_to_1840(p_1840, p_1850)) %>% 
+  ungroup()
+
+# Assign a direction for each word:
+# - 1840 → 1850" if its contribution is higher in that direction,
+# - otherwise "1850 → 1840".
+# Signed Partial JSD:
+# - Negative = more distinctive of 1840
+# - Positive = more distinctive of 1850
+word_dist <- word_dist %>%
+  mutate(Direction = 
+           ifelse(Partial_JSD_1840 > Partial_JSD_1850,  # decide dominant direction
+                            "1840 to 1850", 
+                            "1850 to 1840"),
+         Partial_JSD = ifelse(Direction == "1840 to 1850", 
+                              -Partial_JSD_1840,  # negate to show shift from 1840
+                               Partial_JSD_1850))  # keep positive for 1850-leaning
+
+# Rank words by the their contribution to divergence (i.e., absolute Partial JSD)
+# and keep the top 30 most distinctive words across the two decades
+word_dist <- word_dist %>%
+  arrange(desc(abs(Partial_JSD))) %>%  # Sort by highest absolute contribution
+  slice(1:30)                          # Keep top 30 words
+```
+
+Partial JSD can be interpreted as follows:
+* Higher Partial JSD: The word's frequency changed significantly over time (either increased or decreased).
+* Lower Partial JSD: The word remained relatively stable in frequency between the two time periods.
+* Partial JSD = 0: The word's probability did not change at all between the two time periods. If a word was never used in both periods, its probability is always 0.
+
+One effective way of visualizing the results from Partial JSD is with a diverging bar chart, like in the following visualization. Higher Partial JSD values (e.g., war, india, government) indicate words whose relative importance changed significantly between 1840 and 1850 whereas lower Partial JSD values (e.g., noble, stated, foreign) suggest words that remained relatively stable in their frequency distribution across both decades. 
+
+```{r, fig.cap="Partial Jensen–Shannon divergence (JSD) values for the top words distinguishing the 1840 and 1850 Hansard debates."}
+# create a mirrored bar chart showing which words contribute 
+# most to linguistic shift
+# between 1840 and 1850 
+# bars are flipped to show direction, based on partial jsd
+ggplot(word_dist, aes(x = reorder(word, Partial_JSD), # order words by divergence
+                      y = Partial_JSD, # y-axis is signed partial jsd
+                      fill = Direction)) + # fill bars by direction label
+  geom_bar(stat = "identity") + # draw bars with exact values
+  coord_flip() + # flip axes for horizontal layout
+  labs(title = "Partial JSD of Top Words: 1840 vs. 1850", # chart title
+       x = "word", # x-axis label
+       y = "partial jsd value", # y-axis label
+       fill = "change direction") + # legend title
+  theme_minimal() + # use a clean minimal theme
+  scale_fill_manual(values = c("1840 to 1850" = "red", # color for 1840 shift
+                               "1850 to 1840" = "blue")) + # color for 1850 shift
+  theme(legend.position = "bottom") # move legend below plot
+```
+
+From our analysis, we can start to interpret what was trending and what was going away from the vantage point of an objective observer who had lived through hte years 1840 to 1859.  On the up-and-up were Ireland, corn, trade, and duties, and discussions of baronets and the poor. 
+
+Less and less in evidence after 1850 were discussions of war, India, and the work of committees. Various formal language were passing, including addressing other members of parliament as "gentleman," talking about the "matter" at hand, or addressing each other as "sir."  
+
+The causes and implications of language changes are interesting to contemplate, and, as with much work in text mining, they require deeper reading of context in order to dive deeper.  The point is that distance measurement lends us a metric to make concrete phenomena that are otherwise invisible -- the pulse of rising and falling trends over time.  
+
+## Exercises: 
+
+1) In chapter 3 we analyzed the top words of the Chancellors of the Exchequers for the 1830s by counting top words and visualizing them in a facet wrapped bar chart. This time use tf-idf to create this visualization, but this time using tf-idf as the measurement instead of count.
+
+2) Take a single debate, such as the 1833 Debate on the Abolition of Slavery, and find the individual speakers. Use JSD to create comparisons between speakers. Remember to go back into the debates themselves and closely read the text before making definitive claims. Refer to chapter 3 if you need a refresher on how to do this.
+
+3) In chapter 2 and chapter 3, we learned how to use a controlled vocabulary to focus our analyses on subsets of the data that include a particular word of interest. Re-do the comparison of the decades 1830 and 1860, but this time filter the two decades for just debates that include the word "cotton." How does tf-idf obviate the need for stopwords lists? How does working with tf-idf result in a different interpretation than working with stopwords alone?  Is one method more accurate than another, or does each algorithm contribute a different perspective on the truth?
+
+4) Up to this point we have analyzed one-word and two-word utterances (e.g. tokens and bigrams). Are there limitations to this approach when it comes to making meaning from historical data? 
+
+
