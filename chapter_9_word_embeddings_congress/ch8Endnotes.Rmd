@@ -46,7 +46,7 @@ climate_change_text_2020 <- congress_daily_climate_change_2020$content
 
 When a computer analyzes language, it cannot work with words directly. Instead, it represents each word as a list of numbers, called a vector. For example, instead of storing the word "climate" as text, the model might represent it like this:
 
-> *climate → [0.21, -0.44, 0.88, 0.13, ...]*
+> **climate → [0.21, -0.44, 0.88, 0.13, ...]**
 
 Each number in the vector captures a small piece of the word's meaning based on how the word appears next to other words in the corpus. By examining these patterns across large amounts of text, it becomes possible for a computer to estimate the numeric representations that reflect relationships between words. To do this, we will use a technique called machine learning. 
 
@@ -268,6 +268,11 @@ vector_addition <- function(word1, word2, embeddings, top_n = 10) {
     slice_head(n = top_n) }
 ```
 
+Sometimes we might think to analyze a word that does not appear in our corpus. If we do 
+
+In debates that include the word "climate" the word "man" appears but not "woman" 
+
+
 
 If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
 
@@ -275,7 +280,7 @@ If one of the words does not exist in the corpus, we will see the error `Error i
 vector_addition("man", "woman", congress_daily_climate_change_2000)
 ```
 
-# Word Association and the Congress Viewer
+# Visualizing Word Association using the Congress Viewer
 
 For the purposes of this book, we work with a limited subset of the data: three decades of Congressional Records. This smaller window allows analysts to run the data on a personal computer while still providing the tools to demonstrate the research strategies used throughout the book. 
 
@@ -287,17 +292,19 @@ The first plot we will look at from the Congress Viewer shows the semantic assoc
 
 Our guiding question will be: How do the semantic associations between "democracy" and "Iraq" evolve over time in Congressional debate? When approaching a question like this, historians often begin with a working hypothesis. Based on historical knowledge of major turn-of-the-millennium events, one might reasonably expect that the association between "democracy" and "Iraq" becomes stronger during the period surrounding the Iraq War. Political leaders frequently supported military intervention by framing it as an effort to defend or promote democracy. If that linguistic framing was common in Congressional debate, we would expect the language surrounding these two words to become more similar during that period. The purpose of this analysis, however, is not simply to confirm what historians may already know about the Iraq war, but to demonstrate that the associations between Iraq and democracy is measurable, and to demonstrate how that rhetorical connection appears in the broader corpus of the Congressional debate.  
 
-The first visualization we created examines the word "democracy." For most of the twentieth century, the words most closely associated with democracy are fairly unsurprising: terms such as "patriotism," "freedom," "liberty," "victory," and "win." These associations largely carry a positive tone, and many are connected to words like "unity" and "peace."
+The first visualization we created examines the word "democracy." For most of the twentieth century, the words most closely associated with democracy are fairly unsurprising and repeat throughout each decade, terms such as "patriotism," "freedom," "liberty," "victory," and "win." These associations largely carry a positive tone, and many are connected to words like "unity" and "peace." What is notable is that this pattern remains consistent even during major historical upheaval. For example, in 1940, during the period surrounding World War II, the words most closely associated with democracy still include "fredom," "unity," and "peace." Despite the global conflict, the rhetorical language surrounding democracy in Congressional debate does not shift dramatically. Instead, democracy continues to be discussed primarily in terms of shared political values and ideals rather than immediate military action.
 
-By 2000, however, the pattern of associations shifts. During the period surrounding the Iraq War, the words most closely associated with "democracy" include "defend" (as the most associated word), "war," "troops," and "terror." The language surrounding democracy becomes suddenly tied to military action, reflecting the political language of the period.
+By 2000, however, the pattern of associations shifts drastically. During the period surrounding the Iraq War, the words most closely associated with "democracy" include "defend" (as the most associated word), "war," "troops," and "terror." The language surrounding democracy becomes suddenly tied to military action. 
 
 ```{r, echo=FALSE}
 knitr::include_graphics("democracy.jpg")
 ```
 
-Now, cross-reference the democracy visualization with the word "iraq." Before 1920, Iraq appears too rarely in the corpus to appear in our word embeddings dataset. In the 1920s, the few associations that do emerge include Talley (also spelled Tallil)—a military base in Iraq—and Mosul, a major city in Iraq. Beyond these geographic references, there are few strong or consistent associations.
+If the language of democracy becomes closely tied to military conflict during this period, it is worth examining whether "Iraq" appears within a similar rhetorical context Exploring the associations surrounding the word “Iraq” allows us to test our working hypothesis: that the Iraq War represents a turning point in how democracy is discussed in Congressional debate. If this hypothesis holds, we would expect the vocabulary surrounding “Iraq” to increasingly overlap with the language now associated with “democracy.”
 
-A similar pattern appears in 1940. The words most closely associated with "iraq" include "danish," "beaches," and "rhine." At first glance, these terms seem unrelated to Iraq. The most plausible explanation is data sparsity: because Iraq is mentioned in relatively few sentences in the Congressional Records, our statistical word embeddings model builds its associations based on a small set of debates. In that situation, any nearby geopolitical terms can highly influence associations, even if they are not conceptually related to Iraq. Therefore, Iraq's association with "danish," "beaches," or "rhine" does not suggest that it had any direct political relationship with the events taking place in Denmark or along the Rhine, such as military invasions. 
+As shown by the following image, before 1920, Iraq appears too rarely in the corpus to appear in our word embeddings dataset. In the 1920s, the few associations that do emerge include Talley (also spelled Tallil)—a military base in Iraq—and Mosul, a major city in Iraq. Beyond these geographic references, there are few strong or consistent associations.
+
+A similar pattern appears in 1940. The words most closely associated with "iraq" include "danish," "beaches," and "rhine." At first glance, these terms seem unrelated to Iraq. The most plausible explanation is data sparsity: because Iraq is mentioned in relatively few sentences in the Congressional Records, our word embeddings model builds its associations based on a small set of debates. In that situation, any nearby geopolitical terms can highly influence associations, even if they are not conceptually related to Iraq. Therefore, Iraq's association with "danish," "beaches," or "rhine" does not suggest that it had any direct political relationship with the events taking place in Denmark or along the Rhine, such as military invasions. 
 
 In the 1950s, Iraq is most associated with other Middle Eastern nations such as Israel, Palestine, Egypt, Syria, and Jordan. These unremarkable associations stay consistent until the 1990s, where the rhetoric of post-9/11 emerges from the data. Iraq becomes more associated with Russia, an enemy to the United States, and "warfare." By 2000, the vocabulary surrounding Iraq shows clear signs of the emerging conflict that would become the Iraq War. Words such as "troops," "defend," and "democracy" appear more frequently in association with Iraq. Around this time, the term terrorism also begins to appear, reflecting the growing rhetorical framing that would soon develop into the broader discourse of the "War on Terror."
 
@@ -307,13 +314,15 @@ Perhaps most interesting is that we have measured the extent to which the words 
 knitr::include_graphics("iraq.jpg")
 ```
 
-### Analyzing the Association Between Two Words Over Time using Congress Viewer
-
 Another type of visualization we can produce using the Congress Viewer is a line chart showing the association between two words over time (see: https://shinyviz.smu.edu/shiny/public/congress-viewer-demo/, navigate to the tab "Difference"). 
 
 This following visualization shows how the semantic relationship between the words "Iraq" and "democracy" changes over time in the U.S. Congressional Record. The x-axis represents the decade of the Congressional Records being analyzed. The points each represent a decade, and the connecting line that moves across the y-axis shows how the relationship between the two words in question changes from decade to decade, appearing in similar or less similar linguistic contexts. Higher similarity values mean Iraq and democracy appear in more Congressional debates together, and are therefore more strongly associated in political discourse. Lower or negative values mean the words appear in different Congressional debates and are not strongly related in the language used at the time.
 
 This line chart confirms the earlier analysis by showing how the semantic relationship between the words democracy and Iraq changes over time in the Congressional Record. In the early twentieth century, the two words appear in largely unrelated contexts, indicating that discussions of Iraq were not strongly connected to debates about democracy. Beginning around the mid-twentieth century, however, the similarity between the two terms begins to increase. The association rises sharply from the 1970s through the 2000s, showing that Iraq increasingly appears in discussions framed around democracy. This visualization reflects the growing tendency of U.S. Congressional discourse to connect Iraq with democracy, particularly during the period surrounding the United States' involvement in the Iraq War.
+
+However, this visualization shows a slightly different pattern than the previous scatterplots. In the scatterplot of words most associated with "Iraq," the word "democracy" does not appear among the most closely associated terms until 2000. In other words, the scatterplot does not show a gradual increase in the relationship between the two words across earlier decades. Instead, it depicts a sudden shift and focus in the surrounding vocabulary, where words associated with military conflict—such as those related to war, defense, and troops—appear prominently. On the one hand, this visualization draws our attention to this political shift, offering a clear signal to the analyst. However, when interpreted in isolation, the visualization could be misleading as it seems to suggest that the connection between "Iraq" and "democracy" emerges relatively abruptly rather than building over multiple decades. 
+
+The linechart, by contrast, suggests that the relationship between the words Iraq and democracy has grown over multiple decades, since the 1980s. While the scatterplot shows when the new vocabulary becomes highly prominent, the line chart demonstrates that the semantic association between "Iraq" and "democracy" continues to grow stronger over time. Together, the two visualization types help to clarify both the timing of the shift in poltiical focus, and the increasing strength of the relationship between the concepts.
 
 ```{r, echo=FALSE}
 knitr::include_graphics("democracy_to_iraq.jpg")
@@ -322,7 +331,11 @@ knitr::include_graphics("democracy_to_iraq.jpg")
 
 # Exercises
 
-1. Word embeddings reveal patterns of association in language, but they are only one analytical lens. What other historical research methods could be paired with this approach to deepen interpretation? Explain how combining at least two methods could produce a richer understanding of climate discourse in Congressional records.
+1. Word embeddings reveal patterns of association in language, but they are only one analytical lens. We showed that pairing multiple different types of visualizations to depict word embeddings shows us 
+
+
+
+What other historical research methods could be paired with this approach to deepen interpretation? Explain how combining at least two methods could produce a richer understanding of climate discourse in Congressional records.
 
 2. Select one word strongly associated with "climate" (for example: change, global, or warming). Then, locate one or two speeches or documents from the Congressional Record containing that word. Compare your close reading of these records with the computational result. Does the statistical association match the context of the Congressional Records?
 
