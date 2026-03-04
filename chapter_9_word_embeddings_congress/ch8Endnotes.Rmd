@@ -51,7 +51,7 @@ Machine learning refers to computational methods that identify patterns in data 
 
 Word embeddings represent each word as a point in a numeric space. Words that appear in similar contexts tend to be placed near one another in this space. Because the words are represented numerically, the distance between them can be measured, allowing analysts to identify which words are most closely associated with a given term. The following image illustrates this idea. The word “fossil” appears closer to "fuels" than to "nuclear." These associations are intuitive, reflecting the idea that fossil fuels commonly appear together in discussions of climate, whereas fossil is less association with nuclear, as two different forms of energy. 
 
-```{r}
+```{r, out.width="100%"}
 knitr::include_graphics("coal.png")
 ```
 
