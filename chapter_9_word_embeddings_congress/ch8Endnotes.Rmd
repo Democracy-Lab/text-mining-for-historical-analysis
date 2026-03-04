@@ -18,30 +18,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 We have been doing more "white box" analyses -- now a little "black box" analysis 
 
-```{r, warning=FALSE, message=FALSE}
-library(tmha.data)
-library(text2vec)
-library(tidyverse)
-library(kableExtra)
-
-data("congress_daily_climate_change_2000_2020")
-
-congress_daily_climate_change_2000 <- congress_daily_climate_change_2000_2020 %>% 
-  filter(decade == "2000")
-
-climate_change_text_2000 <- congress_daily_climate_change_2000$content
-
-congress_daily_climate_change_2010 <- congress_daily_climate_change_2000_2020 %>% 
-  filter(decade == "2010")
-
-climate_change_text_2010 <- congress_daily_climate_change_2000$content
-
-congress_daily_climate_change_2020 <- congress_daily_climate_change_2000_2020 %>% 
-  filter(decade == "2020")
-
-climate_change_text_2020 <- congress_daily_climate_change_2020$content
-```
-
 ## An Introduction to Word Embeddings
 
 When a computer analyzes language, it cannot work with words directly. Instead, it represents each word as a list of numbers, called a vector. For example, instead of storing the word "climate" as text, the model might represent it like this:
@@ -66,10 +42,15 @@ It is also important to note that word embeddings capture statistical associatio
 
 In the following sections, we will create a word embedding model records from the United States Congressional Record that mention the word "climate." Rather than simply generating a word cloud, we will build functions that allow us to add and subtract word vectors and examine patterns of word association. Because our personal computers may have limited computing power, we will then use Congress Viewer, an application developed by one of the authors of this book, to analyze the Stanford Corpus of the Congressional Record at a much larger scale and to quickly test hypotheses about the language of the United States Congressional Records.
 
-The following code demonstrates how to use the word embeddings model, GloVe.  
+The following code demonstrates how to use the GloVe word embedding model from the R library `text2vec`. We will write a function that trains a word embedding model on the data. This function allows us to generate embeddings separately for each decade in the climate change corpus. Working decade by decade, rather than training the model on the entire corpus at once, reduces the amount of computer memory required, which is neccessary for generating word embeddings on many laptops. This approach also makes it easier to analyze change over time, since the data is already partitioned into separate decade-based subsets that we can analyze. 
 
-```{r}
-# A function that trains GloVe word embeddings from text.
+```{r, message=FALSE}
+library(tmha.data)
+library(text2vec)
+library(tidyverse)
+library(kableExtra)
+
+# A function that trains GloVe word embeddings from text
 # The parameters control model size, context window, vocabulary filtering,
 # training iterations, and reproducibility.
 find_word_embeddings <- function(data,
@@ -80,41 +61,90 @@ find_word_embeddings <- function(data,
                                  n_iter=30,
                                  seed=42) {
   
-  # Tokenize the text: convert to lowercase and split sentences into words
+  # Tokenize the text by converting it to lowercase and split sentences into words
   tokens <- word_tokenizer(str_to_lower(data))
   
-  # Create an iterator over the tokenized text for efficient processing
+  # Create an "iterator" over the tokenized text for efficient processing
+  # An iterator is a tool common in programming that allows the code to go
+  # through the data one piece at a time instead of all at once
   it <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE)
   
-  # Build the vocabulary from the tokens and remove very rare words
+  # Build the vocabulary from the tokens and remove words that are mentioned less
+  # than the specified threshold (e.g. term_count_min). If the term_count_min is 
+  # set to 1, all words will be included in the model. If the term_count_min is 
+  # set to 5, a word will need to have been stated at least 5 times to be included 
+  # in the model 
   vocab <- create_vocabulary(it) %>%
     prune_vocabulary(term_count_min = term_count_min)
   
-  # Convert the vocabulary into a vectorizer that maps words to indices
+  # Next, we convert the vocabulary into a "vectorizer." The vectorizer is a tool
+  # that translates words into numbers so the computer can work with them
+  # This step prepares the data so that the model can count how often words appear 
+  # near one another and ultimately learn the relationships between them
   vectorizer <- vocab_vectorizer(vocab)
   
-  # Create a term–co-occurrence matrix showing which words appear near each other
-  # within the specified window size
+  # Create a term–co-occurrence matrix that records how often 
+  # words appear near one another within the chosen window size. For example, 
+  # if the window is 5, the model looks five words to the left and five words 
+  # to the right of each word and treats this window as the a word's context.
+  # This step allows the model to learn which words tend to occur in similar
+  # contexts. The word embeddings algorithm then uses this information to place
+  # words in a numerical space where words that appear in similar contexts are
+  # located closer together.
   tcm <- create_tcm(it, vectorizer, skip_grams_window = window)
 
   # Set the random seed so the results can be reproduced
   set.seed(seed)
   
-  # Initialize the GloVe model with the chosen dimensionality and weighting parameter
+  # Initialize the GloVe model. This step sets up the machine learning algorithm 
+  # that will learn the word embeddings from the co-occurrence matrix.
+  # The parameter "rank" determines the number of dimensions used to represent
+  # a word. A higher number of dimensions allows the model to capture more
+  # representative relationships between words, but it also requires more computation.
+  # The parameter "x_max" controls how strongly over represented or very frequent word pairs
+  # influence the model. This weighting helps prevent extremely common word
+  # combinations from skewing the learning process.
   glove <- GlobalVectors$new(rank = rank, x_max = x_max)
   
-  # Train the model on the co-occurrence matrix for the specified number of iterations
+  # Now train the model on the co-occurrence matrix for the specified number of iterations
   wv_main <- glove$fit_transform(tcm, n_iter = n_iter)
   
-  # Extract the context vectors learned during training
+  # Extract the vectors learned during training
   wv_context <- glove$components
   
-  # Combine the main and context vectors to produce the final word embeddings
-  word_embeddings <- wv_main + t(wv_context)
-}
+  # Combine the main and context vectors to produce the final word embeddings. 
+  # When the model processes the word climate, that word is treated as the "main" word. 
+  # The nearby words are treated as "context" words. During training, the model 
+  # learns one vector for each word as a main word and another vector for each word as a context word.
+  word_embeddings <- wv_main + t(wv_context) }
 ```
 
+We can apply our word embeddings function to data from our new package, `tmha.data`. Before we do that, we will read in the corpus, `congress_daily_climate_change_2000_2020`, and create the subsets for each decade. Then we can run `find_word_embeddings()` on each decade. 
+
+```{r, warning=FALSE, message=FALSE}
+
+data("congress_daily_climate_change_2000_2020")
+
+congress_daily_climate_change_2000 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2000")
+
+climate_change_text_2000 <- congress_daily_climate_change_2000$content
+
+congress_daily_climate_change_2010 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2010")
+
+climate_change_text_2010 <- congress_daily_climate_change_2000$content
+
+congress_daily_climate_change_2020 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2020")
+
+climate_change_text_2020 <- congress_daily_climate_change_2020$content
+```
+
+
 ```{r, echo=FALSE}
+# This code does not appear in the HTML output
+
 quiet_run <- function(expr) {
   tf <- tempfile()
   zz <- file(tf, open = "wt")
@@ -133,33 +163,21 @@ word_embeddings_2010 <- quiet_run(find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 <- quiet_run(find_word_embeddings(climate_change_text_2020))
 ```
 
-These settings control how the GloVe model learns relationships between words.
+GloVe prints short progress messages so it is possible to see how training is progressing. These messages include three pieces of information: the time, the "epoch" (or, how many times the model has gone through the dataset), and the "loss value" (a number that indicates how well the model is learning). A more nuanced overview of the training process is this: 
 
-The rank determines how many numbers are used to represent each word. Representing words using more numbers allows the model to detect more subtle differences between words, while fewer numbers make the model simpler and faster but less precise.
+Model training happens iteratively. The term epoch refers to one complete pass through the entire dataset. This iteration is necessary because the model cannot capture the patterns in the data in a single pass. Instead, the training procedure gradually adjusts the model's parameters each time the data is processed. If the console prints `epoch 10`, it means the training process has gone through the entire corpus ten times, allowing the model to better capture statistical relationships between words than if it had just iterated through the corpus once. 
 
-The window tells the model how many nearby words to pay attention to when learning meaning. The basic idea is that words that appear close together in sentences are often related, so the model looks at the five words on either side of each word.
-
-The term_count_min (1) setting decides which words are included in the analysis. Words that appear fewer times than this threshold are ignored. This helps prevent extremely rare words, spelling mistakes, or noise in the data from influencing the model.
-
-The x_max (10) setting reduces the influence of very common words. Words like “the,” “and,” or “of” appear so frequently that they could otherwise dominate the training process, so this parameter limits how much weight they receive.
-
-The n_iter (30) parameter controls how many times the model goes through the data to refine its understanding of word relationships. More iterations usually improve the results, but they also make the process take longer.
-
-Finally, the seed (42) ensures that the model produces the same results every time it runs with the same data and settings. This is important for reproducibility, especially in research.
-
-GloVe prints short progress messages so it is possible to see how training is progressing. These messages include three pieces of information: the time, how many times the model has gone through the dataset (the epoch), and a number that indicates how well the model is learning (the loss value).
-
-Model training happens iteratively. The term epoch refers to one complete pass through the entire dataset. This iteration is necessary because the model cannot capture the patterns in the data in a single pass. Instead, the training procedure gradually adjusts the model's parameters each time the data is processed. If the console shows epoch 10, it means the training process has gone through the entire corpus ten times, allowing the model to better capture statistical relationships between words.
-
-The output also includes a loss value, which is a number that measures how well the model’s current predictions match the patterns observed in the data. During training, the model compares the relationships between words it predicts with the relationships that actually appear in the corpus. The loss value summarizes how different these two are. As training continues and the model’s parameters are updated, the loss typically becomes smaller, indicating that the predictions are aligning more closely with the patterns in the text.
-
-During training, messages such as INFO [<timestamp>] epoch <k>, loss <value> appear in the console. These updates allow the user to watch the model’s progress as it repeatedly studies the corpus and gradually improves its understanding of relationships between words.
+While the machine learning model is training, it repeatedly evaluates how well it is learning the patterns in the data by comparing the word relationships it predicts with the word relationships that actually appear in the corpus. The difference between these two is called "loss." As training continues, the loss typically becomes smaller, indicating that the predictions are aligning more closely with the patterns in the text.
 
 ```{r, eval=FALSE}
 word_embeddings_2000 <- find_word_embeddings(climate_change_text_2000)
 word_embeddings_2010 <- find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 <- find_word_embeddings(climate_change_text_2020)
 ```
+
+
+This is also why this approach is considered "black box." 
+
 
 ## Finding Words with the Greatest Association
 
