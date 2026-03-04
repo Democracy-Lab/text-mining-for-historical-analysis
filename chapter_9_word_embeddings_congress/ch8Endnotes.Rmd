@@ -66,10 +66,9 @@ Importantly, this 2-dimensional representation of the word embeddings is not a d
 
 It is also important to note that word embeddings capture statistical association within a specific dataset, not a definitive meaning behind words. In another corpus, like the 19th-century Hansard debates, the word "power" would not have co-occured with the word "nuclear," but perhaps instead alongside words that indicate political authority or the influence of the British Empire.  
 
-In the following sections, we will create a word embedding model records from the United States Congressional Record that mention the word "climate." Rather than simply generating a word cloud, we will build functions that allow us to add and subtract word vectors and examine patterns of word association. Because our personal computers may have limited computing power, we will then use Congress Viewer, an application developed by one of the authors of this book, to analyze the Stanford Corpus of the Congressional Record at a much larger scale and to quickly test hypotheses about the langauge of the United States Congressional Records.
+In the following sections, we will create a word embedding model records from the United States Congressional Record that mention the word "climate." Rather than simply generating a word cloud, we will build functions that allow us to add and subtract word vectors and examine patterns of word association. Because our personal computers may have limited computing power, we will then use Congress Viewer, an application developed by one of the authors of this book, to analyze the Stanford Corpus of the Congressional Record at a much larger scale and to quickly test hypotheses about the language of the United States Congressional Records.
 
-
-The following code demonstrates how to use a word embeddings model, GloVe. 
+The following code demonstrates how to use the word embeddings model, GloVe. 
 
 ```{r}
 # A function that trains GloVe word embeddings from a vector of text.
