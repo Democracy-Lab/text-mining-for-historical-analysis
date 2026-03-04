@@ -357,7 +357,7 @@ knitr::include_graphics("iraq.jpg")
 
 4. Choose a decade and examine which climate-related terms are missing or unusually rare. Are there words you would expect but do not see? Does silence itself signal political positioning? How might archival absence complicate computational interpretation? Write a short reflection on how historians might interpret silence differently than data scientists based on their training.
 
-5. Come up with five words that you think are signals of debates on climate (for example: regulation, China, hurricane, jobs). For each word, compute the similarity of the word to climate. Which decade shows the strongest link to climate for each word? What's your historical interpretation?
+5. Come up with five words that you think are signals of debates on climate (for example: regulation, China, hurricane, jobs). For each word, write code and use the `tmha.data` to compute the similarity of the word to climate. Which decade shows the strongest link to climate for each word? What's your speculation for why this association might exist?
 
-6. Use Congress Viewer to search for your own words. Do you notice any trends when you compare multiple words, side-by-side? 
+6. Use Congress Viewer to search for your own words. Do you notice any trends when you compare multiple words side-by-side? For example, in the chapter we compared "democracy" and "Iraq" and saw that by the early 2000s the language around democracy increasingly included words like war, troops, and defend. Do similar patterns appear in the words you choose? Write a few sentences describing what you observe and what historical events might explain any word associations. 
 
