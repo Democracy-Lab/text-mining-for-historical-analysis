@@ -167,7 +167,7 @@ GloVe prints short progress messages so it is possible to see how training is pr
 
 Model training happens iteratively. The term epoch refers to one complete pass through the entire dataset. This iteration is necessary because the model cannot capture the patterns in the data in a single pass. Instead, the training procedure gradually adjusts the model's parameters each time the data is processed. If the console prints `epoch 10`, it means the training process has gone through the entire corpus ten times, allowing the model to better capture statistical relationships between words than if it had just iterated through the corpus once. 
 
-While the machine learning model is training, it repeatedly evaluates how well it is learning the patterns in the data by comparing the word relationships it predicts with the word relationships that actually appear in the corpus. The difference between these two is called "loss." As training continues, the loss typically becomes smaller, indicating that the predictions are aligning more closely with the patterns in the text.
+While the machine learning model is training, it repeatedly evaluates how well it is learning the patterns in the data by comparing the word relationships it predicts with the word relationships that actually appear in the corpus. The difference between these two is called "loss." As training continues, the loss typically becomes smaller, indicating that the predictions are aligning more closely with the actual linguistic patterns in the text. 
 
 ```{r, eval=FALSE}
 word_embeddings_2000 <- find_word_embeddings(climate_change_text_2000)
@@ -175,13 +175,13 @@ word_embeddings_2010 <- find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 <- find_word_embeddings(climate_change_text_2020)
 ```
 
+This complex process--where the model evaluates and trains itself--is why this approach is considered "black box." The resulting model can be meaningful both as an object of analysis in its own right and as a tool for analyzing the data. However, the exact way the model is created is difficult for humans to interpret directly. Each iteration of the data results in different statisitcal probabilities becuase training might occure in a different, randomized order. 
 
-This is also why this approach is considered "black box." 
-
+The resulting word embedding model will also be similar, but slightly different each time it is trained. Because the training process begins randomly, the model may learn slightly different relationships between words on each run. For example, the word "fossil" might be most closely associated with "burning" in one iteration of the model, but most closely associated with "fuel" in another. Even with these minor differences, the overall results encoded in the model should remain similar, meaning that words with related meanings or contexts will still tend to appear near one another.
 
 ## Finding Words with the Greatest Association
 
-We can now write a function 
+Now that we have a word embeddings representation of our decades, we can define a function to find words that are most similar to 
 
 ```{r}
 get_similar <- function(keyword, word_embeddings, top_n = top_n_default) {
@@ -206,12 +206,7 @@ most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
 ```{r}
 table_2000 <- most_similar_climate %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(format = "latex",
-    caption = 'Words Most Related to "Climate": 2000s Congressional Records',
-        col.names = c("Word", "Cosine similarity"),
-        align = c("l", "r"),
-    booktabs = TRUE) %>%
-  kable_styling(full_width = FALSE)
+  kable(caption = 'Words Most Related to "Climate": 2000s Congressional Records')
 
 table_2000
 ```
@@ -220,11 +215,7 @@ table_2000
 ```{r}
 table_2010 <- most_similar_emissions %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(format = "latex", caption = 'Words Most Related to "Emissions": 2010s Congressional Records',
-    col.names = c("Word", "Cosine similarity"),
-    align = c("l", "r"),
-    booktabs = TRUE) %>%
-  kable_styling(full_width = FALSE)
+  kable(caption = 'Words Most Related to "Emissions": 2010s Congressional Records') 
 
 table_2010
 ```
@@ -232,13 +223,7 @@ table_2010
 ```{r}
 table_2020 <- most_similar_coal %>%
   mutate(similarity = round(similarity, 3)) %>%
-  kable(format = "latex",
-        caption = 'Words Most Related to "Coal": 2020s Congressional Records',
-        col.names = c("Word", "Cosine similarity"),
-        align = c("l", "r"),
-        booktabs = TRUE) %>%
-  kable_styling(full_width = FALSE,
-                latex_options = c("hold_position"))
+  kable(caption = 'Words Most Related to "Coal": 2020s Congressional Records') 
 
 table_2020
 ```

@@ -545,16 +545,32 @@ how well it is learning the patterns in the data by comparing the word
 relationships it predicts with the word relationships that actually
 appear in the corpus. The difference between these two is called “loss.”
 As training continues, the loss typically becomes smaller, indicating
-that the predictions are aligning more closely with the patterns in the
-text.</p>
+that the predictions are aligning more closely with the actual
+linguistic patterns in the text.</p>
 <pre class="r"><code>word_embeddings_2000 &lt;- find_word_embeddings(climate_change_text_2000)
 word_embeddings_2010 &lt;- find_word_embeddings(climate_change_text_2010)
 word_embeddings_2020 &lt;- find_word_embeddings(climate_change_text_2020)</code></pre>
-<p>This is also why this approach is considered “black box.”</p>
+<p>This complex process–where the model evaluates and trains itself–is
+why this approach is considered “black box.” The resulting model can be
+meaningful both as an object of analysis in its own right and as a tool
+for analyzing the data. However, the exact way the model is created is
+difficult for humans to interpret directly. Each iteration of the data
+results in different statisitcal probabilities becuase training might
+occure in a different, randomized order.</p>
+<p>The resulting word embedding model will also be similar, but slightly
+different each time it is trained. Because the training process begins
+randomly, the model may learn slightly different relationships between
+words on each run. For example, the word “fossil” might be most closely
+associated with “burning” in one iteration of the model, but most
+closely associated with “fuel” in another. Even with these minor
+differences, the overall results encoded in the model should remain
+similar, meaning that words with related meanings or contexts will still
+tend to appear near one another.</p>
 </div>
 <div id="finding-words-with-the-greatest-association" class="section level2">
 <h2>Finding Words with the Greatest Association</h2>
-<p>We can now write a function</p>
+<p>Now that we have a word embeddings representation of our decades, we
+can define a function to find words that are most similar to</p>
 <pre class="r"><code>get_similar &lt;- function(keyword, word_embeddings, top_n = top_n_default) {
   
   kw_vec &lt;- word_embeddings[keyword, , drop = FALSE]
@@ -569,23 +585,118 @@ most_similar_emissions &lt;- get_similar(&quot;emissions&quot;, word_embeddings_
 most_similar_coal &lt;- get_similar(&quot;coal&quot;, word_embeddings_2000, 20)</code></pre>
 <pre class="r"><code>table_2000 &lt;- most_similar_climate %&gt;%
   mutate(similarity = round(similarity, 3)) %&gt;%
-  kable(format = &quot;latex&quot;,
-    caption = &#39;Words Most Related to &quot;Climate&quot;: 2000s Congressional Records&#39;,
-        col.names = c(&quot;Word&quot;, &quot;Cosine similarity&quot;),
-        align = c(&quot;l&quot;, &quot;r&quot;),
-    booktabs = TRUE) %&gt;%
-  kable_styling(full_width = FALSE)
+  kable(caption = &#39;Words Most Related to &quot;Climate&quot;: 2000s Congressional Records&#39;)
 
 table_2000</code></pre>
+<table>
+<caption>Words Most Related to “Climate”: 2000s Congressional
+Records</caption>
+<thead>
+<tr class="header">
+<th align="left">word</th>
+<th align="right">similarity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">change</td>
+<td align="right">0.984</td>
+</tr>
+<tr class="even">
+<td align="left">global</td>
+<td align="right">0.895</td>
+</tr>
+<tr class="odd">
+<td align="left">warming</td>
+<td align="right">0.825</td>
+</tr>
+<tr class="even">
+<td align="left">address</td>
+<td align="right">0.721</td>
+</tr>
+<tr class="odd">
+<td align="left">addressing</td>
+<td align="right">0.717</td>
+</tr>
+<tr class="even">
+<td align="left">issue</td>
+<td align="right">0.716</td>
+</tr>
+<tr class="odd">
+<td align="left">impacts</td>
+<td align="right">0.716</td>
+</tr>
+<tr class="even">
+<td align="left">problem</td>
+<td align="right">0.689</td>
+</tr>
+<tr class="odd">
+<td align="left">policy</td>
+<td align="right">0.684</td>
+</tr>
+<tr class="even">
+<td align="left">issues</td>
+<td align="right">0.659</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>table_2010 &lt;- most_similar_emissions %&gt;%
   mutate(similarity = round(similarity, 3)) %&gt;%
-  kable(format = &quot;latex&quot;, caption = &#39;Words Most Related to &quot;Emissions&quot;: 2010s Congressional Records&#39;,
-    col.names = c(&quot;Word&quot;, &quot;Cosine similarity&quot;),
-    align = c(&quot;l&quot;, &quot;r&quot;),
-    booktabs = TRUE) %&gt;%
-  kable_styling(full_width = FALSE)
+  kable(caption = &#39;Words Most Related to &quot;Emissions&quot;: 2010s Congressional Records&#39;) 
 
 table_2010</code></pre>
+<table>
+<caption>Words Most Related to “Emissions”: 2010s Congressional
+Records</caption>
+<thead>
+<tr class="header">
+<th align="left">word</th>
+<th align="right">similarity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">greenhouse</td>
+<td align="right">0.923</td>
+</tr>
+<tr class="even">
+<td align="left">carbon</td>
+<td align="right">0.871</td>
+</tr>
+<tr class="odd">
+<td align="left">dioxide</td>
+<td align="right">0.844</td>
+</tr>
+<tr class="even">
+<td align="left">reduce</td>
+<td align="right">0.816</td>
+</tr>
+<tr class="odd">
+<td align="left">gases</td>
+<td align="right">0.813</td>
+</tr>
+<tr class="even">
+<td align="left">gas</td>
+<td align="right">0.797</td>
+</tr>
+<tr class="odd">
+<td align="left">reduction</td>
+<td align="right">0.761</td>
+</tr>
+<tr class="even">
+<td align="left">reductions</td>
+<td align="right">0.759</td>
+</tr>
+<tr class="odd">
+<td align="left">reducing</td>
+<td align="right">0.757</td>
+</tr>
+<tr class="even">
+<td align="left">emission</td>
+<td align="right">0.741</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>table_2020 &lt;- most_similar_coal %&gt;%
   mutate(similarity = round(similarity, 3)) %&gt;%
   kable(format = &quot;latex&quot;,
@@ -626,15 +737,15 @@ another.</p>
 ##    word          similarity
 ##    &lt;chr&gt;              &lt;dbl&gt;
 ##  1 portfolio          0.571
-##  2 creation           0.538
-##  3 investment         0.509
-##  4 establishing       0.491
-##  5 opportunities      0.483
-##  6 program            0.478
-##  7 incentives         0.476
-##  8 occupies           0.474
-##  9 package            0.471
-## 10 includes           0.468</code></pre>
+##  2 establishing       0.566
+##  3 creation           0.541
+##  4 investment         0.503
+##  5 mom                0.473
+##  6 agency             0.461
+##  7 2008               0.458
+##  8 hoisie             0.455
+##  9 80,000             0.453
+## 10 opportunities      0.452</code></pre>
 <p>If a query returns an error like:</p>
 <blockquote>
 <p><code>Error in embeddings[word2, , drop = FALSE] : subscript out of bounds</code></p>
@@ -644,16 +755,16 @@ another.</p>
 <pre><code>## # A tibble: 10 × 2
 ##    word          similarity
 ##    &lt;chr&gt;              &lt;dbl&gt;
-##  1 investment         0.565
-##  2 incentives         0.558
-##  3 creation           0.557
-##  4 portfolio          0.555
-##  5 provides           0.533
-##  6 opportunities      0.507
-##  7 includes           0.502
-##  8 package            0.495
-##  9 authorizes         0.471
-## 10 2008               0.468</code></pre>
+##  1 portfolio          0.603
+##  2 creation           0.582
+##  3 incentives         0.539
+##  4 investment         0.527
+##  5 provides           0.511
+##  6 package            0.498
+##  7 unprepared         0.487
+##  8 opportunities      0.484
+##  9 includes           0.480
+## 10 development        0.479</code></pre>
 </div>
 <div id="vector-addition" class="section level2">
 <h2>Vector Addition</h2>
