@@ -326,7 +326,6 @@ Substantively more different members of parliament were elected in the ten years
 nrow(postreform_only_speakers) - nrow(prereform_only_speakers)
 ```
 
-
 We can also investigate speakers from a third category -- those who were continuously in parliament, who held office before the reform and who were able to secure election after the reform as well. How many such speakers were there? 
 
 Please note that we do not have the data to ask which members of parliament who held office before 1832 were elected to office after 1832. We do not have the data to support that question. What we have in Hansard is only a record of who was recorded as having spoken. This is a rather more discrete query, because not every elected member actually speaks when they are in office, and some of those who spoke might have spoken so little that the clerks recording speeches took no notice of what they said. 
