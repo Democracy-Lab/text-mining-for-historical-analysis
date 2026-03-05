@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Bibliography 
 
+[cabot -- please shift the chapter numbers down 1]
+
 ### Introduction
 
 Ahnert, Ruth, Emma Griffin, Mia Ridge, and Giorgia Tolfo. *Collaborative Historical Research in the Age of Big Data: Lessons from an Interdisciplinary Project*. Elements in Historical Theory and Practice. Cambridge: Cambridge University Press, 2023. https://doi.org/10.1017/9781009175548.
@@ -270,13 +272,16 @@ Wittig, Monique. The Straight Mind and Other Essays. Translated by Monique Witti
 
 Zeldes, Amir, and Caroline T. Schroeder. “Computational Methods for Coptic: Developing and Using Part-of-Speech Tagging for Digital Scholarship in the Humanities.” Digital Scholarship in the Humanities, vol. 30, suppl. 1, Dec. 2015, pp. i164–i176. Oxford University Press, https://doi.org/10.1093/llc/fqv043.
 
-### Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record
+### Chapter 8: Analyzing the Language of Climate Change in the United States Congressional Record [update the title cabot]
 
 Silge, Julia, and Robinson, David. (2016). "tidytext: Text mining and analysis using tidy data principles in R." _Journal of Open Source Software_, 1(3), 37. https://doi.org/10.21105/joss.00037
 
 Spinu, Vitalie, Garrett Grolemund, and Hadley Wickham. lubridate: Make Dealing with Dates a Little Easier. Version 1.9.2, 2023. R package, https://CRAN.R-project.org/package=lubridate.
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. "Welcome to the Tidyverse." _Journal of Open Source Software_, vol. 4, no. 43, 2019, p. 1686. https://doi.org/10.21105/joss.01686.
+
+Add congress viewer by steph buongiorno
+
 
 ### Chapter 9: Data 
 

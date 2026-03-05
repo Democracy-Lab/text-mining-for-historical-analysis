@@ -621,6 +621,7 @@ buck_speeches <- buck_speech_ids %>%
 
 # make a table
 buck_speeches %>%
+  head() %>%
   kable()
 ```
 
@@ -649,7 +650,6 @@ buckingham_sentences_enjoyment <- slavery_debates_1830 %>%
 
 # make a table
 buckingham_sentences_enjoyment %>%
-  mutate(text = str_wrap(text, 80)) %>% # just the first few lines
   mutate("Mr. Buckingham's mentions of enjoyment" = text) %>% # rename the text column 
   select("Mr. Buckingham's mentions of enjoyment") %>% # only the one column 
   kable()
