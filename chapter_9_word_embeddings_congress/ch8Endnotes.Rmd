@@ -22,7 +22,7 @@ We have been doing more "white box" analyses -- now a little "black box" analysi
 
 When a computer analyzes language, it cannot work with words directly. Instead, it represents each word as a list of numbers, called a vector. For example, instead of storing the word "climate" as text, the model might represent it like this:
 
-> **climate : [0.21, -0.44, 0.88, 0.13, ...]**
+> *climate : [0.21, -0.44, 0.88, 0.13, ...]*
 
 Each number in the vector captures a small piece of the word's meaning based on how the word appears next to other words in the corpus. By examining these patterns across large amounts of text, it becomes possible for a computer to estimate the numeric representations that reflect relationships between words. To do this, we will use a technique called machine learning. 
 
@@ -211,7 +211,7 @@ most_similar_emissions <- get_similar("emissions", word_embeddings_2000, 10)
 most_similar_coal <- get_similar("coal", word_embeddings_2000, 20)
 ```
 
-
+We can now show the results in a table. One advantage of using a table instead of a flattened, two-dimensional scatter plot to display similar words is that it produces a more focused set of results for inspection. Rather than presenting every word in the embedding space, including many that are only weakly related, the table directs our attention to the terms with the highest similarity scores. This makes it easier to identify the most meaningful associations without the visual distraction of peripheral words that contribute little to interpreting the relationship.
 
 ```{r}
 table_2000 <- most_similar_climate %>%
@@ -240,17 +240,23 @@ table_2020
 
 ## Vector Subtraction
 
-Vector subtraction asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
+Vector subtraction asks: what part of the meaning belongs to word 1 but not word 2? Because embeddings place words in embedded space, where similar words are represented closer together, subtracting one vector from another allows us to reason about conceptual differences by extracting a portion of meaning that distinguishes one concept from another.
 
 ```{r}
 vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
-
-  # keep 1×d matrices so sim2() gets matrices on both sides
+  
+  # Extract the vector representation for word1 from the embeddings matrix
   a <- embeddings[word1, , drop = FALSE]
+  
+  # Extract the vector representation for word2 from the embeddings matrix
   b <- embeddings[word2, , drop = FALSE]
-  target <- a - b
-
-  sims <- sim2(embeddings, target, method = "cosine", norm = "l2")[, 1]
+  
+  # Subtract the two vectors
+  semantic_difference <- a - b
+  
+  # Calculate cosine similarity between the resulting vector
+  # and every other word vector in the embeddings matrix
+  sims <- sim2(embeddings, semantic_difference, method = "cosine", norm = "l2")[, 1]
 
   tibble(word = names(sims), similarity = unname(sims)) %>%
     filter(!word %in% c(word1, word2)) %>%
@@ -262,11 +268,9 @@ vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
 vector_subtraction("renewable", "fossil", word_embeddings_2000)
 ```
 
-If a query returns an error like: 
+If a query returns an error like the following, then the word was not in the dataset. 
 
 > `Error in embeddings[word2, , drop = FALSE] : subscript out of bounds` 
-
-then that means the word was not in the dataset. 
 
 ```{r}
 vector_subtraction("renewable", "fossil", word_embeddings_2010)
@@ -292,7 +296,6 @@ vector_addition <- function(word1, word2, embeddings, top_n = 10) {
 Sometimes we might think to analyze a word that does not appear in our corpus. If we do 
 
 In debates that include the word "climate" the word "man" appears but not "woman" 
-
 
 
 If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
