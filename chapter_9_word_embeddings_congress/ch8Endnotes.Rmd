@@ -264,6 +264,8 @@ vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
     slice_head(n = top_n) }
 ```
 
+[Jo: there must be a better example for environmental history.]
+
 ```{r}
 vector_subtraction("renewable", "fossil", word_embeddings_2000)
 ```
@@ -293,12 +295,9 @@ vector_addition <- function(word1, word2, embeddings, top_n = 10) {
     slice_head(n = top_n) }
 ```
 
-Sometimes we might think to analyze a word that does not appear in our corpus. If we do 
+If we search for a word that does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
 
-In debates that include the word "climate" the word "man" appears but not "woman" 
-
-
-If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
+[Jo: SOS -- what environmental history would be interesting here?]
 
 ```{r, error=TRUE}
 vector_addition("man", "woman", congress_daily_climate_change_2000)

@@ -364,7 +364,7 @@ directly. Instead, it represents each word as a list of numbers, called
 a vector. For example, instead of storing the word “climate” as text,
 the model might represent it like this:</p>
 <blockquote>
-<p><strong>climate : [0.21, -0.44, 0.88, 0.13, …]</strong></p>
+<p><em>climate : [0.21, -0.44, 0.88, 0.13, …]</em></p>
 </blockquote>
 <p>Each number in the vector captures a small piece of the word’s
 meaning based on how the word appears next to other words in the corpus.
@@ -569,20 +569,48 @@ tend to appear near one another.</p>
 </div>
 <div id="finding-words-with-the-greatest-association" class="section level2">
 <h2>Finding Words with the Greatest Association</h2>
-<p>Now that we have a word embeddings representation of our decades, we
-can define a function to find words that are most similar to</p>
+<p>Now that we have created word embedding representations for each
+decade, we can define a function that identifies the words most strongly
+associated with a term of interest. For example, we can find the ten
+words most closely associated with “climate” in the
+<code>word_embeddings_2000</code> subset. We could also examine the
+associations for other words, such as “emissions” or “coal.” Researchers
+can also use the function to explore associations for any other word of
+choice.</p>
+<p>The function works by implementing “cosine similarity”, a
+mathematical measure that finds the distance of two word vectors in the
+embedding space (recall the image of the scatter plot above). Words with
+similar contexts producing higher cosine similarity scores, and
+vice-versa.</p>
 <pre class="r"><code>get_similar &lt;- function(keyword, word_embeddings, top_n = top_n_default) {
   
+  # Extract the vector that represents the position of the keyword in space.
   kw_vec &lt;- word_embeddings[keyword, , drop = FALSE]
+  
+  # Calculate the cosine similarity between the word of choice and all other words.
   cos_sim &lt;- sim2(word_embeddings, kw_vec, method = &quot;cosine&quot;, norm = &quot;l2&quot;)[, 1]
 
+  # Convert the similarity scores into a table 
+  # sort the words by similarity
+  # return the top most similar words.
   tibble(word = names(cos_sim), similarity = unname(cos_sim)) %&gt;%
     filter(word != keyword) %&gt;%
     arrange(desc(similarity)) %&gt;%
     slice_head(n = top_n) }</code></pre>
-<pre class="r"><code>most_similar_climate &lt;- get_similar(&quot;climate&quot;, word_embeddings_2000, 10)
+<pre class="r"><code># Find the words that are most associated with the analyst provided word of interest
+# The number at the end indicates how many data points to return
+most_similar_climate &lt;- get_similar(&quot;climate&quot;, word_embeddings_2000, 10)
 most_similar_emissions &lt;- get_similar(&quot;emissions&quot;, word_embeddings_2000, 10)
 most_similar_coal &lt;- get_similar(&quot;coal&quot;, word_embeddings_2000, 20)</code></pre>
+<p>We can now show the results in a table. One advantage of using a
+table instead of a flattened, two-dimensional scatter plot to display
+similar words is that it produces a more focused set of results for
+inspection. Rather than presenting every word in the embedding space,
+including many that are only weakly related, the table directs our
+attention to the terms with the highest similarity scores. This makes it
+easier to identify the most meaningful associations without the visual
+distraction of peripheral words that contribute little to interpreting
+the relationship.</p>
 <pre class="r"><code>table_2000 &lt;- most_similar_climate %&gt;%
   mutate(similarity = round(similarity, 3)) %&gt;%
   kable(caption = &#39;Words Most Related to &quot;Climate&quot;: 2000s Congressional Records&#39;)
@@ -600,43 +628,43 @@ Records</caption>
 <tbody>
 <tr class="odd">
 <td align="left">change</td>
-<td align="right">0.984</td>
+<td align="right">0.985</td>
 </tr>
 <tr class="even">
 <td align="left">global</td>
-<td align="right">0.895</td>
+<td align="right">0.893</td>
 </tr>
 <tr class="odd">
 <td align="left">warming</td>
-<td align="right">0.825</td>
+<td align="right">0.836</td>
 </tr>
 <tr class="even">
 <td align="left">address</td>
-<td align="right">0.721</td>
-</tr>
-<tr class="odd">
-<td align="left">addressing</td>
-<td align="right">0.717</td>
-</tr>
-<tr class="even">
-<td align="left">issue</td>
-<td align="right">0.716</td>
+<td align="right">0.744</td>
 </tr>
 <tr class="odd">
 <td align="left">impacts</td>
-<td align="right">0.716</td>
+<td align="right">0.719</td>
+</tr>
+<tr class="even">
+<td align="left">addressing</td>
+<td align="right">0.714</td>
+</tr>
+<tr class="odd">
+<td align="left">issue</td>
+<td align="right">0.701</td>
 </tr>
 <tr class="even">
 <td align="left">problem</td>
-<td align="right">0.689</td>
+<td align="right">0.700</td>
 </tr>
 <tr class="odd">
 <td align="left">policy</td>
-<td align="right">0.684</td>
+<td align="right">0.681</td>
 </tr>
 <tr class="even">
-<td align="left">issues</td>
-<td align="right">0.659</td>
+<td align="left">international</td>
+<td align="right">0.665</td>
 </tr>
 </tbody>
 </table>
@@ -657,76 +685,166 @@ Records</caption>
 <tbody>
 <tr class="odd">
 <td align="left">greenhouse</td>
-<td align="right">0.923</td>
+<td align="right">0.915</td>
 </tr>
 <tr class="even">
 <td align="left">carbon</td>
-<td align="right">0.871</td>
+<td align="right">0.877</td>
 </tr>
 <tr class="odd">
 <td align="left">dioxide</td>
-<td align="right">0.844</td>
+<td align="right">0.849</td>
 </tr>
 <tr class="even">
 <td align="left">reduce</td>
-<td align="right">0.816</td>
+<td align="right">0.813</td>
 </tr>
 <tr class="odd">
 <td align="left">gases</td>
-<td align="right">0.813</td>
-</tr>
-<tr class="even">
-<td align="left">gas</td>
-<td align="right">0.797</td>
-</tr>
-<tr class="odd">
-<td align="left">reduction</td>
-<td align="right">0.761</td>
+<td align="right">0.811</td>
 </tr>
 <tr class="even">
 <td align="left">reductions</td>
-<td align="right">0.759</td>
+<td align="right">0.787</td>
+</tr>
+<tr class="odd">
+<td align="left">gas</td>
+<td align="right">0.776</td>
+</tr>
+<tr class="even">
+<td align="left">reduction</td>
+<td align="right">0.765</td>
 </tr>
 <tr class="odd">
 <td align="left">reducing</td>
-<td align="right">0.757</td>
+<td align="right">0.749</td>
 </tr>
 <tr class="even">
-<td align="left">emission</td>
-<td align="right">0.741</td>
+<td align="left">pollution</td>
+<td align="right">0.732</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code>table_2020 &lt;- most_similar_coal %&gt;%
   mutate(similarity = round(similarity, 3)) %&gt;%
-  kable(format = &quot;latex&quot;,
-        caption = &#39;Words Most Related to &quot;Coal&quot;: 2020s Congressional Records&#39;,
-        col.names = c(&quot;Word&quot;, &quot;Cosine similarity&quot;),
-        align = c(&quot;l&quot;, &quot;r&quot;),
-        booktabs = TRUE) %&gt;%
-  kable_styling(full_width = FALSE,
-                latex_options = c(&quot;hold_position&quot;))
+  kable(caption = &#39;Words Most Related to &quot;Coal&quot;: 2020s Congressional Records&#39;) 
 
 table_2020</code></pre>
+<table>
+<caption>Words Most Related to “Coal”: 2020s Congressional
+Records</caption>
+<thead>
+<tr class="header">
+<th align="left">word</th>
+<th align="right">similarity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">plants</td>
+<td align="right">0.814</td>
+</tr>
+<tr class="even">
+<td align="left">power</td>
+<td align="right">0.801</td>
+</tr>
+<tr class="odd">
+<td align="left">sources</td>
+<td align="right">0.752</td>
+</tr>
+<tr class="even">
+<td align="left">generation</td>
+<td align="right">0.739</td>
+</tr>
+<tr class="odd">
+<td align="left">fired</td>
+<td align="right">0.733</td>
+</tr>
+<tr class="even">
+<td align="left">burning</td>
+<td align="right">0.718</td>
+</tr>
+<tr class="odd">
+<td align="left">nuclear</td>
+<td align="right">0.706</td>
+</tr>
+<tr class="even">
+<td align="left">using</td>
+<td align="right">0.702</td>
+</tr>
+<tr class="odd">
+<td align="left">powerplants</td>
+<td align="right">0.688</td>
+</tr>
+<tr class="even">
+<td align="left">generating</td>
+<td align="right">0.688</td>
+</tr>
+<tr class="odd">
+<td align="left">use</td>
+<td align="right">0.681</td>
+</tr>
+<tr class="even">
+<td align="left">fossil</td>
+<td align="right">0.663</td>
+</tr>
+<tr class="odd">
+<td align="left">fuels</td>
+<td align="right">0.661</td>
+</tr>
+<tr class="even">
+<td align="left">produce</td>
+<td align="right">0.661</td>
+</tr>
+<tr class="odd">
+<td align="left">electricity</td>
+<td align="right">0.656</td>
+</tr>
+<tr class="even">
+<td align="left">plant</td>
+<td align="right">0.656</td>
+</tr>
+<tr class="odd">
+<td align="left">clean</td>
+<td align="right">0.650</td>
+</tr>
+<tr class="even">
+<td align="left">technologies</td>
+<td align="right">0.646</td>
+</tr>
+<tr class="odd">
+<td align="left">liquid</td>
+<td align="right">0.626</td>
+</tr>
+<tr class="even">
+<td align="left">wind</td>
+<td align="right">0.624</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="vector-subtraction" class="section level2">
 <h2>Vector Subtraction</h2>
-<p>Vector subtraction in word embeddings asks: what part of the meaning
-belongs to word1 but not word2? Because embeddings place words inside a
-multidimensional geometric “meaning space,” where similar words live
-closer together, subtracting one vector from another isolates the
-semantic direction unique to the first term. Vector subtraction lets us
-reason about conceptual differences directly in mathematical space —
-extracting the portion of meaning that distinguishes one concept from
+<p>Vector subtraction asks: what part of the meaning belongs to word 1
+but not word 2? Because embeddings place words in embedded space, where
+similar words are represented closer together, subtracting one vector
+from another allows us to reason about conceptual differences by
+extracting a portion of meaning that distinguishes one concept from
 another.</p>
 <pre class="r"><code>vector_subtraction &lt;- function(word1, word2, embeddings, top_n = 10) {
-
-  # keep 1×d matrices so sim2() gets matrices on both sides
+  
+  # Extract the vector representation for word1 from the embeddings matrix
   a &lt;- embeddings[word1, , drop = FALSE]
+  
+  # Extract the vector representation for word2 from the embeddings matrix
   b &lt;- embeddings[word2, , drop = FALSE]
-  target &lt;- a - b
-
-  sims &lt;- sim2(embeddings, target, method = &quot;cosine&quot;, norm = &quot;l2&quot;)[, 1]
+  
+  # Subtract the two vectors
+  semantic_difference &lt;- a - b
+  
+  # Calculate cosine similarity between the resulting vector
+  # and every other word vector in the embeddings matrix
+  sims &lt;- sim2(embeddings, semantic_difference, method = &quot;cosine&quot;, norm = &quot;l2&quot;)[, 1]
 
   tibble(word = names(sims), similarity = unname(sims)) %&gt;%
     filter(!word %in% c(word1, word2)) %&gt;%
@@ -736,35 +854,35 @@ another.</p>
 <pre><code>## # A tibble: 10 × 2
 ##    word          similarity
 ##    &lt;chr&gt;              &lt;dbl&gt;
-##  1 portfolio          0.571
-##  2 establishing       0.566
-##  3 creation           0.541
-##  4 investment         0.503
-##  5 mom                0.473
-##  6 agency             0.461
-##  7 2008               0.458
-##  8 hoisie             0.455
-##  9 80,000             0.453
-## 10 opportunities      0.452</code></pre>
-<p>If a query returns an error like:</p>
+##  1 portfolio          0.570
+##  2 incentives         0.521
+##  3 opportunities      0.509
+##  4 provides           0.505
+##  5 investment         0.504
+##  6 creation           0.495
+##  7 business           0.478
+##  8 80,000             0.475
+##  9 development        0.467
+## 10 wilderness         0.467</code></pre>
+<p>If a query returns an error like the following, then the word was not
+in the dataset.</p>
 <blockquote>
 <p><code>Error in embeddings[word2, , drop = FALSE] : subscript out of bounds</code></p>
 </blockquote>
-<p>then that means the word was not in the dataset.</p>
 <pre class="r"><code>vector_subtraction(&quot;renewable&quot;, &quot;fossil&quot;, word_embeddings_2010)</code></pre>
 <pre><code>## # A tibble: 10 × 2
 ##    word          similarity
 ##    &lt;chr&gt;              &lt;dbl&gt;
-##  1 portfolio          0.603
-##  2 creation           0.582
-##  3 incentives         0.539
-##  4 investment         0.527
-##  5 provides           0.511
-##  6 package            0.498
-##  7 unprepared         0.487
-##  8 opportunities      0.484
-##  9 includes           0.480
-## 10 development        0.479</code></pre>
+##  1 creation           0.580
+##  2 portfolio          0.554
+##  3 incentives         0.543
+##  4 provides           0.532
+##  5 opportunities      0.528
+##  6 package            0.527
+##  7 investment         0.524
+##  8 includes           0.519
+##  9 development        0.496
+## 10 applicants         0.483</code></pre>
 </div>
 <div id="vector-addition" class="section level2">
 <h2>Vector Addition</h2>
