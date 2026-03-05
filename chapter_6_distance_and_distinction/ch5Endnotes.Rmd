@@ -79,30 +79,56 @@ peter_df <- tibble(writer = "Beatrix Potter",
 
 ## Vectorizing as Preparation for Measurement
 
-If we wanted a comprehensive list of words used frequently by Lewis Carroll but rarely by Beatrix Potter, we would begin by representing each book as a frequency count of all the words they contain (e.g., "rabbit," "tea," "queen" for  _Through the Looking Glass_, and "rabbit," "garden," "jacket" for _The Tale of Peter Rabbit_). Here is code to tokenize, clean, and count the words for each text:
+If we wanted a comprehensive list of words characteristic of Lewis Carroll but rarely by Beatrix Potter, we would begin by representing each book as a frequency count of all the words they contain (e.g., "rabbit," "tea," "queen" for  _Through the Looking Glass_, and "rabbit," "garden," "jacket" for _The Tale of Peter Rabbit_). 
+
+In this example, we combine the two books into a single dataset so that we only need to apply our analysis steps once. Working with one dataset simplifies our work because the same code can be applied across both of our books simultaneously, rather than repeating the same operations for multiple datasets.
+
+When working with large corpora such as the Hansard debates, the process has been different. Because the collection is extremely large, we partition the data into smaller subsets--such as decade partitions--and each subset is processed separately. When working with Hansard, this approach is necessary for minimizing memory usage and running the data on a personal computer. However, it also means that the same data processing steps must often be repeated for each dataset. 
+
+In our example, the dataset is small enough that we can combine the books into a single dataset using `bind_rows()`, which will later make it easy to apply methods such as TF-IDF directly. 
 
 ```{r, message=FALSE, warning=FALSE}
 # Combine both texts
-books <- bind_rows(looking_glass_df, peter_df)
+# Combine the two book datasets into a single corpus
+combined_books <- bind_rows(looking_glass_df, peter_df)
+```
 
-# Tokenize text by spliting it into individual words
-tokens <- books %>%
+Books downloaded from Project Gutenberg often contain formatting elements that are not part of the original narrative. These files may include markers indicating the beginning or end of the book or section breaks. _Through the Looking-Glass_, for example, begins with three stars (`***`), which mark the start of the Project Gutenberg transcription rather than part of the novel itself. 
+
+To prevent these formatting symbols from entering our analysis, we include a cleaning step when processing the text. We first use `unnest_tokens()` to tokenize the books into individual words and then apply a regular expression (regex) that keeps only alphabetical words, removing symbols, formatting markers, and other non-word characters from the dataset.
+
+```{r}
+# Tokenize the text by splitting it into individual words
+tokenized_words <- combined_books %>%
   unnest_tokens(word, text) %>%
-  filter(str_detect(word, "^[a-z']+$"))  # keep only alphabetic words
+  filter(str_detect(word, "^[a-z]+$"))
+```
 
-# Calculate word frequencies per author
-word_counts <- tokens %>%
+* `^` - Tells the computer to start matching the word at the beginning of the dataframe cell. This ensures the match begins with the very first character. If the token begins with a number or symbol, it will not be kept in the dataset.
+* `[]` - Brackets that mean “match any one of these characters.” They define the set of characters that are allowed in the match.
+* `a-z` - Allows any lowercase letter from a to z.
+* `+` - A symbol meaning "match one or more of the preceding characters." This means the regex will match any number of alphabetical characters, as long as they start from the beginning of the token.
+* `$` - Tells the computer to match to the end of the string. This ensures that the token continues with alphabetical characters throughout the entire match. 
+
+
+The order of the data-processing steps is very important. Normally, a regex such as this would remove words that contain punctuation, for example, `rabbit!`. If punctuation were still present in the tokens, we would need to modify the regex to allow punctuation at the end of a word. However, we already removed punctuation from words with `unnest_tokens()` so we do not need to adjust the regex to handle punctuation.
+
+```{r}
+# Count how often each word appears for each author
+author_word_counts <- tokenized_words %>%
   count(writer, word) %>%
   pivot_wider(names_from = word, values_from = n, values_fill = 0)
 
-# Focus on selected words of interest  
-target_words <- c("rabbit", "she", "little", "chortled", "shed", 
-                  "the", "hoe", "slithy", "galumph")
-selected <- word_counts %>%
-  select(writer, any_of(target_words))
+# Define the specific words we want to examine
+words_of_interest <- c("rabbit", "she", "little", "chortled", "shed", 
+                       "the", "hoe", "slithy", "galumph")
 
-# View the table
-print(selected)
+# Create a table containing only those selected words
+selected_word_counts <- author_word_counts %>%
+  select(writer, any_of(words_of_interest))
+
+# View the resulting table
+print(selected_word_counts)
 ```
 
 In advanced text mining, this entire set of steps is described as "vectorising" the text, because each text is converted into a list of numerical values corresponding to its word frequencies. 
