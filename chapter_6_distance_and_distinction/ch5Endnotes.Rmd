@@ -29,48 +29,59 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Up to now, this book has focused on simple measurements such as word counts. In this chapter, we shift our attention to statistical methods. Specifically, we explore two key concepts widely used in the natural sciences, information sciences, and digital humanities for capturing the defining traits of systems: distinctiveness, which measures how characteristic a word is within a specific context, and distance, which compares the similarity or difference between texts. 
+[Jo -- needs better intro]
 
-Distinctiveness may be used as a way of identifying unique features or patterns within a dataset (e.g., distinguishing words or features that are characteristic of a specific text or corpus compared to another). We will explore "term frequency-inverse document frequency" abbreviated to tf-idf. 
+Many of the techniques used in text mining did not originate in history; rather, they were developed in fields such as the natural sciences, information science, and data science, and later adapted for the analysis of language. This cross-disciplinary borrowing is powerful, but at the same time, it requires careful interpretation. When a method is adapted from another domain, it may not map perfectly onto historical language data. Analysts must therefore remain attentive to what the metric actually measures, as well as to the kinds of questions it can and cannot answer.
 
-Distance measurements are typically used to assign a metric to the similarity or dissimilarity of two sets of data. Just a few distance measurements include Jensen-Shannon Divergence (JSD), Euclidean distance, or cosine similarity. 
+In this chapter, we examine two concepts that are widely used across scientific fields to describe the defining characteristics of data: distinctiveness and distance. Distinctiveness measures how characteristic a word is within a particular context—for example, identifying which terms appear unusually often in one set of texts compared to others. Distance, by contrast, measures the similarity or difference between texts or linguistic patterns. Together, these concepts provide a framework for comparing bodies of text and identifying the features that distinguish, for example, a decade, a speaker, or debate from another.
 
-To understand how these metrics might work in research, imagine that our task is comparing two famous children's authors.  First, let's use some code to grab two texts, Lewis Carroll's _Through the Looking Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^
+# Distinctiveness and Distance in Practice
+
+To understand how these metrics can be used in research, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. 
+
+To test this hypothesis, the first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains only characters and no special formatting (such as fonts, images, or layout). Since plain text files are simply lines of words and punctuation, they are easy to process using code. To download the books we can locate their URLs and pass them to the `readLines()` function.
 
 ```{r}
+library("tidyverse")
+library("tidytext")
+
 # URLs for plain text versions
 looking_glass_url <- "https://www.gutenberg.org/files/12/12-0.txt"
 peter_url <- "https://www.gutenberg.org/cache/epub/14838/pg14838.txt"
 
-# Extract "Through the Looking-Glass" and save it to RStudio's global 
-# environment
+# Extract "Through the Looking-Glass" and save it to RStudio's global environment
+# The argument encoding = "UTF-8" tells R how to interpret characters in the file 
+# and handle the  punctuation, quotation marks, and non-ASCII characters that often appear in texts
+# and can cause errors during data processing 
+# We can optionally turn off warnings that do not effect the code and to keep our console clean 
 looking_glass_text <- readLines(looking_glass_url, 
                                 encoding = "UTF-8", 
                                 warn = FALSE)
 
-# Extract "The Tale of Peter Rabbit" and save it to RStudio's global 
-# environment
+# Extract "The Tale of Peter Rabbit" and save it to RStudio's global environment
 peter_text <- readLines(peter_url, 
                         encoding = "UTF-8", 
                         warn = FALSE)
 ```
 
-You can now see the texts we collected in the Global Environment panel. 
+We can now see the texts we collected in the Global Environment panel. However, it is not easy to click on them or explore their contents because they are not stored in a tabular format, like our earlier work with the `hansardr` data. When working with the `tidyverse`, it is conventional to organize data in this tabular format. Doing so makes the data easier to process. For this reason, we will convert the text into a table before continuing with the analysis.
 
-## Vectorising as Preparation for Measurement
+```{r}
+# Transform the data to a table using "tibble" (a tidyverse-style table)
+# Create a column for "writer" and assign the name of the writer
+# Create a column for "text" and assign the contents of the book
+looking_glass_df <- tibble(writer = "Lewis Carroll", 
+                           text = looking_glass_text)
+
+peter_df <- tibble(writer = "Beatrix Potter", 
+                   text = peter_text)
+```
+
+## Vectorizing as Preparation for Measurement
 
 If we wanted a comprehensive list of words used frequently by Lewis Carroll but rarely by Beatrix Potter, we would begin by representing each book as a frequency count of all the words they contain (e.g., "rabbit," "tea," "queen" for  _Through the Looking Glass_, and "rabbit," "garden," "jacket" for _The Tale of Peter Rabbit_). Here is code to tokenize, clean, and count the words for each text:
 
 ```{r, message=FALSE, warning=FALSE}
-# Load required libraries
-library("tidyverse")
-library("tidytext")
-
-# Convert to data frames
-looking_glass_df <- tibble(writer = "Lewis Carroll", text = looking_glass_text)
-
-peter_df <- tibble(writer = "Beatrix Potter", text = peter_text)
-
 # Combine both texts
 books <- bind_rows(looking_glass_df, peter_df)
 
@@ -761,10 +772,6 @@ jsd <- function(p, q) {
 
 
 ```
-
-The difference in the return statements—one using `p` and the other using `q`—ensures that each function measures the directional change in word usage for a specific decade. By using `p` in one function and `q` in the other, we avoid blending the two distributions. Instead, we get a clearer, one-sided measure of how word usage changed over time. The measurement allows us to distinguish words that declined after 1840 from those that rose in prominence by 1850.
-
-In both functions, `m = 0.5 * (p + q)` represents the average probability distribution between the two periods, and the return value calculates the information gain when approximating `p` (or `q`) with `m`. Partial JSD ensures that we capture asymmetrical shifts in word frequency over time. 
 
 At this stage we can calculate word frequencies. Calculating word frequencies is an essential step because JSD operates on probability distributions. By counting how often each word appears in a given decade (e.g., 1840 and 1850), we can transform these counts into probabilities, which are required to measure divergence. Since Partial JSD specifically focuses on how one decade’s word distribution deviates from another without averaging both directions, accurate word frequencies ensure that we capture asymmetrical changes in language use. An asymmetrical change occurs when a word's usage shifts more in one direction than the other. For example, if a word was common in 1840 but became rare in 1850, this is an asymmetrical change because the decrease is not balanced by an equivalent increase elsewhere. Partial JSD captures these one-sided shifts, helping identify words that either faded out or emerged over time rather than averaging both directions.
 
