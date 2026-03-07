@@ -501,6 +501,8 @@ top_events_1867_w_speech_metadata <- top_events_1867 %>%
 head(top_events_1867_w_speech_metadata)
 ```
 
+In this visualization, you may notice that we have produced a different sort of visualization than the bar charts we have been creating. `ggplot2` is a flexible library for creating many different types of visualizations from the same dataset. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. 
+
 ```{r, fig.cap= "Plot showing the frequency with which Parliament in 1867 referred to major past events—including famines, wars, riots, and public meetings—across the months from February to August. Each square represents a day on which a speech mentioned a given event bigram; larger and brighter squares indicate higher numbers of mentions.", fig.fullwidth=TRUE, fig.asp = 0.8, fig.width = 7}
 # Load the viridis color palette library for colorblind-friendly colors
 library("viridis")

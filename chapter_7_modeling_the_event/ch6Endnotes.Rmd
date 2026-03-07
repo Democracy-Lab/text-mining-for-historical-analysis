@@ -401,6 +401,7 @@ all_speakers_annotated <- all_per_speaker_wordcounts %>%
 # inspect the data
 all_speakers_annotated
 ```
+
 Note that we have created two columns that annotate the speeches and speakers in different ways. The "period" column refers to the year in question -- were the n words said in 1831 prereform or postreform?  The "class" column sorts the speakers themselves -- did this speaker only speak in the prereform years, the postreform years, or in both periods? 
 
 We also have a wordcount column that reflects the words each speaker spoke per year. 
@@ -983,17 +984,18 @@ The portrait of change we have here is exceptional rather than the rule. We're l
 
 1) This chapter builds on previous chapters, expanding what can be demonstrated with the tools provided so far. A great deal of space has been spent on creating elegant and informative visualizations, for example, timelines labeled with names that accurately reflect how an individual was described in the text, even while metadata behind the scenes ensures that we count one person per one dot. Why is it important to reference the names found in the original text? Why is it important to use metadata to ensure that one person gets one dot?
 
-2) This chapter leverages a number of applications of distinctiveness measures -- like tf-idf and log likelihood -- to ask, in different ways, what is special about the speakers before and after the Reform Act? In your own words, explain what was done with the data in each of these exercises: 
-  a) tf-idf by time period
-  b) log likelihood by time period
-  c) comparing speakers from one period only against those continuously elected
-  d) comparing the most prolific speakers who were exclusively prereform against the most prolific speakers who were exclusively postreform
+2) In this chapter we annotate our data. Annotation is important because it allows us to add meaning to otherwise difficult to interpret visualizations. How might the way we choose to annotate our data be a scholarly choice in its own right? In what ways can annotation shape the kinds of historical questions we are able to ask or how we can interpret the past? 
 
-3) The approach profiled here generated many analyses filled with obscure  names, in part because we have used the stricter tf-idf rather than the more inclusive log likelihood measure.  For the analyses of prereform and post reform speakers and their words, change the code so that the analysis uses log likelihood. Are the results any easier to interpret?
+3) Why is performing observational validation an important step when processing and analyzing data? What kinds of problems can it help researchers detect? How frequently should researchers return to the data to validate their results as they move through different stages of analysis? When examining the data during validation, what kinds of patterns, anomalies, or errors should they be looking for?
 
-4) We have generated an analysis of 1832 and of 1867. Choose your favorite of the visualizations, and consult the version of this analysis for each event. What is the same in both events? What is different?  
+4) This chapter leverages tf-idf to ask, in different ways, what is special about the language before and after the Reform Act? In your own words, explain what was done with the data in each of these exercises: 
+  a) identifying how many words were spoken prereform and postreform
+  b) comparing speakers from prereform, postreform, and both periods
+  c) distinctiveness before and after the Reform act of 1832
+  
+5) In Table 6.1, the top ten most frequently used words in Parliament before and after the Reform Act are quite similar. To make the analysis more meaningful, we used tf-idf to identify words that are more distinctive to each period. What are some other metrics or approaches an analyst could use at this stage to highlight meaningful differences in language between the two periods?
 
-5) We have not supplied an interpretation for all of the obscure place names that occur in the comparison of speakers elected in one period versus those elected continuously. Choose one of the charts, and use your skills to navigate back to in-text mentions of these words. Based on what you have found, give an interpretation of the significance of distinctiveness measures for our understanding of the Reform Act.  
+6) Tf-idf can draw attention to infrequent words, including names that appear less commonly in the corpus, such as Quamina Gladstone. Why is it valuable for researchers to notice these uncommon names or references? How might identifying such figures lead historians to new questions, overlooked people or events, or important historical connections? 
 
-6) In an essay of a page, explain why it is important to compare the results of different analyses rather than to choose one of these approaches at random. What do we get out comparing the results of different methods of analysis? Do you get more insight out of comparing different events (1832 vs 1867), or different aspects of the same event?
+7) As mentioned in the chapter, historians often argue that after the Reform Act of 1832 Parliament began focusing more on issues affecting the growing middle class and urban population. Has text mining tested, validated, or complicate this interpretation? 
 

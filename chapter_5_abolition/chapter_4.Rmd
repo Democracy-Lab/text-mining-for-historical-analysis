@@ -14,7 +14,7 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-One of the most important tasks in history is the study of events—moments when something changed. Historians ask not only what happened, but why those moments mattered and how people understood change as it unfolded. In this and future chapters, we adopt a historian’s perspective by asking what makes certain moments historically significant and how evidence allows us to interpret them.
+One of the most important tasks in history is the study of events—moments when something changed. Historians ask not only what happened, but why those moments mattered and how people understood change as it unfolded. In this and future chapters, we adopt a historian's perspective by asking what makes certain moments historically significant and how evidence allows us to interpret them.
 
 This chapter introduces a research strategy. Up to this point, each analytical technique has been practiced separately: counting words, identifying prolific speakers, examining preferred vocabulary, and analyzing collocates to understand how meaning forms around key terms. Now, these skills come together into a single coherent research task centered on understanding a historical event. Events punctuate time, marking moments when attention intensifies and language shifts in response to political or social change. Rather than studying discourse in isolation, the goal is to identify an event, find the speakers most active around it, examine the themes and collocates they used, compare how different individuals framed the moment, and interpret what changed and why it mattered. In earlier exercises, speakers, word use, and collocates were analyzed independently; here, those same methods are combined into a unified workflow that moves from computational analysis toward historical interpretation.
 
@@ -24,7 +24,7 @@ To see how these questions emerge in practice, we turn to a historical example w
 
 Studying the interplay between white male politicians as they debated the fate of millions of enslaved persons from the West Indies to South Africa is in many ways an out-of-date exercise. Today, we recognize the degree to which enslaved people across British empire struggled to liberate themselves. A persistent tradition of uprisings and riots marked their ongoing resistance. The life of ideas and leaders — even women leaders like Queen Nannie — are important to understanding the British Empire.  
 
-We will find only an indirect trace of how the freedom struggles of the Caribbean changed laws and ideas in Britain. The personages and uprisings that rocked the West Indies were rarely named in Westminster. The direct records of those events are held in pamphlets and documents in the Caribbean itself, slowly being digitalized through other means. 
+We will find only an indirect trace of how the freedom struggles of the Caribbean changed laws and ideas in Britain. The personages and uprisings that rocked the West Indies were rarely named in Westminster. The direct records of those events are held in pamphlets and documents in the Caribbean itself, slowly being digitalized and published through other means.[^1]: One of the authors of this book has been working with translators who travel to the National Archives of Cuba to photograph notarial records that contain references to slavery. Buongiorno then processes the images using a large language model (LLM) to perform optical character recognition (OCR), after which the transcriptions are validated for accuracy.
 
 And yet, those freedom struggles half a world a way did matter in many respects to British life. They circulated among evangelical readers; they forced philosophers of capitalism to reckon with the way that capitalism had been instantiated as misery in many places where it was enacted. British debates about slavery came to a head in the halls of parliament after 1832, when an evangelical middle class got the vote after decades of political struggles of their own. In 1833, the elected representatives of the evangelical middle class committed themselves to talking about slavery as a moral ill and bringing it to an end across empire. 
 
@@ -38,9 +38,9 @@ Before we begin to think about the contribution that text mining can make to the
 
 Remarks about the importance of reading background information may be experienced as off-putting by some undergraduate students of data, who want to be assured that in a course on text mining that they will acquire the tools to make wonderful discoveries.  But just as students of statistics must study more than an introductory course in statistics to make a novel contribution, so too students of text mining must enroll in more than one course to do really important work.  Reading a wikipedia entry cannot substitute for the kind of background knowledge that a student would acquire in the course of taking an introductory course on the History of Victorian England. Nor can Text Mining for Historical Analysis make up for courses in the undergraduate study of History, although this book’s companion volume, The Dangerous Art of Text Mining, includes many arguments about the specific kind of knowledge of sources, obfuscations, agency, and experience that historical study makes available.  Producing insight worthy of the attention of multiple fields is no simple game. It cannot be produced at the touch of a button or the application of a new algorithm to new data; it requires adjusting the algorithm, rethinking the questions, examining the data, and iterating through the work until something truly surprising has come to light. 
 
-A shortcut which Guldi recommends in The Dangerous Art of Text Mining for those who want to achieve results before enrolling in a specialist course on the historical background material is to engage in an ongoing collaboration with a professor, librarian, or graduate student already familiar with the background material, allowing that scholar’s sense of validation and surprise to guide the work with data. In these days, many LLMs can give adequate summaries of the events that pertain to a database. A useful prompt might look like, “Given the Hansard dataset, what are the most important political events of the 1830s that would appear in these debates? Do not hallucinate.” A request for more information might be, “Tell me about the British Abolition of Slavery in 1833. Use published works only. Do not hallucinate. Give links to the citations.” In our experience, at the current level of LLMs, it is worth checking on some of those links to make sure that they are real.
+[Steph's cut]
 
-In ‘hybrid' work, where computer scientists and humanists work on the same team to produce new knowledge, collaborating over multiple iterations and investigations, there can be a division of labor around the research.  In general, a high caliber of work can only be accomplished by teams where at least one valued member is as serious about history as they are about algorithmic study.
+In 'hybrid' work, where computer scientists and humanists work on the same team to produce new knowledge, collaborating over multiple iterations and investigations, there can be a division of labor around the research. In general, a high caliber of work can only be accomplished by teams where at least one valued member is as serious about history as they are about algorithmic study.
 
 Not every historian needs access to every kind of background knowledge. If a course on Victorian Britain offers the ideal background for text mining the parliamentary debates, a course on American history offers a much better background to working with the Congressional Record. Scholars who have studied Latin American, African, or Asian history will necessarily have the background to work with other datasets. The point here is that understanding a time and a place represents a commitment of reading dozens of books. No single Wikipedia article or textbook will substitute for this work, and only this background work really equips an analyst to ask the questions about consensus and surprise that outfit an analyst for understanding when their data work is validating what scholars already know and when their data work has advanced to the discovery of something truly surprising.
 
@@ -66,7 +66,7 @@ In the sections of text that follow, as we pursue the question more deeply, we w
 
 # Finding the Research Question that the Tools of Text Mining Can Address
 
-First, we need to think about the fit between the tools of text mining and the issue of the abolition of slavery. As explained above, we don't have the source base in Hansard to contribute to burning questions about the role of enslaved persons in pursuing their own freedom. If all we have is Hansard, we need to retailor our question to the dataset we have. With Hansard, we can count mentions of slavery and the way that slavery is addressed by the spakers who were in power at the time when slavery was nominally abolished throughout British empire. Can we write a research question that might light to insights on the basis of word count?
+First, we need to think about the fit between the tools of text mining and the issue of the abolition of slavery. As explained above, we don't have the source base in Hansard to contribute to burning questions about the role of enslaved persons in pursuing their own freedom. If all we have is Hansard, we need to retailor our question to the dataset we have. With Hansard, we can count mentions of slavery and the way that slavery is addressed by the speakers who were in power at the time when slavery was nominally abolished throughout British empire. Can we write a research question that might light to insights on the basis of word count?
 
 One place to start is with the speakers in parliament who contributed the most to the 1833 debates about slavery. As we saw in a previous chapter, one place where text mining excels is simply counting the number of words contributed to a given issue by individual speakers. Based on word counts, we can expect to accurately identify the speakers in parliament who contributed the most to the slavery question.
 
@@ -78,17 +78,21 @@ From this question we may be able to navigate to an original contribution about 
 
 ## Top Speakers in the Debates About Slavery
 
-In a previous chapter, we looked into the top speakers in parliament in a given year. In this exercise, we want to begin by finding just those speakers who spoke the most in debates about slavery. We can use `str_detect()` to look for the word "slavery" in the titles of debate. Then we could the top speakers.
+In a previous chapter, we looked into the top speakers in parliament in a given year. In this exercise, we want to begin by finding just those speakers who spoke the most in debates about slavery. We can use `str_detect()` to look for the word "slavery" in the titles of debate. Then we count the top speakers.
 
-If you are new to code, take a moment to notice how changing only one line in the code below produces a different angle of analysis.  The code below is otherwise very similar to the code in the previous chapters. One of the great pleasures of coding is the facility with which a few skills can quickly become powerful in the hands of an analyst who has many questions.
+The code below is otherwise very similar to the code in the previous chapters. One of the great pleasures of coding is the facility with which a few skills can quickly become powerful in the hands of an analyst who has many questions.
 
 ```{r, warning=FALSE, message=FALSE}
 # load packages
 library("tidyverse")
 library("tidytext")
+library("knitr")
 library("lubridate")
 library("hansardr")
 library("ggrepel")
+library("textstem")
+library(scales)
+
 
 # load data
 data("hansard_1830")
@@ -123,13 +127,19 @@ top_slavery_speakers <- words_per_speaker_slavery_1830 %>% # create a new datase
   arrange(desc(words_per_speaker)) %>% # arrange in descending order 
   slice(1:20) # take only the top n speakers
 
+head(top_slavery_speakers)
+```
+
+We now have a dataset that shows the total number of words by each speaker in the subset of debates about slavery from the 1830s. We can now find word counts per speaker by year. 
+
+```{r}
 # calculates the number of words each speaker said per year in the 1830 slavery dataset
 # group the text data by speaker and year, count the words, 
 # and arrange the results in descending order
 words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new dataset
   group_by(speaker, year) %>% # group by speaker and year
-  summarize(words_pspy = n()) %>% # count words and store in new column
-  arrange(desc(words_pspy)) # sort in descending order of word count
+  summarize(words_per_speaker_per_year = n()) %>% # count words and store in new column
+  arrange(desc(words_per_speaker_per_year)) # sort in descending order of word count
 
 # create a summary of the number of words each speaker contributed per year 
 # in the slavery debates of 1830
@@ -137,33 +147,37 @@ words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new
 # and their yearly distribution of speech.
 words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new dataset
   group_by(speaker, year) %>% # group by speaker and year
-  summarize(words_pspy = n()) %>% # count words per speaker per year
-  arrange(desc(words_pspy)) # sort from highest to lowest word count
+  summarize(words_per_speaker_per_year = n()) %>% # count words per speaker per year
+  arrange(desc(words_per_speaker_per_year)) # sort from highest to lowest word count
 
 # find the words per speaker per year for just the top speakers
-top_words_pspy_slavery_1830 <- words_per_speaker_per_year_slavery_1830 %>%
+top_words_per_speaker_per_year_slavery_1830 <- words_per_speaker_per_year_slavery_1830 %>%
   filter(speaker %in% unique(top_slavery_speakers$speaker)) # retain only relevant rows
 ```
+
+```{r}
+head(top_words_per_speaker_per_year_slavery_1830)
+```
+
+```{r}
+tail(top_words_per_speaker_per_year_slavery_1830)
+```
+We can now visualize our data to view who spoke the most about slavery, and in what years. We can also introduce another library, `ggrepel`, which gives us tools for enhancing the readability of our plot by making sure that labels do not overlap.
 
 ```{r, fig.cap="Number of words spoken about slavery by individual members of Parliament from 1830 to 1838. Each point represents a speaker in a given year, plotted by the total number of words they contributed on the topic.", warning=FALSE, message=FALSE}
 # visualize who spoke about slavery in 1830, how much they said, and when they spoke.
 # each point represents a speaker's total words for a given year
 # the x-axis shows years (rounded to whole numbers), and the y-axis shows word counts.
-ggplot(top_words_pspy_slavery_1830, # make a graph
+ggplot(top_words_per_speaker_per_year_slavery_1830, # make a graph
        aes(x = year, # x axis = year
-           y = words_pspy, # y axis = word count
+           y = words_per_speaker_per_year, # y axis = word count
            label = speaker)) + # use speaker names for labels
   geom_text_repel(size = 2) + # repel overlapping text labels
   geom_point() + # plot each point
   ggtitle("Who spoke about slavery, how much, and when?") + # plot title
   ylab("Number of words spoken") + # y axis label
-  scale_x_continuous(breaks = # whole number x axis
-                       function(x) 
-                         unique(floor(pretty(seq(min(x), 
-                                                 (max(x) + 1) * 1))))) 
+  scale_x_continuous(breaks = sort(unique(top_words_per_speaker_per_year_slavery_1830$year))) # create a whole number x-axis
 ```
-
-You may notice that we have produced a different sort of visualization than the bar charts of the previous chapter. The ggplot library of graphics is a highly flexible language for producing many visualizations from the same data. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. With this plot we also introduce another library, `ggrepel`, which gives us tools for enhancing the readability of our plot by making sure that labels do not overlap.
 
 What does this chart of the top speakers about slavery tell us? The chart gives us some suggestions about where to start looking. It tells us that the five speakers who contributed the most to the debate in 1830 spoke twice as much as the speakers in other debates of the decade.  The list of these speakers gives us a good place to start looking at data.  The main speakers in 1833 were Edward Stanley, the Duke of Wellington, James Silk Buckingham, Fowell Burton, and Robert Peel.  We also see the evidence of a second wave of debates, when issues of indentured servitude came to parliament's attention in 1838.  Then, Lord Brougham and Lord Gleneig were the main contenders. 
 
@@ -173,9 +187,7 @@ Exploring the contributions of the top speakers and the tensions between them is
 
 ## Using Our Skills to Explore the Historical Debates About the Abolition of Slavery
 
-Understanding how to group data by speaker and year gives us the possibility of closely studying the contribution of different speakers.  For instance, suppose that we wanted to read all of the debates relating to Slavery Abolition Act of 1833, which went into effect in 1834 and outlawed slavery in many British colonies, including the Caribbean and South Africa, although not across much of India, where debt slavery would persist for decades, and where the caste system would exclude many people from participation in the economy through the twenty-first century.
-
-There are some new commands below that are used for demonstration purposes to show how one might navigate our newly joined dataset. Don't feel worried if you can't read every line. You will be learning how to aggregate data by speaker very soon.
+Understanding how to group data by speaker and year gives us the possibility of closely studying the contribution of different speakers. For instance, suppose that we wanted to read all of the debates relating to Slavery Abolition Act of 1833, which went into effect in 1834 and outlawed slavery in many British colonies, including the Caribbean and South Africa, although not across much of India, where debt slavery would persist for decades, and where the caste system would exclude many people from participation in the economy through the twenty-first century.
 
 ```{r, message = FALSE, echo=FALSE}
 # find the words spoken about slavery in the year 1833
@@ -196,36 +208,29 @@ head(words_per_speaker_slavery_1833)
 
 Counting how many words were spoken in the 6,000 some sentences about the abolition of British slavery is our first reminder of the bias of this data set: the speakers are white men, many of them of a class invested in slavery. This collection of words is not suitable for investigating narratives that depict lived experiences of dehumanization, recorded from the words of enslaved people.
 
-Nevertheless, distant reading--a technique where we read historical patterns across large text collections rather than individual documents--allows us to investigate the dynamics of politics in the British parliamentary system that made the official abolition of slavery possible. We can take a snapshot at the speeches of the most active speakers -- Buckingham, Stanley, Wellington, and Peel -- by comparing their most-invoked words in these debates.
+Nevertheless, distant reading allows us to investigate the dynamics of politics in the British parliamentary system that made the official abolition of slavery possible. We can take a snapshot at the speeches of the most active speakers -- Buckingham, Stanley, Wellington, and Peel -- by comparing their most-invoked words in these debates.
 
-In the following code, we provide a list of speakers and use the `%in%` operator to filter for any of these speakers. 
+In the following code, we provide a list of speakers and use the `%in%` operator to filter for debates that contain any of these speakers. 
 
 ```{r, message = F}
-library(knitr)
-
 # make a list of the names of the top speakers
-pattern1 = c("Mr. Fowell Buxton", "Mr. Buckingham", "Mr. Stanley", 
+most_active_speakers = c("Mr. Fowell Buxton", "Mr. Buckingham", "Mr. Stanley", 
              "The Duke of Wellington", "Sir Robert Peel")
 
-# search for the words said by the speakers in pattern1 
+# search for the words said by the speakers in most_active_speakers 
 top_slavery_speakers_1833 <- slavery_debates_1833 %>%
-  filter(speaker %in% pattern1) # keep rows containing a speaker's name
+  filter(speaker %in% most_active_speakers) # keep rows containing a speaker's name
 
-top_slavery_speakers_1833 %>%
-  head() %>% # just the first few lines
-  mutate(text = str_trunc(text, 120)) %>%  # just the first 120 characters
-  kable()
+head(top_slavery_speakers_1833)
 ```
 
-Next, let's break the text into words and clean it up, removing numbers and stop words. We're lemmatizing each word into its word stem so that we can count singular and plural of the same word as one.
+Next, let's break the text into words and clean it up, removing numbers and stop words. We are lemmatizing each word to its base form so that we can count singular and plural of the same word as one.
 
 ```{r, message = F}
-library(textstem)
-
 # clean up the list of words
 filtered_words_per_top_slavery_speaker_1833 <- top_slavery_speakers_1833 %>%
   unnest_tokens(word, text) %>% # break up into words 
-  filter(!str_detect(word,"^\\s*[0-9]*\\s*$")) %>% # remove all numbers 
+  filter(!str_detect(word,"[0-9]+")) %>% # remove all numbers 
   anti_join(stop_words, by = "word") %>% # remove stopwords 
   mutate(word = lemmatize_words(word)) # lemmatize the word 
 
@@ -233,9 +238,7 @@ filtered_words_per_top_slavery_speaker_1833 <- top_slavery_speakers_1833 %>%
 head(filtered_words_per_top_slavery_speaker_1833)
 ```
 
-Next, let's count the words by how many times each speaker says them.
-
-For our visualization, we will look at only the words spoken most frequently.
+Next, we will count how many times each word appears for each speaker in the vocabulary of each abolitionist speaker.
 
 ```{r, message = F}
 abolition_speaker_wordcounts <- filtered_words_per_top_slavery_speaker_1833 %>%
@@ -246,7 +249,12 @@ abolition_speaker_wordcounts <- filtered_words_per_top_slavery_speaker_1833 %>%
 top_words_per_abolition_speaker <- abolition_speaker_wordcounts %>%
   slice(1:15)  # find the 15 words that each speaker says the most frequently 
   
-kable(top_words_per_abolition_speaker) # make a table
+head(top_words_per_abolition_speaker)
+```
+
+```{r}
+tail(top_words_per_abolition_speaker)
+
 ```
 
 Now visualize: 
@@ -268,19 +276,19 @@ top_words_per_abolition_speaker %>%
        y = "Count") # label the y axis
 ```
 
-## From Concepts to ideas
+## From Concepts to Ideas
 
 What can we learn from this visualization about the history of slavery? How might we use the tools of text mining to learn something new about this important historical moment?
 
 What shows up clearly in the counts of most frequently-used words is a series of keywords that motivated debate. The fact that all five speakers invoke the terms "slavery," "freedom," and "labour" suggests that they are operating as what historians call "concepts" -- the theoretical constellations of ideas that produced much of the modern world.  Terms such as "nation," "republic," "democracy," and "development" were argued over and redefined over the course of decades and centuries, until the terms eventually stabilized. 
 
-Historians believe that identifying the debates over these words is key to understanding the abstract forces that remade society, or the "conceptual changes" by which modern understanding was produced.  Peter de Bolla and his coauthors defined concepts as "'cultural entities' held by many agents collectively, that is held by a 'culture'." (de Bolla et. al). They argue that concepts allow cultures to feel their way through increasingly abstract modes of ideation, because concepts "provide the scaffolding that enables one to understand whatever is the object of attention and thought." In the era of the debates over the abolition of slavery, the concept "freedom" was doing just such important work, allowing ordinary British people and the politicians who represented them to reckon with certain aspects of the abhorrent economic reality that made Britain so rich in the age of empire: the fact that Britain's wealth was largely due to the plunder of wealth from foreign lands and especially the theft of time from the millions of enslaved humans who harvested sugar, tea, cotton, and the other raw materials upon which empire's trade was based. Talking about "freedom" formed the basis for reckoning with capitalism and empire as systems, for holding them account to a higher set of principles. That work was at its infancy in the era of the British laws that outlawed the Atlantic slave trade and slavery in some parts of British empire, but the work of defining and promoting freedom continues to this day as the specific cases and principles that comprise freedom continue to be brought into consciousness through the work of social movements, politics, and ideation.
+Historians believe that identifying the debates over these words is key to understanding the abstract forces that remade society, or the "conceptual changes" by which modern understanding was produced.  Peter de Bolla and his coauthors defined concepts as "'cultural entities' held by many agents collectively, that is held by a 'culture'" (de Bolla et. al). They argue that concepts allow cultures to feel their way through increasingly abstract modes of ideation, because concepts "provide the scaffolding that enables one to understand whatever is the object of attention and thought." In the era of the debates over the abolition of slavery, the concept "freedom" was doing just such important work, allowing ordinary British people and the politicians who represented them to reckon with certain aspects of the abhorrent economic reality that made Britain so rich in the age of empire: the fact that Britain's wealth was largely due to the plunder of wealth from foreign lands and especially the theft of time from the millions of enslaved humans who harvested sugar, tea, cotton, and the other raw materials upon which empire's trade was based. Talking about "freedom" formed the basis for reckoning with capitalism and empire as systems, for holding them account to a higher set of principles. That work was at its infancy in the era of the British laws that outlawed the Atlantic slave trade and slavery in some parts of British empire, but the work of defining and promoting freedom continues to this day as the specific cases and principles that comprise freedom continue to be brought into consciousness through the work of social movements, politics, and ideation.
 
 Historically speaking, as concepts arise, they tend to be contested. At the beginning, there was no single definition of "science" or "nation" to which all parties subscribed; these terms had to be debated and argued over until they became abstract ideas that could be invoked in support of other debates. Corpus linguistics gives us useful clues about how to identify potential concepts: as a rule of thumb, the words spoken about the most in any debates are those that are most contested. In the debates of 1833, we can tell that the words "slavery," "freedom," and "labour" may fit such a description. Often the words spoken most frequently are words whose definition is up for grabs; speakers who disagree with each other will talk at great length to assert their own definition of one of these key concepts. The two speakers who mention freedom the most in 1833 are Buckingham and Peel, and we might expect that they represent two poles of disagreement about what freedom is or should be.
 
 One part of unpacking the life of concepts is to understand the contestation of concepts by individuals as they formulate ideas and arguments.  In this usage, we follow de Bolla and his collaborators call the individual uses of concepts by writers and speakers "ideas" (de Bolla et al Ch 2.1.2).  Therefore, for the following discussion, let us use "concept" to reference that shared terminology of values, especially "freedom," while reserving "idea" for any other terms we might use to understand how individual speakers make their cases. When people in the past argued about how to define terms like "freedom," they used many examples. Words such as "wages," "apprenticeship," and "regulation" were used in the slavery debates to signal how freedom was to be achieved.
 
-We already have enough material to hypothesize about some major differences that marked the speakers out in their construction of the problems of freedom and slavery. Buckingham and Buxton, representing the abolition lobby, use a now offensive term for indicating race. The word they use began with a reference to a color, black, indicated by the Latin _nigrum_. We might become curious about how universally this term was used against other comparative terms for race, by whom, and what other words kept company with those terms. Buckingham also uses words for abstract values such as “enjoyment” and “life,” where Buxton is more willing to talk about facts on the ground in “Jamaica,” for instance the “insurrection.”
+We already have enough material to hypothesize about some major differences that marked the speakers out in their construction of the problems of freedom and slavery. Buckingham and Buxton, representing the abolition lobby, use a now offensive term for indicating race. The word they use began with a reference to a color, black, indicated by the Latin _nigrum_. We might become curious about how universally this term was used against other comparative terms for race, by whom, and what other words kept company with those terms. Buckingham also uses words for abstract values such as "enjoyment" and “life,” where Buxton is more willing to talk about facts on the ground in "Jamaica," for instance the "insurrection."
 
 Problems of imperial governance concern the other speakers, whose personal background was associated less with middle-class abolition movements than with the military and colonial order of British empire. Peel speaks of "colonies," "compensation," and "proprietors;" if we have read some background to the debates, we might guess that Peel is wrapped up with the technical questions of whether the imperial parliament in Westminster has the right to tell the colonial government in Jamaica, and what will be the fallout if the Westminster parliament tells the white planters in Jamaica that their property is suddenly invalid.  Stanley's eyes are on markets -- he speaks of "sugar," the major project produced by slave labor, "averages" (a hint that he may be speaking in technical terms about economic production, although we would need to read more to understand how), and "compensation" and "colonies," like Peel. Wellington's eyes are also on imperial issues, drawing attention (perhaps) to the implications of debates over slavery for India (although again more reading would be necessary to understand how India is being invoked).
 
@@ -306,9 +314,8 @@ tfidf_per_top_slavery_speaker_1833 <- abolition_speaker_wordcounts %>%
   bind_tf_idf(word, speaker, n) %>% 
   arrange(desc(tf_idf))
 
-# inspect the data
-tfidf_per_top_slavery_speaker_1833 %>% head(50) %>% # just the first few rows
-   kable() # make a table
+# view the 50 first rows
+head(tfidf_per_top_slavery_speaker_1833, 50)
 ```
 
 Note that the `bind_tf_idf()` function creates three new columns -- `tf`, `idf`, and `tf_idf`. The one we really care about is the last, `tf_idf`, an index of how distinctive each word is of each speaker. A very high `tf_idf` marks words that are said very frequently by one speaker and never by any other speakers. A very low tf_idf marks words that are rarely said by anyone or said by everyone with nearly the same frequency.  Looking for the high `tf_idf` words for each speaker will tell us which words are most unique to them -- a useful clue to the distinctive arguments, ideas, and referents that each speaker contributed to the debate.
@@ -326,44 +333,53 @@ most_distinctive_words_per_abolition_speaker <- tfidf_per_top_slavery_speaker_18
   mutate(tf_idf = round(tf_idf, 4)) %>% # round the tf_idf score to only 4 decimal places 
   select(index, word, tf_idf, n, speaker) # drop all columns except these
 
+head(most_distinctive_words_per_abolition_speaker)
+```
+
+Next, we will create a series of small tables displaying each speaker, their most distinctive words, and the `tf_idf` score of that word-speaker combination. 
+
+We could create a bar graph, of course, but because `tf_idf` measures represent an abstract concept -- distinctiveness -- visualizing this data risks confusing some possible readers, who might mistake the bar graph of `tf_idf` for a count of frequency.  Analysts often have to make choices about how to represent their data so as to generate the least confusion about the meaning of any statistical measure. For abstract indexes like `tf_idf`, generated in the course of our research, we recommend offering simple tables along with prose that explains the significance of the numbers.
+
+```{r}
 # create a series of smaller datasets reflecting the top speakers
+# we can change the number in the brackets to select a different speaker 
 speaker1 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[1]) %>% 
+  filter(speaker == most_active_speakers[1]) %>% 
   select(word, tf_idf)
 
 speaker2 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[2]) %>% 
+  filter(speaker == most_active_speakers[2]) %>% 
   select(word, tf_idf)
 
 speaker3 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[3])%>% 
+  filter(speaker == most_active_speakers[3]) %>% 
   select(word, tf_idf)
 
 speaker4 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[4])%>% 
+  filter(speaker == most_active_speakers[4]) %>% 
   select(word, tf_idf)
 
 speaker5 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[5])%>% 
+  filter(speaker == most_active_speakers[5]) %>% 
   select(word, tf_idf)
 ```
-
-Next, let's create a series of small tables displaying each speaker, their most distinctive words, and the `tf_idf` score of that word-speaker combination. 
-
-We could create a bar graph, of course, but because `tf_idf` measures represent an abstract concept -- distinctiveness -- visualizing this data risks confusing some possible readers, who might mistake the bar graph of `tf_idf` for a count of frequency.  Analysts often have to make choices about how to represent their data so as to generate the least confusion about the meaning of any statistical measure. For abstract indexes like `tf_idf`, generated in the course of our research, we recommend offering simple tables along with prose that explains the significance of the numbers.
 
 ```{r, message = F}
 kable(speaker1, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[1])
 ```
+
 ```{r, message = F}
 kable(speaker2, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[2])
 ```
+
 ```{r, message = F}
 kable(speaker3, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[3])
 ```
+
 ```{r, message = F}
 kable(speaker4, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[4])
 ```
+
 ```{r, message = F}
 kable(speaker5, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[5])
 ```
@@ -390,35 +406,22 @@ We can check the significance of our distinctiveness measure by another kind of 
 most_distinctive_words_per_abolition_speaker <- most_distinctive_words_per_abolition_speaker %>%
   mutate(word = reorder_within(word, n, speaker)) 
 
-# x-axis: words (flipped for readability)
-# y-axis: counts of each word
-# fill color: tf-idf score (converted to a factor so bars are shaded categorically, not continuously)
-# geom_col(): draws the bar chart
-# facet_wrap(): creates separate mini-plots by speaker
-# coord_flip(): makes long word labels readable
-# scale_x_reordered(): preserves word ordering within facets
-# scale_fill_grey(): use grayscale instead of color
-# guides(fill = "none"): hides the fill legend
-# scale_y_continuous(): forces whole number tick marks
-# labs(): titles, subtitles, captions, axis labels
-ggplot(data = most_distinctive_words_per_abolition_speaker,
-       aes(most_distinctive_words_per_abolition_speaker,
-           x = word,
-           y = n, 
-           fill = factor(tf_idf) )) +
-  geom_col() + 
-  facet_wrap(~speaker, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() + 
-  scale_fill_grey() + 
-  guides(fill = "none") + 
-  scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + 
-  labs(title = "Speakers\' Most Distinctive Words", 
+ggplot(data = most_distinctive_words_per_abolition_speaker,  
+       aes(x = word, # words put on x-axis (flipped later for readability)
+           y = n, # counts of each word put on y-axis
+           fill = factor(tf_idf))) + # fill with tf-idf score (converted to a factor for bar shading)
+  geom_col() + # draw the bar chart
+  facet_wrap(~speaker, scales = "free") + # creates separate mini-plots by speaker
+  coord_flip() + # makes long word labels readable
+  scale_x_reordered() + # preserves word ordering within facets
+  scale_fill_grey() + # use grayscale instead of color
+  guides(fill = "none") + # hide the fill legend
+  scale_y_continuous(breaks = pretty_breaks()) + # choose clean tick marks for the y-axis
+  labs(title = "Speakers' Most Distinctive Words",           # labs(): titles, subtitles, captions, axis labels
        subtitle = "From the 1830s debates on the abolition of slavery",
-       caption = "Pale shading indicates greater distinctiveness", 
-       x = "Word", 
-       y = "Count") 
+       caption = "Pale shading indicates greater distinctiveness",
+       x = "Word",
+       y = "Count")
 ```
 
 As opposed to the list, our bar chart shows both tf-idf distinctiveness (represented as paleness of the bar) with count on the x axis.  This visualization can guide us as to whether we want to investigate a particular word because of its distinctiveness -- or whether that word might be a poor marker of significance. For instance, most of Stanley's distinctive words are revealed to have a wordcount of only 2, which is too few to be significant; it simply doesn't make sense that "rum," "mine," and "barrel" merit investigation when Stanley spoke them only twice in his voluminous speech-giving -- that is, unless we already had a previous interest in the rum trade and its intersection with slavery. Statistically distinctive these words might be; worthy of further investigation they are not (at least not necessarily). 
@@ -443,16 +446,17 @@ most_distinctive_words_per_abolition_speaker
 ```{r, fig.cap="Most distinctive words used by six major speakers in the 1830s debates on the abolition of slavery, filtered to include only terms appearing more than five times. Pale bars indicate words that are more distinctive to each speaker relative to each other speaker.", message = F}
 
 ggplot(data = most_distinctive_words_per_abolition_speaker2, 
-       aes(x = word, y = n, fill = factor(tf_idf) )) +
-  geom_col() +
-  scale_fill_grey() +
-  facet_wrap(~speaker, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() + 
-  guides(fill = "none") +
-   scale_y_continuous(breaks = function(x) 
-     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers on x-axis
-  labs(title = "Speakers\' Most Distinctive Words with N > 5",
+       aes(x = word, # words placed on the x-axis (flipped later for readability)
+           y = n, # counts of each word placed on the y-axis
+           fill = factor(tf_idf))) + # fill shading reflects the tf-idf score
+  geom_col() + # draw the bar chart
+  scale_fill_grey() + # use grayscale shading instead of color
+  facet_wrap(~speaker, scales = "free") + # create separate panels for each speaker
+  coord_flip() + # flip the axes to make long word labels readable
+  scale_x_reordered() + # preserve word ordering within each facet
+  guides(fill = "none") + # hide the fill legend
+  scale_y_continuous(breaks = pretty_breaks()) + # choose clean tick marks for the y-axis
+  labs(title = "Speakers' Most Distinctive Words with N > 5", # plot titles and labels
        subtitle = "From the Debates in the 1830s on the Abolition of Slavery",
        caption = "Pale means more distinctive",
        x = "Word",
@@ -473,21 +477,19 @@ mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>%
   arrange(desc(n)) %>%
   slice(1:40)
   
-mr_buckingham_slavery_debates
+head(mr_buckingham_slavery_debates)
 ```
 
 ```{r, fig.cap="The most frequently used words in Mr. Buckingham’s speeches during the 1833 debates on the abolition of slavery. Bar shading reflects each word’s TF-IDF score, indicating how distinctive the term is relative to other abolitionist speakers. Dark coloring means the term is less distinctive, whereas the light coloring means the term is more distinctive."}
 
 ggplot(data = mr_buckingham_slavery_debates,
-  aes(x = reorder(word, n),
-      y = n,
-      fill = factor(tf_idf))) +
-  geom_col() +
-  scale_fill_grey() +
-  scale_y_continuous(
-    breaks = function(x) unique(
-      floor(pretty(seq(min(x), max(x)))))) +
-  coord_flip() +
+  aes(x = reorder(word, n), # order words by frequency
+      y = n, # counts of how often each word appears
+      fill = factor(tf_idf))) + # shading reflects the tf-idf score
+  geom_col() + # draw the bar chart
+  scale_fill_grey() + # use grayscale shading instead of color
+  scale_y_continuous(breaks = pretty_breaks()) + # choose clean tick marks for the y-axis
+  coord_flip() + # flip the axes so the word labels are easier to read
   labs(title = "Mr Buckingham's Most Frequently Spoken Words",
        subtitle = "From the 1833 Debates on the Abolition of Slavery",
        x = "Word",
@@ -509,15 +511,13 @@ mr_buckingham_slavery_debates2 <- tfidf_per_top_slavery_speaker_1833 %>%
 
 ggplot(data = mr_buckingham_slavery_debates2,
        aes(x = reorder(word, n), # the x axis will show words ordered by their count 
-           y = n),
-          fill = factor(tf_idf)) + # the y axis will show n 
-  scale_fill_grey() +
-  scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), 
-                            (max(x) + 1) * 1))))) + # use whole numbers for the x-axis
+           y = n, # the y axis will show n
+           fill = factor(tf_idf))) + # shading reflects the tf-idf score
   geom_col() + # create a bar graph 
+  scale_fill_grey() + # use grayscale shading instead of color
+  scale_y_continuous(breaks = scales::pretty_breaks()) + # choose clean tick marks for the y-axis
   coord_flip() + # switches the x and y axis for a more elegant presentation 
-  labs(title = "Mr Buckingham\'s Most Distinctive Words",
+  labs(title = "Mr Buckingham's Most Distinctive Words",
        subtitle = "From the 1833 Debate on the Abolition of Slavery",
        x = "Word",
        y = "Count")
@@ -565,21 +565,20 @@ buckingham_sentences <- slavery_debates_1833 %>%
 buckingham_on_wages <- buckingham_sentences %>%
   filter(str_detect(text, "wages"))
 
-buckingham_on_wages%>%
-  mutate(text = str_wrap(text, 80)) %>% # just the first few lines
+buckingham_on_wages %>%
   mutate("Mr. Buckingham's mentions of wages in the slavery debates" = text) %>% # rename the text column 
   select("Mr. Buckingham's mentions of wages in the slavery debates") %>% # only the one column 
   kable()
 ```
 
-Here they are as plaintext:
+Here they are printed without `kable` styling, straight to the console. 
 
 ```{r}
-buckingham_on_wages %>% select(text) %>% 
-  mutate(text = str_wrap(text, 80))
+buckingham_on_wages %>% 
+  select(text)
 ```
 
-In the plaintext version, we see artifacts of the OCR process like \n, meaning "line break." It's also harder to read.  
+This version is much harder to read.  
 
 Reading is the essential reason for any choice of formatting. We may expand the number of lines or characters we display by adding an argument to head() (as in head(50) for fifty lines) or changing the second argument of str_wrap(text, 80)) to show a higher number of characters. The analyst's responsibilty is to use continuously adjust the number of rows of data and characters in order to skim the actual text in question in such a way that promotes their learning -- and the learning of any readers whom they intend to educate about their argument. 
 

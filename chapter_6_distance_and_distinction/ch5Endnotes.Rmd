@@ -37,9 +37,9 @@ In this chapter, we examine two concepts that are widely used across scientific 
 
 # Distinctiveness and Distance in Practice
 
-To understand how these metrics can be used in research, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. 
+To understand how these metrics can be used in research, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. To test whether our anecdotal observations are grounded in the literature, we can use tf-idf. 
 
-To test this hypothesis, the first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains only characters and no special formatting (such as fonts, images, or layout). Since plain text files are simply lines of words and punctuation, they are easy to process using code. To download the books we can locate their URLs and pass them to the `readLines()` function.
+The first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains only characters and no special formatting (such as fonts, images, or layout). Since plain text files are simply lines of words and punctuation, they are easy to process using code. To download the books we can locate their URLs and pass them to the `readLines()` function.
 
 ```{r}
 library("tidyverse")
@@ -99,23 +99,38 @@ To prevent these formatting symbols from entering our analysis, we include a cle
 
 ```{r}
 # Tokenize the text by splitting it into individual words
-tokenized_words <- combined_books %>%
+tokens <- combined_books %>%
   unnest_tokens(word, text) %>%
   filter(str_detect(word, "^[a-z]+$"))
 ```
 
-* `^` - Tells the computer to start matching the word at the beginning of the dataframe cell. This ensures the match begins with the very first character. If the token begins with a number or symbol, it will not be kept in the dataset.
-* `[]` - Brackets that mean “match any one of these characters.” They define the set of characters that are allowed in the match.
-* `a-z` - Allows any lowercase letter from a to z.
-* `+` - A symbol meaning "match one or more of the preceding characters." This means the regex will match any number of alphabetical characters, as long as they start from the beginning of the token.
-* `$` - Tells the computer to match to the end of the string. This ensures that the token continues with alphabetical characters throughout the entire match. 
+Our regex can be read like so: 
+
+* `^` - The carrot tells the computer to start matching the word at the beginning of the dataframe row. If the token begins with a number or symbol, it will not be kept in the dataset.
+* `[]` - The brackets define the set of characters (e.g. the letters a, b, c) that are allowed in the match.
+* `a-z` - The alphabet from a through z. Inside brackets, this tells the computer to match any lowercase letter between a and z.
+* `+` - A plus sign meaning "match one or more of the preceding characters." This symbol will match any number of alphabetical characters.
+* `$` - The dollar sign tells the computer to match to the end of the string. 
+
+The order of these data-processing steps is important. The regex we just wrote would remove words that contain punctuation, for example, `rabbit.`. Removing these would be problematic for our analysis, because we can inadvertently lose lots of data. However, we already removed punctuation from words with `unnest_tokens()` so we do not need to adjust the regex to handle punctuation. If punctuation were still present in the tokens, we would need to modify the regex to allow punctuation at the end of a word.
 
 
-The order of the data-processing steps is very important. Normally, a regex such as this would remove words that contain punctuation, for example, `rabbit!`. If punctuation were still present in the tokens, we would need to modify the regex to allow punctuation at the end of a word. However, we already removed punctuation from words with `unnest_tokens()` so we do not need to adjust the regex to handle punctuation.
+
+At this stage, we can also inspect our data and make preliminary observations about ENTER
+
+
+
+Before applying tf–idf, we can first gather some preliminary information about our dataset. Looking at the data before running a statistical method can help confirm whether our question is on the right track. For example, we can selectively look for words might already know are characteristic of each author and make observations based on our knowledge of the dataset or the texts themselves. This can help identify words that appear to be especially characteristic or unique within the texts. However, this type of inspection is limited because it relies on the researcher already knowing which words to look for. It does not allow us to systematically discover all of the distinctive words in the corpus. Methods such as tf–idf are useful for identifying which words are most distinctive across the entire dataset at scale. 
+
+
+
+Include passages that talk about the difference. 
+
+Now what happens if we 
 
 ```{r}
 # Count how often each word appears for each author
-author_word_counts <- tokenized_words %>%
+author_word_counts <- tokens %>%
   count(writer, word) %>%
   pivot_wider(names_from = word, values_from = n, values_fill = 0)
 
@@ -131,13 +146,9 @@ selected_word_counts <- author_word_counts %>%
 print(selected_word_counts)
 ```
 
-In advanced text mining, this entire set of steps is described as "vectorising" the text, because each text is converted into a list of numerical values corresponding to its word frequencies. 
-
-The vectors allow us to compute many different measurements, including distinctiveness, distance, and all of their variants, because all of the difference metrics we will apply begin with these words.
-
 ## Using Distinctiveness to Compare Two Authors
 
-Distinctiveness measures score the relationships between words and documents across two or more sets of texts. Distinctiveness measures can identify words that are characteristic of a specific author, document, year, or political group. Take, for example, Lewis Carroll, a renowned British author of children's literature. Carroll, who had a background in mathematics and logic, was famously inventive with language, especially in his use of nonsense and portmanteau words. He had a strong preference for whimsical and linguistically playful terms—words that stretch meaning or defy conventional usage—such as "slithy," "chortle," and "galumph," -- especially visible in his poem _Jabberwocky,_ which enriches the dreamlike world of _Through the Looking Glass_.^2^
+Distinctiveness measures score the relationships between words and documents across two or more sets of texts. Within political dataset, distinctiveness measures can identify words that are characteristic of a specific author, document, year, or political group. Take, for example, Lewis Carroll, a renowned British author of children's literature. Carroll, who had a background in mathematics and logic, was famously inventive with language, especially in his use of nonsense and portmanteau words. He had a strong preference for whimsical and linguistically playful terms—words that stretch meaning or defy conventional usage—such as "slithy," "chortle," and "galumph," -- especially visible in his poem _Jabberwocky,_ which enriches the dreamlike world of _Through the Looking Glass_.^2^
 
 If we're using distinctiveness algorithms, we would choose tf-idf or log likelihood, which assigns high values to each author–word pair. The pairs _Carroll–slithy_ and _Potter–shed_ should get a very high score, because these words are very unique to the respective authors. In contrast, _Carroll–she, Carroll–the, Potter–the,_ and _Potter–she_ would each get a very low distinctiveness score, as these common words are not unique to either author.
 
@@ -155,7 +166,7 @@ tfidf_table <- word_counts2 %>%
 
 # View top distinctive words for each author
 filtered_tfidf <- tfidf_table %>%
-  filter(term %in% target_words) %>%
+  filter(term %in% words_of_interest) %>%
   arrange(document, desc(tf_idf)) %>%
   select(term, tf_idf)
 ```
@@ -183,42 +194,8 @@ combined <- tibble(beatrix_term = left$term,
                    carroll_tfidf = right$tf_idf)
 
 combined %>%
-  kable(format = "latex",
-        booktabs = TRUE,
-        col.names = c("Beatrix Word", "TF-IDF", 
-                      "Lewis Carroll Word", "TF-IDF")) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
-```
-
-
-
-
-
-```{r}
-#library(knitr)
-
-#make_tab <- function(df) {
-#  df %>%
-#    mutate(tf_idf = round(as.numeric(tf_idf), 6)) %>%
-#    kable(format = "latex", booktabs = TRUE, caption = NULL,
-#          col.names = c("Word", "TF-IDF")) %>%
-#    as.character() }
-
-#left_tab  <- make_tab(filtered_tfidf[1:6, ])
-#right_tab <- make_tab(filtered_tfidf[7:12, ])
-
-#two_pane_table <- paste0(
-#    "\\noindent
-#    \\begin{minipage}[t]{0.48\\textwidth}
-#    \\raggedright\\textbf{Some Beatrix Potter Words}\\\\[3pt]", 
-#    left_tab, "
-#    \\end{minipage}\\hfill
-#    \\begin{minipage}[t]{0.48\\textwidth}
-#    \\raggedright\\textbf{Some Lewis Carroll Words}\\\\[3pt]", 
-#    right_tab, "
-#    \\end{minipage}")
-
-#asis_output(two_pane_table)
+  kable(col.names = c("Beatrix Word", "TF-IDF", 
+                      "Lewis Carroll Word", "TF-IDF"))
 ```
 
 We can use distinctiveness to quickly identify the words that are frequently in Carroll's book but not Potter's. We might expect the results to include a list of words that includes "Jabberwock" (a fearsome creature), the "Snark" (an elusive entity), the "Bandersnatch" (a fast and dangerous beast), and other terms from his peculiar universe. Indeed, many of these words have rarely, if ever, appeared in publications not authored by Carroll himself. 
@@ -250,66 +227,44 @@ Measuring distance can offer insight into different types of questions than dist
 
 By measuring distance, we can compare the distribution of words in the two books. We would begin with a word-frequency vector, as above. Next, we apply a distance measure to the word counts. The result will be one measurement. A low distance value would indicate that _Alice's Adventures_ and _Peter Rabbit_ are linguistically similar. A high distance value would suggest that the texts are very dissimilar. However, if we were to compare _Alice's Adventures_ to another Carroll book, such as _Through the Looking-Glass_, the calculated distance would be smaller, reflecting the stylistic and lexical similarities between the two texts.^3^
 
-Again, don't worry about the code, but pay attention to the scores in the results:
+
+
+
 
 ```{r}
-library("text2vec")             # Load the package
-
-# define a function for jsd
-jsd <- function(p, q) {
-  # Ensure p and q are probability distributions
-  p <- p / sum(p)
-  q <- q / sum(q)
-  m <- 0.5 * (p + q)
-  
-  # Define a helper function for KL divergence
-  kl_div <- function(a, b) {
-    a <- ifelse(a == 0, 1, a)  # Avoid log(0)
-    b <- ifelse(b == 0, 1, b)
-    sum(a * log2(a / b)) }
-  
-  0.5 * kl_div(p, m) + 0.5 * kl_div(q, m) }
-
 # load Alice in Wonderland
+library(philentropy)
+
 alice_url <- "https://www.gutenberg.org/files/11/11-0.txt"
 alice_text <- readLines(alice_url, encoding = "UTF-8", warn = FALSE)
 
-# Combine into one data frame
 books <- bind_rows(
   tibble(booktitle = "Alice", text = alice_text),
   tibble(booktitle = "Peter", text = peter_text),
-  tibble(booktitle = "LookingGlass", text = looking_glass_text))
+  tibble(booktitle = "LookingGlass", text = looking_glass_text)
+)
 
-# Tokenise and count
 word_freqs <- books %>%
   unnest_tokens(word, text) %>%
-  filter(str_detect(word, "^[a-z']+$")) %>%
+  filter(str_detect(word, "^[a-z]+$")) %>%
   count(booktitle, word) %>%
   group_by(booktitle) %>%
   mutate(freq = n / sum(n)) %>%
   ungroup()
 
-# Create a frequency matrix (book x word)
 freq_matrix <- word_freqs %>%
   select(booktitle, word, freq) %>%
   pivot_wider(names_from = word, values_from = freq, values_fill = 0) %>%
   column_to_rownames("booktitle") %>%
   as.matrix()
 
-# Compute JSD for each pair of books
-book_names <- rownames(freq_matrix)
-n_books <- nrow(freq_matrix)
+# Pairwise Jensen–Shannon divergence (no for-loops)
+jsd_matrix <- philentropy::distance(freq_matrix, method = "jensen-shannon", unit = "log2")
+jsd_matrix <- as.matrix(jsd_matrix)
+rownames(jsd_matrix) <- rownames(freq_matrix)
+colnames(jsd_matrix) <- rownames(freq_matrix)
 
-jsd_matrix <- matrix(0, n_books, n_books)
-rownames(jsd_matrix) <- book_names
-colnames(jsd_matrix) <- book_names
-
-for (i in 1:n_books) {
-  for (j in 1:n_books) {
-    jsd_matrix[i, j] <- jsd(freq_matrix[i, ], freq_matrix[j, ]) } }
-
-# View results
-kable(jsd_matrix)
+kable(jsd_matrix, digits = 4)
 ```
 
 Distance measurements give us a score for how "distant" each book is from each other book. With Jensen-Shannon Distance (JSD), smaller values mean more similar texts. _Alice's Adventures in Wonderland_ has a distance of 0 from _Alice's Adventures in Wonderland_ because they are the same text.  Meanwhile, _Alice_ has the highest distance from _Peter Rabbit_, while _Alice_ is much closer in writing style to _Through the Looking Glass_.
@@ -324,7 +279,17 @@ In sum, distance is useful for quantifying how far apart texts are in terms of t
 
 ## Distinctiveness and Distance Compared
 
-While distinctiveness identifies the unique lexical features of a writer’s vocabulary, distance focuses on measuring the relationships and proximities between entire sets of features. We suggest that both of these methods of measurement invite a broader reflection on computational methods by foregrounding the importance of the processes through which we produce historical knowledge.
+While distinctiveness identifies words that are characteristic within a corpus, distance measures the difference between an entire corpora.
+
+
+
+
+
+We suggest that both of these methods of measurement invite a broader reflection on computational methods by foregrounding the importance of the processes through which we produce historical knowledge.
+
+
+
+
 
 The ways in which we decide to process and analyse data—whether through distance or distinctiveness—are shaped by the questions we pose. Yet the choices we make during data processing directly influence the interpretive lenses we apply to a corpus. The computational steps involved in data processing are as much a part of knowledge creation as the act of historical interpretation itself. The methods we choose mediate our access to historical records, and their respective affordances and limitations may lead us to shift our analytical focus—for instance, from emphasizing distinctiveness as an indicator of uniqueness in a corpus, to using distance to reveal relational patterns, or to adopting an entirely different metric more suitable to the historical material at hand. Both methodological decisions are interpretive acts in their own right, as they shape how we understand and conceptualize the data before us. 
 
@@ -380,7 +345,6 @@ library("hansardr")
 library("tidyverse")
 library("lubridate")
 library("tidytext")
-library("gt")
 
 # Load tidytext's built-in list of stop words for filtering out common words
 data("stop_words")
@@ -404,10 +368,7 @@ hansard_data <- bind_rows(hansard_1830, hansard_1860)
 # Inspect the data
 hansard_data[, 2:3] %>%
   sample_n(5) %>%
-  kable(format = "latex", 
-        booktabs = TRUE,
-        caption = "Sample from Hansard Data") %>%
-  column_spec(1, width = "14cm")
+  kable(caption = "Sample from Hansard Data") 
 ```
 
 We can now further process our dataset to prepare it for tf-idf analysis. The following code applies a series of transformations: it tokenizes the text into a one-word-per-row format, removes stop words using the predefined list from the `tidytext` package, and filters out digits using a regular expression. While chaining multiple functions together, we ensure that the data is cleaned and structured appropriately for tf-idf calculations.
@@ -434,14 +395,16 @@ tokenized_hansard_data <- suppressMessages(
   hansard_data %>%
     unnest_tokens(word, text) %>%
     anti_join(stop_words) %>%
-    filter(!str_detect(word, "[[:digit:]]")))
+    filter(!str_detect(word, "[0-9]")))
+```
 
+```{r}
 # tokenize the 'text' column into individual words, 
 # remove stop words, and filter out tokens that contain digits
 tokenized_hansard_data <- hansard_data %>%
   unnest_tokens(word, text) %>% # break text into one word per row
   anti_join(stop_words) %>% # remove stop words like 'the' or 'and'
-  filter(!str_detect(word, "[:digit:]")) # remove words with digits
+  filter(!str_detect(word, "[0-9]")) # remove words with digits
 
 # count how often each word appears per decade,
 # sort by frequency, and remove words that appear only once

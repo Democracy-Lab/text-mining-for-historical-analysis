@@ -161,6 +161,20 @@ Winters, Jane and Martin Steer. Digging into Linked Parliamentary Data (DiLiPaD)
 
 ### Chapter 4: Text Mining British Concepts in the 1833 Debates About the Abolition of Slavery
 
+Cabot, in this paragraph: 
+
+One of the authors of this book has been working with translators who travel to the National Archives of Cuba to photograph notarial records that contain references to slavery. Buongiorno then processes the images using a large language model (LLM) to perform optical character recognition (OCR), after which the transcriptions are validated for accuracy.
+
+Please cite my forthcoming datasets: 
+
+Adriana Chira; Aisnara Perera Diaz; Maria de los Angeles Merino Fuentes; Steph Buongiorno, 2025,
+"Escrituras Protocolos 1640 al 44 y 1650", https://doi.org/10.7910/DVN/AEDRPT, Harvard Dataverse, DRAFT
+VERSION
+Adriana Chira; Aisnara Perera Diaz; Maria de los Angeles Merino Fuentes; Steph Buongiorno, 2025,
+"Escrituras Protocolos 1730 to 1733", https://doi.org/10.7910/DVN/AZCY4B, Harvard Dataverse, DRAFT
+VERSION, UNF:6:gj/M2efvaPDnYEIsYfLR5A== [fileUNF]
+
+
 ### Chapter 5: Using Distinctiveness and Distance for Comparative Analyses of Historical Data
 
 Belkin, Nicholas J., and W. Bruce Croft. "Information Filtering and Information Retrieval: Two Sides of the Same Coin?" _Communications of the ACM_, vol. 35, no. 12, Dec. 1992, pp. 29–38. https://doi.org/10.1145/138859.138861.
