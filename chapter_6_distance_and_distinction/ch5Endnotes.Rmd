@@ -51,7 +51,7 @@ peter_url <- "https://www.gutenberg.org/cache/epub/14838/pg14838.txt"
 
 # Extract "Through the Looking-Glass" and save it to RStudio's global environment
 # The argument encoding = "UTF-8" tells R how to interpret characters in the file 
-# and handle the  punctuation, quotation marks, and non-ASCII characters that often appear in texts
+# and handle the punctuation, quotation marks, and symbols that often appear in texts
 # and can cause errors during data processing 
 # We can optionally turn off warnings that do not effect the code and to keep our console clean 
 looking_glass_text <- readLines(looking_glass_url, 
@@ -208,13 +208,11 @@ distinctively_carroll <- tfidf_table %>%
   arrange(desc(tf_idf)) %>%
   select(term, tf_idf)  
 
-kable(head(distinctively_carroll, 15),
-      format = "latex",
-      booktabs = TRUE,
-      caption = "Lewis Carroll's Most Distinctive Words when Alice 
-                is compared with Peter Rabbit",
-      col.names = c("Word", "TF-IDF"),
-      escape = FALSE)
+distinctively_carroll %>%
+  head(15) %>%
+  kable(caption = "Lewis Carroll's Most Distinctive Words when Alice is compared with Peter Rabbit",
+        col.names = c("Word", "TF-IDF"),
+        escape = FALSE)
 ```
 
 Interestingly, the Jabberwock, Bandersnatch, and Snark are outranked in this comparison by relatively simple characters -- Alice, the Queen, the Red Knight, and Humpty-Dumpty -- because none of these characters appear in _Peter Rabbit_, while all of those characters are mentioned more than the Jabberwock. 
@@ -226,9 +224,6 @@ If we were to compare _Through the Looking Glass_ with a broader corpus of child
 Measuring distance can offer insight into different types of questions than distinctiveness does. Suppose, instead of looking for particular words, we wish to assess how overall linguistically different the profile of any two authors is.  
 
 By measuring distance, we can compare the distribution of words in the two books. We would begin with a word-frequency vector, as above. Next, we apply a distance measure to the word counts. The result will be one measurement. A low distance value would indicate that _Alice's Adventures_ and _Peter Rabbit_ are linguistically similar. A high distance value would suggest that the texts are very dissimilar. However, if we were to compare _Alice's Adventures_ to another Carroll book, such as _Through the Looking-Glass_, the calculated distance would be smaller, reflecting the stylistic and lexical similarities between the two texts.^3^
-
-
-
 
 
 ```{r}
@@ -661,6 +656,7 @@ The output from the `gc()` function provides a snapshot of memory usage and trig
 Sometimes, due to memory fragmentation, R may not be able to release memory back to the operating system, even after running `gc()`.Memory fragmentation occurs when R allocates memory in multiple small chunks over the course of a session. As objects are created and removed, chunks of data become scattered throughout the computer's memory. R's garbage collector (`gc()`) can free memory, but it cannot always merge these scattered memory blocks into a single large block that the operating system can reclaim. As a result, memory usage can remain high, even if most objects have been removed. 
 
 Memory consumption can be seen in RStudio above the Global Environment panel. If a significant amount of memory remains reserved, it may be necessary to restart R to fully release fragmented memory. We can restart RStudio by closing out of RStudio and without saving the work space, or by running `q()` with the parameter `save` set to "no". 
+
 Important: Running the following code block will quit RStudio. 
 
 ```{r, eval=FALSE}

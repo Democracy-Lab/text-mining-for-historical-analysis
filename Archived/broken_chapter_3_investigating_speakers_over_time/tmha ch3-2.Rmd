@@ -1,0 +1,622 @@
+---
+title: "Chapter 3: Investigating Speakers and Change Over Time Using Grouped Data"
+output: pdf_document
+geometry: "left=1in,right=1in,top=2in,bottom=1in"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In previous chapters, we investigated how breaking up strings of text into individual words or multi-word phrases can give us insight into a corpus. We did things like count the number of words within an entire data frame. But historians often want to profile not merely the collective use of language, but also the role of individual speakers and how their language changed over time. Or historians might want to count by other variables, like by the date or by the individual debate. 
+
+In this chapter, we will learn how to count by "grouping" the data, allowing us to take other fields, like speaker name, year, and debate title, into account. This chapter will use these groupings to gain insight into the discourse of speakers in Parliament. But in order to perform a critical analysis of speakers, we must first ask ourselves: why study the language of individual speakers in Parliament when 19th-century British Parliament was mostly a small group of elite white men and not people who reflected the British population?
+
+One answer is that we can model the language of parliament to better understand the workings of institutions, rather than "great men" of history. We can better understand the dynamics of power that imposed itself on 19th-century British society. The language of Parliamentarians was not merely communication, but also an instrument of power through which these individuals imposed an imagined order upon Britian--an order that reflected the biases, fears, and desires of elite white men--many of whose fathers served in Parliament, and who themselves inhereted their place in Parliament through familial status. 
+
+Thus, when we analyze speakers we better understand which people were rewarded with power, and how this power was expressed through langauge. We get a glimps of how Parliament existed as a space where the power relations of a small, elite group were actualized as the legitimate order of British society--a power that extended outwards to the societies women and its poor. 
+
+## Counting by Group to Find the Wordiest Speakers
+
+Our first excersize is finding the most "wordy" Parliamentarians from 1830--that is, Parliamentarians who spoke the most words. Often, the Parliamentarians who spoke the most did so becuase fellow Parliamentarians trusted them to express the wants of their own social group. 
+
+To analyze speakers in Hansard, we will first need to import a new category of data from hansardr: "speaker_metadata." 
+
+```{r, message = F}
+library(hansardr)
+
+data("speaker_metadata_1830")
+```
+
+```{r}
+head(speaker_metadata_1830)
+```
+
+For now, we will just go over three relevant fields from `speaker_metadata`. 
+
+Each sentence from the Hansard corpus is assigned a unique ID, as represented by the "sentence_id" field. The speaker who stated a sentence is assigned the same ID. This allows us to join the data from speaker_metadata to other data from hansardr, such as the debate text. 
+
+The other two important fields we will address are the "speaker" and the "suggested_speaker" fields. 
+
+The "speaker" field contains the speaker name as it was originally transcribed within the Hansard corpus. The resulting field contains inconsistencies and a lack of standardization that can make analysis of speakers difficult. A single speaker may have been recorded by different permutations of his first, middle and last name(s) (for example, "William Gladstone" may be transcribed as "William E. Gladstone", "W. Gladstone", or "Mr. Gladstone," to name just a few). In other cases, a speaker may have been called by a rotating office title (like "Prime Minister"). It is also the case that different speakers are recorded by the same name. For instance, two people named Sir Robert Peel served in Parliament during the 1820s and both are evoked by the same spelling of the name. To make analysis of speaker names more challenging yet, during the digitization processes, optical character recognition (OCR) errors were introduced into the speaker names. Common OCR error include interpreting a lower case "L" as an "i," or the lower case letter "a" as an "o."
+
+To address the hurdles around analysis of speakers, we added a "suggested_speaker" field. This field contains our suggestion for the true identity of the speaker. The unique speaker within the corpus are assigned standardized name and number combinations. While multiple speakers during the same period shared the same name (like how "Mr. W. Gladstone" could refer to William Ewart Gladstone or his son William Henry Gladstone) only William Gladstone is assigned number 3104. 
+
+In the following code we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" fields before tokenizing the data into individual words. 
+
+```{r}
+install.packages("textstem")
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(tidytext)
+library(tidyverse)
+library(lubridate)
+library(textstem)
+
+data("hansard_1830")
+
+words_1830 <- hansard_1830 %>% 
+  left_join(speaker_metadata_1830) %>%
+  select(speaker, suggested_speaker, text) %>%
+  unnest_tokens(word, text)
+```
+
+```{r}
+head(words_1830)
+```
+
+With a data frame containing fields for "speaker", "suggested_speaker", and "word," we are now in a position to perform a new kind of analysis to see the number of words each speaker contributed to Parliament using two new functions: `group_by()` and `summarize()`. We will use `group_by()` to organize the data by group before using summarize for our count. By using `group_by()` we can count the number of times a word was stated by a speaker, or within a year, and so forth. `group_by()` can be passed multiple arguments that refer to fields in a data set. To group by speaker will pass "speaker" to the `group_by()` function. Another useful function along with `group_by()` is `summarize()`. The `summarize()` function can be used with any statistical transformation, for instance `mean()` or `max()`. Here, we will use `summarize()` with a function to count, which is `n()`. 
+
+In the following code the argument `words_spoken = n()` tells `summarize()` to create a new column with the number of words that reflect each unique speaker
+
+```{r, message = F}
+words_per_speaker_1830 <- words_1830 %>%
+  group_by(speaker) %>%
+  summarize(words_spoken = n()) %>%
+  arrange(desc(words_spoken))
+```
+
+```{r, echo=FALSE}
+head(words_per_speaker_1830)
+```
+
+Most students of British history will be familiar with the names of the speakers on this list, which include two prime ministers as well as one noted Irish orator and nationalist, Daniel O'Connell.  The careful analyst will be a little concerned about the speaker as "The Chancellor of the Exchequer," however, which refers not to an individual but a title that was handed off to multiple individuals over the century.  
+
+The Chancellor of the Exchequer is the head financial officer of the United Kingdom.  He oversees the work of the Treasury.  In many cases, the Chancellor of the Exchequer was a preliminary step to becoming Prime Minister.  We would expect most of the Chancellor of the Exchequer's speeches in parliament to reflect a predominant concern with taxation and spending.  However, it is also possible that different individuals who held this post prioritized different causes. We can test our hypothesis on the 1830s by comparing the top words spoken by different individuals who occupied this post.  
+
+In the code below we create a custom stop words list to eliminate the most frequent words said by all members of parliament. We have already addressed the importance of removing stop words as a means to see words that are more meaningful for an analysis. In previous chapters we used an existing stop words list from TidyText. The hansardr library also provides its own stop words list. It may be the case, however, that an analyst wants to curate their own stop words list that caters to their specific data set or research question. In the following code we create a stop words list by assigning a list of words to a tibble (a tidyverse-style data frame).
+
+```{r}
+custom_stop_words = tibble(word = c("hon", "speaker", "house", "question", "lord", "bill", "committee", "duty", "country", "time", "amount", "government", "proposed", "law", "measure", "learned", "law", "sir", "respect", "public", "gentleman", "gentlemen", "friend", "noble", "parliament", "expenditure", "revenue", "tax", "principle", "proposal", "consideration", "duties", "stated", "parliament", "act", "opinion", "inquiry", "effect", "subject", "object", "motion", "baronet", "crown", "propose", "estimates", "sum", "account", "ministers", "majesty", "legislature", "demand", "regulations", "hour", 
+"proposition", "persons", "principles","service", "found", "propositions", "office", "matter", "statement",
+"paid", "increase", "moved", "means", "considerable", "supply", "intention", "debt", "received", "expense", "estimate", "charges", "resolution", "notice", "report", "parties", "party", "surplus", "commons", "parties", "class", "commission", "form", "answer", "commissioners", "appointment", "officers", "saving", "appeared", "granted", "late", "day", "future", "opportunity", "saving", "officers", "information", "extent", "authority", "session", "justice", "believed", "support", "character", "carried", "plan", "paper", "clause",  "opposite", "system", "argument", "rate", "considered", "bills", "increase", "result", "reference", "prepared", "laid", "portion", "passed", "intended", "chancellor", "taxation", "classes", "appointed", "established", "parish", "confidence", "evidence", "pensions", "bring", "income", "connected", "referred", "objection", "hoped", "adopted", "chancellor", "account", "ministers", "occasion", "reduction", "reductions", "service", "services", "attention", "vote", "brought", "forward", "purpose", "wish", "called", "period", "money", "purpose", "power", "charge", "view", "circumstances", "trade", "taxes", "list", "civil", "wished", "people", "discussion", "applied", "proper", "taking", "amendment", "statements", "repeal", "papers", "fund", "feeling", "measures", "minister", "purposes", "payment", "stock", "increased", "bound", "grant", "grounds", "doubt", "applied", "stamp", "manner", "conduct", "exchequer", "provide", "reduced", "table", "difficulties", "anxious", "compared", "provide", "king", "individual", "expressed", "hear", "hope", "establishment", "debate", "contrary", "instance", "introduced", "call", "lords", "existing", "half", "head", "offices", "views", "leave", "respecting", "speech", "feel", "excise", "effected", "economy", "night", "price", "majority", "reason", "disposed", "held", "claims", "leave", "required", "moment", "admitted", "ready", "words", "issue", "allowed", "true", "treasury", "administration", "consent", "advantage", "business", "calculated", "enter", "fair", "nature", "oppose", "reign", "honour", "mode", "reduce", "difficulty", "favour", "credit", "adopt", "additional", "individuals", "mind",
+"sale", "times", "amounted", "deficiency", "laws", "til", "agreed", "alluded", "mentioned", "meant", "heard", "feelings", "engaged", "consolidated", "conclusion", "circulation", "begged", "calculations", "afford", "acts", "acted", "giving", "pledge", "matters", "contract", "proceed", "determined", "satisfaction", "declare", "giving", "spirits", "resolutions", "pursue", "opposition", "force","pursue", "force", "opinions", "refer", "produce", "appeal", "pay", "terms", "private", "reform", "observations", "entitles", "laws", "alteration", "due", "gallant", "joint", "undoubtedly", "alluded", "benefit", "consequence", "perfectly", "trusted", "loan", "proceed", "cent", "regard", "political", "royal", "carry", "importance", "proceedings", "aware", "rates", "similar", "examination", "details", "told", "supposed", "sufficient", "person", "necessity", "millions", "emoluments", "difference", "department", "till", "submit", "lay", "imposed", "claim", "branches", "recommended", "privy", "personal", "select", "salary", "revenues", "preceding", "practice", "move", "meet", "hand", "funds", "formed", "expenses", "establishments", "entitled", "dimunition", "settlement", "lordships", "earl", "duke", "clauses", "objected", "legislatures",
+"sense", "arrangement", "address", "sufficient", "local", "clergy", "relief", "necessity", "application", "claim", "responsibility", "situation", "satisfactory", "ground", "revenues", "quarter", "change", "founded", "secretary", "provided", "read", "commutation", "body", "provision", "practice", "difference", "composition", "condition", "hands", "provision", "capital", "responsibility", "press", "knowledge", "raised", "friends", "altogether", "meet", "hand", "free", "difference", "claim", "necessity", "arguments", "left", "single", "founded", "arrangement", "admit", "total", "told", "operation", "apply", "shown", "person", "decision", "actual", "returns", "return", "restrictions", "national", "limited", "hundred", "existed", "council", "charged", "annual", "allowances", "proceeding", "word", "existed", "fairly", "loss", "spirit", "west", "sum"))
+```
+
+We can now filter and clean our data and explore the langauge of speakers called Chancellor of the Exchequer. In the following code we first remove instances of John Spencer, who spoke so few words as Chancellor of the Exchequer that he contributes little to our project.  Then we eliminate numbers, stop words, and custom stop words before counting each speaker's words with `group_by()` and `summarize()`.
+
+```{r, message = F}
+chancellor_of_the_exchequeur <- words_1830 %>%
+  filter(str_detect(speaker, "Exchequer"),
+         str_detect(word, "[a-z]"),
+         suggested_speaker != "john_spencer_1234",
+         suggested_speaker != "") %>%
+  anti_join(stop_words) %>%
+  anti_join(custom_stop_words) %>%
+  mutate(word = lemmatize_words(word)) %>%
+  group_by(suggested_speaker, word) %>%
+  summarize(n = n()) %>%
+  top_n(15) %>%
+  ungroup()
+```
+
+```{r}
+head(chancellor_of_the_exchequeur)
+```
+
+```{r, message = F}
+chancellor_of_the_exchequeur <- chancellor_of_the_exchequeur %>%
+  mutate(word = reorder_within(word, n, suggested_speaker)) %>%
+  group_by(suggested_speaker) %>%
+  top_n(15)
+  
+ggplot(data = chancellor_of_the_exchequeur, 
+       aes(x = word, y = n)) +
+  geom_col() +
+  scale_x_reordered() +
+  coord_flip() +
+  facet_wrap(~suggested_speaker, scales = "free") +
+  labs(x = "word", y = "speaker") +
+  ggtitle("Favorite words of each individual Chancellor of the Exchequer in the 1830s")
+```
+
+The results show a division of interests.  Goulburn is interested in talking about taxation on beer, tobacco, malt, and consumption; Peel is interested in addressing questions about how taxes relate to the church and its tithes, as well as political issues about how dissenters, Protestants and Catholics. Peel also thinks about commodities, but his commodities are different than Goulburn's; they include malt, land, and barley. Rice takes the issues in a different direction, reflecting on Dublin, India, banks, newspapers, and pensions.  He shares with Peel a concern about property or land taxes.    
+
+How new is this information to readers of British history?  We have long known that issues of what was taxed and how are a basic matter for politics of class, empire and nation; everyone wants someone else to pay for the government.  
+
+The research modeled in this textbook has a pedagogical function, and for that reason, we often present in these chapters examples that could be improved, and the above chart is one of those.  Analysts should note several problems that might complicate our analysis and that call for further work.  One of these is that a frequent word does not necessarily equate to importance: the most frequently-mentioned terms are typically the terms most subject to debate. Robert Peel, for instance, does not name Ireland's church tithes because he was interested in protecting the church in Ireland; to the contrary, he wished to abolish the system of tithes.  Nor does the word list give us material for interpreting the rest of Peel's politics; the word list does nothing to tell the uninformed analyst about the movement for the abolition of taxes on grain, which forms a background to interpreting Peel's mentions of barley.  The word list tells us little about the presence in 1830s Ireland of two churches, Roman Catholic and the Church of England. Without further reading, we might never known that Goulburn was famous for arguing for reductions on taxation.  The analyst who comes to this data without a background in British history would do well to read in secondary sources before attempting to interpret the graph.  
+
+After some basic background research, however, the word lists can help produce insight, cluing the reader into differences such as Goulburn's relative willingness to talk about "distress," Peel's interest in "education," or Rice's interest in the post office.  With word lists of this sort, we retrieve important clues about the salient differences contributed to political debates by individual ministers.  A researcher interested in the careers of Chancellors of the Exchequer might start here before reading more deeply.
+
+Another issue is the custom stop words list.  For some researchers, the list in `custom_stop_words` may unnecessarily eliminate words whose usage they might want to track. Some researchers will want to identify words for rhetorical statements such as "hoped" or "feeling"; others may be intrigued about how different speakers refer to "information" or "knowledge." In general, I have opted for a deep list which includes every general allusion to governance, institutions, discovery, and communication.  The beauty of custom lists is that each researcher can easily adjust the words to match their interests Analysts should understand how carefully they must tailor a custom stop words list to their project, and how much of a difference additions and subtractions make. Using a custom stop word list is very much an artisinal skill of research; it involves much the same skills of judgment, awareness, curiosity, and sensitivity to background issues from theory and secondary sources as does careful reading of primary sources.  
+
+One complication of lists is that to produce functional results, a custom stop words list must often be long; the hundreds of performative, rhetorical, and governmental words listed below is not a perfect list, and it would not work for every exercise. In later chapters, we will investigate approaches such as differential measurement which allow the reader to skip over custom stop words lists to obtain information about what distinguishes one speaker from another or one year from the next.  No process is perfect, however, and analysts must often resort to some kind of custom filter to get closer to information that is useful for their project.  There is no silver bullet for creating an absolutely accurate tool where text-mining research always produces useful information; rather, iterative inquiry, paired with background reading and in-depth reading of primary sources, is the basis upon which all insight is ultimately made.  
+
+Another issue has to do with the quality fo the data in the "speaker" field, which corresponds exactly to what is on the page in the nineteenth-century printed records of parliament. There is no guarantee that this method will produce a perfect analysis; we're going by who was lableled Chancellor of the Exchequer in Hansard, and there are no guarantees that the printed books label all speakers by their title. This is because the "speaker" field in the hansardr data set lists the names of the speakers as they are described in the published version of the debates.  Wherever possible, we have annotated this information about speaker with static id's for most individual speakers, using the Parliamentary Identifiers used in parliament to this day.  The field "suggested_speaker" uses these specific id numbers and gives a more accurate picture of the top speakers.   
+
+With more research, we could use the disambiguated speaker and date fields to revise the output above, creating a more accurate analysis that gives all the speeches by the individuals in question while they held the post of Chancellor of the Exchequer.  Most of the time, we will want to use the suggested_speaker field to find and track speakers. 
+
+Notice that the lines of code below differ from the lines of code above only in that the argument of the function `group_by()` has been changed from "speaker" to "suggested_speaker:"
+
+```{r, message = F}
+words_per_speaker_1830 <- words_1830 %>%
+  filter(suggested_speaker != "") %>%
+  group_by(suggested_speaker) %>%
+  summarize(words_spoken = n()) %>%
+  arrange(desc(words_spoken))
+```
+
+```{r, echo=FALSE}
+head(words_per_speaker_1830)
+```
+
+In this view, we see the first and last names of individual speakers as well as their ID number from parliament (that is, Robert Peel is id 1664; 1664 is not, in this case, a date).
+
+
+## Working With Dates
+
+Knowing who spoke the most in parliament is useful.  But very often insight comes not from examining how counts change over time.  What if we want to know not merely who spoke the most, but who was the top speaker for each year in parliament?  Our `hansard_1830` data frame lists a date in the "speechdate" column, formatted as a four-digit year, two-digit month, and two digit day. To easily track speeches by year, we can add a new "field" -- that is, a column -- listing just the year of each speech.
+
+Very frequently, when working with information about dates, we need to extract the month, day, or year from a data set. The lubridate package makes it easy to extract this information. We will use the `year()` function from lubridate with `mutate()` to create a new column that has just the extracted year from the `speechdate` field.
+
+```{r, message = F}
+data("debate_metadata_1830")
+
+words_1830 <- hansard_1830 %>% 
+  left_join(speaker_metadata_1830) %>%
+  select(speaker, suggested_speaker, text) %>%
+  unnest_tokens(word, text)
+
+hansard_1830 <- hansard_1830 %>% 
+  left_join(debate_metadata_1830) %>%
+  mutate(year = year(speechdate))
+
+words_1830 <- hansard_1830 %>% 
+  left_join(speaker_metadata_1830) %>%
+  select(speaker, suggested_speaker, text, year) %>%
+  unnest_tokens(word, text) 
+```
+
+```{r, echo=FALSE}
+head(words_1830)
+```
+
+Notice that the resulting dataset has a new field, "year."
+
+Now that we have a field for the year of each speech, we can return to "grouping" data to execute a faceted count where we count words by speaker and year.  When we used the command `group_by()` above, we used it with one argument.  But `group_by()` can take multiple arguments, allowing the analyst to perform grouped counts that involve multiple dimensions of the dataset.  Next, we will use `group_by()` on two data fields at the same time -- the "speaker" and "year" columns of as the arguments of `group_by()`, as in `group_by(speaker, year)`.
+
+```{r, message = F}
+words_per_speaker_1830 <- words_1830 %>%
+  filter(suggested_speaker != "") %>%
+  group_by(speaker, year) %>%
+  summarize(words_spoken = n()) %>%
+  arrange(desc(words_spoken))
+```
+
+```{r, echo=FALSE}
+head(words_per_speaker_1830)
+```
+
+Notice that the result of grouping and counting is a data set with three columns: "speaker," "year," and "words spoken." The last column is the count for each speaker per year -- a field that makes it possible to analyze change over time.
+
+When we use the `group_by()` command, the fields we use for grouping are preserved in the output.  Two columns are the names of the facets we used for grouping -- "speaker" and "year" -- while the last column, "words_spoken," is the count of how many words are recorded for each speaker per year.  
+
+```{r pressure, echo=FALSE}
+library(lubridate)
+
+hansard_1820 <- hansard_1820 %>% 
+  left_join(debate_metadata_1820) %>%
+  left_join(speaker_metadata_1820) %>%
+  mutate(year = year(speechdate)) %>%
+  select(-sentence_id, speechdate, suggested_speaker)
+
+hansard_1830 <- hansard_1830 %>% 
+  left_join(debate_metadata_1830) %>%
+  left_join(speaker_metadata_1830) %>%
+  mutate(year = year(speechdate)) %>%
+  select(-sentence_id, speechdate, suggested_speaker)
+
+# make two categories, pre- and post-reform
+prereform <- hansard_1830 %>%
+  bind_rows(hansard_1820) %>%
+  filter(speechdate <= as.Date("1832-6-4")) %>%
+  mutate(period = "prereform")
+
+postreform <- hansard_1830 %>% 
+  left_join(debate_metadata_1830) %>%
+  filter(speechdate >= as.Date("1832-6-4")) %>%
+  mutate(period = "postreform")
+
+# tokenize words (this may be slower)
+prereform_words <- prereform %>% 
+  unnest_tokens(word, text) 
+  
+postreform_words <- postreform %>% 
+  unnest_tokens(word, text) 
+
+# count words per speaker per year 
+prereform_speakers_wordcount <- prereform_words %>%
+  #left_join(speaker_metadata_1830) %>%
+  #left_join(speaker_metadata_1820) %>%
+  group_by(speaker, year) %>%
+  summarize(n = n())
+
+postreform_speakers_wordcount <- postreform_words %>%
+  #left_join(speaker_metadata_1830) %>%
+  group_by(speaker, year) %>%
+  summarize(n = n())
+
+# label the speakers that only appear pre- or post-reform
+prereform_only_speakers <- prereform_speakers_wordcount %>%
+  anti_join(postreform_speakers_wordcount) %>%
+  mutate(class = "prereform only") %>%
+  distinct(speaker, class)
+
+nrow(prereform_only_speakers)
+
+postreform_only_speakers <- postreform_speakers_wordcount %>%
+  anti_join(prereform_speakers_wordcount) %>%
+    ungroup() %>%
+  mutate(class = "postreform only") %>%
+  distinct(speaker, class)
+
+nrow(postreform_only_speakers)
+
+# glue the data together for processing
+all_speakers <- bind_rows(postreform_speakers_wordcount, prereform_speakers_wordcount) %>%
+  ungroup() 
+
+all_speakers_annotated <- all_speakers %>%
+  left_join(prereform_only_speakers) %>%
+  left_join(postreform_only_speakers) 
+
+top_speakers <- all_speakers_annotated %>%
+  group_by(year) %>%
+  arrange(desc(n)) %>%
+  slice(5) %>% 
+  mutate(top = TRUE)
+
+graph_ready <- all_speakers_annotated %>%
+  left_join(top_speakers) 
+
+# graph it 
+ggplot(graph_ready, aes(x = year, y = n, fill = class)) +
+  geom_point() +
+  geom_text(data=subset(graph_ready, top == TRUE),
+            aes(label=speaker)) +
+  labs(title = "Comparing Speakers Before and After the Second Reform Act of 1867") 
+```
+
+```{r, echo=FALSE}
+hansard_1820 <- hansard_1820 %>% 
+  left_join(debate_metadata_1820) 
+
+prereform <- hansard_1830 %>% 
+  bind_rows(hansard_1820) %>%
+  filter(speechdate <= as.Date("1832-6-4")) %>%
+  mutate(period = "prereform")
+
+postreform <- hansard_1830 %>% 
+  left_join(debate_metadata_1830) %>%
+  filter(speechdate >= as.Date("1832-6-4")) %>%
+  mutate(period = "postreform")
+
+prereform_wordcount <- prereform %>% 
+  unnest_tokens(word, text) %>%
+    mutate(n = n()) 
+  
+prereform_speakers_wordcount <- prereform_wordcount %>%
+  left_join(speaker_metadata_1830) %>%
+  left_join(speaker_metadata_1820) %>%
+  group_by(speaker) %>%
+  reframe(total = sum(n))  
+
+postreform_wordcount <- postreform %>% 
+  unnest_tokens(word, text) %>%
+    mutate(n = n()) 
+
+postreform_speakers_wordcount <- postreform_wordcount %>%
+  left_join(speaker_metadata_1830) %>%
+  group_by(speaker, year) %>%
+  reframe(n_per_speaker_per_year = sum(n))  
+
+prereform_only_speakers <- prereform_speakers_wordcount %>%
+  anti_join(postreform_speakers_wordcount) %>%
+  mutate(class = "prereform only")
+
+postreform_only_speakers <- postreform_speakers_wordcount %>%
+  anti_join(prereform_speakers_wordcount) %>%
+  mutate(class = "postreform only")
+
+
+continuous_speakers <- postreform_speakers_wordcount %>%
+  inner_join(prereform_speakers_wordcount) %>%
+  mutate(class = "both periods")
+
+
+all_speakers <- bind_rows(postreform_speakers_wordcount, prereform_speakers_wordcount) %>%
+  left_join(prereform_only_speakers) %>%
+  left_join(postreform_only_speakers) 
+
+top_speakers <- all_speakers %>%
+  arrange(desc(n_per_speaker_per_year)) %>%
+  slice(5) %>% 
+  mutate(top = TRUE)
+
+graph_ready <- all_speakers %>%
+  left_join(top_speakers) 
+
+ggplot(graph_ready, aes(x = word, y = n_per_speaker_per_year, fill = class)) +
+  geom_point() +
+  geom_text(data=subset(graph_ready, top == TRUE),
+            aes(label=speaker)) +
+  geom_title("Comparing Speakers Before and After the Second Reform Act of 1867") 
+```
+
+```{r}
+data("hansard_1860")
+data("hansard_1870")
+
+data("debate_metadata_1860")
+data("debate_metadata_1870")
+
+hansard_1860 <- hansard_1860 %>% 
+  left_join(debate_metadata_1860) 
+
+hansard_1870 <- hansard_1870 %>% 
+  left_join(debate_metadata_1870)
+
+prereform <- hansard_1860 %>%
+  filter(speechdate <= as.Date("1867-8-15")) %>%
+  mutate(period = "prereform")
+
+postreform <- hansard_1860 %>%
+  bind_rows(hansard_1870) %>%
+  filter(speechdate >= as.Date("1869-1-1")) %>%
+  mutate(period = "postreform")
+
+
+prereform_wordcount <- prereform %>% 
+  unnest_tokens(word, text) %>%
+    mutate(n = n()) 
+  
+prereform_speakers_wordcount <- prereform_wordcount %>%
+  left_join(speakers_metadata_1860) %>%
+  group_by(speaker) %>%
+  reframe(total = sum(n))  
+
+postreform_wordcount <- postreform %>% 
+  unnest_tokens(word, text) %>%
+    mutate(n = n()) 
+
+postreform_speakers_wordcount <- postreform_wordcount %>%
+  left_join(speakers_metadata_1870) %>%
+  group_by(speaker, year) %>%
+  reframe(n_per_speaker_per_year = sum(n))  
+
+prereform_only_speakers <- prereform_speakers_wordcount %>%
+  anti_join(postreform_speakers_wordcount) %>%
+  mutate(class = "prereform only")
+
+postreform_only_speakers <- postreform_speakers_wordcount %>%
+  anti_join(prereform_speakers_wordcount) %>%
+  mutate(class = "postreform only")
+
+all_speakers <- bind_rows(postreform_speakers_wordcount, prereform_speakers_wordcount) %>%
+  left_join(prereform_only_speakers) %>%
+  left_join(postreform_only_speakers) 
+
+top_speakers <- all_speakers %>%
+  arrange(desc(n_per_speaker_per_year)) %>%
+  slice(5) %>% 
+  mutate(top = TRUE)
+
+graph_ready <- all_speakers %>%
+  left_join(top_speakers) 
+
+ggplot(graph_ready, aes(x = word, y = n_per_speaker_per_year, fill = class)) %>%
+  geom_point() %>%
+  geom_text(data=subset(graph_ready, top == TRUE),
+            aes(label=speaker))
+  geom_title("Comparing Speakers Before and After the Second Reform Act of 1867") 
+```
+
+### Women in 19th-century Parliament 
+
+For the most part, an analysis of speakers in Parliament will take the researcher down the road of the many elite white men who assumed powerful positions or passed honorary titles to their sons. Only 12 named women spoke in Parliament throughout the 19th-century. One woman who spoke the most was Mrs. Walrand from the 1824 debate, "Motion Respecting the Trial and Condemnation of Missionary Smith at Demerara." Exploring her role in this debate can give us insight and speculation into the criteria that had to be set in place for a woman to appear as a speaker and instrument to the power of Parliament. 
+
+"Motion Respecting the Trial and Condemnation of Missionary Smith at Demerara" reviews the trail, conviction, and death of John Smith, an Methodist missionary from England assigned to the British slave colony of Demerara in South America. Mr. Smith's trial accused him of assisting a slave rebellion that took place in Demerara in August of 1823. MP Brougham brought the topic of Mr. Smith's trial before Parliament to argue that the legal procedings convicting Mr. Smith were unjust and strayed from the guidance of Britain to the leaders of its Demerara colony. One could read his testimony as an early foundation for Britian's movement towards the Slavery Abolition Act of 1833, but his concerns--as well as the testimonies of other speakers--are nonetheless intertwined within a biased legal institution. 
+
+Mrs. Walrand spoke as a witness to the slave rebellion and served as a character witness condemning Mr. Smith. According to her testimony, she saw first hand the brutal violence of the rebells, having been a "defenceless lady" fired at by these "savages."  
+
+```{r, message = F}
+data("hansard_1820")
+data("speaker_metadata_1820")
+data("file_metadata_1820")
+
+mrs_walrand_speaker_metadata <- speaker_metadata_1820 %>%
+  filter(str_detect(speaker, regex('Mrs(.*)Walrand', ignore_case = T)))
+
+mrs_walrand_sentences <- left_join(mrs_walrand_speaker_metadata, file_metadata_1820, by = "sentence_id") %>%
+  left_join(., hansard_1820, by = "sentence_id") %>%
+  select(debate_id, text)
+```
+
+```{r}
+head(mrs_walrand_sentences)
+```
+
+```{r}
+entire_debate <- hansard_1820 %>%
+  left_join(file_metadata_1820, hansard_1820, by = "sentence_id") %>%
+  filter(debate_id == 5142) %>%
+  select("text")
+```
+
+```{r}
+head(entire_debate$text, 20)
+```
+
+```{r, message = F, warning = F}
+mrs_walrand_top_words <- left_join(mrs_walrand_speaker_metadata, hansard_1820) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(is.na(as.numeric(word))) %>%
+  group_by(speaker, word) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n)) %>%
+  top_n(30)
+
+ggplot(data = mrs_walrand_top_words,
+       aes(x = reorder(word, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Mrs. Walrand\'s Top Words",
+       subtitle = "From \"Motion Respecting the Trial and Condemnation of Missionary Smith at Demerara\"",
+       x = "Word",
+       y = "Count")
+```
+
+### Navigating from sentence to speech and debate
+
+We can move from the sentence_id numbers to the speeches and debates that those sentences were a part of. We can do this by using another dataset packaged with hansardr --  "file_metadata_1830" -- to get information on which speech a sentence belongs. In file_metadata, each sentence, speech, and debate are given a unique id.
+
+```{r}
+data("file_metadata_1830")
+```
+
+```{r}
+head(file_metadata_1830)
+```
+
+`file_metadata_1830` is a data frame with fields that either reference the original Hansard transcripts (such as `src_column`, for the column of the sentence) or were added to provide insight into the content and structure of the debates (such as `debate_id`, which tells us which sentences belonging to an entire debate).
+
+To find an entire speech by Mr. Buckingham, we use the command left_join() to merge two datasets (buckingham sentences and file_metadata_1830). Next, we use the command select() to choose those columns that interest us.
+
+```{r, message = F}
+
+buckingham_sentences <- hansard_1830 %>% # create a new variable from the dataset of speeches
+  left_join(speaker_metadata_1830) %>% # merge the dataset of speeches with a dataset of speaker names
+  filter(speaker == "Mr. Buckingham")  # filter for Mr Buckingham in the 'speaker' column
+
+buckingham_sentences2 <- left_join(buckingham_sentences, file_metadata_1830) %>% # merge two datasets, both of which share the sentence_id column
+  select(sentence_id, speech_id, debate_id, speechdate, debate, text) # select six columns to display
+```
+
+```{r}
+kable(buckingham_sentences) #look at the first few columns of the dataset
+```
+
+Notice that in the table above, a column called "speech_id" contains a series of unique numbers. The first sentence stood on its own, but the next five sentences were part of a separate speech within a debate.  We will use these speech_id and debate_id numbers to find and restore the rest of the text from those speeches and debates.
+
+Next, we will use the a speech ID number -- the index number that file_metadata_1830 provides for each unique speech -- to pull other sentences associated with a speech. 
+
+To view Buckingham's sentences belonging to a single speech, we can begin with our list of Buckingham's sentences and use the command filter() to subset just those rows corresponding to the same speech_id number:
+
+```{r, message = F}
+entire_speech <- buckingham_sentences %>% # start with the previous dataset, creating a new variable
+  left_join(file_metadata_1830) %>% # merge with a dataset that contains speech id numbers
+  filter(speech_id == 87731) %>% # search for a particular speech id by number
+  select("text") 
+```
+
+```{r}
+print(entire_speech$text)
+```
+
+We can do something similar to see all the speeches belonging to a specific debate. Each subject that parliament debated was given a unique title, from "The Queen's Speech" to "Distress -- Hand Loom Weavers." On most days, more than one subject was debated.  In our dataset, each speech is classified as belonging to a unique debate title (found in the "debate" column of hansard_1830). That debate title corresponds to a unique debate_id (found in file_metadata_1830). Other sentences classified as having the same debate_id are part of the same debate. 
+
+To find the debate_id for a particular sentence, you can consult one of the tables above where we display the sentence_id and debate_id for some of Buckingham's sentences above. Alternatively, if you know a sentence_id, you can move back to the debate_id of which it is part by navigating the dataset file_metadata_1830, where all of this information is kept. We can use the commands filter() to subset the data for just the row corresponding to the sentence that interests us, and select() to keep just the column with the debate_id index number.
+
+```{r, message = F}
+buck_debate_id <- file_metadata_1830 %>% # start with the dataset of speech, sentence, and debate id numbers 
+  filter(sentence_id == "S3V0018P0_8943") %>% # search for the rows where a particular id is in the sentence_id column
+  select(debate_id) # choose just the debate_id column for the row that is returned
+
+buck_debate_id # show us the resulting variable
+```
+
+Now that we have the debate_id number, we can pull the rest of the sentences and speakers from the rest of the debate. Note that if this seems like a bit of work just to navigate to the whole speech, all you have to do to use the code below is to swap out the number "9802" in the second line below for your own debate_id, and you can easily pull the whole debate for any speech in Hansard. 
+
+```{r, message = F}
+entire_debate <- file_metadata_1830 %>% # start with all the metadata for the 1830s
+  filter(debate_id == 9802) %>% # pull just the rows that correspond to the debate in question 
+  select(sentence_id, speech_id) %>% # subset just two columns -- the columns with id numbers for each sentence and speech  
+  left_join(speaker_metadata_1830) %>% # merge those columns with data about the speakers 
+  left_join(hansard_1830) %>% # merge those columns with the text of the speeches 
+  select(speaker, text, speech_id) %>% # choose just the columns with speech, text, and speech_id numbers
+  group_by(speech_id, speaker) %>% # within each speech, paste together each sentence, back to back, with a space in between. Retain the name of the speaker
+    reframe(speech = paste0(text, collapse = " ")) %>% #paste0(text, " ", text), speaker) %>%
+    ungroup() %>%
+  mutate(speech = paste0(toupper(speaker), " ", speech)) %>% # add the name of the speaker (in all caps) to the front of each speech. 
+  select(speech) # retain just the column with the speaker's name and full speech of each text
+```
+
+Here are a few of the speeches of the debate back-to-back, as they would appear on the printed page. To see the entire debate, remove the brackets and their contents in the line below.
+```{r}
+print(entire_debate$speech[11:13])
+```
+
+Reading a sentence within the context of an entire speech as a string of speeches gives us a much richer sense of the back-and-forth of parliamentary speeches, as well as the positions taken by each speaker.  We recommend that the analyst of history alternate between "close reading" of these speeches in context alongside the "distant reading" of words and phrases charted over time. 
+
+## Exercises
+
+1) As we discussed in the beginning of this chapter, analyzing the individual or collective speeches of men in Parliament can give insight into the workings of the Parliament as an institution of power. We can explore the roles of elite white men as they exerted their will--and the will of their peers--through the Parliamentary institution. We can also explore the roles of women in Parliament and examine how women differ in their contributions, as they were prohibited from becoming members of Parliament. Further, the woman's presence had to be mediated by one of the MPs, as they could not be there without being selected or approved. In result, women were treated as instruments of power in Parliament. 
+
+We can further explore how the role of women manifested in Parliament. First, count the total number of words women spoke in Parliament. Refer to the table below, which visualizes the women in Parliament and the year in which they spoke. Can you find a pattern across the kinds of topics women are brought to Parliament to speak on? 
+
+```{r, echo = FALSE, message = FALSE}
+name <- c("Mrs. (Mary Ann) Clark", "Mrs. Bridgeman", "Miss Mary Ann Taylor", "Louisa Demont",
+          "Franchette Martigner", "Mrs. Walrand")
+
+name_col_2 <- c("Ms. Cunninghame Graham", "Mrs. Dillon", "Mrs. M'Govern", 
+                "Mrs. Mitchel-Thomson", "Ms. Cave", "")
+
+year <- c("1809", "1809", "1809", "1820", "1820", "1824")
+
+year_col_2 <- c("1887", "1902", "1902", "1907", "1907", "")
+
+df <- data.frame(name, year, name_col_2, year_col_2)
+
+df %>%
+  kable(col.names = c("Name", "Year", "Name", "Year")) %>%
+  kable_styling()
+```
+
+Note: The way in which their names are recorded in this table might not reflect the way in which their names appear in the debates because the names have been consolidated into one representation
+
+2) Use the techniques shown above to move between a distant reading of the top words spoken by Mrs. Walrand or Louisa Demont in all of her speeches to the full debate. (As a reminder, you can view all of a speaker's speeches by filtering for just that speaker. You will also need to load the data for the appropriate years.) How does transitioning between the different modes of reading text provide insight into this specific debate? How does the data frame illuminate the role of women in 19th-century Parliament?
+
+3) Adjust the above code to search for a different office title. What can you infer about the different MPs who held this title? Can we support our inferences through close readings of their speeches?  
+
+To get you started, here are a few office positions: 
+- Chancellor of the Exchequer
+- Prime Minister
+- Attorney General
+- Lord Chancellor
+
+4) At the beginning of this chapter, we compared counts are based on the "speaker" column with counts based on the "suggested_speaker" column.  Expand each table to show 30 rows.  How are the two tables different? What are some pros and cons about visualizing the original speaker names and the disambiguated speaker names?  Identify a future research question based on what you learn. 
+
+5) Find the speakers who were referred to by the greatest variety of names in the 1830s. Share the results. Investigate; what characteristics do you think they had in common? AI’s are great for tasks involving linked data — that is , background about individuals — especially for the individuals who are well known and who had published obituaries and biographies, like many members of parliament.  Feed the resulting list to an AI and ask it for input about what they had in common. What did you learn? 
+
+6) Find the speakers who held the highest number of offices in the 1830s.  Share the results.  Then, investigate with AI: what do these individuals have in common? Tell us what you learned.
+
+7) We’ve used a list of speakers’ words over time to investigate many aspects of the data, but let’s go further. For the continuous speakers, almost everyone talks more after the reform. But for whom is the difference how much they spoke pre reform and post reform the greatest? Share your results. Again, use AI to investigate what those speakers have in common. Tell us what you learned.
+
+8) Use your code to identify the continuous speakers who have the greatest difference between the year during which they spoke the most and the year during which they spoke the least.   Share your results. Again, use AI to investigate what those speakers have in common. Tell us what you learned. 
+
+9) Rework the final visualization so that what is labeled are not the top speakers overall, but the top speakers in the prereform and postreform categories.  Show your results.  
+
+10) In the section, "Did the Concept of "Freedom" Change After the Debates of 1833?," we don’t give an interpretation of the tables showing the collocates of the word "freedom" over time. Examining the results, what do you see? Did the meaning of freedom change in these years? How? Specify as many words as possible in your answer. Adjust the number of words displayed to do your research.
