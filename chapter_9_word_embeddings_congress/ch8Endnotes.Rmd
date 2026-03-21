@@ -36,11 +36,11 @@ knitr::include_graphics("coal.jpg")
 
 There are important caveats to this visualization: 
 
-First, this 2-dimensional representation of the word embeddings is not a direct representation of the language inside the Congressional Records. The positions of the words reflect patterns of co-occurrence, not fixed meanings. Words appear close together because they are often used in similar contexts, not because they refer to the same concept. For example, nuclear may appear near coal because both are discussed in debates about electricity geeneration or energy policy, even though they represent different forms of energy.
+* First, this 2-dimensional representation of the word embeddings is not a direct representation of the language inside the Congressional Records. The positions of the words reflect patterns of co-occurrence, not fixed meanings. Words appear close together because they are often used in similar contexts, not because they refer to the same concept. For example, nuclear may appear near coal because both are discussed in debates about electricity geeneration or energy policy, even though they represent different forms of energy.
 
-Second, it is also important to note that word embeddings capture statistical association within a specific dataset, not a definitive meaning behind words. In another corpus, like the 19th-century Hansard debates, the word "power" would not have co-occurred with the word "nuclear," but perhaps instead alongside words that indicate political authority or the influence of the British Empire.  
+* Second, it is also important to note that word embeddings capture statistical association within a specific dataset, not a definitive meaning behind words. In another corpus, like the 19th-century Hansard debates, the word "power" would not have co-occurred with the word "nuclear," but perhaps instead alongside words that indicate political authority or the influence of the British Empire.  
 
-Lastly, this visualization should not be understood as a complete or authoritative representation of the vector space. Rather, it is a simplified visualization meant to show the basic idea that words can be more or less closely associated with one another based on how near they appear in the model. A word embedding model represents words across many dozens or even hundreds of dimensions, with each dimension encoding meaning. To make those relationships analyzable here, the multidimensional space has been flattened into a 2-dimensional visualization.
+* Lastly, this visualization should not be understood as a complete or authoritative representation of the vector space. Rather, it is a simplified visualization meant to show the basic idea that words can be more or less closely associated with one another based on how near they appear in the model. A word embedding model represents words across many dozens or even hundreds of dimensions, with each dimension encoding meaning. To make those relationships analyzable here, the multidimensional space has been flattened into a 2-dimensional visualization.
 
 In the following sections, we will create a word embedding model from the United States Congressional Record that mention the word "climate." Rather than simply generating a scatter plot of words, like we did in in this example, we will build functions that allow us to add and subtract word vectors and examine patterns of word association. Because our personal computers may have limited computing power, we will then use Congress Viewer, an application developed by one of the authors of this book, to analyze the Stanford Corpus of the Congressional Record at a much larger scale and to quickly test hypotheses about the language of the United States Congressional Records.
 
@@ -349,8 +349,7 @@ knitr::include_graphics("democracy_to_iraq.jpg")
 
 ## Conclusion 
 
-
-
+"Black-box" techniques for language analysis can be useful, but we introduce them only after first presenting more transparent metrics and code. This reflects our commitment to giving analysts the power to inspect and interpret each step of the data-processing pipeline and to understand how choices made during writing code shape historical analysis. Once a foundational understanding is in place, analysts can use "white-box" techniques to extend and refine the findings from these examples. For example, tf-idf can help identify words that are strongly associated with "Iraq" but not with "democracy," and vice-versa. Analysts can also use another library, such as `quanteda`, to run keyword-in-context searches that return the original records containing the words of interest, making it possible to examine how "Iraq" and "democracy" were used in their original sentences. 
 
 # Exercises
 
