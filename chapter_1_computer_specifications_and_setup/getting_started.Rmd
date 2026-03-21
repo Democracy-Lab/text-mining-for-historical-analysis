@@ -185,7 +185,14 @@ install.packages("xml2")
 install.packages("usdoj")
 ```
 
-While many packages can be installed from CRAN, many more specialty, research-oriented packages—such as those used in this book—are hosted on GitHub instead. Packages hosted exclusively on GitHub may be there because they change rapidly, support specialized workflows, or, as in our case, include larger datasets that CRAN is not designed to support. 
+A package for applying statistical functions to data, created for this book: 
+
+```{r}
+# Install tools for measurement, like distinctiveness and distance 
+install.packages("dhmeasures")
+```
+
+While many packages can be installed from CRAN, many more specialty, research-oriented packages—such as a couple created for this book—are hosted on GitHub instead. Packages hosted exclusively on GitHub may be there because they change rapidly, support specialized workflows, or, as in our case, include larger datasets that CRAN is not designed to support. 
 
 When a package is hosted on GitHub, it can be installed in several ways. For this book, we try to make the installation of our packages as easy as possible while working on as many computers as possible. To do this we provide special installation scripts that automate downloading and installing the required files. These scripts are accessed using `source()`, which tells R to fetch and run the installation code directly from the provided URL. For example:
 

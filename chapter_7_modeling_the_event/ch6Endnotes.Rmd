@@ -556,6 +556,68 @@ Text mining gives us an opportunity to approach the issue on the basis of the wo
 By using tf-idf as our tool for understanding, we will privilege a strict filter: we will look for words spoken in 1822-32 that were almost never spoken in 1832-42, and vice-versa. What might the silences and expansions of the period reveal that we did not previously know? 
 
 ```{r}
+# library(dplyr)
+# library(tidytext)
+# library(stringr)
+# library(lubridate)
+# library(ggplot2)
+# 
+# # Combine datasets
+# hansard <- bind_rows(
+#   annotated_1820,
+#   annotated_1830,
+#   annotated_1840
+# )
+# 
+# # Define reform cutoff
+# reform_cutoff <- as.Date("1832-06-07")
+# 
+# hansard <- hansard %>%
+#   mutate(
+#     speechdate = as.Date(speechdate),
+#     period = if_else(speechdate < reform_cutoff, "pre_reform", "post_reform")
+#   )
+# 
+# # Tokenize + clean
+# tidy_words <- hansard %>%
+#   filter(!is.na(suggested_speaker)) %>%
+#   unnest_tokens(word, text) %>%
+#   anti_join(stop_words, by = "word") %>%
+#   filter(!str_detect(word, "^[0-9]+$"))
+# 
+# # Compute TF-IDF where document = period
+# period_tfidf <- tidy_words %>%
+#   count(period, word, name = "wordsperperiod") %>%
+#   bind_tf_idf(term = word,
+#     document = period,
+#     n = wordsperperiod
+#   )
+# 
+# # Get top words per period
+# top_words <- period_tfidf %>%
+#   group_by(period) %>%
+#   arrange(desc(tf_idf)) %>%
+#   slice_head(n = 15) %>%
+#   ungroup() %>%
+#   mutate(word = reorder_within(word, tf_idf, period))
+# 
+# # Plot
+# ggplot(top_words, aes(x = word, y = tf_idf, fill = period)) +
+#   geom_col(show.legend = FALSE) +
+#   facet_wrap(~period, scales = "free") +
+#   coord_flip() +
+#   scale_x_reordered() +
+#   scale_fill_grey() +
+#   labs(
+#     title = "Distinctive Words Before and After the Reform Act of 1832",
+#     subtitle = "TF-IDF highlights vocabulary distinctive to each period",
+#     y = "tf-idf",
+#     x = ""
+#   )
+```
+
+
+```{r}
 library(dplyr)
 library(tidytext)
 library(stringr)
@@ -572,23 +634,28 @@ hansard <- bind_rows(
 # Define reform cutoff
 reform_cutoff <- as.Date("1832-06-07")
 
+# Add period variable
 hansard <- hansard %>%
   mutate(
     speechdate = as.Date(speechdate),
     period = if_else(speechdate < reform_cutoff, "pre_reform", "post_reform")
-  )
+  ) %>%
+  filter(!is.na(suggested_speaker))
 
-# Tokenize + clean
-tidy_words <- hansard %>%
-  filter(!is.na(suggested_speaker)) %>%
-  unnest_tokens(word, text) %>%
+# Use count_tokens() to tokenize and count by period
+period_counts <- count_tokens(
+  data = hansard,
+  group = "period",
+  text = "text"
+) %>%
   anti_join(stop_words, by = "word") %>%
-  filter(!str_detect(word, "^[0-9]+$"))
+  filter(!str_detect(word, "^[0-9]+$")) %>%
+  rename(wordsperperiod = n)
 
 # Compute TF-IDF where document = period
-period_tfidf <- tidy_words %>%
-  count(period, word, name = "wordsperperiod") %>%
-  bind_tf_idf(term = word,
+period_tfidf <- period_counts %>%
+  bind_tf_idf(
+    term = word,
     document = period,
     n = wordsperperiod
   )
@@ -596,7 +663,7 @@ period_tfidf <- tidy_words %>%
 # Get top words per period
 top_words <- period_tfidf %>%
   group_by(period) %>%
-  arrange(desc(tf_idf)) %>%
+  arrange(desc(tf_idf), .by_group = TRUE) %>%
   slice_head(n = 15) %>%
   ungroup() %>%
   mutate(word = reorder_within(word, tf_idf, period))
@@ -614,7 +681,9 @@ ggplot(top_words, aes(x = word, y = tf_idf, fill = period)) +
     y = "tf-idf",
     x = ""
   )
+
 ```
+
 
 The results are interesting. One of the top most ranked prereform word is "quamina," a word that references Quamina Gladstone, the leader of the 1823 slave revolt in Demerara led by an enslaved carpenter born in Ghana and sold into slavery with his mother in 1817. Gladstone was prohibited from taking time off of work to look after his ill wife, Peggy. After Peggy's death, Quamina's son Jack Gladstone organized a peaceful strike of thousands. In the aftermath of the revolt, Quamina was assassinated, his body displayed in chains beside the public road.
 
@@ -625,6 +694,269 @@ Other words too point at important differences between the prereform and postref
 Postreform terms such as "Glenelg" and "Normanby" reference individuals who played a major role in the expansion of empire.  Charles Grant, 1st Baron Glenelg, served as Chief Secretary for Ireland after 1819 and President of the Board of Trade after 1828. He helped to author the new Government of India Act of 1833, which transfered power away from the East India Company. 
 
 A more complete research project would use this list of distinctive words to investigate further; elsewhere, we discuss how to navigate the debates.
+
+
+### Understanding Language Shifts With a More Generous Measure: Log Likelihood
+
+Distinctiveness can be measured in multiple ways.  When we compare oranges and apples, we may choose to only note the strictest differences (one has segments, one's flesh is continuous and dense), or we may make a more general list of overlapping trends that are slightly different (both have seeds, bugt one's is white and the other's is dark).  Each time we change the basis of our comparison, we have the opportunity to illuminate something new about difference -- the first time, emphasizing exclusion, the second time, emphasizing overlap. 
+
+As Prof. Guldi has explained in _The Dangerous Art of Text Mining_, different approaches to distinctiveness can be used to explore the multiple dimensions of temporal change.  A skilled digital historian will refuse to settle for one set of answers about distinctiveness, instead choosing to explore many metrics.
+
+If tf-idf is a tool for identifying the characterstics of an orange that can't be found in apples, another approach -- log likelihood -- helps us see the nuances that overlap. The mathematical features of this approach and their implications are explored in _The Dangerous Art of Text Mining_, so here, we will emphasize instead how to employ log likelihood to create an alternative comparison of two time periods.^3^   
+
+The `dhmeasures` package contains the `log_likelihood()` function, which acts much like `bind_tf_idf()`, accepting a data frame with columns `word`, `group`, and `n`, and producing a score of distinctiveness ("ll") for each word-group pair. 
+
+
+
+The function computes this:
+
+How different the frequency of a word is across two groups
+
+Not which group it belongs to
+
+In your code, for each word:
+
+a
+a = count in group 
+g
+g (e.g., pre-reform)
+
+b
+b = count in all other groups (here: post-reform)
+
+Then it computes a statistic based on:
+
+observed counts vs expected counts
+
+👉 This produces a magnitude of difference, not a direction.
+
+
+```{r}
+# library(dplyr)
+# library(tidytext)
+# library(stringr)
+# library(lubridate)
+# library(ggplot2)
+# library(dhmeasures)
+# library(tidyr)
+# 
+# # Combine datasets
+# hansard <- bind_rows(
+#   annotated_1820,
+#   annotated_1830,
+#   annotated_1840
+# )
+# 
+# # Define reform cutoff
+# reform_cutoff <- as.Date("1832-06-07")
+# 
+# # Add period variable
+# hansard <- hansard %>%
+#   mutate(
+#     speechdate = as.Date(speechdate),
+#     period = if_else(speechdate < reform_cutoff, "pre_reform", "post_reform")
+#   )
+# 
+# # Tokenize + clean
+# tidy_words <- hansard %>%
+#   filter(!is.na(suggested_speaker)) %>%
+#   unnest_tokens(word, text) %>%
+#   anti_join(stop_words, by = "word") %>%
+#   filter(!str_detect(word, "^[0-9]+$"))
+# 
+# # Aggregate to counts
+# period_counts <- tidy_words %>%
+#   count(period, word, name = "n")
+# 
+# # Compute log likelihood
+# ll_output <- log_likelihood(
+#   period_counts,
+#   group = "period",
+#   group_list = c("pre_reform", "post_reform")
+# )
+# 
+# # Since LL is symmetric here, keep one copy of the score
+# ll_scores <- ll_output %>%
+#   transmute(
+#     word,
+#     log_likelihood = pre_reform
+#   )
+# 
+# # Pivot counts wide so each word has counts in both periods
+# word_counts_wide <- period_counts %>%
+#   pivot_wider(
+#     names_from = period,
+#     values_from = n,
+#     values_fill = 0
+#   )
+# 
+# # Total number of tokens in each period
+# period_totals <- period_counts %>%
+#   group_by(period) %>%
+#   summarise(total_n = sum(n), .groups = "drop")
+# 
+# pre_total <- period_totals %>%
+#   filter(period == "pre_reform") %>%
+#   pull(total_n)
+# 
+# post_total <- period_totals %>%
+#   filter(period == "post_reform") %>%
+#   pull(total_n)
+# 
+# # Add relative frequencies and assign each word to the period
+# # where it is more characteristic
+# distinctive_words <- word_counts_wide %>%
+#   left_join(ll_scores, by = "word") %>%
+#   mutate(
+#     pre_rate = pre_reform / pre_total,
+#     post_rate = post_reform / post_total,
+#     distinctive_period = case_when(
+#       pre_rate > post_rate ~ "pre_reform",
+#       post_rate > pre_rate ~ "post_reform",
+#       TRUE ~ "tie"
+#     )
+#   ) %>%
+#   filter(distinctive_period != "tie")
+# 
+# # Top words per period
+# top_words <- distinctive_words %>%
+#   group_by(distinctive_period) %>%
+#   arrange(desc(log_likelihood)) %>%
+#   slice_head(n = 15) %>%
+#   ungroup() %>%
+#   mutate(word = reorder_within(word, log_likelihood, distinctive_period))
+# 
+# # Plot
+# ggplot(top_words, aes(x = word, y = log_likelihood, fill = distinctive_period)) +
+#   geom_col(show.legend = FALSE) +
+#   facet_wrap(~distinctive_period, scales = "free_y") +
+#   coord_flip() +
+#   scale_x_reordered() +
+#   scale_fill_grey() +
+#   labs(
+#     title = "Distinctive Words Before and After the Reform Act of 1832",
+#     subtitle = "Words are assigned to the period where their relative frequency is higher",
+#     x = "",
+#     y = "log likelihood"
+#   ) +
+#   theme_minimal()
+```
+
+
+Count words version: 
+
+
+
+```{r}
+library(dplyr)
+library(tidytext)
+library(stringr)
+library(lubridate)
+library(ggplot2)
+library(dhmeasures)
+library(tidyr)
+
+# Combine datasets
+hansard <- bind_rows(
+  annotated_1820,
+  annotated_1830,
+  annotated_1840
+)
+
+# Define reform cutoff
+reform_cutoff <- as.Date("1832-06-07")
+
+# Add period variable
+hansard <- hansard %>%
+  mutate(
+    speechdate = as.Date(speechdate),
+    period = if_else(speechdate < reform_cutoff, "pre_reform", "post_reform")
+  ) %>%
+  filter(!is.na(suggested_speaker))
+
+# Use count_tokens() to tokenize and count by period
+period_counts <- count_tokens(
+  data = hansard,
+  group = "period",
+  text = "text"
+) %>%
+  anti_join(stop_words, by = "word") %>%
+  filter(!str_detect(word, "^[0-9]+$"))
+
+# Compute log likelihood
+ll_output <- log_likelihood(
+  period_counts,
+  group = "period",
+  group_list = c("pre_reform", "post_reform")
+)
+
+# Keep one LL score column since the statistic is symmetric
+ll_scores <- ll_output %>%
+  transmute(
+    word,
+    log_likelihood = pre_reform
+  )
+
+# Pivot counts wide so each word has counts in both periods
+word_counts_wide <- period_counts %>%
+  pivot_wider(
+    names_from = period,
+    values_from = n,
+    values_fill = 0
+  )
+
+# Total number of tokens in each period
+period_totals <- period_counts %>%
+  group_by(period) %>%
+  summarise(total_n = sum(n), .groups = "drop")
+
+pre_total <- period_totals %>%
+  filter(period == "pre_reform") %>%
+  pull(total_n)
+
+post_total <- period_totals %>%
+  filter(period == "post_reform") %>%
+  pull(total_n)
+
+# Assign each word to the period where its relative frequency is higher
+distinctive_words <- word_counts_wide %>%
+  left_join(ll_scores, by = "word") %>%
+  mutate(
+    pre_rate = pre_reform / pre_total,
+    post_rate = post_reform / post_total,
+    distinctive_period = case_when(
+      pre_rate > post_rate ~ "pre_reform",
+      post_rate > pre_rate ~ "post_reform",
+      TRUE ~ "tie"
+    )
+  ) %>%
+  filter(distinctive_period != "tie")
+
+# Top words per period
+top_words <- distinctive_words %>%
+  group_by(distinctive_period) %>%
+  arrange(desc(log_likelihood)) %>%
+  slice_head(n = 15) %>%
+  ungroup() %>%
+  mutate(word = reorder_within(word, log_likelihood, distinctive_period))
+
+# Plot
+ggplot(top_words, aes(x = word, y = log_likelihood, fill = distinctive_period)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~distinctive_period, scales = "free_y") +
+  coord_flip() +
+  scale_x_reordered() +
+  scale_fill_grey() +
+  labs(
+    title = "Distinctive Words Before and After the Reform Act of 1832",
+    subtitle = "Words are assigned to the period where their relative frequency is higher",
+    x = "",
+    y = "log likelihood"
+  ) +
+  theme_minimal()
+```
+
+
 
 ## Distinctiveness Continued: Those Who Weren't Reelected
 
@@ -692,6 +1024,75 @@ ggplot(prereform_top_words_w_speaker_classifications_tfidf,
 
 The same transformation can be applied to postreform-only speakers. Were the statesmen newly elected in 1832-33 different in their words from those who had held office continually?
 
+
+```{r}
+library(dplyr)
+library(tidytext)
+library(stringr)
+library(lubridate)
+library(ggplot2)
+library(forcats)
+# library(textstem)   # uncomment if you want lemmatize_words()
+
+# deduplicate class lookup
+all_classes_dedup <- all_classes %>%
+  distinct(suggested_speaker, .keep_all = TRUE)
+
+# 1) create postreform words first
+postreform_words <- hansard %>%
+  mutate(speechdate = as.Date(speechdate)) %>%
+  filter(speechdate >= reform_cutoff) %>%
+  filter(!is.na(suggested_speaker), suggested_speaker != "") %>%
+  unnest_tokens(word, text)
+
+# 2) clean words
+postreform_words_cleaned <- postreform_words %>%
+  filter(!str_detect(word, "^\\s*[0-9]*\\s*$")) %>%
+  anti_join(stop_words, by = "word")
+  # %>% mutate(word = lemmatize_words(word))   # optional
+
+# 3) join speaker classes
+postreform_words_w_speaker_classifications <- postreform_words_cleaned %>%
+  left_join(all_classes_dedup %>% select(suggested_speaker, class),
+            by = "suggested_speaker") %>%
+  filter(!is.na(class))
+
+# 4) count tokens per class and word
+postreform_words_w_speaker_classifications_counted <- postreform_words_w_speaker_classifications %>%
+  count(class, word, name = "wordsperperiod")
+
+# 5) tf-idf
+postreform_words_w_speaker_classifications_tfidf <- postreform_words_w_speaker_classifications_counted %>%
+  bind_tf_idf(term = word, document = class, n = wordsperperiod) %>%
+  filter(is.finite(tf_idf))
+
+# 6) top words
+postreform_top_words_w_speaker_classifications_tfidf <- postreform_words_w_speaker_classifications_tfidf %>%
+  group_by(class) %>%
+  slice_max(order_by = tf_idf, n = 15, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(
+    class = factor(class, levels = c("prereform only", "postreform only", "both periods")),
+    class = fct_drop(class),
+    word = reorder_within(word, tf_idf, class)
+  )
+
+# 7) plot
+ggplot(postreform_top_words_w_speaker_classifications_tfidf,
+       aes(x = word, y = tf_idf)) +
+  geom_col() +
+  facet_wrap(~class, scales = "free_y") +
+  coord_flip() +
+  scale_x_reordered() +
+  labs(
+    title = "Most Distinctive Words",
+    subtitle = "Postreform-only speakers vs those who also spoke before the Reform Act of 1832",
+    x = "",
+    y = "tf-idf"
+  )
+```
+
+
 ```{r}
 # --- Libraries (only those needed here) ---
 library(dplyr)
@@ -701,6 +1102,7 @@ library(ggplot2)
 library(forcats)      # for fct_drop
 # If you use tidytext's reorder_within/scale_x_reordered:
 library(tidytext)
+library(textstem)
 
 # ---------- Part 1b: Postreform vs Continuous (fixed) ----------
 
@@ -767,7 +1169,7 @@ An alternative approach to measurement is to look exclusively at the speakers wh
 # Applying Tf-idf with a Different Data Architecture Part 2:
 # Measure the most distinctive words of prereform only vs postreform only speakers
 
-words_w_speaker_classifications <- all_words_cleaned %>%
+words_w_speaker_classifications <- all_classes_dedup %>%
   left_join(all_classes, by = "suggested_speaker")
   
 words_w_speaker_classifications_counted <- words_w_speaker_classifications %>%
@@ -998,4 +1400,6 @@ The portrait of change we have here is exceptional rather than the rule. We're l
 6) Tf-idf can draw attention to infrequent words, including names that appear less commonly in the corpus, such as Quamina Gladstone. Why is it valuable for researchers to notice these uncommon names or references? How might identifying such figures lead historians to new questions, overlooked people or events, or important historical connections? 
 
 7) As mentioned in the chapter, historians often argue that after the Reform Act of 1832 Parliament began focusing more on issues affecting the growing middle class and urban population. Has text mining tested, validated, or complicate this interpretation? 
+
+8) The approach profiled here generated many analyses filled with obscure  names, in part because we have used the stricter tf-idf rather than the more inclusive log likelihood measure.  For the analyses of prereform and post reform speakers and their words, change the code so that the analysis uses log likelihood. Are the results any easier to interpret?
 

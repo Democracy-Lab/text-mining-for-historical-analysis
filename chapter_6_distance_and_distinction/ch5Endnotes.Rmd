@@ -29,15 +29,15 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-[Jo -- needs better intro]
-
-Many of the techniques used in text mining did not originate in history; rather, they were developed in fields such as the natural sciences, information science, and data science, and later adapted for the analysis of language. This cross-disciplinary borrowing is powerful, but at the same time, it requires careful interpretation. When a method is adapted from another domain, it may not map perfectly onto historical language data. Analysts must therefore remain attentive to what the metric actually measures, as well as to the kinds of questions it can and cannot answer.
+Many of the techniques used in text mining did not originate in history; rather, they were developed in fields such as the natural sciences, information science, data science, and later adapted for the analysis of historical documents. This cross-disciplinary borrowing can be highly generative, but it also means that the metrics require careful interpretation. When a method is adapted from another discipline, it may not map perfectly onto the problems of history. Analysts must therefore remain attentive to what the metric actually measures, as well as to the kinds of questions it can and cannot answer.
 
 In this chapter, we examine two concepts that are widely used across scientific fields to describe the defining characteristics of data: distinctiveness and distance. Distinctiveness measures how characteristic a word is within a particular context—for example, identifying which terms appear unusually often in one set of texts compared to others. Distance, by contrast, measures the similarity or difference between texts or linguistic patterns. Together, these concepts provide a framework for comparing bodies of text and identifying the features that distinguish, for example, a decade, a speaker, or debate from another.
 
+[Mention where these metrics have been used].
+
 # Distinctiveness and Distance in Practice
 
-To understand how these metrics can be used in research, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. To test whether our anecdotal observations are grounded in the literature, we can use tf-idf. 
+To understand how these metrics can be used during the analysis of language, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. To test whether our observations are grounded in the literature, we can use tf-idf. 
 
 The first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains only characters and no special formatting (such as fonts, images, or layout). Since plain text files are simply lines of words and punctuation, they are easy to process using code. To download the books we can locate their URLs and pass them to the `readLines()` function.
 
@@ -227,40 +227,102 @@ By measuring distance, we can compare the distribution of words in the two books
 
 
 ```{r}
-# load Alice in Wonderland
-library(philentropy)
+# # load Alice in Wonderland
+# library(philentropy)
+# 
+# alice_url <- "https://www.gutenberg.org/files/11/11-0.txt"
+# alice_text <- readLines(alice_url, encoding = "UTF-8", warn = FALSE)
+# 
+# books <- bind_rows(
+#   tibble(booktitle = "Alice", text = alice_text),
+#   tibble(booktitle = "Peter", text = peter_text),
+#   tibble(booktitle = "LookingGlass", text = looking_glass_text)
+# )
+# 
+# word_freqs <- books %>%
+#   unnest_tokens(word, text) %>%
+#   filter(str_detect(word, "^[a-z]+$")) %>%
+#   count(booktitle, word) %>%
+#   group_by(booktitle) %>%
+#   mutate(freq = n / sum(n)) %>%
+#   ungroup()
+# 
+# freq_matrix <- word_freqs %>%
+#   select(booktitle, word, freq) %>%
+#   pivot_wider(names_from = word, values_from = freq, values_fill = 0) %>%
+#   column_to_rownames("booktitle") %>%
+#   as.matrix()
+# 
+# # Pairwise Jensen–Shannon divergence (no for-loops)
+# jsd_matrix <- philentropy::distance(freq_matrix, method = "jensen-shannon", unit = "log2")
+# jsd_matrix <- as.matrix(jsd_matrix)
+# rownames(jsd_matrix) <- rownames(freq_matrix)
+# colnames(jsd_matrix) <- rownames(freq_matrix)
+# 
+# kable(jsd_matrix, digits = 4)
+```
 
+
+```{r}
+library(dhmeasures) # for Jensen-Shannon divergence functions
+
+# URL for Alice's Adventures in Wonderland from Project Gutenberg
 alice_url <- "https://www.gutenberg.org/files/11/11-0.txt"
+
+# Read the text file line by line into R
 alice_text <- readLines(alice_url, encoding = "UTF-8", warn = FALSE)
 
+# Combine the three books into one data frame
+# Each row is a line of text, and each line is tagged with its book title
 books <- bind_rows(
   tibble(booktitle = "Alice", text = alice_text),
   tibble(booktitle = "Peter", text = peter_text),
   tibble(booktitle = "LookingGlass", text = looking_glass_text)
 )
 
-word_freqs <- books %>%
-  unnest_tokens(word, text) %>%
-  filter(str_detect(word, "^[a-z]+$")) %>%
-  count(booktitle, word) %>%
-  group_by(booktitle) %>%
-  mutate(freq = n / sum(n)) %>%
-  ungroup()
+# Turn each line into individual word tokens
+# Keep only lowercase alphabetic words
+# Then count how many times each word appears in each book
+book_counts <- books %>%
+  unnest_tokens(word, text) %>%                 # split text into words
+  filter(str_detect(word, "^[a-z]+$")) %>%      # keep only words with letters a-z
+  count(booktitle, word)                        # count occurrences by book and word
 
-freq_matrix <- word_freqs %>%
-  select(booktitle, word, freq) %>%
-  pivot_wider(names_from = word, values_from = freq, values_fill = 0) %>%
-  column_to_rownames("booktitle") %>%
-  as.matrix()
-
-# Pairwise Jensen–Shannon divergence (no for-loops)
-jsd_matrix <- philentropy::distance(freq_matrix, method = "jensen-shannon", unit = "log2")
-jsd_matrix <- as.matrix(jsd_matrix)
-rownames(jsd_matrix) <- rownames(freq_matrix)
-colnames(jsd_matrix) <- rownames(freq_matrix)
-
-kable(jsd_matrix, digits = 4)
+# Calculate Jensen-Shannon divergence contributions
+# comparing the word distributions of Alice and Peter
+output <- jsd(
+  book_counts,
+  group = "booktitle",                          # column containing group labels
+  group_list = c("Alice", "Peter")              # the two books to compare
+)
 ```
+
+
+
+
+$$
+p = \frac{\text{count of the word in Alice}}{\text{total number of words in Alice}}
+$$
+
+
+enter
+
+$$
+q = \frac{\text{count of the word in Peter}}{\text{total number of words in Peter}}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Distance measurements give us a score for how "distant" each book is from each other book. With Jensen-Shannon Distance (JSD), smaller values mean more similar texts. _Alice's Adventures in Wonderland_ has a distance of 0 from _Alice's Adventures in Wonderland_ because they are the same text.  Meanwhile, _Alice_ has the highest distance from _Peter Rabbit_, while _Alice_ is much closer in writing style to _Through the Looking Glass_.
 
@@ -700,180 +762,198 @@ We hope that readers will become comfortable with the idea that algorithmic appr
 
 First we will load our data and prepare it for our partial JSD function. The following code tokenizes and cleans both decades. 
 
-```{r, message=FALSE, warning=FALSE}
-library("tidyverse")
-library("hansardr")
-library("tidytext")
+
+
+```{r}
+library(tidyverse)
+library(hansardr)
+library(tidytext)
+library(dhmeasures)
 
 # Load Hansard data for the 1840s and 1850s
 data("hansard_1840")
 data("hansard_1850")
 
-# preprocess the 1840s hansard data:
-# tokenize the text column into words, remove stop words, 
-# and filter out tokens that contain digits
-hansard_1840 <- hansard_1840 %>% # create a new dataset
-  unnest_tokens(word, text) %>% # convert text into one word per row
-  anti_join(stop_words) %>% # remove common stop words
-  filter(!str_detect(word, "[:digit:]"))  # remove words with digits
+# preprocess the 1840s hansard data
+hansard_1840 <- hansard_1840 %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!str_detect(word, "[:digit:]")) %>%
+  mutate(decade = "1840s")
 
-# preprocess the 1850s hansard data using the same steps:
-# tokenize, remove stop words, and exclude numeric tokens
-hansard_1850 <- hansard_1850 %>% # create a new dataset
-  unnest_tokens(word, text) %>% # tokenize text
-  anti_join(stop_words) %>% # remove stop words
-  filter(!str_detect(word, "[:digit:]"))  # exclude tokens with digits
+# preprocess the 1850s hansard data
+hansard_1850 <- hansard_1850 %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!str_detect(word, "[:digit:]")) %>%
+  mutate(decade = "1850s")
+
+# combine both decades
+hansard_combined <- bind_rows(hansard_1840, hansard_1850)
+
+# count each word within each decade
+hansard_counts <- hansard_combined %>%
+  count(decade, word)
+
+# calculate JSD contributions for each word
+output <- jsd(
+  hansard_counts,
+  group = "decade",
+  group_list = c("1840s", "1850s")
+)
+
+# keep only the top contributing words
+word_dist_top <- output %>%
+  slice_max(order_by = grp_1840s_1850s, n = 20)
+
+# plot
+ggplot(word_dist_top,
+       aes(x = reorder(word, grp_1840s_1850s),
+           y = grp_1840s_1850s)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "JSD of Top Words: 1840s vs. 1850s",
+    x = "word",
+    y = "jsd value"
+  ) +
+  theme_minimal()
 ```
 
-We have defined a partial JSD function below. The code defines two functions that measure how much word usage changed between 1840 and 1850. Each function compares the word frequencies from one decade to an average of both decades. One function looks at how much 1840’s word usage differs from this average, while the other does the same for 1850. Leveraging JSD helps identify words that became more or less common over time without mixing both decades together.
+
+The short answer
+
+JSD (overall) = one number
+→ how different two texts are
+
+“Partial JSD” (what your code uses) = many numbers (one per word)
+→ how much each word contributes to that difference
+
+In your specific case (important)
+
+With dhmeasures::jsd():
+
+👉 what you are calling “JSD” is actually already per-word contributions
+
+So:
+
+grp_1840s_1850s
+
+is not the total JSD
+—it is what people often call partial JSD
+
+
+
+1. JSD (overall)
+
+One number:
+
+“How different are the 1840s and 1850s?”
+
+Example:
+
+0.12
+2. Partial JSD (per word)
+
+Many numbers:
+
+word	value
+trade	0.01
+industry	0.008
+tax	0.005
+
+Meaning:
+
+“These words explain why the texts differ”
+
+
 
 ```{r}
-# Function to calculate one-sided KL divergence component of JSD
-partial_jsd_1840_to_1850 <- function(p, q) {
-  m <- 0.5 * (p + q) # Midpoint distribution
-  return(p * log2(p / m))} # 1830 deviation from midpoint
+library(tidyverse)
+library(hansardr)
+library(tidytext)
+library(dhmeasures)
 
-partial_jsd_1850_to_1840 <- function(p, q) {
-  m <- 0.5 * (p + q) # Midpoint distribution
-  return(q * log2(q / m))} # 1860 deviation from midpoint
+# Load Hansard data for the 1840s and 1850s
+data("hansard_1840")
+data("hansard_1850")
 
+# preprocess the 1840s hansard data
+hansard_1840 <- hansard_1840 %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!str_detect(word, "[:digit:]")) %>%
+  mutate(decade = "1840s")
 
-# define a function for jsd
-jsd <- function(p, q) {
-  # Ensure p and q are probability distributions
-  p <- p / sum(p)
-  q <- q / sum(q)
-  m <- 0.5 * (p + q)
-  
-  # Define a helper function for KL divergence
-  kl_div <- function(a, b) {
-    a <- ifelse(a == 0, 1, a)  # Avoid log(0)
-    b <- ifelse(b == 0, 1, b)
-    sum(a * log2(a / b))
-  }
-  
-  0.5 * kl_div(p, m) + 0.5 * kl_div(q, m)
-}
+# preprocess the 1850s hansard data
+hansard_1850 <- hansard_1850 %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  filter(!str_detect(word, "[:digit:]")) %>%
+  mutate(decade = "1850s")
 
+# combine both decades
+hansard_combined <- bind_rows(hansard_1840, hansard_1850)
 
-```
+# count each word within each decade
+hansard_counts <- hansard_combined %>%
+  count(decade, word)
 
-At this stage we can calculate word frequencies. Calculating word frequencies is an essential step because JSD operates on probability distributions. By counting how often each word appears in a given decade (e.g., 1840 and 1850), we can transform these counts into probabilities, which are required to measure divergence. Since Partial JSD specifically focuses on how one decade’s word distribution deviates from another without averaging both directions, accurate word frequencies ensure that we capture asymmetrical changes in language use. An asymmetrical change occurs when a word's usage shifts more in one direction than the other. For example, if a word was common in 1840 but became rare in 1850, this is an asymmetrical change because the decrease is not balanced by an equivalent increase elsewhere. Partial JSD captures these one-sided shifts, helping identify words that either faded out or emerged over time rather than averaging both directions.
+# calculate JSD contributions
+output <- jsd(
+  hansard_counts,
+  group = "decade",
+  group_list = c("1840s", "1850s")
+)
 
-```{r}
-# Count word frequencies for both decades 
-freq_1840 <- hansard_1840 %>% 
-  count(word, name = "count_1840")
+# calculate relative frequencies for each decade
+word_props <- hansard_counts %>%
+  group_by(decade) %>%
+  mutate(prop = n / sum(n)) %>%
+  ungroup() %>%
+  select(decade, word, prop) %>%
+  pivot_wider(names_from = decade, values_from = prop, values_fill = 0)
 
-freq_1850 <- hansard_1850 %>% 
-  count(word, name = "count_1850")
+# combine frequencies with JSD output and assign direction
+word_dist <- output %>%
+  left_join(word_props, by = "word") %>%
+  mutate(
+    Direction = case_when(
+      `1850s` > `1840s` ~ "1840 to 1850",
+      `1840s` > `1850s` ~ "1850 to 1840",
+      TRUE ~ "no change"
+    ),
+    Partial_JSD = case_when(
+      `1850s` > `1840s` ~ grp_1840s_1850s,
+      `1840s` > `1850s` ~ -grp_1840s_1850s,
+      TRUE ~ 0
+    )
+  )
 
-freq_1840
-```
+# keep only the top contributing words
+word_dist_top <- word_dist %>%
+  slice_max(order_by = abs(Partial_JSD), n = 20)
 
-In the following code, we take additional steps to focus our analysis on the frequent words from each decade while avoiding rarer terms. Our approach will provide us with an overview of both decades. 
-
-```{r}
-# define how many top words to extract from each decade's corpus.
-# this number controls the vocabulary size for comparison.
-top_n <- 50  # number of top words to extract
-
-# extract the top n most frequent words from the 1840s word frequency table.
-# keep only the word column and return it as a character vector.
-top_words_1840 <- freq_1840 %>%
-  slice_max(order_by = count_1840, n = top_n) %>%  # select top n by count
-  select(word) %>%  # keep only the word column
-  deframe()  # convert to a character vector
-
-# extract the top n most frequent words from the 1850s word frequency table.
-# repeat the same steps to prepare for cross-decade comparison.
-top_words_1850 <- freq_1850 %>%
-  slice_max(order_by = count_1850, n = top_n) %>%  # select top n by count
-  select(word) %>%  # keep only the word column
-  deframe()  # convert to a character vector
-```
-
-Combining the top words from both decades ensures that words that were dominant in either period are included in the analysis, preventing the exclusion of key terms that may have gained or lost prominence.
-
-```{r}
-# Combine top words from both decades and keep only unique words
-all_top_words <- unique(c(top_words_1840, top_words_1850))
-```
-
-We can further prepare and processes the word frequency data to compute Partial JSD, identifying words that changed the most between 1840 and 1850.
-
-The following code works by: 
-* Merging and Cleaning Data: We create a dataset (`word_dist`) that includes the top words from both decades and their frequencies. We use `left_join()` to merge the word counts from 1840 and 1850, ensuring that every word in either decade is included. Missing values (for words that appear in only one decade) are replaced with zeros to avoid computational issues.
-* Normalizing Word Frequencies: The word counts are converted into probabilities by dividing each count by the total number of words in that decade. Normalization ensures that word usage is compared proportionally, rather than based on absolute counts.
-* Handling Logarithmic Calculations: Since logarithms are undefined for zero, words with a probability of 0 are replaced with a small constant (1e-10) to prevent errors in divergence calculations.
-
-```{r}
-# Combine the top words from both decades with their frequency tables
-# Create a dataset containing the union of all top words
-# Join the 1840s word counts
-# Join the 1850s word counts
-# Replace missing counts with zeros so the two decades can be compared directly
-word_dist <- data.frame(word = all_top_words) %>%
-  left_join(freq_1840, by = "word") %>%
-  left_join(freq_1850, by = "word") %>%
-  replace_na(list(count_1840 = 0, count_1850 = 0))
-
-# normalize raw word counts to probabilities by dividing each word's count 
-# by the total count from its respective decade. this prepares data 
-# for comparison using divergence or distance metrics.
-word_dist <- word_dist %>%
-  mutate(p_1840 = count_1840 / sum(count_1840),  # normalize 1840 counts
-         p_1850 = count_1850 / sum(count_1850))  # normalize 1850 counts
-
-# Taking the log of zero isn’t allowed
-# Therefore, we replace any zeros with a tiny number
-# This keeps the math stable without changing the results in a meaningful way.
-word_dist$p_1840[word_dist$p_1840 == 0] <- 1e-10
-word_dist$p_1850[word_dist$p_1850 == 0] <- 1e-10
-
-head(word_dist)
-```
-
-With our word distributions calculated, we are now able to compute Partial JSD and discover the most significant changes between the two decades. 
-
-The following code works by: 
-* Computing Partial JSD: The script applies the Partial JSD functions to compute how much each word's probability in 1840 deviates from the midpoint distribution (1840 to 1850) and vice versa (1850 to 1840). The partial JSD step captures asymmetrical shifts in word usage.
-* Assigning Direction of Change: Each word is assigned to only one direction of change, depending on which Partial JSD score is higher. If a word's usage declined after 1840, it is assigned "1840 to 1850" with a negative score. If a word became more common in 1850, it is assigned "1850 to 1840" with a positive score.
-* Selecting the Most Significant Changes: Finally, we sort words by their absolute Partial JSD score and selects the top 30 most dramatically shifting words.
-
-```{r}
-# Compute Partial Jensen-Shannon Divergence (JSD) for each word 
-# in both directions:
-# - From the 1840 distribution to the 1850 distribution
-# - And from 1850 to 1840
-# This captures how much each word contributes to the overall 
-# divergence between decades, depending on the direction of comparison.
-word_dist <- word_dist %>%
-  rowwise() %>%
-  mutate(Partial_JSD_1840 = partial_jsd_1840_to_1850(p_1840, p_1850),
-         Partial_JSD_1850 = partial_jsd_1850_to_1840(p_1840, p_1850)) %>% 
-  ungroup()
-
-# Assign a direction for each word:
-# - 1840 → 1850" if its contribution is higher in that direction,
-# - otherwise "1850 → 1840".
-# Signed Partial JSD:
-# - Negative = more distinctive of 1840
-# - Positive = more distinctive of 1850
-word_dist <- word_dist %>%
-  mutate(Direction = 
-           ifelse(Partial_JSD_1840 > Partial_JSD_1850,  # decide dominant direction
-                            "1840 to 1850", 
-                            "1850 to 1840"),
-         Partial_JSD = ifelse(Direction == "1840 to 1850", 
-                              -Partial_JSD_1840,  # negate to show shift from 1840
-                               Partial_JSD_1850))  # keep positive for 1850-leaning
-
-# Rank words by the their contribution to divergence (i.e., absolute Partial JSD)
-# and keep the top 30 most distinctive words across the two decades
-word_dist <- word_dist %>%
-  arrange(desc(abs(Partial_JSD))) %>%  # Sort by highest absolute contribution
-  slice(1:30)                          # Keep top 30 words
+# plot
+ggplot(word_dist_top,
+       aes(x = reorder(word, Partial_JSD),
+           y = Partial_JSD,
+           fill = Direction)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "Partial JSD of Top Words: 1840s vs. 1850s",
+    x = "word",
+    y = "partial jsd value",
+    fill = "change direction"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c(
+    "1840 to 1850" = "red",
+    "1850 to 1840" = "blue",
+    "no change" = "gray"
+  )) +
+  theme(legend.position = "bottom")
 ```
 
 Partial JSD can be interpreted as follows:
@@ -882,6 +962,54 @@ Partial JSD can be interpreted as follows:
 * Partial JSD = 0: The word's probability did not change at all between the two time periods. If a word was never used in both periods, its probability is always 0.
 
 One effective way of visualizing the results from Partial JSD is with a diverging bar chart, like in the following visualization. Higher Partial JSD values (e.g., war, india, government) indicate words whose relative importance changed significantly between 1840 and 1850 whereas lower Partial JSD values (e.g., noble, stated, foreign) suggest words that remained relatively stable in their frequency distribution across both decades. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+JSD tells you how different a word is
+Direction tells you which side it belongs to
+Very basic intuition
+
+Imagine a word like “factory”:
+
+appears a lot in the 1850s
+
+appears rarely in the 1840s
+
+Then:
+
+JSD → says:
+👉 “this word matters for distinguishing the decades”
+
+Direction → says:
+👉 “this word is a 1850s word”
+
+Another example
+
+Word: “duke”
+
+common in 1840s
+
+rare in 1850s
+
+Then:
+
+JSD → “this word is important”
+
+Direction → “this is an 1840s word”
+
+
+
+
 
 ```{r, fig.cap="Partial Jensen–Shannon divergence (JSD) values for the top words distinguishing the 1840 and 1850 Hansard debates."}
 # create a mirrored bar chart showing which words contribute 
