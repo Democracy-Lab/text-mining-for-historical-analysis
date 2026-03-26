@@ -403,7 +403,7 @@ requirements to run the code examples in this book:</p>
 practitioners or use out-of-the-box search interfaces to conduct their
 work, but working hands-on with a programming language gives the analyst
 direct control over every aspect of the data quality, its analysis and
-visualization. This introduction is designed to introduce you to the
+visualization. This introduction is designed to introduce readers to the
 language R with no prior experience required.</p>
 <p>Analysts of historical data sometimes use other languages than R,
 although at present, the languages Python and R are the most frequently
@@ -429,12 +429,12 @@ trustworthy community makes R an ideal choice for those who want to
 focus their primary efforts on analysis, as those learning R will not
 face many of the questions about version compatibility that face users
 of certain versions of Python.</p>
-<p>The first step is to make sure that you have access to a computer
-that is set up to use the R programming language. The steps that follow
-explain how to install R on a Mac or PC (Windows machine).</p>
+<p>The first step is to ensure access to a computer that is set up to
+use the R programming language. The steps that follow explain how to
+install R on a Mac or PC (Windows machine).</p>
 <p>We also recommend installing a desktop app called RStudio designed to
 make working with R as intuitive as possible. RStudio is a “code editor”
-that makes it easy to interact with the R language and your data as it
+that makes it easy to interact with the R language and one’s data as it
 undergoes transformations. A code editor is to the language R what
 Microsoft Word is to writing a document: there are ultimately many
 applications which one could use to write a document, but Microsoft word
@@ -447,61 +447,65 @@ updates are necessary, the R interface will provide its own
 instructions, and for the most part, it is sufficient to simply type
 whatever is indicated on the computer screen, perhaps restarting the
 computer if the user encounters difficulty.</p>
-<p>If you have already installed R and RStudio (or a comparable
-development environment of your choosing), you should skip to section
-“Loading Libraries” below.</p>
+<p>If R and RStudio (or a comparable development environment) are
+already installed, skip to section “Loading Libraries” below.</p>
 <div id="installing-the-r-language" class="section level3">
 <h3>Installing the R Language</h3>
-<p>If you are using Mac go to the R project at <a href="https://cran.r-project.org/bin/macosx/" class="uri">https://cran.r-project.org/bin/macosx/</a>. You will have
-two options of the R language to choose from: a R.pkg file and a
-R-arm64.pkg file. The R.pkg file is for Macs with Intel processors. The
-arm64 version is for Macs with arm processors. If you do not know the
-processor of your Mac, go to the apple menu and click on “About This
-Mac.” Your computer’s processor will be listed.</p>
-<p>If you are using Windows go to the R project at <a href="https://cran.r-project.org/bin/windows/base/" class="uri">https://cran.r-project.org/bin/windows/base/</a>. Click
-“Download R for Windows” at the top of the page.</p>
-<p>If you are using Linux your steps for installation may be different
-depending on your distribution. If you have Ubuntu, one of the most
-popular distributions, you can start by follow the instructions here: <a href="https://cloud.r-project.org/bin/linux/ubuntu/fullREADME.html" class="uri">https://cloud.r-project.org/bin/linux/ubuntu/fullREADME.html</a>.</p>
+<p>For Mac, go to the R Project at
+<code>https://cran.r-project.org/bin/macosx/</code>. There will be two
+installer options: <code>R.pkg</code> and <code>R-arm64.pkg</code>. The
+<code>R.pkg</code> file is for Macs with Intel processors, while the
+<code>R-arm64.pkg</code> file is for Macs with ARM processors. To check
+which processor a Mac has, open the Apple menu and select About This
+Mac. The processor information will be listed there.</p>
+<p>For Windows, go to the R Project at
+<code>https://cran.r-project.org/bin/windows/base/</code>. Then click
+Download R for Windows at the top of the page.</p>
+<p>For Linux, installation steps may vary depending on the distribution.
+For Ubuntu, one of the most common distributions, installation can begin
+by following the instructions here:
+<code>https://cloud.r-project.org/bin/linux/ubuntu/fullREADME.html</code>.</p>
 </div>
 <div id="installing-rstudio" class="section level3">
 <h3>Installing RStudio</h3>
-<p>Go to <a href="https://posit.co/download/rstudio-desktop/#download" class="uri">https://posit.co/download/rstudio-desktop/#download</a>. You
-will have the option to download the correct version of RStudio for your
-operating system.</p>
+<p>Go to <a href="https://posit.co/download/rstudio-desktop/#download" class="uri">https://posit.co/download/rstudio-desktop/#download</a>
+which will provide options to download the correct version of
+RStudio.</p>
 </div>
 </div>
 <div id="running-a-line-of-code" class="section level2">
 <h2>Running a Line of Code</h2>
 <p>The first step in learning R is understanding how to run a line of
 code.</p>
-<p>Here are some exercises to learn how to run code on your computer.
-Try each and decide which ones feel most comfortable to you: - You can
-type a command directly into the Console pane and press
-<code>Enter</code>. - You can write it in an R script and execute it by
-placing your curser on the line you want to run and press
-<code>Ctrl + Enter</code> on Windows or Linux (or
-<code>Cmd + Enter</code> on a Mac). - You can also highlight one or more
-lines of code and click the green Run button at the top of the script
-editor.</p>
-<p>When you start RStudio for the first time you will be presented with
-a screen divided into four parts, each of which represents one portion
-of R’s coding environment.</p>
+<p>Here are some exercises to learn how to run code. Try each and decide
+which ones feel most comfortable:</p>
+<ul>
+<li>Type a command directly into the Console pane and press
+<code>Enter</code>.</li>
+<li>Write it in an R script and execute it by placing the computer’s
+cursor on a line of code and pressing <code>Ctrl + Enter</code> on
+Windows or Linux (or <code>Cmd + Enter</code> on a Mac).</li>
+<li>Highlight one or more lines of code and click the green Run button
+at the top of the script editor.</li>
+</ul>
+<p>When RStudio startss for the first time it will show a screen divided
+into four parts, each of which represents one portion of R’s coding
+environment.</p>
 <p>The first place to look is the lower left-hand quadrant of the
-RStudio interface, where you’ll see the word “Console.” The panel in
+RStudio interface, which will show the word “Console.” The panel in
 question is known as the “Console Tab Panel.” A “console” is a window
 that allows the computer’s user to send code directly to the computer.
-You may be familiar with consoles from other places on the computer: PC
-users use the Command Line Prompt – another name for the Console. Mac
-users use a console when they open the “Terminal” app to run
-command-line commands. In RStudio, the console panel is one of two ways
-that allow you to write R code interactively.</p>
+Consoles might be familiar from other places on the computer: PC users
+use the Command Line Prompt – another name for the Console. Mac users
+use a console when they open the “Terminal” app to run command-line
+commands. In RStudio, the console panel is one of two ways that allow us
+to write R code.</p>
 <p>To see RStudio’s console in action, inside RStudio’s console panel,
-position your cursor at the prompt (“&gt;”). Type this simple line of
-code: <code>print(&quot;Hello World&quot;)</code> and press Enter/Return. The
-console will return “Hello World.” You have just run your first line of
+we can position our cursor at the prompt (“&gt;”). Type this simple line
+of code: <code>print(&quot;Hello World&quot;)</code> and press Enter/Return. The
+console will return “Hello World.” We just ran our first line of
 code.</p>
-<p>In RStudio you have the option of typing all of your code into the
+<p>In RStudio we have the option of typing all of our code into the
 Console. However, running code line-by-line at the console makes it
 difficult to save, edit, and revisit. This is why RStudio provides
 another panel specifically for editing R scripts, the “text editor.” The
@@ -513,40 +517,40 @@ write, save, revise, and annotate code. There are many other coding
 programs that would work, and coders comfortable with these programs may
 adapt our instructions. This textbook, however, recommends that
 first-time programmers write their code in RStudio by default.</p>
-<p>To use the Text Editor in RStudio, you must first open a new file. Go
-to “File,” “New File,” and then “R Script.” A new tab will open where
-you can draft multiple lines of code to be run later. For now, in your
-new R Script tab, type the same command as you typed into the Console:
-type <code>print(&quot;Hello World&quot;)</code>.</p>
-<p>Next, you will want to “run” the line of code that you just typed. To
-run a line of code from the Text Editor, you will click the “Run” button
-at upper-right-hand corner of the Text Editor panel. You can also use
-your keyboard (try this too). Position your cursor anywhere in the line
-of code in the Text Editor, and hit the keys <code>CTRL + Enter</code>
-(on PCS) or ‘COMMAND + Return’ (on Macs). To see what you did, look at
-the Console again, which will continue to keep track of the computer’s
+<p>To use the Text Editor in RStudio, we must first open a new file. Go
+to “File,” “New File,” and then “R Script.” A new tab will open where we
+can draft multiple lines of code to be run later. For now, in the new R
+Script tab, type the same command as we typed in the console: type
+<code>print(&quot;Hello World&quot;)</code>.</p>
+<p>Next, we will want to “run” the line of code that we just typed. To
+run a line of code from the Text Editor, we will click the “Run” button
+at upper-right-hand corner of the Text Editor panel. We can also use the
+keyboard (try this too). Position the cursor anywhere in the line of
+code in the Text Editor, and hit the keys <code>CTRL + Enter</code> (on
+PCS) or ‘COMMAND + Return’ (on Macs). To see what we did, look at the
+Console again, which will continue to keep track of the computer’s
 response to all lines of code sent to the computer. In the Console, R
 will return “Hello World.”</p>
-<p>Try to run the code now by typing the following into your Console and
+<p>Try to run the code now by typing the following into the Console and
 pressing Enter, or by highlighting it and clicking Run:</p>
 <pre class="r"><code>print(&quot;Hello World&quot;)</code></pre>
 <pre><code>## [1] &quot;Hello World&quot;</code></pre>
-<p>This should display the phrase “Hello World” beneath your code,
+<p>This should display the phrase “Hello World beneath the code,
 confirming that R executed the command.</p>
 <div id="r-versions" class="section level3">
 <h3>R Versions</h3>
 <p>Before we start writing code for historical analysis, we need to make
 sure we have an up-to-date version of R installed in order to use the
 packages and functions in this book.</p>
-<p>To check which version of R is currently running on your computer,
+<p>To check which version of R is currently running on the computer,
 run:</p>
 <pre class="r"><code>R.version.string</code></pre>
 <pre><code>## [1] &quot;R version 4.5.2 (2025-10-31)&quot;</code></pre>
-<p>If your version is more than one major release behind (e.g., anything
-below 4.3 while the current version is 4.4), you should update R
+<p>If the version shown is more than one major release behind (e.g.,
+anything below 4.3 while the current version is 4.4), we should update R
 from:</p>
 <p><a href="https://cran.r-project.org" class="uri">https://cran.r-project.org</a></p>
-<p>Keeping R up to date helps ensure that your code runs
+<p>Keeping R up to date helps ensure that the code runs
 smoothly—especially when installing or loading packages, which often
 require the latest versions of R to work correctly.</p>
 </div>
@@ -563,9 +567,9 @@ package, we must first install the package with
 <code>install.packages()</code>, and then load it with
 <code>library()</code>. We install the packages here so the libraries
 load smoothly later, without extra setup or interruptions.</p>
-<p>If RStudio prompts you to restart R while installing a package, click
-“Yes” to allow the restart, and then re-run the installation command so
-the package loads into the fresh session.</p>
+<p>If RStudio asks to restart R while installing a package, click “Yes”
+to allow the restart, and then re-run the installation command so the
+package loads into the fresh session.</p>
 <p>Packages only have to be installed once, but they need to be reloaded
 for each new R session using <code>library()</code>.</p>
 <p>First we can install our primary data science packages that serve as
@@ -620,19 +624,23 @@ install.packages(&quot;kableExtra&quot;)
 # For arranging multiple tables, plots, or graphics on a page
 install.packages(&quot;gridExtra&quot;)</code></pre>
 <p>Packages for webscraping and data extraction:</p>
-<pre class="r"><code># Tools for scraping data from websites
+<pre class="r"><code># For scraping data from websites
 install.packages(&quot;rvest&quot;)
 
-# Tools for working with and parsing XML or HTML documents
+# For working with and parsing XML or HTML documents
 install.packages(&quot;xml2&quot;)
 
-# Install tools for accessing and working with U.S. Department of Justice datasets
+# For accessing and working with U.S. Department of Justice datasets
 install.packages(&quot;usdoj&quot;)</code></pre>
+<p>A package for applying statistical functions to data, created for
+this book by Ryan Schaefer and Steph Buongiorno:</p>
+<pre class="r"><code># For &quot;white box&quot; statistical measurements, like distinctiveness and distance 
+install.packages(&quot;dhmeasures&quot;)</code></pre>
 <p>While many packages can be installed from CRAN, many more specialty,
-research-oriented packages—such as those used in this book—are hosted on
-GitHub instead. Packages hosted exclusively on GitHub may be there
-because they change rapidly, support specialized workflows, or, as in
-our case, include larger datasets that CRAN is not designed to
+research-oriented packages—such as a couple created for this book—are
+hosted on GitHub instead. Packages hosted exclusively on GitHub may be
+there because they change rapidly, support specialized workflows, or, as
+in our case, include larger datasets that CRAN is not designed to
 support.</p>
 <p>When a package is hosted on GitHub, it can be installed in several
 ways. For this book, we try to make the installation of our packages as
@@ -641,22 +649,34 @@ this we provide special installation scripts that automate downloading
 and installing the required files. These scripts are accessed using
 <code>source()</code>, which tells R to fetch and run the installation
 code directly from the provided URL. For example:</p>
-<pre class="r"><code>source(&quot;https://raw.githubusercontent.com/Democracy-Lab/hansardr/master/tools/install_hansardr.R&quot;)
+<pre class="r"><code># For accessing the 19th-century debates of Great Britain
+source(&quot;https://raw.githubusercontent.com/Democracy-Lab/hansardr/master/tools/install_hansardr.R&quot;)
 library(hansardr)
 
+# For accessing other sample data used by this book
 source(&quot;https://raw.githubusercontent.com/Democracy-Lab/tmha.data/main/tools/install_tmha.data.R&quot;)
 library(tmha.data)</code></pre>
-<p>In RStudio, you can verify whether a package is already installed by
+<p>Install a package for processing text and creating word
+embeddings:</p>
+<pre class="r"><code># For creating word embeddings.
+install.packages(&quot;text2vec&quot;)</code></pre>
+<p>Install pakcages for scraping text, working with files and folders,
+and processing PDF files:</p>
+<pre class="r"><code># For working with the internet and APIs and downloading data from websites 
+install.packages(&quot;httr&quot;)
+
+# For working with files sand folders 
+install.packages(&quot;fs&quot;)
+
+# For extracting text from PDFs and obtaining information about documents
+install.packages(&quot;pdftools&quot;)</code></pre>
+<p>In RStudio, we can verify whether a package is already installed by
 checking the Packages tab in the lower-right panel. This tab displays
-all packages currently available in your R library. If a package appears
-in that list, it is already installed; if not, you can install it using
-<code>install.packages()</code>. You can also load an installed package
+all packages currently available in the R library. If a package appears
+in that list, it is already installed; if not, we can install it using
+<code>install.packages()</code>. We can also load an installed package
 by checking the box next to its name in this tab, which is equivalent to
-calling <code>library()</code> in your script.</p>
-<pre class="r"><code>install.packages(&quot;text2vec&quot;)  # Install text2vec</code></pre>
-<pre class="r"><code>library(&quot;httr&quot;)
-library(&quot;fs&quot;)
-library(&quot;pdftools&quot;)</code></pre>
+calling <code>library()</code> in the script.</p>
 </div>
 <div id="loading-tools" class="section level2">
 <h2>Loading Tools</h2>
@@ -695,7 +715,7 @@ tested in multiple classroom settings. We demonstrate workflows that
 will run on a MacBook with 8 GB of RAM and roughly 10 GB of free
 hard-drive space. The examples have been designed to run within these
 constraints.</p>
-<p>However, if you encounter additional issues—such as code running
+<p>However, if we encounter additional issues—such as code running
 slowly, long wait times, or working on a machine with limited
 resources—we provide several strategies for adapting the workflows in
 this book to smaller or less powerful computers.</p>
@@ -718,28 +738,19 @@ rm(hansard_1820)
 # Reclaim computer memory
 gc()</code></pre>
 <pre><code>##           used (Mb) gc trigger (Mb) max used (Mb)
-## Ncells  638661 34.2    1408344 75.3  1018661 54.5
-## Vcells 1201602  9.2    8388608 64.0  1974125 15.1</code></pre>
+## Ncells  638553 34.2    1408158 75.3  1032954 55.2
+## Vcells 1201701  9.2    8388608 64.0  1974125 15.1</code></pre>
 <p>Another strategy is to work with a sample of the data rather than the
-full dataset. This allows you to practice the methods without loading
-everything into memory. For example, you might limit the dataset to a
+full dataset. This allows us to practice the methods without loading
+everything into memory. For example, we might limit the dataset to a
 smaller set of speakers or select only a few years from the larger
 decade-long corpus. In the following code, we combine the Hansard
 debates with their associated metadata—specifically the dates on which
 each speech was given—so that we can filter the corpus to include only a
 few of the years we want to work with.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.6
-## ✔ forcats   1.0.1     ✔ stringr   1.6.0
-## ✔ ggplot2   4.0.1     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.5     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code># Load just the debates from the 1820s
+<pre class="r"><code>library(tidyverse)
+
+# Load just the debates from the 1820s
 data(&quot;hansard_1820&quot;)
 
 data(&quot;debate_metadata_1820&quot;)
@@ -765,10 +776,10 @@ hansard_sample &lt;- hansard_1850 %&gt;%
 </div>
 <div id="getting-help-on-functions" class="section level2">
 <h2>Getting Help on Functions</h2>
-<p>When working in R, you will frequently encounter functions you have
-not used before. A simple way to learn what a function does is to open
-its documentation. We can read its documentation in RStudio by typing
-two question marks followed by the function name:</p>
+<p>When working in R, we will frequently introduce new functions. A
+simple way to learn what a function does is to open its documentation.
+We can read its documentation in RStudio by typing two question marks
+followed by the function name:</p>
 <pre class="r"><code>??function_name</code></pre>
 <p>For example, to read the documentation for the <code>library()</code>
 function, run:</p>
@@ -776,7 +787,7 @@ function, run:</p>
 <p>This opens a page in RStudio’s Help pane that shows a description of
 the function and examples of how to use it.</p>
 <p>Learning to consult documentation early will make it much easier to
-follow the examples in this book and to experiment on your own.</p>
+follow the examples in this book and to experiment.</p>
 <div id="loading-libraries" class="section level3">
 <h3>Loading Libraries</h3>
 <p>The “datasets” library is a set of quantitative data sets that are
@@ -784,26 +795,24 @@ frequently used to teach code, although because this book is about text,
 we will only consult them once for the purpose of teaching.</p>
 <pre class="r"><code>library(datasets)</code></pre>
 <p>When a software package is called by the command ‘library’, its data
-and commands are available for you to use with R. R keeps track of which
+and commands are available to use with R. R keeps track of which
 packages have been installed and loaded in the ‘Packages’ tab, which is
 one of the tabs available in the lower right-hand quadrant of
 RStudio.</p>
 <p>In the lower-right-hand quadrant of Rstudio, click on the “Packages”
-tab now, and you’ll see a list of software packages that came pre-loaded
-with R. Notice that some of these packages are checked, meaning that
-they are already loaded and ready for use.</p>
-<p>Scroll down until you see the package “datasets.” It should have a
-check mark next to it – the result of your loading the package with the
-command above. You can uncheck it and re-check the box next to datasets:
-the “Package” panel offers you another way to load a software library.
-Make sure that the box next to “datasets” is checked before you move
-on.</p>
-<p>One thing to remember: if you’ve perfectly typed a command that you
-expect to run, and R gives you an error message, one thing to check is
-whether all the libraries needed for a particular exercise are
-checked.</p>
+tab now, and RStudio will display a list of software packages that came
+pre-loaded with R. Notice that some of these packages are checked,
+meaning that they are already loaded and ready for use.</p>
+<p>Scroll down to the package “datasets.” It should have a check mark
+next to it – the result of loading the package with the command above.
+We can uncheck it and re-check the box next to datasets: the “Package”
+panel offers another way to load a software library. Make sure that the
+box next to “datasets” is checked before moving on.</p>
+<p>One thing to remember is that if a command has been typed correctly
+and R still returns an error message, it is worth checking whether all
+the libraries required for that exercise have been loaded.</p>
 <p>It is important to note that packages only need to be installed once
-but libraries need to be reloaded every time you start a new RStudio
+but libraries need to be reloaded every time we start a new RStudio
 session.</p>
 </div>
 <div id="loading-data" class="section level3">
@@ -815,19 +824,19 @@ available software libraries. Back in the Text Editor panel, type in the
 following line of code, then run it using the “Run” button or
 CNTRL+Enter / COMMAND+Return:</p>
 <pre class="r"><code>data(iris)</code></pre>
-<p>To see what you’ve done, look in the upper right-hand quadrant of
-RStudio, known as the “Workplace Browser” panel. By default, you will be
+<p>To see what we’ve done, look in the upper right-hand quadrant of
+RStudio, known as the “Workplace Browser” panel. By default, we will be
 looking at the “Environment” tab.</p>
-<p>In the Environment Tab, you will see that there is only one data set
-currently listed: “iris.” The Environment Panel tells us what data and
-variables are loaded. It is useful for checking what data is available
-and what it looks like. The Environment Panel lists “iris” as having 150
-“obs” or “observations” of “5 variables,” which is another way of saying
-that there is data that could be displayed in a spreadsheet of five rows
-and 160 columns, or 150 rows and 5 columns.</p>
+<p>The Environment Tab will show only one dataset named: “iris.” The
+Environment Panel tells us what data and variables are loaded. It is
+useful for checking what data is available and what it looks like. The
+Environment Panel lists “iris” as having 150 “obs” or “observations” of
+“5 variables,” which is another way of saying that there is data that
+could be displayed in a spreadsheet of five rows and 160 columns, or 150
+rows and 5 columns.</p>
 <p>Click on the blue and white arrow button near iris to see a sample of
 the content of the data set.</p>
-<p>When you run code, you may periodically want to check what your data
+<p>When running code, we may periodically want to check what the data
 looks like. Knowing how to inspect data in the “Environment” tab is a
 useful skill.</p>
 <div id="a-simple-visualization" class="section level4">
@@ -841,15 +850,15 @@ blank.</p>
 it:</p>
 <pre class="r"><code>hist(iris$Sepal.Width)</code></pre>
 <p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3dd4DUZN7A8d/C7tI7IggqIogUy2FDRcWOICpWRD0VFRsqnKDYy53lRE8U9YRTzn7qeYqFs2E7Gwh6qGc9O4qoHMV36ezmnZSZnZJsMtkkz2by/fwhSWYmk2dn8nV2JpMVDQDgi6jeAACIKwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwFFksx/5jnVm4BSQkCRJEdKW9WbgFJCQGPqLtE9ULtgrLFgjj45RZ+Keyj+M7J/84pWe+cudB6ZtzFX7Sctv1iXs2jDM+MHbda6vEOPoZe9VY/N9bI9fzUeokPSs9sYs79Yc7cbc8c7j+RGfXlHT3eEyBDQmKpXQCePS3ki5C2snwfLjfH0z11ar4B+Om4nY6UV+8/MLKu5s4vU2npmHTcvjt32/FimL+xiza1sbNznLGt2tDF3n6eAZj9+BFQpAhpT9Qro9voVxoW8hfWytKMEHNB1f2hSW8pjl5gLVx0guU6uDmgAtttj/Nzle3PmdfMeL7cu206fKVvsKaDZjx8BVYqAxlSJB/QJCTqgw3NCueVKY+FBkm9MQAOw3Z6LjLuwXjr+ybzDA825NcaL4+3rGAkBbYgIaEzVFdAHt0/Zo44bN/yA3mCM5v4lP+Yudh6Z25jN9x836iwVWxlTF+gLHzAbVrnzEUfv1skq6CvBDMC2a68Z93CxOXOseX/taoy5ucbMhXWMhIA2RAQ0puoKqKuGH9AJ+hZ2D259K9uk1tfoTxv0T+Hvr0hNl3+UWrqL8TMbu1i/xoZ/9DXmhgRzh7ZdW99aX7q/OdPTKvZnxtwdxvTLdayRgDZEBDSmYhDQDev939YIaH/363n1jL6+U63DmM7RZ67WtJ+ND3WOS1/nxy2Ml6O/BnKH9l07vPY151J9Un81fK9xySn6bIu1dayRgDZEBDSmvL8HuuGBU/berNlWB5z+mPnL4vWSMcG8RvUzZ23XuaJj3xMfXJV9F1U37dq23e73VGvH69e9Xl90hj41MLX3X7Bt0/fMK9187O7dKtr0GD55oXWzg/XrHK99eHAzqewxcra+6P2xvVu13/20j+yHUnD3s8eNG6CvpMO4ceNyP9TJGlneptQ9ZvMNx5lWQOfoM8M0bb7xQ3gys3bzVeCC9Ozb5/9m46ZbDb30h/SCgfrFZ6RWvu8mTXse+Y+sw6EKfwr2XZtu3MN/9ckX9JfY41P/Ocu4xGjiwTa3/PfYPi3a/+bqnzIBzXv80lf/bEK/Nh33On+R/c8YISGgMeU5oA/1zuxvfYyrFwT02X6ZBZ3/XLvCFzcxlx24vCCg73VI/TM/Nb/u2g6Z21ZcsMG4nRnQRyqtxaPXaleXW9e4sMZmJIV3n7WFsiHnuoUBTW9K3WPWrtWnX7AC+mP3lFSs/mVc42+ZtX9zsO49a+aQ9CoqRy81F5kBXbqvtXzrF63b2f0U7AP6nXGdh/TJa1ITRz+c+s8O+twa/W0FubXglqvPKzPXu/ErdQf0zqbmohbX2vyIERoCGlNeAzpRsp2mFQb02rLsaxy3xlrf38vTi/Y+Wv9vVkC/MHqhB/SsnLUfa9zQCGjPiszS8y+rvUZWn9Ns7r6IgGY2pe4xa4/rUxfnfRPpR+Py3yy3+/m+n318aD/zRagR0DH7ZRY3us28rt1PweE3a+N/FuP1qcNSE5O/Tv2nYnVq7h3jpp/l33LNgZnVtjZ+yXcK6F9rF/7RbjgICQGNKTOgW+yYsZGxID+gsyTX9NTvjmPHGgdZbjd2rH5AzZ/zrmEdx/NB89pFRkqzAmq+NktV67682xoHhR+ctzA7kK1/yh+H3d0XEdDMptQ9Zu0zfaLpE3lf5WxrXL7RJe8XvDL+3yY5q+huvAY1Ato2a3Gjufpi25+CQ0CN93YH6VNdUxOvavpn/2+mfwzd88eonZq3aj2geY+fcfXyrGNcmy+u63mDYBHQmLorf9cy5Qd0kD5Zed7jsx863SjiJsZ7ilkfQnxm7npbnDnt/N+YqzC+jVNjHNctnY47sau15tqAtjQXpKq1pbHDnjL1vinDjEUj9etYAW25/0k7pbeq5X4n7WBOPZ43DIe7d/oQKT+gtZviMubqPsYV990mJ2qnpzew9Z7n/GVuVdYlxrsWZWe98J/HzUPtjR/WQOva3UadYX4N00yh7U/BIaCzjeum/q+wKPVvo/8zjk69SbNKeXr+GF8272WLk07a3Lprhw+R9I067OjNzKlpTs8ZBI+AxpS3gFYZL//uNG5h7LtivGbK2gFPMpYeocej2jzO23hP7lFjcq/U4vXmNbICmtrzj/j9vXcs0r43ZsxDb07WJ7fVp8yADtQ/TbFeXu74bWr6FmPy93nDcLh7rwHNbIrrmF9PvxCu/NNXmdX9r/a90pSy/mc8b73g/cb4muVdxrTx3kjF51omoGfoRxfMMN+j+Ehz+Ck4BHRtC335B5r2ZOqffpr2h9Q/R6eWG//3eDx/jHsbq7449fq4Zrx5304BLbsutVHrzK+DnlhwrwgNAY0pbwH9wlh4i3mTffqnGGdzq90B/8/owHbWr7AnGFefp1m77kbma7IhxtKsgHZ+17z638pT+prTxpHv3fQpI6AVxifN5ouzxv8xpje32bmd7t5zQNOb4j7mSbU/pN3/lv5s/5cReT+/Ho8ayy/Xp82Ua1XGmyNXaOmAjsi6Q7nS6afgdHSR8YWouzXt0tQ/J5ufxW+e6qpxaOryvJF8atyF+brUfE3sGNCzjel13fTpgwrvFWEhoDFVzCvQxiP+ujDnxrU7oPl+YfpIns+MF143pG5nfIZ+qbn0zfyAPlq4OQs2yw3o9uZi4/ffbc3pffTp43Nv5nD33gP6aOElDmPWHs1693L7eeml88/I/rQo5TJ96Z5Zw9eO0mf21NIBtT6lX2V8dSn3sPusn4JTQI2TLp2hafqnQ3do2nJ9Yxdr8/Slg/JHYrxor/jWXPyfOgP6uTkzIms9iAIBjamCT+En2QVU+026C33OeXJF5rq1O+CVxj6a+aTGeOfzKE17NTsV5uvI2oA2yflgp/qDhy8/xvwST1ZADzMvHJI1vZ9NQB3u3nNAazfFdcya9t3v0u/npm74j9rlXzw48YCNM5c0eiv1C7NxTNBB40zG95VaaFZAt0zfzPh9uavTT8EpoF/py1OvbdMHgm0t+v9A7tSXXp0/kqPT5TbsVEdAm1ZnbRMBjRABjSmPAX2tcaYMUr7rbdYRO7U74Nn6VK/MSoxvyuylaY8YN7AOfzReLWUFtG/tndY8cGS72jvICuiR5uVGQEea03YBdbh7zwHta3eJ/ZiNzX2tf/qCZh/nrnnRY+d1Ni8ZkHpdKIVWWwE9IH2L3+tzTZx+Co5fENK/fFSx5kv9tvr3jk5MTVyknaZfe27+SIz7Ozl9w1F1BDR9R6cS0IgR0JjyGFDtze2zK9D2WWNh7Q54fCZZhnP12W2s7+Q0TS8dkxvQgZmrf7WXtd6W5rGiRQfU4e49B3Sg3SX2YzYdKa1u724sPqZg5WuuMy5otNp8mZjneytoJ6avbhx6WbbB4afgGNDzjFbqR9Dvos/qP+l9NP2LV+2r80fSS5+6JH3DiwhoA0RAY8prQDXt35fvWHsoZuP39UWOr0CNt/t207QZxpVXWktHOAR0nfF6rslv//Z5jZmT+r4CTd99PQNqO2aTfhzoUiOEnW1+qOZhTR9oC20C+qUV0My7nkZu2zn9FBwD+qx+wW3np/4zVp99NzXRarX+lnO66LW3NE43ckr6hhcT0AaIgMaU94CmLP7rUW2sDhhlc3wP1LjgUE2baVw3/Vvutg4BnazPtTfPJnStr4A63H29A2ozZpNxIP0HxtKl2pFtUzbNekfXPAvpS9pq499X8u/dCGgm90as+jr9FBwDurpZ6oIT9U+p7tNn1+uz9+pXnlEwEuPN18HpGx5BQBsgAhpTRQU0Zf2rY4wvFBmfgdTugMZZijIfg//XuMpV6UOBpphLv8z/JlJ6nUP1ufPN6dG+Aupw90EENGfMX+up1LfO/CaS8U2ed813DOTt2htMT/9/w/g0/cH8ezcCWvaBObPG+ERqtNNPwfkkSfrPpLf+DYBPjNndU1M761f+vmAkxrueTaxzmazcmIA2QAQ0prwF9NQhKekQGF/Z7qBPGTvgefrUr8aBmNtbB2Iae6zx1ULjA5UtzPPRmYdn2wTUOP2b+ScplrbzFVCnu69PQO3GvNJY86J0QI0v0H+j/d1Y+pvM+etW7arPt1ytab/N3tY3p6ToKzQPYzrKXDpVrMja/xScA5r+6lBrc9S/s2b751xu3PJW44Kx5uI/SF5Azyv4kRDQ6BHQmPIW0P31qX7WdxSNTzh21qeMHdD8eNdIhRyjv91Zba6iv75jm7v1kes0reZScQqocdhOP/1cGKtGiq+AOt19fQJqO2bj5eIfs3+Fr1yrrTE/Ox8w0/z45g3j6E/jZCDP6RMV5ivjL4wDPvVX49Y3kc7Vf+m/zzhStuNqp59C1pY+doYu8/2nz6xi7mPOPmLN/q5wJNY1jZfkt5bnB/Tkgh8JAY0eAY0pbwG92Vi45TUz//Xs1D3Eioh1nHiX+T/9ommfmKed63nu3ZMGmPvrY/o1vjC/qbjFmFN6iWNAzT9K0WfyPZPMP5NhHhVZVEAd7r4+AbUds/FNyPbzjYAuMd5b1P+68G3W2Drtfsxv9+9uTlca7/wax5KWnTXzs7euMI6/76oHMv1d+C1OHGsda3qt408ha0sn1D4yhi3Mq00y576xVvq8zRh3NS/a6rTT06f8MwOa9fgRULUIaEx5C+iy3JMKpV4dGb+vpk/yo58O7fa8a5xmru6KvMV2AZ2Rf50K/WR0RQXU6e7rEVDbMX+hf1YjLc7aWVpcbn716OnUVauHSwHzjd/3m+YsbP6CvtAIaMusxduvd/wp1BFQ6+x36UP5zWP4m662GeMzBVtnBjT78SOgShHQmPL4IdK/Wufsf63eMpY+lrUDar/POSHn8dZflVh/aGZRPyODNgGtGZy5Tnvzd379g+XiAupw9/X5EMl2zLfmlch8J3PtsXmLK61TfGpPZBe09evGMiOgpw7KLN7iO+efQh0Bfcq8cvqbpuYZ+Q60G4mWtXnNsw6kz378CKhSBDSmvH4K/0nWXz5vdHT6wKQjanfA1OucPplrdKk9FdrasY3MZTsuKvyTHpaFe1q32/3T541/WywrOqD2d1+vT+Ftx3yDZDsw/cnRzP5ZSxsf8mlmhXMHZJYea35ebp2R/qfdreUHfF/HT6GOgJonGsgch3qNcfGfbEeizbBOUSftZmX9TaTsx4+AKkVAY8r7YUwfXn3wlm3Lm3YaeE7ttxdrHhy8WUWb7R4y56qfPnPbThXttz7hgdValvfO3rpF6wF/Wqcd5xRQreavI3o13ezIJ2q0X82/avF98QG1vft6HsZkN+bX050T2fyWrL93N++K4Vt2qGjeZbsTb8v5g0I1T5/Wt32zvodM+jK9xPqbSOvu3rNzkx5Hz6rzp1BHQDXjb4IMT8+Zp9yr/XtRuSNZ9/dRWzVv2//i77P/qFz240dAlSKgcGW85Jqueivq7/VLDmknjYdf9azPPxdqBRTIIKCw89e7Usx3/rTlxucmz9d9g5jI/ZMeRSKgyEdAYcf4CxxdzTcK9RMGSas1LreIBwKKQBFQ2LnAeGNuhxeW/zLb/LsSl7rfJg4IKAJFQGFn6ZaSY5dVqrcoGOduvZP/GxNQ5COgsPXD7tn9PHSF+y1KHwFFPgIKe9Uz0n+VuPHQZ1RvTMNAQJGPgMJR1X+eue3W+95Y6X7NZHjwxpQXVW8FGhICCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAYWTVUvDsFb1sIDgRBLQqpfuf2D2r1HcE4LzRXMJw2brVQ8MCExoAZ0z50NrasXZlfqOUzFqcVj3hTC8KOWtg1cmS1UPDAhMaAEV2dGceLVr+rVHu3vCujOE4EUZ+GHwWhNQlJDQA7pkY5FGe5x26bG9Ugm9P6x7Q/AIKOAm9ICOEhm4QJ+ovqOFtPlfWHeHwBFQwE3YAf1BpNsya9GdIteEdXcIHAEF3IQd0IdEMu981vSW3cK6OwSOgAJuwg7oTSIfZ5aNko3CujsEjoACbsIO6DSRNZllF0llWHeHwBFQwE3YAX1F5LvMshNk07DuDoEjoICbsANa1UluSy9atYnsH9bdIXAEFHATYkBbHjHp7tcXT5EOC61F40SmhnV3CBwBBdyEGFBTM5EtV+sL5h4q0oUvxMcHAQXchBbQ8cP7NElHdElq/s3Uv+VPhXVvCB4BBdyEeTam6m9fmjZxxDbNjYC+IdJpZoh3hqARUMBNBKezq/l+Q+q/84dMWVHn1f5zfYFLD+cETuoQUMBNwzmh8sF2J488QfVWJRgBBdw0nID++6IL8+0k16reqgQjoICbiAK6/pv/riz+VuPlT8FvCjwioICbMAO65t0Z1z2qd/PzoxuLlO/1drErIKAqEVDATYgBfWlT/V3Mji9oX3Ux39Asv3JDcWsgoCoRUMBNeAG9u8zMZtOPDxNpNmBgKyn6i0gEVCUCCrgJLaBL24vsfNnNI1vJTmVy5ipNq7mzlbRbUtQ6CKhKBBRwE1pALxWZVJP6d3ZjkX3MRQ+LXFLUOgioSgQUcBNaQIfIVuYfAD9R5Blr2bayS1HrIKAqEVDATWgB7SFjzInpIl9Yy06SjkWtg4CqREABN6EFtJlcaU7MEkkfAnqRVBS1DgKqEgEF3IQW0H5yqjnxRtu26T/qcZx0KWodBFQlAgq4CS2gR8jGq/MWbeglOxe1DgKqEgEF3IQW0JtFTl6fu2iKyFVFrYOAqkRAATehBXRdP5G+V92bOfCz+pNTy6Tpl0Wtg4CqREABN+F9E2lOO/17SG9Ycwta6HO3FrcKAqoSAQXchPhd+J9Hl9UGdE4qn83vLnINBFQlAgq4CfV0dsvfnpH+i5xzNz/ghp+LvT0BVYmAAm4azgmVbRBQlQgo4IaAwgEBBdwQUDggoIAbAgoHBBRwQ0DhgIACbggoHBBQwA0BhQMCCrghoHBAQAE3BBQOCCjghoDCAQEF3BBQOCCggBsCCgcEFHBDQOGAgAJuCCgcEFDADQGFAwIKuCGgcEBAATcEFA4IKOCGgMIBAQXcEFA4IKCAGwIKBwQUcENA4YCAAm4IKBwQUMANAYUDAgq4IaBwQEABNwQUDggo4IaAwgEBBdwQUDggoIAbAgoHBBRwQ0DhgIACbggoHBBQwA0BhQMCCrghoHBAQAE3BBQOCCjghoDCAQEF3BBQOCCggBsCCgcEFHBDQOGAgAJuCCgcEFDADQGFAwIKuCGgcEBAATcEFA4IKOCGgMIBAQXcEFA4IKCAGwIKBwQUcBN6QKu++2TeB1//6uu2BFQlAgq4CTWgi28f1r1MDF2H3Lqw6NsTUJUIKOAmxIAuO69cslWc/kuRayCgKhFQwE14Af2qh17NZr0HDx0xbO8+LfSZHp8WtwoCqhIBBdyEFtC1/US6XPHeBmu25qMbtxLps6qodRBQlQgo4Ca0gN4ucvDynCVrzxa5pah1EFCVCCjgJrSADpIu+S83a3aVXYtaBwFViYACbkILaAc5o2DZLdKxqHUQUJUIKOAmtIA2k4kFy+6VZkWtg4CqREABN6EFtLcMLlg2VnoVtQ4CqhIBBdyEFtDxIo/kLZrX3ObX+rrXQUDVIaCAm9AC+mUzKZ+4KGvBsj+2kIr3i1oHAVWJgAJuwjuQfnqZSPlu46f+49mXn3/izxfu01REbipuFQRUJQIKuAnxq5wPdpBcre4pcg0EVCUCCrgJ82QiS6/um5XPrS9bUuwKCKhKBBRwE/Lp7L6dNXnS2NFnXTD56W/crvrp9QUGyfXhbh7qQEABNw3nhMoHi42RqrcqwQgo4KbhBHT+hQV2kmtUb1WCEVDATUQBXf/Nf1cWfyveA1WJgAJuwgzomndnXPeo3s3Pj24sUr7X28WugICqREABNyEG9KVN9XcxO76gfdXFfEOz/MoN7rfKRkBVIqCAm/ACerf115CafnyYSLMBA1ulpqcWtwoCqhIBBdyEFtCl7UV2vuzmka1kpzI5c5Wm1dzZStoVdygoAVWJgAJuQgvopSKTalL/zm4sso+56GGRS4paBwFViYACbkIL6BDZar0xcaLIM9aybWWXotZBQFUioICb0ALaQ8aYE9NFvrCWncQZ6WOEgAJuQjwj/ZXmxCyR9CGgF0lFUesgoCoRUMBNaAHtJ6eaE2+0bbvGWnacdClqHQRUJQIKuAktoEfIxqvzFm3oJTsXtQ4CqhIBBdyEFtCbRU5en7toishVRa2DgKpEQAE3oQV0XT+Rvlfdmznws/qTU8uk6ZdFrYOAqkRAATfhfRNpTjv9e0hvWHMLWuhztxa3CgKqEgEF3IT4XfifR5fVBnROKp/N7y5yDQRUJQIKuAn1dHbL356x0Jqcu/kBN/xc7O0JqEoEFHDTcE6obIOAqkRAATcEFA4IKOCGgMIBAQXcEFA4IKCAGwIKBwQUcENA4YCAAm4IKBwQUMANAYUDAgq4IaBwQEABNwQUDggo4IaAwgEBBdwQUDggoIAbAgoHBBRwQ0DhgIACbggoHBBQwA0BhQMCCrghoHBAQAE3BBQOCCjghoDCAQEF3BBQOCCggBsCCgcEFHBDQOGAgAJuCCgcEFDADQGFAwIKuCGgcEBAATcEFA4IKOCGgMIBAQXcEFA4IKCAGwIKBwQUcENA4YCAAm4IKBwQUMANAYUDAgq4IaBwQEABNwQUDggo4IaAwgEBBdwQUDggoIAbAgoHBBRwQ0DhgIACbggoHBBQwA0BhQMCCrghoHBAQAE3BBQOCCjghoDCAQEF3BBQOCCggJtIAlr10v0PzP61+NsRUJUIKOAmtIDOmfOhNbXi7EpJqRi1uNh1EFCVCCjgJrSAiuxoTrzaVSzt7ilyHQRUJQIKuAk9oEs2Fmm0x2mXHtsrldD7i1sHAVWJgAJuQg/oKJGBC/SJ6jtaSJv/FbUOAqoSAQXchB3QH0S6LbMW3SlyTVHrIKAqEVDATdgBfUgk885nTW/Zrah1EFCVCCjgJuyA3iTycWbZKNmoqHUQUJUIKOAm7IBOE1mTWXaRVBa1DgKqEgEF3IQd0FdEvsssO0E2LWodBFQlAgq4CTugVZ3ktvSiVZvI/kWtg4CqREABNyEGtOURk+5+ffEU6bDQWjROZGpR6yCgKhFQwE2IATU1E9lytb5g7qEiXYr7QjwBVYmAAm5CC+j44X2apCO6JDX/Zurf8qeKXAcBVYiAAm7CPBtT9bcvTZs4YpvmRkDfEOk0s8gVEFCVCCjgJoLT2dV8vyH13/lDpqyo82pf3Hh9vkHyx/A3Dw4IKOCm4ZxQebjYGKl6qxKMgAJuGk5A376wwE7yB9VblWAEFHATakDXvzPzrSVZ818sWFDU7XkPVCUCCrgJMaA1U9unfgkvO+L9zJLBUtzdEVCVCCjgJryA/nKA9T5mk8fSiwhonBBQwE14AT0+9epzpzHHdxNp9Li1iIDGCQEF3IQW0NdFuryQ+nfttWXS4UdzGQGNEwIKuAktoCeKzDanbhUZYU4R0DghoICb0AK6i+yZnhwq8ooxQUDjhIACbkILaFsZl578sokMqNEnCGicEFDATWgBbSWTMtOXWH8YiYDGCQEF3IQW0K1k38x0VTfpsFgjoPFCQAE3IX6IVPbPzMxjIkPWE9B4IaCAm9AC+rxIZeYIeu1IkeNWE9BYIaCAm/AOpB8hItuefZM5s7y/SM/J2xDQGCGggJvwArpsX/17nE2tuaWDzO91FrUKAqpSOAGtlO13CN7un6v+aSGZQjyZyPrp/WsDqq2a2I6Axko4AS2zO+1r/U1X/dNCMoV7PtDPnryvdmbljDMP7FnUzQmoSmEF9O5HArevTFP900IyNZwTKtsgoCqFFdA3g1/pkQQUahBQOCCggBsCCgcEFHBDQOGAgAJuCCgcEFDADQGFAwIKuCGgcEBAATcEFA4IKOCGgMIBAQXcEFA4IKCAGwIKBwQUcENA4YCAAm4IaClY/9784N1BQAEXBLQUXBHOOeIIKFA3AloKxsgmfQO3MQEFXBDQUjBGrgi+SuMJKOCCgJYCAkpAoYRNQL+PfiscEFCPCCgBhRI2AW207z2/Rr8hdgioRwSUgEIJm4CKSEVbad8AACAASURBVPNRz26IflsKEFCPCCgBhRI2Ad3d+MOJG49/N/qtyUNAPSKgBBRK2H2I9PV12xiHAfa97rvItycHAfWIgBJQKOHwKfyHF3XXE1q294wV0W5PDgLqEQEloFDC8TCmmjfHdtIb2uyYZ9ZHuUHZCKhHBJSAQom6jgNd/9xvW+kN7XTuvMi2JwcB9YiAElAoUfeB9PPOKze/Fd3vweqINigbAfWIgBJQKOEc0OrXx21mxHMz4+3QI9ZFuFUWAuoRASWgUMIhoOtnn9nZrOfv3q6peWlUhchN0W6YjoB6REAJKJSwC+jaWaM7mPU8f4616D9NpU+Um2UioB4RUAIKJWwCelxro56bZ+qpO1BaRrZNGQTUIwJKQKGE/Vc5ZfMJc3MXHiy7R7NB2QioRwSUgEIJu4B2z69nylvPfRjB1uQhoB4RUAIKJWwC+k70W+GAgHpEQAkolHA6jMk47HPlzxFuiQ0C6hEBJaBQwjagq/64w7b6vwvK+v9e2fc4NQLqGQEloFDCLqDf9xbZWp9YICI7fxvxFmUhoB4RUAIKJWwCWr2DSMXx+tRPx7YW2TvqTapFQD0ioAQUStgE9D6RPRZZ0z/vL/JIpBuUjYB6REAJKJSwCehQabskM7N8Izk6ws3JRUA9IqAEFErYBHQT+W3W3CmyTWQbk4+AekRACSiUsAlopVyWNXelNItsY/IRUI8IKAGFEjYB3Tjnl/aR0imyjclHQD0ioAQUStgEdF/pUpWZWdVN9opua/IQUI8IKAGFEjYBvVNkRE165jiRKVFuTw4C6hEBJaBQwiag63qLbP/I6tTU+ud3Fem2sl53UPXdJ/M++PpXX7cloB4RUAIKJey+ifTJRvpfNO68Q/fGqX9bFJ6ZybPFtw/rXmb+UaWuQ25dWPTtCahHBJSAQgnb78IvGtNYLId+7nvVy9J/kc5ScfovRa6BgHpEQAkolHA4G9PHY7dvV9ai5wmv+F/zVz2MPyvfe/DQEcP27tNCn+nxaXGrIKAeEVACCiXq/rPG9bC2n0iXK97bYM3WfHTjViJ9VhW1DgLqEQEloFAitIDeLnLw8pwla88WuaWodRBQjwgoAYUSoQV0kHTJf7lZs6vsWtQ6CKhHBJSAQgnbgP5w//ljs/hacQc5o2DZLdKxqHUQUI8IKAGFEnYBfbxNzqfn/l6kNpOJBcvuLfJ79QTUIwJKQKGETR2/qpQAAtpbBhcsGyu9iloHAfWIgBJQKGFTx9EiA2YtXFLL14rHF56JeV5zm1/r614HAfWEgBJQKGET0G1k0/p9e9PwZTMpn7goa8GyP7aQiveLWgcB9YiAElAoYRPQZnJ5EGueXiZSvtv4qf949uXnn/jzhfs0FZGbilsFAfWIgBJQKFEY0JUidwWy6gc75L2X2uqeItdAQD0ioAQUShQGtKqRTAhm3Uuv7puVz60vK/rNVALqEQEloFDC5lf4QdJvXVCr/3bW5EljR591weSnv3G76tfTCuwnNwS1IaWNgBJQKGET0Hcq5eyawsVhGy42jo1+O+KIgBJQKGF3kOes9rLzrJ+i3pLXxxTYRq6OeiviiYASUChhE9CDD95Of/HXsmOa75Wvf2fmW9lvfH6xYEFRt+c9UI8IKAGFEjYBLfg92ueqa6a2189sf0TtsZ+Di1wXAfWIgBJQKGH3IVI+f2v+5QCrv00eSy8ioCEhoAQUSoR2Ojvt+NSrz53GHN9NpNHj1iICGhICSkChRGgBfV2kywupf9deWyYdfjSXEdCQEFACCiVCC+iJIrPNqVtFRphTBDQkBJSAQgmnov3y/AN3L9HqcTjoLrJnenKoyCvGBAENCQEloFDCvmjPDND/nPsCbcLI2X5X3FbGpSe/bCIDjBQT0JAQUAIKJeyKVnOa+fH5Am2syMU+X4W2kkmZ6UtEjPOIENCQEFACCiXsinaZSNme5+kBvSn1QvQCfyveSvbNTFd1kw6LNQIaGgJKQKGE3Z/0aCxdX9aPp1+gafO6SKXraUBsnShl/8zMPCYyZD0BDQ0BJaBQwqZo40Ve0qyAagvK5FxfK35epDJzBL12pMhxqwloWAgoAYUSNkXbSfYwLjECqg2t/TS9OCNEZNuzrXPQL+8v0nPyNgQ0HASUgEIJm6K1N19zWgG9SDr7W/OyffUPoppac0sH+fhePQH1iIASUChhU7Tm5l90twJ6eZF/y73W+un9awOqrZrYjoCGhYASUChhU7SecpBxiRnQw2QL/2v/7Mn7amdWzjjzwJ5F3ZyAekRACSiUsAnoqVL5sZYO6AdN5ISotymDgHpEQAkolLAJ6JsiO/xgBXRhN5Hnot8qCwH1iIASUChh96bkCSLtr3xN5Pl3ruskMjTybcogoB4RUAIKJewCuib777sNXB75NmUQUI8IKAGFEvYfiz/Z08pnlxnVEW9QNgLqEQEloFDC4biitU9OOGbIUeMerYp2a/IQUI8IKAGFEuH9SY8AEFCPCCgBhRIEtBQQUAIKJQhoKSCgBBRK2AT0tnzRb5WFgHpEQAkolLAJqOSLfqssBNQjAkpAoYRrQMvKy6PfKgsB9YiAElAoYRPQN9Jeu+e8FtL88eg3Ko2AepT0gB4hF88PwVrVjysaPJffz38YJI1mRbMlNgioR0kPaN+Ct50CcbLqxxUNntsbnD90lE2UfRmJgHqU9ID2kE36Bm5z2V/144oGz/UTotNFPoxiQ+wQUI8IaAjjn05A4co1oNNEPo5iQ+wQUI8IKAGFEq4BvVkaK3svnYB6REAJKJRwDeiBsmUU22GLgHpEQAkolHAJaPW1Ks+oTEA9IqAEFErYBHS/Wnt0FBEOY2rwCCgBhRLuX+UcFf1GpRFQjwgoAYUSNgHtmGWTA++MfpsyCKhHBJSAQglOZ1cKCCgBhRIEtBQQUAIKJQhoKSCgBBRKENBSQEAJKJSwCWh/e+Oj3zgC6hEBJaBQwssZ6U1XRr9xBNQjAkpAoYRNQCdd0EIPZtMtW+r/bJx+BfpC9BtHQD0ioAQUSti9BzpVpOuUH2o07cc7uslGcyLfpgwC6hEBJaBQwiagnzWTgaus6dW7SqefIt2gbATUIwJKQKGETUDPkdaLMzM/tpaLItycXATUIwJKQKGETUB7y0FZc0OlX2Qbk4+AekRACSiUsAloc/ld1txEaRXZxuQjoB4RUAIKJWwC2jbnFejB0jKyjclHQD0ioAQUStgEdIC0XZaZWd5e+kS4ObkIqEcElIBCCZuAXiUyNP2XjGuGi4yLdIOyEVCPCCgBhRI2Af1fR5HdXjMmX99DpPLziDepFgH1iIASUChhdyD9801EpOvg4/bupn8V6ZbItymDgHpEQAkolLA9G9Oc3TPfgO92X9RblIWAekRACSiUcDid3VP76V+E77T7H1dHuzm5CKhHBJSAQgnH84Fu+OmzFVFuiB0C6hEBJaBQghMqlwICSkChhFNAf3n+gbuXaDXB3EnVS/c/MPvX4m9HQD0ioAQUStgH9JkBZSKyQJswcrbfFc+Z86E1teLsSv3jqIpRi+u8gQ0C6hEBJaBQwi6gNaeZn8Av0MaKXOzzVajIjubEq13Tn+i3u6fIdRBQjwgoAYUSdgG9TKRsz/P0gN6UeiF6gc8VWwFdsrFIoz1Ou/TYXqmE3l/cOgioRwSUgEIJm4B+1Vi6vqwXcIGmzesild/4W7EV0FEiAxfoE9V3tJA2/ytqHQTUIwJKQKGETUDHi7ykWQHVFpTJuf5WbAb0B5Fu6VOT3ClyTVHrIKAeEVACCiVsArqT7GFcYgRUGyp7+luxGdCHRDLvfNb0lt2KWgcB9YiAElAoYRPQ9uZrTiugF0lnfys2A3qTyMeZZaNko6LWQUA9IqAEFErYnpF+onGJGdDLpZm/FZsBnSayJrPsIqksah0E1CMCSkChhE1Ae5pnpLcCephs4W/FZkBfEfkus+wE2bSodRBQjwgoAYUSNgE9VSr137rNgH7QRE7wt2IzoFWd5Lb0olWbFPmUJKAeEVACCiVsAvqmyA4/WAFd2E3kOX8rlpZHTLr79cVTpMNCa9E4kalFrYOAekRACSiUsDuQ/gSR9le+JvL8O9d1Ehnqc8WWZiJbGufEm3uoSJfivhBPQD0ioAQUStgFdM1wqTVwub8Vjx/ep0l6HUs043WtlD9V5DoIqDcElIBCCfuTiTzZ00pflxnVtlfwpPrbl6ZNHLFNcyOgb4h0mlnkCgioRwSUgEIJh9PZrX1ywjFDjhr3aFUAd1Hz/YbUf+cPmVL3CZq/mz4t334yOYD7TwACSkChRGFAf5k9e5GCDdEOERvHqtiS+CGgBBRKFAa0qkxuVLAh2itjCmwjV6nYkvghoAQUStj8Cr+ZnBP9dtjiPVCPCCgBhRI2Ab1Eeir9W5y1CKhHBJSAQgmbgK7cy/wyvHoE1CMCSkChhN2n8FUnya7/XBTQH5SrDwLqEQEloFDCJqAjR47sIiJNunazRL9VFgLqEQEloFDCJqAFxxL5WW/1YntFrYSAekRACSiUsKnjjvn8rPcbu6M6i40xAfWIgBJQKOHr5aUHi9oS0OgQUAIKJXKKduml/whsxeue6pPq5RZD8hS1DgLqEQEloFAiJ6AiJwW46qpBIpPqtQYC6hEBJaBQwiGg5eWj67/ulwhoRAgoAYUSDgEN5rVoZwIaDQJKQKFEqAEdSkCjQUAJKJQINaC3DJ5er9sTUI8IKAGFEqEGtL4IqEcElIBCCQJaCggoAYUSBLQUEFACCiUIaCkgoAQUShDQUkBACSiUIKClgIASUChBQEsBASWgUCIvoG22NtVOpajaNgLqFQEloFAiL6D1PwVdkAioRwSUgEIJAloKCCgBhRI5dfzGnqptI6BeEVACCiXUvbz0gIB6REAJKJQgoKWAgBJQKEFASwEBJaBQgoBG7P/mh+BwAhr8Sgko3BHQiG3vcKhDPRHQwBFQuCOgEWsnW/cNXBMCGvxKCSjcEdCItYtNQAgoAYUbAhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYU7AhoxAhqX8RNQuCOgESOgcRk/AYW70ANa9d0n8z74+ldftyWgHhFQAgolQg3o4tuHdS8TQ9chty4s+vYE1CMCSkChRIgBXXZeuWSrOP2XItdAQD0ioAQUSoQX0K966NVs1nvw0BHD9u7TQp/p8WlxqyCgHhFQAgolQgvo2n4iXa54b4M1W/PRjVuJ9FlV1DoIqEcElIBCidACervIwctzlqw9W+SWotZBQD0ioAQUSoQW0EHSJf/lZs2usmtR6yCgHhFQAgolQgtoBzmjYNkt0rGodRBQjwgoAYUSoQW0mUwsWHavNCtqHQTUIwJKQKFEaAHtLYMLlo2VXkWtg4B6REAJKJQILaDjRR7JWzSvuc2v9XWvg4B6QkAJKJQILaBfNpPyiYuyFiz7YwupeL+odRBQjwgoAYUS4R1IP71MpHy38VP/8ezLzz/x5wv3aSoiNxW3CgLqEQEloFAixK9yPthBcrW6p8g1EFCPCCgBhRJhnkxk6dV9s/K59WVLil0BAfWIgBJQKBHy6ey+nTV50tjRZ10w+elv3K666NECw+TGcDdPAQIal/FPl20Ln5L1N0/1MxBBajgnVD5UbIxSvVWBI6BxGf/Fdk/I+qss7nwQaNgaTkBfGHlUvq3kStVbFTgCGp/xdzggeBWyVPVTEAFqOAG1wXugHhHQ2Iy/NQEtKQQ0YgQ02eMnoKWFgEaMgCZ7/AS0tBDQiBHQZI+fgJYWAhoxAprs8RPQ0hJWQKsX2ytqJQTUoxgFhIAS0FISVkC/cTgKrqiVEFCPYhQQAkpAS0lYAV3UloDaIqDJHj8BLS2hvQe67qk+qV5uMSRPUesgoB7FKCAElICWkhA/RKoaJDKpXmsgoB7FKCAElICWkjA/hX+JgBYioMkePwEtLaEextSZgBYgoMkePwEtLaEGdCgBLUBAkz1+AlpaQg3oLYOn1+v2BNSjGAUk6QFtInvtF7zh36p+XicV30SKGAFN+vhD8RfVz+ukIqARI6BJH/8tfwncnjJN9fM6qQhoxAgo4w/ckQRUFQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoBEjoIw/cARUGQIaMQLK+ANHQJUhoI7W33BhCJoSkOBXmvTxE1BlCKij1yQcBCRwSR8/AVWGgDp6UTYbHzwCyvgDR0CVIaCOXozPDpT0gCR9/ARUGQLqiIAy/uAR0NJCQB0RUMYfPAJaWgioIwLK+INHQEsLAXVEQBl/8AhoaSGgjggo4w8eAS0tBNQRAWX8wSOgpYWAOiKgjD94BLS0EFBHBJTxB4+AlhYC6oiAMv7gEdDSQkAdEVDGHzwCWloIqCMCyviDR0BLCwF1REAZf/AIaGkhoI4IKOMPHgEtLQTUEQFl/MEjoKWFgDoioIw/eAS0tBBQRwSU8QePgJYWAuqIgDL+4BHQ0kJAHRFQxh88AlpaCKgjAsr4g0dASwsBdURAGX/wCGhpIaCOCCjjDx4BLS2RBLTqpfsfmP1r8bcjoB4lPSBJHz8BVSa0gM6Z86E1teLsSkmpGLW42HUQUI+SHpCkj5+AKhNaQEV2NCde7SqWdvcUuQ4C6lHSA5L08RNQZUIP6JKNRRrtcdqlx/ZKJfT+4tZBQD1KekCSPn4CqkzoAR0lMnCBPlF9Rwtp87+i1kFAPUp6QJI+fgKqTNgB/UGk2zJr0Z0i1xS1DgLqUdIDkvTxE1Blwg7oQyKZdz5restuzjf46dECw+TGsDbPAwLK+INHQEtL2AG9SeTjzLJRspHzDQ4TG6PC2jwPCCjjDx4BLS1hB3SayJrMsouk0vkG/zyqwFZyRVib5wEBZfzBI6ClJeyAviLyXWbZCbJpUevgPVCPkh6QpI+fgCoTdkCrOslt6UWrNpH9i1oHAfUo6QFJ+vgJqDIhBrTlEZPufn3xFOmw0Fo0TmRqUesgoB4lPSBJHz8BVSbEgJqaiWy5Wl8w91CRLsV9IZ6AepT0gCR9/ARUmdACOn54nybpiC5Jzb+Z+rf8qSLXQUC9SXpAkj5+AqpMmGdjqv72pWkTR2zT3AjoGyKdZha5AgLqUdIDkvTxE1BlIjidXc33G1L/nT9kyopib0lAPUp6QJI+fgKqDCdUdkRAGX/wCGhpIaCOCCjjDx4BLS0E1BEBZfzBI6ClhYA6IqCMP3gEtLQQUEcElPEHj4CWFgLqiIAy/uAR0NJSGgF968D9gjcgPjtQ0gOS9PETUGVKI6Bn2J1LtP5iswMlPSBJHz8BVaY0AjpGTvhL4I6Izw6U9IAkffwEVJlSCWiyd6CkByTp4yegyhBQRzHagZIekKSPn4AqQ0AdxWgHSnpAkj5+AqoMAXUUox0o6QFJ+vgJqDIE1FGMdqCkByTp4yegyhBQRzHagZIekKSPn4AqQ0AdxWgHSnpAkj5+AqoMAXUUox0o6QFJ+vgJqDIE1FGMdqCkByTp4yegyhBQRzHagZIekKSPn4AqQ0AdxWgHSnpAkj5+AqoMAXUUox0o6QFJ+vgJqDIE1FGMdqCkByTp4z9SrvkyeF9Vh7t7lwQC6ihGO1DSA5L08W8bzukczwp39y4JBNRRjHagpAeE8bfrFriNZP9wd++SQEAdxWoHYvyBS/r4pxNQDwioo6TvQIw/2eMnoF4QUEdJ34EYf7LHT0C9IKCOkr4DMf5kj5+AekFAHSV9B2L8yR4/AfWCgDpK+g7E+JM9fgLqBQF1lPQdiPEne/wE1AsC6ijpOxDjT/b4CagXBNRR0ncgxp/s8RNQLwioo6TvQIw/2eMnoF4QUEdJ34EYf7LHT0C9IKCOkr4DMf5kj5+AekFAHSV9B2L8yR4/AfWCgDpK+g7E+JM9/jul+4XBu/jRcJsRNQLqKOk7EONP9vgnhnOS0bKqcKMRMQLqKOk7EONP+vg3Gx+8JrI03GhEjIDW8QRK+g7E+IOX9PG3JqDRIaAexWgHYvzJHj8BjRAB9ShGOxDjT/b4CWiECKhHMdqBGH+yx09AI0RAPYrRDsT4kz1+AhohAupRjHYgxp/s8RPQCBFQj2K0AzH+ZI+fgEaIgHoUox2I8Sd7/AQ0QgTUoxjtQIw/2eMnoBEioB7FaAdi/MkePwGNEAH1KEY7EONP9vgJaIQIqEcx2oEYf7LHT0AjREA9itEOxPiTPX4CGiEC6lGMdiDGn+zxV0jbdsHr+UG4JXJGQB2xAzH+4DH+UEwPt0TOCKgjdiDGHzzG/9ybgTtUpoVbImcE1BE7EOMPHuMPYfxHElBbBNSjpO9AjD/Z4yeg9gioR0nfgRh/ssdPQO0RUI+SvgMx/mSPn4DaI6AeJX0HYvzJHj8BtUdAPUr6DsT4kz3+Ug5o1XefzPvg61993ZaAepT0HYjxJ3v8pRrQxbcP624dONt1yK0Li749AfUo6TsQ40/2+EszoMvOK8/5skDF6b8UuQYC6lHSdyDGn+zxl2RAv+qhV7NZ78FDRwzbu08LfabHp8WtgoB6lPQdiPEne/ylGNC1/US6XPHeBmu25qMbtxLps6qodRBQj5K+AzH+ZI+/FAN6u8jBy3OWrD1b5Jai1kFAPUr6DsT4kz3+UgzoIOmS/3KzZlfZ1fkGSx57NN8wudHbnY2RI28K3MHSK/iV3lQmfwh+pZ0Yf/ArZfyxGf/AEgxoBzmjYNkt0tH5BofbnaXqBG93dkY458gCEAt3+cxUvYUW0GYysWDZvdLM+QZPHVXggB5zvN3Z/GMKb1xvh/fYI4S1Dugbwkr36z48+JUyfsYfvFDGf9Rvf/SZqXoLLaC9ZXDBsrHSK6y7A4DIhRbQ8SKP5C2a19zm13oAiKvQAvplMymfuChrwbI/tpCK98O6OwCIXHgH0k8vEynfbfzUfzz78vNP/PnCfZqKyE2h3RsARC7Er3I+2CHvk7JW94R3ZwAQuTBPJrL06r5Z+dz6siUh3hcARC7k09l9O2vypLGjz7pg8tPfhHtHABC5Bn1CZQBoyAgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCpNAJ6dbNNe5Sc7s02Ur0JIWjTUvUWhKBz01J8/jU/UfV+HQOlEdCdI/wDqkBCdFW9X8dAaQR0jFzzZcm5T3ZXvQkhaCPvqd6E4I0szeffvqr36xgolYBOU70JwXtR9lO9CSFoJ0tVb0LweP4lFgFtsErzCUxA46I0n39BI6ANVmk+gQloXJTm8y9oBLTBKs0nMAGNi9J8/gWNgDZYpfkEJqBxUZrPv6AR0AarNJ/ABDQuSvP5FzQC2mCV5hOYgMZFaT7/gkZAG6zSfAIT0Lgozedf0Ahog1WaT2ACGhel+fwLGgFtsErzCUxA46I0n39BI6ANVmk+gQloXJTm8y9oBLTBKs0nMAGNi9J8/gWNgDZYpfkEJqBxUZrPv6AR0AarNJ/ABDQuSvP5FzQC2mCV5hOYgMZFaT7/gkZAG6zSfAIT0Lgozedf0Ahog1WaT2ACGhel+fwLWmkEdII8rHoTgveOHKF6E0LQvckq1ZsQPJ5/iVUaAf31mQ2qNyEELy5WvQUh+GS+6i0IAc+/xCqNgAKAAgQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKAT/EM6Isn927dbuCJr9tc9OXvtm7ecY/b10a+TfXmOKjxUmuOgg2rj3VTjurffMuhly2zuSy2D5XzoOL8UBneq5TZhUtj+0iFL44BXXZ4+jl6wpL8y6Y3My/p95WKLauHOgY1PL575dz+1nZ3mFFwWWwfqjoGFeOHyrCqj9gENLaPVARiGND1+4mU7XPheXukHtIDa3Ive7BMZM8Jp3cW6WH3mqfhqmtQfaTljmkfqtk8n35pJ7LxKVec2is1uJfzLovtQ1XXoOL7UJnOEpuAxvaRikIMAzpdpHKWPvFi6iGdmnPR0o7S+OHUv6uGiZynYtt8q2NQ1U3kCCXbVH+niJy0OvXv+gtFNluTc1F8H6o6BhXjh8owS2wCGt9HKgoxDGjqF6jHzKnny6T9huyLrhaZYEws7yzliyPfsnqoY1DfikxSsUn1t6JM+qw3pqp3Enk357LYPlR1DSq+D5Xh542lcWFAY/tIRSJ+Af1MZNv0dOoZ/E72Zf2kfJE5dYXIHdFuV73UNaiXRO6OfouCMEfkSmvyMpHcNwxj+1DVzVcELwAAEBNJREFUNaj4PlSGg6Xr6MKAxvaRikT8AvqkyNnp6TEiM7MuSr0A2M2afE9kWLTbVS91DEqbJmJ3uEEMzBC515q8WeS67Ivi+1DVMagYP1S6O6TshQkFAY3vIxWJ+AX0vqZNb0pPnyDyVtZFs0TGW5Mbmkn3aLerXuoYlDZRZHHVq9P/9PCi6Lerfha+8Ub6iIKRIo9mXxTfh6qOQcX4oUr5tLmcqxUGNL6PVCTiF9As67pJWfYxP5OzPn/pLWUrFWxS/eUPShshzW7ppL+7X3b8/1RtVH3NbiUdcx6OUnioCgYV64dq3QDZepVNQEvhkQpRrAN6reR+6Dkp80mMpg0WWRj9FgUgf1DaNrWHFm78qqKNqo83/vmXk8qlyfM5C+P+UNkOKtYP1YVSMV+zCWjcH6mQxTmgt5VJk/ezF4wVeTY9PVTkk+g3qf4KBlXTXKTD1O9WfzSjq0jXX1Vtl39t9Z7s9FHuwrg/VLaDivND9Woj+YNmF9C4P1Ihi29Av0w9mo3+nrNotEjmyOYRIvMi36Z6sxnU9yI9vjOmlg3M+qgpPozWNBqR+y2WuD9UtoOK8UO1bDMZqB88VxjQuD9SIYtrQKsubSLS/h+5C88SyfxONUzkg6g3qr5sB7VhyZLV1uS/G0llVeRbVV9rVn7+1N4iXT7PXhj3h8p2UDF+qI6VFv/V/y0MaNwfqZDFNKCPb5p6AXDYj3lLLxB5Ij2denZ/He021Zv9oLLtIfJSZJsTqDNFjsmej/lDZcofVLZ4PVT3i0w3JgoDWhKPVHhiGdAVR6dKMyD/e8jGB4Z/Tk/3EVkR6UbVl9Ogsp0mcn9EmxOwVU2l8fqs+Vg/VGn5g8oWq4dqRev0AZ62n8LH/5EKTxwDumyb1C+699QUXvCUyIXWZE0L2STSjaovx0Flu1TkgWg2JxBz5yzITA8Q+Sbrovg+VHUMKlusHqrvJddJWZfF95GKRAwDujr129GBtr/ofi2yjzX5Ueo6EW5TvTkPav4bb2amj7U72VjDtbm0qE5PDxT5b9ZF8X2o6hhUbB+qugIa30cqEjEM6ESRUQ6/OG0tTa0Tbt0kckt0m1R/zoMaIjLXmqzuJRVxOjjmAJFPrcmaVtI45xjs2D5UdQwqtg/ViklpO4uMnDQp5ziQ2D5SkYhfQFe2ky1XOVx2mcgNxsS6raT8u+i2qd7qGNQUkUOtyTtSlY1skwJwg8hp1uQ0kb1yLovtQ1XHoGL8UKUVvgca30cqEvEL6AyRyXmLls6cOdM4fmRJK2k5P/VvzTkiY6LfNP/qGNSKTiLj9Yma6S2lXaxOJ/Zzcym7xTg136Op12pv6xPxf6jqGFSMH6q02oDG/5GKRPwCeqbINoNrfaEZZxiT740LUyFqfs69t+4mssUvajezOHUN6olyka4nXnz81qkFf1W7mcW6O7XJWx1/8ejtJX0OuPg/VHUNKsYPlaU2oCXwSEUhfgE9MPf9bv0j0drHWptcbi7eOl5fOatzUE92tha3vk/tVhbvlibWprc1X7SVwENV56Bi/FCZ7AIa30cqAvELaK86A6otGLNl0w673Byzk8bUPahfp+7XtbLDwN8X/Am9hu+LK3bs3HTrwy5Pv3SJ/0Ol1TmoGD9UBtuAxveRCl/8AgoADQQBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgrFqk+aoHoTAJ8IKBTbIN1VbwLgEwFF4LrJjq5L0l67ZKA03mPSa1mL/nXWgT2bdhlwwtNr67UV/aVn1tx/ROS/6ZnzRdpXp2cOEDnTbgv7S/+c+UHSrV7bg1JEQBE47wH9aYRYTlxqLZq/f3qRbPqa7Y08yg2o1lnkr7UXibxtTVe3Fvl7HQH96IwzzKsSUBQioAic54D+upnI9pdIx6u3E9mzxlj0YlORxoNHX3ji4CYije6vx1bkBXSUyCnW5A96nS+3ZhaIlP1SR0CfE7nHmCegKERAEbhH73nadYnhHJHJNfp7oOtPE/mLvmRF6oXikV8bF/44TqTlZ/63Ii+gd4n0tiZn6AHdyZq5Q2Q72y0koHBHQKHMhiZyiPUh0qrNZA990Z9F9l2fvvxckWP9rz0voF+novmTOXmMNN5Ryn42Z44TGe9wewIKNwQUIVu5xOmSz42Xnean8GOkrb7oGJEHMpevaCTNapxXvL6qjgsLAqr1EHnCmKjuILvdKGK9PdBdxPbVMQGFBwQUgetpvp+4o4zUVl66ednszBJNe3XkgDYddz7lE2Mm1aaH0wF978479Q/d9xV5oXZFe3XrVmVOvTWmV4sOO//uay19wwVLT2kjjTc56IFMRJffuH+Xyo7bH5W+fX5ATxU535iYK3LVRyLHGTOLRBqv0LK2cNFF27Zu1f+SxWZAx1mfZ31jBnTdlIEdWmw7+stAfkwoAQQUgasN6Mq9UvGpDWjVAVaPGl+tz841fnvOOQ50tMhJhStcc1L6duZHP6mAPru5tWj3X8zrPNsu/eH9PubhT/kB/ZvILsbE1SJztM2ko3Eg09+tpemAPtzKXEnH12wCuniAOVf5eCA/J8QfAUXgagN6kmx59uRF6SU1h4u0PuGyCXuKlOm/Nq9uJU3ezg3o/ak8Hf1J/goPEak4cMI5g1IXnqbPpwLaTaTnb0/fvpHI9hv0Rf9tItLjjCvPP6hc5GzjRvkBXZxayUp9YndpV62dLjJXn0kV8qKsbX42tcJ2B43fp7m020gP6A8Lbhe5esGCdXpAOw6Q/hPuujR1120XB/sTQ1wRUAQuE9AuMmF11pIPRAYs02eniwzT/70g1bRJn2YHtEaPpPSfOGtF1vqeEtnhI31idleRWZoRUGl0vb7k2bYiM/SJ1GvUccZLyvfbSFfjVvkB1Y/+fCX1z/LGcpSmzRS5Ul+4s8iLtVu4oY/IUH0Tv+mrb4am5bwHKnJWKqTayu1EHqn3DwklgYAicJmAyq45S+4Uudec36zllvo/qwYbvxE3v2pB5rarTm1k/rK+w/lPrTIXre0p7b83J18ukwGaGVDrOM43RDZbk/r3N9LS+uLS8SL/0/8tCOh5Ir9P/fOYyF2a9n8Vxq/uqyqkcmXtFk4T2c38itLSdjYBtd4mTQX9kvr8fFA6CCgCVxvQf+YsSQX0stxrrrmmjfmuYq+pa9LLfrhxv+bmwjZnGt180nqxqNvTOOo9FbU2y6wlQ80P19+d86G1IPXLufELdkFAU+s5MPXPaSLfpf7ZWxot0bRXRfbM2sLU69FXrWtfYhPQp8yLvhDh/CcwEFAErjagi3KWvN9IGo2ZW51z3aoHDzdruf3XtQvXvXXdEOPDnE56zibWVk1/y/J5I2pHpJc8KHJB1vrWP9vRKaCp391bbUi9+pW++twNIg9p2jXpOBtbuKbc+vVfM46xKgiodejo9wQUFgKKwGUC2qQmd8kfyvTXlQde8WZ2RDdI14cOSl2wzeqclax7YXRjkQ5LjGNDsz1gRC0TzTnpo+3XvHzL2GH9K/Wr2AdUf335b+0TkXH6zIciJ2jaMJF/1W7hQpHBmftvVBDQVtZFBBRpBBSBywS0a94Sbc5BTYwIdrqm9kxLxqfw/9os8/5orQ86iUzStCG5Ab3biNrN6SstEjko9c/aP5hvBjTedYBjQC8SmapNEXnWmNtUOtXUtJfma2u38Iv00aHm5U4H0hNQpBFQBC4T0G55S1Kqnpqwmx7RPTakLzMPY/qXyDGa9uR++83KWlHq1/P9NO2o1K/tC2otMaJ2Yfo674ocqWk1+pFOh1zz9Edr9N/yHQI6W7+Pg6SJ+eHUaSLzPhI5IGsL1zaWvTPX7kRA4YqAInB1BVRX9WBX44XkTcfrGbSOA20ng4zPtydlXfFD40QfqSK+k3sHzxnRND0scq6mPS2yzUJzgXNAVzWRTdY015use1zk6r+IXJ+9hd1rN3lZ4XugBBT5CCgC5xTQP1//J2s+9VrwdE07RTpqmYB21n8T/1SkZ9ZboX8xPix6ROS69JKbxk6oMaLWLn2g6OEif9O08bVfAT3JMaDa3iLTRCabMysqZNeTMm02t3A/kdet6z5EQOGOgCJwTgHdX+Qrc/4t45XmFSLfpwO6yPwC0V6pfzK/3C/rZ3xZvqqLdLJeXc4vk5GaeRzoVeaSuSIbrdDPRSLvmgt+6eoc0N+LbCrygTW3lzTeRNpsyN7C+0T2MD/4WrclAYU7AorAOQX0IpFhxqmZlu8p8ozxe/ekdEDPMr8RNKexyAArha/uLLKj3rcZIt2M6r2/ifHNeiOgjY1Xsy90ELlNM87qOda40dztU5cZJ/uwArp05syZ6Re1b+kfM3VJb9T1+twhOVtY3V9k+PLUxM97Z30T6U7jGgQUhQgoAucU0EWdRNocffHlo1qKDNHLOEjk0mo9oNU3i+xgHNv0gP5FpB7DTzhmcOq1onQz/oxR9S4iTQ67/JJhqcsu1hc8Z7yS7HPq2J1SS/rpX69c2E5knyn3XTm8THqLHP7P1ZmAzhHjda5hvX5w6YnpjXpfD+iU3G3WvwvfYfgFw9tKq2FmQF8T2e6+u1YQUNghoAic44dIL3VMH4s05Fd9fn6b1C/gJ0rbMVuJtP/IvOrs/rVHLA37zly2/EBrQeVE4xfsVEDvONNatIt5Xo+ZzczZtve+I2YybQKqH/apHz5vSf2yn/l9Pv0x10MtzfV0eGmSGdBlbWrPxmRdl4AijYAicM6fwlfdsP9WzTrvenL6U/Xv9k63crfMn8zcMOvs7btUdtr5qEvfr13lP4/r3qzToLFfm3PGr9Wzj+hSufGB96WPyV94xoBWbQZcuUTTbuhS0esX+4D+yfwDSJZTRDrmHeqvaT9ctG2b5ltN+F6zAqr9a/dWld0XEVDYIaBQqWbe1FHSdNQ184q6VeZ9SUAtAgrFcs4H6g0BRQNBQKEYAUV8EVAoRkARXwQUqlWtLPYWBBQNBAFF/BBQNBAEFPGz9NVXF7lfCwgdAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwCcCCgA+EVAA8ImAAoBPBBQAfCKgAOATAQUAnwgoAPhEQAHAJwIKAD4RUADwiYACgE8EFAB8IqAA4BMBBQCfCCgA+ERAAcAnAgoAPhFQAPCJgAKATwQUAHwioADgEwEFAJ8IKAD4REABwKf/B56XiXxVBrsTAAAAAElFTkSuQmCC" width="672" /></p>
-<p>The ‘$’ marker tells R to select from the iris data set just the data
-in the column labeled “Sepal Width.” If you’re working with data that
-looks like a spreadsheet, for instance a data set with columns and rows,
-you can call the columns with the same marker. In R, these columns are
-known as “facets” of the data, and as we shall see, there are multiple
-ways of accessing them. We will only rarely see the dollar-sign marker
-in the future, since we will be working with another set of commands
-known as “tidy” commands, which make it easy to work with data that
-takes the form of rows and columns.</p>
+<p>The <code>$</code> marker tells R to select from the iris data set
+just the data in the column labeled “Sepal Width.” If we are working
+with data that looks like a spreadsheet, for instance a data set with
+columns and rows, we can call the columns with the same marker. In R,
+these columns are known as “facets” of the data, and as we shall see,
+there are multiple ways of accessing them. We will only rarely see the
+dollar-sign marker in the future, since we will be working with another
+set of commands known as “tidy” commands, which make it easy to work
+with data that takes the form of rows and columns.</p>
 <p>Our first visualization command, “hist,” is also not one that we’ll
 see frequently in this book, but we use it here because it’s fast. The
 “hist” command makes a “histogram” or bar chart of frequencies for each
@@ -862,11 +871,11 @@ providing much by way of information. The visualization has a title and
 its axes are labeled. In this book, we will make many more complex
 visualizations which have custom axis labels and captions describing the
 data sets’ content in detail.</p>
-<p>The “Plots” tab temporarily stores all of the visualizations you make
-in an R session. To store these visualizations, you can pull down the
-“Export” menu (just below Plots/Packages/Help/Viewer). You’ll see
+<p>The “Plots” tab temporarily stores all of the visualizations made in
+an R session. To store these visualizations, we can pull down the
+“Export” menu (just below Plots/Packages/Help/Viewer). This will show
 options to export the visualization as a pdf, to the clipboard, or to
-another format. Choose one and save the histogram somewhere on your
+another format. Choose one and save the histogram somewhere on the
 computer.</p>
 <p>In Chapter 1, we will meet the “Hansard” data set which includes a
 century of parliamentary debates, and we will begin counting words and
@@ -886,16 +895,16 @@ small enough to run on a computer with the above mentioned minimum
 specifications. Even still, we encourage the reader to clear the Global
 Environment (and remove all saved variables) before proceeding to a new
 chapter. To do this, click on the broom icon in the Global Environment
-panel and confirm you wish to remove all objects from the environment.
-Next, click on the disk icon in the Global Environment panel and select
-“Free Unused R Memory.” You may also remove specific objects from the
-environment using <code>rm()</code>.</p>
+panel and confirm removing all objects from the environment. Next, click
+on the disk icon in the Global Environment panel and select “Free Unused
+R Memory.” We may also remove specific objects from the environment
+using <code>rm()</code>.</p>
 <pre class="r"><code>rm(iris)</code></pre>
 </div>
 <div id="the-errors-we-all-face-and-how-to-learn" class="section level3">
 <h3>The Errors We All Face And How to Learn</h3>
 <p>This book is designed to be accessible to first-time coders. It
-assumes that you have mastered the skills of installing packages,
+assumes that analysts have mastered the skills of installing packages,
 loading packages, inspecting data, and saving visualizations described
 in this introduction.</p>
 <p>One route of learning is working through the code in the chapters
@@ -913,22 +922,22 @@ the following line into the R console and pressing ‘enter’:</p>
 ##           ^</code></pre>
 <p>This line will result in an error, because a close quotation mark is
 missing on the other side of the phrase “hello world.”</p>
-<p>As you learn to code, whatever your level of experience, you are
+<p>As anyone learns to code, at whatever level of experience, we are
 almost certain to have typos and errors that stop the program from
-performing as you expect. We advise you to ask yourself what went wrong
-when you inevitably get error messages or unexpected results. Through
-closely following the examples in the book and paying attention to any
-error messages that result, you will gradually learn to recognize common
+performing as expected. We like to ask ourselves what went wrong when we
+inevitably get error messages or unexpected results. Through closely
+following the examples in the book and paying attention to any error
+messages that result, one will gradually learn to recognize common
 errors like missing parentheses or quotation marks.</p>
 </div>
 </div>
 <div id="finalizing-setup" class="section level2">
 <h2>Finalizing Setup</h2>
-<p>With tools installed and an environment ready, you now have
-everything you need to begin exploring large-scale historical text data.
-Every computer has limitations and each chapter will provide strategies
-for working effectively with the Hansard data regardless of hardware. In
-the following chapters, we turn from setup to analysis, beginning our
+<p>With tools installed and an environment ready, we now have everything
+we need to begin exploring large-scale historical text data. Every
+computer has limitations and each chapter will provide strategies for
+working effectively with the Hansard data regardless of hardware. In the
+following chapters, we turn from setup to analysis, beginning our
 journey into the methods of text mining at scale.</p>
 </div>
 
