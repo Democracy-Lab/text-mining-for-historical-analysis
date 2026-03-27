@@ -393,3 +393,7 @@ For
 example, they might show that in the United States Congressional Record, the word man became increasingly
 associated with the term gay in later decades—indicating a change in how certain concepts were linked in
 political discourse (Buongiorno). congress viewer 
+
+
+
+appendix e citations -- 2 of them at the end, the github and the vignett 

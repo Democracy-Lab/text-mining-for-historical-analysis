@@ -928,6 +928,8 @@ The portrait of change we have here is exceptional rather than the rule. We're l
 
 3) Why is performing observational validation an important step when processing and analyzing data? What kinds of problems can it help researchers detect? How frequently should researchers return to the data to validate their results as they move through different stages of analysis? When examining the data during validation, what kinds of patterns, anomalies, or errors should they be looking for?
 
+3) The approach profiled here generated many analyses filled with obscure names, in part because we have used the stricter tf-idf rather than the more inclusive log likelihood measure.  For the analyses of prereform and post reform speakers and their words, change the code so that the analysis uses log likelihood. Are the results any easier to interpret?
+
 4) This chapter leverages tf-idf to ask, in different ways, what is special about the language before and after the Reform Act? In your own words, explain what was done with the data in each of these exercises: 
   a) identifying how many words were spoken prereform and postreform
   b) comparing speakers from prereform, postreform, and both periods

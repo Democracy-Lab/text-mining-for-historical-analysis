@@ -1,0 +1,146 @@
+---
+title: "Troubleshooting spacyr Installation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+spacyr can be more complicated to install than a regular R package because it depends on two different languages, R and Python, working together. Even though the code is written in R, the actual text processing is done behind-the-scenes by spaCy, which runs in Python. In practice, this means R passes the text to Python, Python parses it with spaCy, and then returns the results to R as a data frame. 
+
+Because different operating systems and computers handle Python installations, file paths, and system permissions in different ways, errors can happen either during the installation of spacyr, or later when trying to use a spaCy model for text processing. Since spacyr is such a useful package for processing natural language but can be difficult to set up, this section is designed to help demystify the errors that might occur during spacyr installation and troubleshoot common problems.
+
+A good first step is to have spacyr handle the setup automatically by running `spacy_install()`. This function creates a clean, separate Python environment just for spacyr, then installs spaCy, the langauge model, and its required packages there. Ideally, this approach would prevent errors because everything spacyr needs would be installed together in one place. However, this setup does not always work as expected, which is why this section also covers additional troubleshooting steps.
+
+```{r, eval=FALSE}
+# install spacyr
+install.packages("spacyr")
+
+# load the spacyr library
+library(spacyr)
+
+# use the automated install from spacyr
+spacy_install()
+```
+
+If we can initalize spaCy and process text then the installation is working. 
+
+```{r, eval=FALSE}
+# initalize spaCy
+spacy_initialize()
+
+# attempt to parse text using spaCy
+spacy_parse("Hello World.")
+
+# turn off spaCy
+spacy_finalize()
+```
+
+If it instead throws an error, either during installation or initialization, we can troubleshoot. The installation process can feel intimidating when error messages appear with unfamiliar jargon. However, much of this language just refers to behind-the-scenes setup steps like the ones being explained here. In practice, these errors usually come from a small number of common problems:
+
+* *R is pointing to the wrong Python*. Many computers have more than one version of Python installed. For example, there may be a version of Python that came with the computer, and another that was installed by the user at a different time, such as through Anaconda. When trying to install spacyr, the installation process may also install a version of Python if it does not find a suitable version. As a result, spacyr may be connected to the wrong Python installation. If spaCy is installed in one version of Python, but R is connected to a different one, spacyr will not be able to find or run spaCy.
+* *The Python environment is broken or has conflicting packages*. spaCy runs inside a Python environment, which is the space where Python and its packages are installed. Sometimes a package does not install completely, some files are missing, or there are underlying conflicts between software dependencies. In otherwords, spaCy may need one version of software, while another installed package expects a different version of the same software. When that happens, spaCy may appear to be installed, but it still may not run correctly because the Python environment contains packages that do not work together.  
+* *spaCy was installed, but the language model cannot be found*. spacyr automatically installs the English language model along with spaCy Python. However, the model may not have installed correctly, a different model may be needed, or spacyr may not be able to find the model in the Python environment it is using. When this happens, spaCy itself might be installed but it still cannot process text.
+
+As an example, one student testing this book encountered the following error while trying to install `spacyr`:
+
+```
+"Error in pyenv_bootstrap_unix() : installation of pyenv failed" in line 96: "spacy_install(lang_models = "en_core_web_sm", ask = FALSE)"
+```
+
+This error indicates that spacyr failed to install during the "bootstrap" step. Here, bootstrap is just jargon for the initial setup stage where the computer tries to prepare the tools it needs before continuing with the rest of the installation. In other words, the setup failed at the very beginning of the installation process. The error also identifies where the failure happened. In this student's notebook, the R code was at line 96. The line numbers can be seen in the left margin on RStudio. The error message than shows the exact line of code that failed: the `spacy_install()` command.
+
+A good first step is to restart R and try the installation one more time. Sometimes problems are solved be simply restarting R because a failed installation attempt can leave the R session holding onto incomplete Python configuration information. Restarting R clears this incomplete information and lets the install start cleanly. Other times, however, errors persist. Even after running the install command and the initialization command, spacyr may still return errors such as `Error in spacy_initialize() : No spaCy environment found. Use spacy_install() to get started` or `ModuleNotFoundError: No module named 'spacy'`, or other similar errors. 
+
+These messages usually indicate that the automatic setup did not complete correctly. In that situation, the next step is to follow the manual installation process outlined below.
+
+These errors usually point to a very common problem: R is not connected to the Python installation that contains spaCy. spacyr does not run Python on its own. Instead, spacyr relies on the `reticulate` package to connect R to Python behind the scenes. If `reticulate` points R to the wrong Python installation, spacyr may not be able to find the spaCy environment, even if spaCy was installed somewhere else on the computer during set up. 
+
+To begin troubleshooting, the first step is to check which version of Python is currently being used by R. The `reticulate` package provides a function for troubleshooting Python, `py_config()`, among others. 
+
+```{r}
+# load reticulate
+library(reticulate)
+
+# check the Python configuration
+py_config()
+```
+
+`py_config()` displays useful information for troubleshooting, including the Python version, the location of the Python installation, and the locations of installed Python packages such as numpy. It also tells us what software versions are installed. This information can help diagnose whether there are underlying problems with the Python setup R is using. Although the main concern here is a common problem like spacyr using the wrong Python, the version numbers also matter. For example, if the Python version is too old, it may not be able to run numpy, which spaCy depends on.
+
+The Python file path (the first line) shows which Python environment R is using: `/home/stephbuongiorno/.virtualenvs/r-spacyr/bin/python`. This file path begins in the home directory, `/home/stephbuongiorno/`. Inside that home directory is a hidden folder named `.virtualenvs`, denoted by the period (`.`). Hidden folders are typically used to store system or setup files, so they may not be visible in their directory by default. Inside `.virtualenvs` is the environment named `r-spacyr`. In this example, a "virtual environment" is the same thing as a "Python environment": a separate location where Python and its packages are installed.
+
+We can check whether spaCy and its required packages are installed in the version of Python used by our current R session, or if they were installed somewhere else.
+
+```{r}
+# check if spacy Python is available
+py_module_available("spacy")
+```
+
+If `py_module_available("spacy")` returns `TRUE`, spaCy is installed in the Python environment R is currently using. If it returns `FALSE`, spaCy is not installed in that environment. In that case, the next step may be to check whether spaCy was installed in a different Python environment or to install it manually in the one R is using.
+
+We can check for different Python environments like so: 
+
+```{r}
+# return a list of all available Python environments
+virtualenv_list()
+```
+
+Referring back to the output from `py_config()`, R is currently using the Python environment named `r-spacyr`. Running this code shows that two Python environments are available, but `r-spacyr` is currently in use. 
+
+We could copy and paste the file path and we can manually specify a different Python environment for R to use. Or, we could create a new Python environment. The following code walks through both steps: 
+
+```{r, eval=FALSE}
+# create a new Python environment
+virtualenv_create("spacyr-example-manual-install")
+
+# tell R to use that environment
+use_virtualenv("spacyr-example-manual-install", required = TRUE)
+
+# install spacy in that environment
+py_install("spacy")
+```
+
+If problems continue because R is still not finding the correct version of Python, another option is to install a fresh copy of Python directly for the virtual environment. This can also help when the computer’s existing Python version is too old and a newer version is needed.
+
+```{r, eval=FALSE}
+# install Python and create a separate Python environment 
+python_exe <- install_python()
+
+# this version includes python = python_exe to specify the Python version to be installed
+virtualenv_create("spacyr-example-manual-install", python = python_exe)
+
+# install spacy in that environment
+py_install("spacy")
+```
+
+We can even specify which version of Python we wish to use with `use_python()`. We also included the argument, `required = TRUE`. This means that R must use that exact Python installation. If R cannot use that Python for some reason, `reticulate` will return an error. This is helpful for troubleshooting because it prevents R from silently choosing a different Python installation and making it look like everything worked when it actually connected to the wrong environment.
+
+```{r, eval=FALSE}
+use_python("~/.virtualenvs/r-spacyr-test/bin/python", required = TRUE)
+```
+
+In these steps we accomplish what `spacy_install()` is meant to do automatically, but in a more manual way that gives us more control over the installation if needed. 
+
+We could also manually install the spaCy language model. In the following code, `reticulate` helps make sure the installation happens in the correct Python environment. `py_exe()` returns the path to the Python that R is currently using, and `system2()` uses that Python to run the command `python -m spacy download en_core_web_sm`. This command downloads the small, English spaCy language model into the same Python environment R is connected.
+
+```{r, eval=FALSE}
+system2(py_exe(), c("-m", "spacy", "download", "en_core_web_sm"))
+```
+
+Now we can try the initialization steps again to see whether we successfully installed `spacyr`: 
+
+```{r}
+library(spacyr)
+
+spacy_initialize()
+
+spacy_parse("This is a test.")
+
+spacy_finalize()
+```
+
+While an understanding of manual installation can help with setting up spacyr, some questions may still remain or some problems may require additional troubleshooting. In those cases, a good next step outside this book is to consult the official spacyr vignette, A Guide to Using spacyr, by Kenneth Benoit and Akitaka Matsuo, located here: `https://cran.r-project.org/web/packages/spacyr/vignettes/using_spacyr.html`. Another useful resource is the spacyr GitHub issues page, maintained through the repository for spacyr, where users report errors and maintainers discuss possible fixes. The GitHub issues page is located here: `https://github.com/quanteda/spacyr/issues`. AI-based chatbots may also be able to help. However, a basic understanding of the underling problem, such as the foundation provided in this section, can make that help much more effective than simply copying and pasting commands without understanding what they do. With a greater grasp of the potential problems, we can provide more information to a chatbot, likely making the troubleshooting process more informed and likely more effective. 
+
+
