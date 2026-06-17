@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.7)  3 MAR 2026 12:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.25)  30 MAR 2026 09:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**ch3.tex
-(./ch3.tex
+**Ch4_Endnotes.tex
+(./Ch4_Endnotes.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/base/article.cls
@@ -41,7 +41,7 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/geometry/geometry.sty
-Package: geometry 2020/01/02 v5.9 Page Geometry
+Package: geometry 2026/03/07 v6.0 Page Geometry
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks17
@@ -477,8 +477,8 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count340
-) (./ch3.aux)
-\openout1 = `ch3.aux'.
+) (./Ch4_Endnotes.aux)
+\openout1 = `Ch4_Endnotes.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 139.
 LaTeX Font Info:    ... okay on input line 139.
@@ -575,96 +575,100 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 21
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 211.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 211.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 211.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 215.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 216.
 [2] [3] [4] [5] [6] [7]
-<ch3_files/figure-latex/unnamed-chunk-9-1.pdf, id=44, 469.755pt x 325.215pt>
-File: ch3_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type pdf)
-<use ch3_files/figure-latex/unnamed-chunk-9-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-9-1.pdf  used on input line 653.
+<Ch4_Endnotes_files/figure-latex/unnamed-chunk-9-1.pdf, id=45, 469.755pt x 325.215pt>
+File: Ch4_Endnotes_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type pdf)
+<use Ch4_Endnotes_files/figure-latex/unnamed-chunk-9-1.pdf>
+Package pdftex.def Info: Ch4_Endnotes_files/figure-latex/unnamed-chunk-9-1.pdf  used on input line 657.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[8] [9 <./ch3_files/figure-latex/unnamed-chunk-9-1.pdf>] [10] [11]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 830.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 830.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 830.
-
-Overfull \hbox (4.41151pt too wide) in paragraph at lines 830--843
+[8] [9 <./Ch4_Endnotes_files/figure-latex/unnamed-chunk-9-1.pdf>] [10] [11]
+Overfull \hbox (4.41151pt too wide) in paragraph at lines 834--847
 [][] 
  []
 
 [12] [13] [14]
 
-LaTeX Warning: Float too large for page by 52.43697pt on input line 1070.
+LaTeX Warning: Float too large for page by 52.43697pt on input line 1074.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [15]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1087.
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1091.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `TS1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TS1/lmtt/b/n' tried instead on input line 1087.
-<ch3_files/figure-latex/unnamed-chunk-16-1.pdf, id=90, 469.755pt x 325.215pt>
-File: ch3_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type pdf)
-<use ch3_files/figure-latex/unnamed-chunk-16-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-16-1.pdf  used on input line 1095.
+(Font)              Font shape `TS1/lmtt/b/n' tried instead on input line 1091.
+<Ch4_Endnotes_files/figure-latex/unnamed-chunk-16-1.pdf, id=91, 469.755pt x 325.215pt>
+File: Ch4_Endnotes_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type pdf)
+<use Ch4_Endnotes_files/figure-latex/unnamed-chunk-16-1.pdf>
+Package pdftex.def Info: Ch4_Endnotes_files/figure-latex/unnamed-chunk-16-1.pdf  used on input line 1099.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1095--1097
+Underfull \hbox (badness 10000) in paragraph at lines 1099--1101
 [][]
  []
 
-[16{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc} <./ch3_files/figure-latex/unnamed-chunk-16-1.pdf>] [17] [18]
-<ch3_files/figure-latex/unnamed-chunk-19-1.pdf, id=109, 469.755pt x 325.215pt>
-File: ch3_files/figure-latex/unnamed-chunk-19-1.pdf Graphic file (type pdf)
-<use ch3_files/figure-latex/unnamed-chunk-19-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-19-1.pdf  used on input line 1252.
+[16{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc} <./Ch4_Endnotes_files/figure-latex/unnamed-chunk-16-1.pdf>] [17] [18]
+<Ch4_Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf, id=110, 469.755pt x 325.215pt>
+File: Ch4_Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf Graphic file (type pdf)
+<use Ch4_Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf>
+Package pdftex.def Info: Ch4_Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf  used on input line 1257.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[19 <./ch3_files/figure-latex/unnamed-chunk-19-1.pdf>] [20]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1345.
+[19 <./Ch4_Endnotes_files/figure-latex/unnamed-chunk-19-1.pdf>] [20]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1351.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [21]
-Overfull \hbox (16.60127pt too wide) in paragraph at lines 1460--1464
+Overfull \hbox (16.60127pt too wide) in paragraph at lines 1467--1471
 []\T1/lmr/m/n/10 To iden-tify these speak-ers, we will be-gin by re-turn-ing to an ear-lier data frame -- ``pre-re-form_speakers_wordcount''
  []
 
 [22] [23]
-<ch3_files/figure-latex/unnamed-chunk-30-1.pdf, id=147, 469.755pt x 325.215pt>
-File: ch3_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
-<use ch3_files/figure-latex/unnamed-chunk-30-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-30-1.pdf  used on input line 1596.
+<Ch4_Endnotes_files/figure-latex/unnamed-chunk-30-1.pdf, id=148, 469.755pt x 325.215pt>
+File: Ch4_Endnotes_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
+<use Ch4_Endnotes_files/figure-latex/unnamed-chunk-30-1.pdf>
+Package pdftex.def Info: Ch4_Endnotes_files/figure-latex/unnamed-chunk-30-1.pdf  used on input line 1605.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[24] [25 <./ch3_files/figure-latex/unnamed-chunk-30-1.pdf>] [26] [27] [28]
-<ch3_files/figure-latex/unnamed-chunk-35-1.pdf, id=179, 469.755pt x 325.215pt>
-File: ch3_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
-<use ch3_files/figure-latex/unnamed-chunk-35-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 1864.
+[24] [25 <./Ch4_Endnotes_files/figure-latex/unnamed-chunk-30-1.pdf>] [26] [27] [28]
+<Ch4_Endnotes_files/figure-latex/unnamed-chunk-35-1.pdf, id=180, 469.755pt x 325.215pt>
+File: Ch4_Endnotes_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
+<use Ch4_Endnotes_files/figure-latex/unnamed-chunk-35-1.pdf>
+Package pdftex.def Info: Ch4_Endnotes_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 1875.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[29] [30 <./ch3_files/figure-latex/unnamed-chunk-35-1.pdf>] [31] [32] [33] (./ch3.aux)
+
+Underfull \hbox (badness 10000) in paragraph at lines 1875--1881
+[][]
+ []
+
+[29] [30 <./Ch4_Endnotes_files/figure-latex/unnamed-chunk-35-1.pdf>] [31] [32] [33] (./Ch4_Endnotes.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 13633 strings out of 469514
- 212375 string characters out of 5468931
- 671406 words of memory out of 5000000
- 41959 multiletter control sequences out of 15000+600000
- 679764 words of font info for 86 fonts, out of 8000000 for 9000
+ 13632 strings out of 469515
+ 212510 string characters out of 5468945
+ 669083 words of memory out of 5000000
+ 41958 multiletter control sequences out of 15000+600000
+ 682756 words of font info for 87 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,12n,93p,3577b,640s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ch3.pdf (33 pages, 784893 bytes).
+ 89i,12n,93p,974b,640s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
+Output written on Ch4_Endnotes.pdf (33 pages, 749833 bytes).
 PDF statistics:
- 334 PDF objects out of 1000 (max. 8388607)
- 268 compressed objects within 3 object streams
- 72 named destinations out of 1000 (max. 500000)
- 170 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 335 PDF objects out of 1000 (max. 8388607)
+ 267 compressed objects within 3 object streams
+ 71 named destinations out of 1000 (max. 500000)
+ 162 words of extra memory for PDF output out of 10000 (max. 10000000)
 

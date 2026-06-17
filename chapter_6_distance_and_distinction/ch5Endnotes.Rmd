@@ -29,9 +29,9 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Many of the techniques used in text mining did not originate in history; rather, they were developed in fields such as the natural sciences, information science, data science, and later adapted for the analysis of historical documents. This cross-disciplinary borrowing can be highly generative, but it also means that the metrics require careful interpretation. When a method is adapted from another discipline, it may not map perfectly onto the problems of history. Analysts must therefore remain attentive to what the metric actually measures, as well as to the kinds of questions it can and cannot answer.
+Many of the techniques used in text mining did not originate in history; rather, they were developed in fields such as the natural sciences, information science, data science, and later adapted for the analysis of historical documents. This kind of cross-disciplinary borrowing can be highly generative, but it also means that the metrics require careful understanding in both how they are applied and how their results are interpreted. When a method is adapted from another discipline, it may not map perfectly onto the problems of history. Analysts must therefore remain attentive to what the metric actually measures, as well as to the kinds of questions it can and cannot answer.
 
-In this chapter, we examine two concepts that are widely used across scientific fields to describe the defining characteristics of data: distinctiveness and distance. Distinctiveness measures how characteristic a word is within a particular context—for example, identifying which terms appear unusually often in one set of texts compared to others. Distance, by contrast, measures the similarity or difference between texts or linguistic patterns. Together, these concepts provide a framework for comparing bodies of text and identifying the features that distinguish, for example, a decade, a speaker, or debate from another.
+In this chapter, we examine two concepts used across many scientific fields to identify and make visible important features of data: distinctiveness and distance. Distinctiveness measures how characteristic a word is within a particular context—for example, identifying which terms appear unusually often in one set of texts compared to others. Distance, by contrast, measures the similarity or difference between texts or linguistic patterns. Together, these concepts provide a framework for comparing bodies of text and identifying the features that distinguish, for example, a decade, a speaker, or debate from another.
 
 [Mention where these metrics have been used].
 
@@ -39,11 +39,14 @@ In this chapter, we examine two concepts that are widely used across scientific 
 
 To understand how these metrics can be used during the analysis of language, consider a simple example comparing two well-known children's authors. In this example, we will examine Lewis Carroll's _Through the Looking-Glass_ and Beatrix Potter's _The Tale of Peter Rabbit_.^1^ We chose these two authors for a practical and pedagogical reason: the authors posses clear, stylistic differences. While both authors write for children, their language differs notably. Carroll often uses playful and invented words and abstract descriptions, while Potter tends to use more concrete vocabulary describing animals, nature, and everyday actions. We hypothesize that these differences will make for distinct distributions that we can measure. To test whether our observations are grounded in the literature, we can use tf-idf. 
 
-The first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains only characters and no special formatting (such as fonts, images, or layout). Since plain text files are simply lines of words and punctuation, they are easy to process using code. To download the books we can locate their URLs and pass them to the `readLines()` function.
+The first step is to select and download the books that will form the corpus for analysis. We will collect our books from Project Gutenberg, a digital library that provides free access to books whose copyrights have expired or that have been released for public use. The books can be easily downloaded with R, and they are stored in "plain text"—a format that contains characters and no special encoding for fonts, images, or layouts making them easy to process. To download the books we can locate their URLs and pass them to the `readLines()` function.
 
-```{r}
-library("tidyverse")
-library("tidytext")
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+library(dhmeasures)
+library(kableExtra)
+library(knitr)
 
 # URLs for plain text versions
 looking_glass_url <- "https://www.gutenberg.org/files/12/12-0.txt"
@@ -64,7 +67,9 @@ peter_text <- readLines(peter_url,
                         warn = FALSE)
 ```
 
-We can now see the texts we collected in the Global Environment panel. However, it is not easy to click on them or explore their contents because they are not stored in a tabular format, like our earlier work with the `hansardr` data. When working with the `tidyverse`, it is conventional to organize data in this tabular format. Doing so makes the data easier to process. For this reason, we will convert the text into a table before continuing with the analysis.
+We can now see the books in the Global Environment panel. However, they are not in a tabular format, so we cannot simply click on them and explore their contents the way we could with the `hansardr` data. 
+
+When working with the `tidyverse`, it is conventional to organize data in a tabular format because it makes the data easier to process. Therefore, we will convert the text into a table before continuing with the analysis.
 
 ```{r}
 # Transform the data to a table using "tibble" (a tidyverse-style table)
@@ -83,9 +88,9 @@ If we wanted a comprehensive list of words characteristic of Lewis Carroll but r
 
 In this example, we combine the two books into a single dataset so that we only need to apply our analysis steps once. Working with one dataset simplifies our work because the same code can be applied across both of our books simultaneously, rather than repeating the same operations for multiple datasets.
 
-When working with large corpora such as the Hansard debates, the process has been different. Because the collection is extremely large, we partition the data into smaller subsets--such as decade partitions--and each subset is processed separately. When working with Hansard, this approach is necessary for minimizing memory usage and running the data on a personal computer. However, it also means that the same data processing steps must often be repeated for each dataset. 
+When working with large corpora such as the Hansard debates, our process has been different. Because the collection is extremely large, we often partition the data into smaller subsets--such as decade partitions--and each decade is processed separately. Partitioning the Hansard data is necessary for minimizing memory usage and running the data on a personal computer. However, it also means that the same data processing steps must often be repeated for each dataset. 
 
-In our example, the dataset is small enough that we can combine the books into a single dataset using `bind_rows()`, which will later make it easy to apply methods such as TF-IDF directly. 
+In our example, the dataset is small enough that we can combine the books into a single dataset using `bind_rows()`, which will later make it easy to apply methods such as TF-IDF.  
 
 ```{r, message=FALSE, warning=FALSE}
 # Combine both texts
@@ -114,19 +119,11 @@ Our regex can be read like so:
 
 The order of these data-processing steps is important. The regex we just wrote would remove words that contain punctuation, for example, `rabbit.`. Removing these would be problematic for our analysis, because we can inadvertently lose lots of data. However, we already removed punctuation from words with `unnest_tokens()` so we do not need to adjust the regex to handle punctuation. If punctuation were still present in the tokens, we would need to modify the regex to allow punctuation at the end of a word.
 
+At this stage, researchers can also inspect the data and gather preliminary information about the dataset. Looking at the data before running a statistical method can help confirm whether the research question is on the right track. For example, a researcher might selectively look for words already known to be characteristic of each author and make observations based on knowledge of the dataset or the texts themselves. This process can help identify words that appear especially characteristic or unique within the texts. 
 
+However, this type of inspection is limited because the process depends on prior knowledge of which words to examine. This type of inspection can also introduce confirmation bias—that is, the tendency to notice evidence that supports existing expectations while overlooking evidence that does not. Additionally, this type of inspection does not allow for the systematic discovery of all distinctive words in the corpus. Methods such as tf–idf are useful because they identify which words are most distinctive across the entire dataset at scale.
 
-At this stage, we can also inspect our data and make preliminary observations about ENTER
-
-
-
-Before applying tf–idf, we can first gather some preliminary information about our dataset. Looking at the data before running a statistical method can help confirm whether our question is on the right track. For example, we can selectively look for words might already know are characteristic of each author and make observations based on our knowledge of the dataset or the texts themselves. This can help identify words that appear to be especially characteristic or unique within the texts. However, this type of inspection is limited because it relies on the researcher already knowing which words to look for. It does not allow us to systematically discover all of the distinctive words in the corpus. Methods such as tf–idf are useful for identifying which words are most distinctive across the entire dataset at scale. 
-
-
-
-Include passages that talk about the difference. 
-
-Now what happens if we 
+The following code creates a table that allows researchers to manually inspect how often our selected words appear for each author. The results reveal clear differences in how frequently each author uses the selected words, highlighting patterns that align with expectations about each author's style and vocabulary.
 
 ```{r}
 # Count how often each word appears for each author
@@ -148,14 +145,13 @@ print(selected_word_counts)
 
 ## Using Distinctiveness to Compare Two Authors
 
-Distinctiveness measures score the relationships between words and documents across two or more sets of texts. Within political dataset, distinctiveness measures can identify words that are characteristic of a specific author, document, year, or political group. Take, for example, Lewis Carroll, a renowned British author of children's literature. Carroll, who had a background in mathematics and logic, was famously inventive with language, especially in his use of nonsense and portmanteau words. He had a strong preference for whimsical and linguistically playful terms—words that stretch meaning or defy conventional usage—such as "slithy," "chortle," and "galumph," -- especially visible in his poem _Jabberwocky,_ which enriches the dreamlike world of _Through the Looking Glass_.^2^
+Distinctiveness measures score the relationships between words and documents across two or more sets of texts. Distinctiveness measures can identify words that are characteristic of a specific author, document, year, or group. Take, for example, Lewis Carroll, a renowned British author of children's literature. Carroll, who had a background in mathematics and logic, was famously inventive with language, especially in his use of nonsense and portmanteau words. He had a strong preference for whimsical and linguistically playful terms—words that stretch meaning or defy conventional usage—such as "slithy," "chortle," and "galumph," -- especially visible in his poem _Jabberwocky,_ which enriches the dreamlike world of _Through the Looking Glass_.^2^
 
 If we're using distinctiveness algorithms, we would choose tf-idf or log likelihood, which assigns high values to each author–word pair. The pairs _Carroll–slithy_ and _Potter–shed_ should get a very high score, because these words are very unique to the respective authors. In contrast, _Carroll–she, Carroll–the, Potter–the,_ and _Potter–she_ would each get a very low distinctiveness score, as these common words are not unique to either author.
 
-We will explain the code required later, but for now, simply observe the difference between the tf-idf measurements for each author. Which word-writer pairs get a high tf-idf score -- which is to say, they are highly distinctive? Which word-author pairs get a low tf-idf score?
+We will explain the code in more detail later, but for now, focus on the tf-idf scores for each word-author pair. A higher tf-idf score indicates that a word is more distinctive for a particular author, while a lower tf-idf score indicates that a word is less distinctive. In this table, values close to 0 (including 0.000000) indicate words that are either common across both authors or do not stand out for one author. The higher values—such as rabbit for Beatrix Potter or slithy for Lewis Carroll—are still small in absolute terms, but are relatively higher than the others in the table and therefore more distinctive.
 
 ```{r}
-# Count word frequencies per author (long format)
 word_counts2 <- tokens %>%
   count(writer, word, sort = TRUE) %>%
   rename(document = writer, term = word)
@@ -164,19 +160,12 @@ word_counts2 <- tokens %>%
 tfidf_table <- word_counts2 %>%
   bind_tf_idf(term = term, document = document, n = n)
 
-# View top distinctive words for each author
+# View selected words with more readable tf-idf values
 filtered_tfidf <- tfidf_table %>%
   filter(term %in% words_of_interest) %>%
   arrange(document, desc(tf_idf)) %>%
-  select(term, tf_idf)
-```
-
-
-
-```{r two-pane, results='asis', message=FALSE, warning=FALSE}
-library(kableExtra)
-
-filtered_tfidf <- as_tibble(filtered_tfidf)
+  mutate(tf_idf = round(tf_idf, 6)) %>%
+  select(document, term, tf_idf)
 
 left <- filtered_tfidf %>%
   select(term, tf_idf) %>%
@@ -196,13 +185,24 @@ combined <- tibble(beatrix_term = left$term,
 combined %>%
   kable(col.names = c("Beatrix Word", "TF-IDF", 
                       "Lewis Carroll Word", "TF-IDF"))
+
+```
+
+Let's interpret the results: Although "she" appears much more often in Lewis Carroll than in Beatrix Potter, tf-idf still assigns it a score of zero because the word appears in both authors’ texts. In a corpus with only two documents, any word shared by both documents receives an inverse document frequency of zero, which makes the overall tf-idf score zero. Thus, tf-idf measures distinctiveness across documents, not simply differences in raw counts. This is also a good example of a limitation of tf-idf in a very small corpus. With only two documents, shared words get flattened to zero even when the counts differ a lot.
+
+
+Rabbit only appears in Beatrix Potter 
+
+In a larger corpus, tf-idf does not reduce all shared words to zero. Instead, it assigns lower scores to words that appear in many documents and higher scores to words that appear in fewer documents. This allows tf-idf to capture degrees of distinctiveness, rather than treating distinctiveness as an all-or-nothing property.
+
+
+```{r two-pane, results='asis', message=FALSE, warning=FALSE}
+
 ```
 
 We can use distinctiveness to quickly identify the words that are frequently in Carroll's book but not Potter's. We might expect the results to include a list of words that includes "Jabberwock" (a fearsome creature), the "Snark" (an elusive entity), the "Bandersnatch" (a fast and dangerous beast), and other terms from his peculiar universe. Indeed, many of these words have rarely, if ever, appeared in publications not authored by Carroll himself. 
 
 ```{r, message=FALSE, warning=FALSE}
-library("kableExtra")
-
 distinctively_carroll <- tfidf_table %>% 
   filter(document == "Lewis Carroll") %>%
   arrange(desc(tf_idf)) %>%
@@ -264,8 +264,6 @@ By measuring distance, we can compare the distribution of words in the two books
 
 
 ```{r}
-library(dhmeasures) # for Jensen-Shannon divergence functions
-
 # URL for Alice's Adventures in Wonderland from Project Gutenberg
 alice_url <- "https://www.gutenberg.org/files/11/11-0.txt"
 
@@ -650,9 +648,6 @@ most_dist_hansard_words <- hansard_words_1830_to_1870 %>%
 ```
 
 ```{r tfidf-tables, results='asis'}
-library("knitr")
-library("kableExtra")
-
 make_kable <- function(df, dec_label) {
   df %>%
     select(word, tf_idf) %>%
