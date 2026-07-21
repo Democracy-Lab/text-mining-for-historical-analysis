@@ -38,7 +38,7 @@ We have previously seen how to load the text from a single decade of the Hansard
 First we can load the text data from the 1860s speeches, recalling that one of the columns, `sentence_id`, refers to the number of each sentence and its location in the nineteenth-century printed volumes of Hansard's parliamentary debates, referenced by series ("S"), volume ("V"), and page ("P"). Sentences are listed in the order in which they appeared on the page.
  
 ```{r, warning=FALSE, message=FALSE}
-# Use the hansardr library to load the debate text
+# Load the Hansard data
 library(hansardr)
 
 data("hansard_1860")
@@ -55,17 +55,13 @@ df_head <- hansard_1860 %>%
 ```
 
 ```{r}
-kable(df_head, 
-      format = "latex", 
-      booktabs = TRUE, 
-      linesep = "",
-      caption = "Sample sentences from 1860s Hansard, including each sentence's 
-                unique identifier and the corresponding text as extracted from the debate transcripts.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the sentences as a formatted table
+df_head %>%
+  kable(caption = "Sample sentences from 1860s Hansard, including each sentence's 
+                   unique identifier and the corresponding text as extracted from 
+                   the debate transcripts.") %>%
+  column_spec(2, width = "12cm")
+
 ```
 
 Next, we can load the metadata corresponding with the Hansard debate text. 
@@ -79,16 +75,10 @@ data("debate_metadata_1860")
 df_head <- debate_metadata_1860 %>% 
   slice_head(n = 5)
 
-kable(df_head, 
-      format = "latex", 
-      booktabs = TRUE, 
-      linesep = "",
-      caption = "Debate-level metadata from 1860s Hansard, including each sentence's identifier, the date of the speech, and the title of the corresponding debate.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the debate-level metadata as a formatted table
+df_head %>%
+  kable(caption = "Debate-level metadata from 1860s Hansard, including each sentence's 
+                   identifier, the date of the speech, and the title of the corresponding debate.")
 ```
 
 `hansardr` includes detailed contextual information for each of the speeches, using the same system of references that we saw in the previous data set -- series, volume, page, and sentence number. In the `debate_metadata` dataset, however, there is no "text" column, but rather a series of columns that illuminate multiple "fields" of each sentence: the speech date (recorded as "speechdate" within the data) for when the speech was given and the official title of the "debate" in which the sentence was spoken. 
@@ -105,16 +95,11 @@ data("speaker_metadata_1860")
 df_head <- speaker_metadata_1860 %>% 
   slice_head(n = 5)
 
-kable(df_head, 
-      format = "latex", 
-      booktabs = TRUE, 
-      linesep = "",
-      caption = "Speaker-level metadata for sample sentences from the 1860 Hansard corpus, including the recorded speaker name, the algorithmically suggested speaker match, and indicators for name ambiguity, fuzzy matching, and ignored cases.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the speaker metadata as a formatted table
+df_head %>% 
+kable(caption = "Speaker metadata for sample sentences from the 1860 Hansard corpus, 
+                 including the recorded speaker name, the algorithmically suggested speaker 
+                 match, and indicators for name ambiguity, fuzzy matching, and ignored cases.")
 ```
 
 The `speaker_metadata_1860` dataset provides information about the "speaker" of each sentence as the MP's name was recorded in the original Hansard debates. It also includes a "suggested speaker" column, which contains a disambiguated version of the speaker names where ambiguous or inconsistent references to the same individual have been resolved into a single, standardized name, allowing for more accurate identification of MPs across the corpus. 
@@ -139,18 +124,11 @@ data("file_metadata_1860")
 df_head <- file_metadata_1860 %>% 
   slice_head(n = 5)
 
-kable(df_head, 
-    format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "Source-file metadata for selected sentences from the 1860 Hansard corpus, 
-    including the identifiers for the sentence, speech, and debate, as well as the source 
-    file, source image, and original column location.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the source file metadata as a formatted table
+df_head %>%
+  kable(caption = "Source file metadata for selected sentences from the 1860 Hansard corpus,
+                   including the identifiers for the sentence, speech, and debate, as well as 
+                   the source file, source image, and original column location.")
 ```
 
 We have chosen to store the debate text (`hansard_1860`) separately from the contextual information about each speech (for example, `debate_metadata_1860` or `speaker_metadata_1860`), as well as the information about each hard copy file containing the speeches (`file_metadata_1860`). We subsetted the data into individual files because the data for each decade is quite large. Processing such a large dataset can exceed a computer's resources, such as its memory. In other cases, we chose to exclude certain fields from processing if they were not immediately relevant to our analysis, as doing so reduces memory usage and improves overall processing speed so that we can focus on our research instead of waiting too long for any intermediary processing step to complete. Furthermore, many operations in this book -- for instance, counting words per decade -- require just a few datasets loaded at a time. 
@@ -165,18 +143,12 @@ library("tidyverse")
 # left_join() will automatically detect that both datasets share the sentence_id 
 hansard_1860 <- left_join(hansard_1860, debate_metadata_1860)
 
-# Show the first few rows of the 1860 Hansard debate text
+# Display the first six rows of the 1860 Hansard debate text and metadata
 hansard_1860 %>%
   head() %>%
   mutate(text = str_trunc(text, 120)) %>%  
-  kable(format = "latex", 
-        booktabs = TRUE, 
-        caption = "Text excerpts from the 1860 Hansard corpus alongside their associated 
-                  metadata, including the sentence identifier, speech date, and 
-                  debate title.") %>%
-  kable_styling(full_width = FALSE, position = "left") %>%
-  column_spec(2, width = "6cm") %>%
-  column_spec(4, width = "4cm")
+  kable(caption = "Text excerpts from the 1860 Hansard corpus alongside their associated 
+                   metadata, including the sentence identifier, speech date, and debate title.")
 ```
 
 Notice that the resulting dataset, `hansard_corpus_1860`, has information about speaker and date for each sentence of text. 
@@ -204,16 +176,15 @@ While there are several approaches to finding multiword phrases, we will demonst
 The following code filters the speeches of the 1860s for the first months of 1867 before the vote on the Second Reform Act, which gave Britain's urban working-class men the right to vote. We also introduce a new package, `lubridate`, which can be installed in the usual way using `install.packages()`.
   
 ```{r}
-# load packages for tokenization and date handling
+# Load packages for tokenization and date handling
 library("tidytext")   
 library("lubridate")  
 
-# create a new data frame "hansard_1867" from "hansard_1860" that contains
-# data for 1867 
-hansard_1867 <- hansard_1860 %>% # create a new data frame
-  mutate(year = year(speechdate)) %>% # extract year from speechdate
-  filter(year == 1867, # keep only year 1867
-         speechdate <= ymd("1867-08-15")) # and speechdate before or on august 15
+# Create a new data frame "hansard_1867" from "hansard_1860" with data for 1867 
+hansard_1867 <- hansard_1860 %>% # Create a new data frame
+  mutate(year = year(speechdate)) %>% # Extract year from speechdate
+  filter(year == 1867, # Keep only year 1867
+         speechdate <= ymd("1867-08-15")) # Keep speech dates before or on august 15
 ```
 
 Now that we have filtered the dataset for our desired timeline, we can tokenize the text into bigrams. The order in which we perform data processing is important. Tokenizing after filtering ensures that we are working with a smaller and more focused dataset. Working with a smaller dataset ensures we do not exhaust our computer's resources or its processing capabilities. Skills for handling a large dataset on a smaller computer, like a laptop, is paramount to being able to answer questions while processing large corpora for historical analysis, as we describe in more detail in subsequent chapters.
@@ -230,8 +201,8 @@ The following code uses the `unnest_tokens()` function, which we previously used
 
 ```{r}
 # Generate bigrams (two-word sequences) from the "text" column of the hansard_1867 data
-bigrams_1867 <- hansard_1867 %>% # create a new dataset
-  unnest_tokens(bigram, text, token = "ngrams", n = 2) # unnest bigrams 
+bigrams_1867 <- hansard_1867 %>% # Create a new dataset
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) # Unnest bigrams 
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
@@ -239,16 +210,10 @@ bigrams_1867 <- hansard_1867 %>% # create a new dataset
 df_head <- bigrams_1867 %>% 
   slice_head(n = 5)
 
-kable(df_head, 
-      format = "latex", 
-      booktabs = TRUE, 
-      linesep = "",
-      caption = "Raw bigrams extracted from the 1867 Hansard proceedings alongside their associated metadata.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the raw bigrams and associated metadata as a formatted table
+df_head %>%
+  kable(caption = "Raw bigrams extracted from the 1867 Hansard proceedings alongside 
+                   their associated metadata.")
 ```
 
 Note that the bigrams extracted overlap, as if the same sentence had been subdivided several times. The presentation of the bigrams is expected, as bigrams are created by looking at each pair of words in order, one step at a time—so each new bigram shares a word with the one before it.
@@ -257,9 +222,14 @@ Note that the bigrams extracted overlap, as if the same sentence had been subdiv
 
 Now we can count the top bigrams and remove any that contain stop words. We remove stop words to focus on word pairs that might be more meaningful for our analysis.
 
+The `filter(!str_detect(bigram, paste0(...)))` line removes rows where the bigram column contains a stop word. The `paste()` function combines the words in `stop_words$word` using the or operator (`|`), while `paste0()` adds word boundaries (`\\b`) around the regular expression so that only complete words are matched. The `str_detect()` function then identifies bigrams containing these stop words, and the `!` reverses the result so that only bigrams without stop words are retained.
+
+`filter(str_detect(bigram, "^[a-z]+ [a-z]+$"))` keeps rows where the bigram column follows a specific pattern. The bigram must contain exactly two lowercase alphabetic words separated by a single space. Bigrams containing numbers, punctuation, or uppercase letters are excluded.
+
 ```{r}
-# remove bigrams that contain any stop words
-# keep only bigrams made up of two lowercase alphabetic words
+# Clean the bigrams in the 1867 Hansard dataset
+# - str_detect() identifies and removes bigrams that contain common stop words
+# - The second str_detect() keeps only bigrams made up of two lowercase alphabetic words
 clean_bigrams_1867 <- bigrams_1867 %>%
   filter(!str_detect(bigram, 
                      paste0("\\b(", paste(stop_words$word, collapse = "|"), ")\\b"))) %>%
@@ -271,41 +241,21 @@ clean_bigrams_1867 <- bigrams_1867 %>%
 df_head <- clean_bigrams_1867 %>% 
   slice_head(n = 5)
 
-kable(df_head, 
-      format = "latex", 
-      booktabs = TRUE, 
-      linesep = "",
-      caption = "Cleaned bigrams from the 1867 Hansard corpus together with their metadata. The cleaned bigrams reflect preprocessing steps that remove stopwords.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the cleaned bigrams and associated metadata as a formatted table
+df_head %>%
+  kable(caption = "Cleaned bigrams from the 1867 Hansard corpus together with their metadata. 
+                   The cleaned bigrams reflect preprocessing steps that remove stop words.")
 ```
-
-The above code processes the dataset by applying the following transformations and filters: 
-
-`filter(!str_detect(...))`
-- Removes rows where the `bigram` column contains any stop word.
-- It constructs a regular expression from a list of stop words (`stop_words$word`) by:
-  - Combining them with the OR operator (`|`).
-  - Surrounding them with word boundaries (`\\b`) to match complete words only.
-- Only bigrams without stop words are retained.
-
-`filter(str_detect(bigram, "^[a-z]+ [a-z]+$"))`
-- Keeps rows where the `bigram` column matches a specific pattern:
-  - The `bigram` must consist of exactly two lowercase alphabetic words separated by a single space.
-  - Rows where the `bigram` contains numbers, punctuation, or non-lowercase letters are excluded.
 
 We can now count the resulting bigrams. 
 
 ```{r, message=FALSE}
-# count the frequency of each bigram in the cleaned dataset
-# keep the top 100 most frequent bigrams and sort them in descending order
+# Count the frequency of each bigram in the cleaned dataset
+# Keep the top 100 most frequent bigrams and sort them in descending order
 top_bigrams_1867 <- clean_bigrams_1867 %>%
-  count(bigram) %>% # count frequency of each bigram
-  top_n(100) %>% # select top 100 bigrams
-  arrange(desc(n)) # sort bigrams by frequency, highest first
+  count(bigram) %>% # Count frequency of each bigram
+  top_n(100) %>% # Select top 100 bigrams
+  arrange(desc(n)) # Sort bigrams by frequency, highest first
 ```
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
@@ -313,16 +263,10 @@ top_bigrams_1867 <- clean_bigrams_1867 %>%
 df_head <- top_bigrams_1867 %>% 
   slice_head(n = 5)
 
-kable(df_head, format = "latex", 
-    booktabs = TRUE, 
-    linesep = "",
-    caption = "The most frequent bigrams in the 1867 Hansard corpus, ranked 
-    by their number of occurrences.") %>%
-  kable_styling(latex_options = c("scale_down", "repeat_header"),
-                table.envir = FALSE) %>%
-  column_spec(which(colnames(df_head) == "text"), 
-              latex_column_spec = "p{12cm}", 
-              latex_valign = "top")
+# Display the most frequent bigrams as a formatted table
+df_head %>%
+  kable(caption = "The most frequent bigrams in the 1867 Hansard corpus, ranked 
+                   by their number of occurrences.")
 ```
 
 In our list, we see several contemporary rhetorical figures that stem from the practice of referring to other speakers in parliament as "my noble friend" or "my learned friend."  We also see allusions to the debates over representation and the question of who would have the vote, especially in the phrases "household suffrage," referencing historical argument for granting middle-class men the right to vote with the Reform Bill of 1832, and "roman catholic," a reference to the fact that Roman Catholics could already vote until the Reform Act of 1834. Only in 1867 did those working-class men get the vote in Britain, and these earlier precedents were frequently alluded to as a justification.  
@@ -331,20 +275,16 @@ We also see a reference to "public meetings."  Why did speakers in parliament in
 
 ```{r}
 # Filter the 1867 Hansard speeches to keep only those that mention "public meetings"
-my_reading <- hansard_1867 %>% # create a new dataset
-  filter(str_detect(text, "public meetings")) # detect the phrase
+my_reading <- hansard_1867 %>% # Create a new dataset
+  filter(str_detect(text, "public meetings")) # Detect the phrase
 
+# Display sample Hansard text containing the phrase "public meetings"
 my_reading %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable(format = "latex", 
-        booktabs = TRUE, 
-        longtable = TRUE, 
-        escape = FALSE,
-        caption = "Sample Hansard text from 1867 containing multiple occurrences 
-        of the phrase “public meetings.”") %>%
-  column_spec(1, width = "14cm")
+  kable(caption = "Sample Hansard text from 1867 containing multiple occurrences
+                   of the phrase \"public meetings.\"")
 ```
 
 A cursory reading of the sentences suggests that members of parliament were well aware of massive public meetings where more than a thousand members of the public showed up support the vote for working-class people.  We read of demonstrations around British Empire, even in Nova Scotia.  We read of members of parliament challenging each other to meet the demands of the public: "Have you not heard or read what has been said?"  We have only skimmed a few sentences, but the material in these 126 rows gives us what we need to understand how members of parliament talked about public protests in these crucial months of 1867.
@@ -358,18 +298,22 @@ Text mining also allows us to look for multiword phrases beyond bigrams.  We can
 We can use a slight adjustment of the code we used above to count bigrams to find n-grams of any length. Here is code for finding common five-word-phrases, filtering them, counting them, and finding the top 50 examples:
 
 ```{r, message=FALSE}
-# create 5-grams (sequences of 5 consecutive words) from the "text" column
-# store the results in a new column called "ngram"
-# unnest_tokens() is used with token = "ngrams" and n = 5 to generate 5-word sequences
-fivegrams_1867 <- hansard_1867 %>% # create a new dataset
-  unnest_tokens(ngram, text, token = "ngrams", n = 5) # generate 5-grams from text
+# Create 5-grams from the "text" column of the 1867 Hansard dataset
+# - unnest_tokens() splits the text into sequences of consecutive words
+# - token = "ngrams" specifies that the text should be tokenized into n-grams
+# - n = 5 specifies that each n-gram should contain five consecutive words
+# - The new column containing the 5-grams is called "ngram"
+fivegrams_1867 <- hansard_1867 %>% # Create a new dataset
+  unnest_tokens(ngram, text, token = "ngrams", n = 5) # Generate 5-grams from text
 
-# filter for 5-grams that contain the word "people"
-# count the frequency of those 5-grams and keep the top 50
-people_n_grams <- fivegrams_1867 %>% # create a new dataset
-  filter(str_detect(ngram, "people")) %>% # keep 5-grams containing "people"
-  count(ngram) %>% # count frequency of each 5-gram
-  top_n(50) # keep top 50 by count
+# Identify the most frequent 5-grams that contain the word "people"
+# - str_detect() keeps 5-grams that contain the word "people"
+# - count() counts the frequency of each 5-gram
+# - top_n() keeps the 50 most frequent 5-grams
+people_n_grams <- fivegrams_1867 %>% # Create a new dataset
+  filter(str_detect(ngram, "people")) %>% # Keep 5-grams containing "people"
+  count(ngram) %>% # Count the frequency of each 5-gram
+  top_n(50) # Keep the top 50 by count
 
 head(people_n_grams)
 ```
@@ -381,20 +325,16 @@ Reading further down the list of multi-word phrases might give us more hints abo
 ```{r}
 # Filter the 1867 Hansard speeches to include only rows where the exact phrase 
 # "minds of the people" appears in the "text" column
-minds <- hansard_1867 %>% # create a new dataset
-  filter(str_detect(text, "minds of the people")) # detect the phrase
+minds <- hansard_1867 %>% # Create a new dataset
+  filter(str_detect(text, "minds of the people")) # Detect the phrase
 
+# Display sample Hansard text containing the phrase "minds of the people"
 minds %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable(format = "latex", 
-        booktabs = TRUE, 
-        longtable = TRUE, 
-        escape = FALSE,
-        caption = "Sample Hansard text from 1867 containing multiple 
-        occurrences of the phrase “minds of the people.”") %>%
-  column_spec(1, width = "14cm")
+  kable(caption = "Sample Hansard text from 1867 containing multiple 
+                   occurrences of the phrase \"minds of the people.\"")
 ```
 
 When speakers referenced the "minds of the people," they frequently depicted popular politics as a form of collective political achievement to which ordinary people contributed the rational evidence of their own lived experience. We find the phrase connected to ideas about moral "duty" and political "harmony." We also see it invoked in reference to Ireland, India and Scotland.
@@ -412,31 +352,33 @@ In applying our list, this exercise invites readers to investigate the idea that
 data("hansard_1860")
 data("debate_metadata_1860")
 
-# merge the hansard speech data with its metadata using a left join
-# this retains all rows from hansard_1860 and adds matching metadata columns
+# Add matching debate metadata to the Hansard speech data
 hansard_1860 <- left_join(hansard_1860, debate_metadata_1860)
 
-# create a new dataset for just the year 1867
-hansard_1867 <- hansard_1860 %>% # create a new data frame
-  mutate(year = year(speechdate)) %>% # keep only speeches from the year 1867, 
-  filter(year == 1867, #keep only speeches made on or before August 15th
+hansard_1867 <- hansard_1860 %>% # Create a new data frame
+  mutate(year = year(speechdate)) %>% # Keep only speeches from the year 1867, 
+  filter(year == 1867, # Keep only speeches made on or before August 15th
          speechdate <= as.Date("1867-08-15"))
 ```
 
 ```{r}
-# Create bigrams (2-word sequences) from the "text" column of the 1867 Hansard data
-# - "bigram" is the name of the new column to store the 2-word phrases
-# - "text" is the input column containing the speech text
-# - token = "ngrams" with n = 2 extracts bigrams
+# Create bigrams from the "text" column of the 1867 Hansard data
+# - unnest_tokens() splits the text into sequences of consecutive words
+# - token = "ngrams" specifies that the text should be tokenized into n-grams
+# - n = 2 specifies that each n-gram should contain two consecutive words
+# - The new column containing the bigrams is called "bigram"
 bigrams_1867 <- hansard_1867 %>%
-  unnest_tokens(bigram, text, token = "ngrams", n = 2) 
+  unnest_tokens(bigram, text, token = "ngrams", n = 2)
 
-# remove bigrams that contain any stop word (e.g., "the", "of", "and")
-# and keep only bigrams made up of two lowercase alphabetic words
+# Clean the bigrams in the 1867 Hansard data
+# - str_detect() identifies bigrams that contain common stop words
+# - paste() combines the stop words into a single search pattern
+# - filter() removes bigrams containing stop words
+# - The second str_detect() keeps only bigrams containing two lowercase alphabetic words
 clean_bigrams_1867 <- bigrams_1867 %>% 
   filter(!str_detect(bigram, paste0("\\b(", 
                                     paste(stop_words$word, collapse = "|"), ")\\b"))) %>% 
-  filter(str_detect(bigram, "^[a-z]+ [a-z]+$")) 
+  filter(str_detect(bigram, "^[a-z]+ [a-z]+$"))
 
 head(clean_bigrams_1867)
 ```
@@ -444,103 +386,110 @@ head(clean_bigrams_1867)
 The following code filters the `clean_bigrams_1867` dataset to retain only rows where the bigram column contains any word from the pattern1 list (e.g., "riot," "meeting," "famine"). It uses a regular expression to match whole words, ensuring accurate filtering. After filtering, the resulting dataset, `events_1867`, includes only the bigram and speechdate columns. Filtering allows the analyst to focus on specific bigrams related to the predefined topics of interest.
 
 ```{r}
-# define a controlled vocabulary of event-related keywords to search for in bigrams
+# Define a controlled vocabulary of event-related keywords to search for in bigrams
 controlled_vocab = c("riot", "meeting", "famine","revolt", "exhibition", "massacre", 
                      "strike", "war") 
 
-# filter the cleaned bigrams to keep only those that contain one of the vocabulary terms
-# build a regex pattern from the vocabulary and match bigrams containing those words
-# select only the bigram and the associated speech date for further analysis
+# Filter bigrams using the controlled vocabulary
+# - paste() combines the vocabulary terms into a single search pattern
+# - str_detect() identifies bigrams containing a vocabulary term
+# - filter() keeps only bigrams that contain a vocabulary term
+# - select() keeps only the bigram and its associated speech date
 events_1867 <- clean_bigrams_1867 %>%
   filter(str_detect(bigram, 
                     paste0("\\b(", paste(controlled_vocab, collapse = "|"), ")\\b"))) %>% 
-  select(bigram, speechdate) 
+  select(bigram, speechdate)
 
 head(events_1867)
 ```
 
-
-
 If we look carefully at the events list so generated, we will recognize only a few of the references as actual events.  Many of the bigrams including our controlled vocabulary are simply descriptions, for example, "disorderly riot."  A few are references to actual events and meetings specified by the name of an event, for instance, the "Bristol Riot" or a "Yorkshire meeting."  Far more frequent are general references to a "public meeting" or "recent meeting."  All of the results are interesting, of course, because as we have seen members of parliament leaned on each other to acknowledge the public sentiment for expanding the vote.  
 
-How did references to meetings vary over time? By this time, you will have noticed that searching for a controlled vocabulary, visualization, guided reading, and deliberation about the meaning of the data is an iterative process that we engage over many rounds -- not an automatic process where the analyst looks for a word like "riot" and immediately finds meaningful results.  We can search for our key phrases and visualize them.  
+How did references to meetings vary over time? By this time, it might be clear that searching for a controlled vocabulary, visualization, guided reading, and deliberation about the meaning of the data is an iterative process that we engage over many rounds -- not an automatic process where the analyst looks for a word like "riot" and immediately finds meaningful results.  We can search for our key phrases and visualize them.  
 
 In the following code, we define a new list of bigrams that make up our controlled vocabulary—specific phrases referring to historical events—and then filter the dataset to keep only the rows where the phrases appear. Note that the code below uses a new command for faceted counting--`group_by()`--which we will investigate in greater detail throughout the book. 
 
-For now, it is just important to know that `group_by()` effectively sorts data into buckets based on some category. For example, you could use group_by() to organize the data by year—putting all the speeches from the same year into one group—or by speaker, grouping together everything each person said. By grouping, we are able to perform calculations on each category individually. Instead of counting words for an entire data subset, like we did in Chapter 1, we can count words by group. In the following code we use `group_by()` to combine and count each bigram.
+For now, it is just important to know that `group_by()` effectively sorts data into buckets based on some category. For example, we could `use group_by()` to organize the data by year—putting all the speeches from the same year into one group—or by speaker, grouping together everything each person said. By grouping, we are able to perform calculations on each category individually. Instead of counting words for an entire data subset, like we did in Chapter 1, we can count words by group. In the following code we use `group_by()` to combine and count each bigram.
 
 ```{r, message=FALSE}
-# define a controlled vocabulary of specific multi-word historical events (as bigrams)
+# Define a controlled vocabulary of specific multi-word historical events (as bigrams)
 controlled_vocab_events = c("yorkshire meeting", "clontarf meeting", "recent meeting",
                             "public meeting", "paris exhibition", "orissa famine",
                             "irish famine", "crimean war", "civil war", "affghan war",
                             "kaffir war", "bristol riot") 
 
-# filter the events to keep only those that exactly match a defined historical event
-# group the matched events and count their occurrences
-# keep only the top 10 most frequently mentioned events
+# Identify the 10 most frequently mentioned historical events
+# - filter() keeps bigrams that exactly match a defined historical event
+# - group_by() groups occurrences of the same event
+# - summarize() counts the total occurrences of each event
+# - slice_max() keeps the 10 most frequently mentioned events
+# - arrange() sorts the events from most to least frequent
 top_events_1867 <- events_1867 %>%
-  filter(bigram %in% controlled_vocab_events) %>%
-  group_by(bigram) %>%
-  summarize(total = n()) %>%
-  slice_max(total, n = 10) %>%   # modern replacement for top_n()
-  arrange(desc(total))
+  filter(bigram %in% controlled_vocab_events) %>% # Keep defined events
+  group_by(bigram) %>% # Group by event
+  summarize(total = n()) %>% # Count occurrences
+  slice_max(total, n = 10) %>% # Keep top 10
+  arrange(desc(total)) # Sort by frequency
 
 head(top_events_1867)
 ```
 
 ```{r}
-# join the top event bigrams with the full events dataset to recover their speech dates
-# extract the month, count mentions by date, and return a regular data frame
+# Add speech-date information to the most frequently mentioned events
+# - left_join() adds speech dates from the full events dataset
+# - mutate() extracts the month from each speech date
+# - count() counts event mentions by speech date
+# - ungroup() removes any remaining grouping
 top_events_1867_w_speech_metadata <- top_events_1867 %>%
-  left_join(events_1867, by = "bigram") %>%  # join to recover speech dates
-  mutate(month = month(speechdate)) %>% # extract month from speechdate
-  count(bigram, speechdate) %>% # count mentions by date
-  ungroup() # remove grouping
+  left_join(events_1867, by = "bigram") %>% # Add speech dates
+  mutate(month = month(speechdate)) %>% # Extract month
+  count(bigram, speechdate) %>% # Count mentions by date
+  ungroup() # Remove grouping
 
 head(top_events_1867_w_speech_metadata)
 ```
 
-In this visualization, you may notice that we have produced a different sort of visualization than the bar charts we have been creating. `ggplot2` is a flexible library for creating many different types of visualizations from the same dataset. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. 
+In this visualization, it may be clear that we have produced a different sort of visualization than the bar charts we have been creating. `ggplot2` is a vast library for creating many different types of visualizations from the same dataset. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. 
 
 ```{r, fig.cap= "Plot showing the frequency with which Parliament in 1867 referred to major past events—including famines, wars, riots, and public meetings—across the months from February to August. Each square represents a day on which a speech mentioned a given event bigram; larger and brighter squares indicate higher numbers of mentions.", fig.fullwidth=TRUE, fig.asp = 0.8, fig.width = 7}
+
 # Load the viridis color palette library for colorblind-friendly colors
 library("viridis")
 
 # Create a bubble plot showing how often specific events were mentioned over time
 ggplot(top_events_1867_w_speech_metadata, 
-       aes(x = speechdate, # x-axis: date of the speech
-           y = bigram, # y-axis: event bigram (e.g., "irish famine")
-           size = n, # bubble size represents number of mentions
-           color = n)) + # bubble color also reflects number of mentions
+       aes(x = speechdate, # X-axis: date of the speech
+           y = bigram, # Y-axis: event bigram (e.g., "irish famine")
+           size = n, # Bubble size represents number of mentions
+           color = n)) + # Bubble color also reflects number of mentions
 
   # Use a viridis color scale with a log transformation for good contrast in frequency
-  # treat "n" as continuous, not categorical, for a smooth gradient of colors
-  scale_color_viridis(breaks = round, # apply rounding to color scale breaks
-                      trans = "log", # log-transform to spread small/large counts
-                      option = "A", # use Viridis option A color scheme
-                      discrete = FALSE, # treat "n" as continuous
-                      direction = 1) + # default color direction (ascending)
+  # Treat "n" as continuous, not categorical, for a smooth gradient of colors
+  scale_color_viridis(breaks = round, # Apply rounding to color scale breaks
+                      trans = "log", # Log-transform to spread small/large counts
+                      option = "A", # Use Viridis option A color scheme
+                      discrete = FALSE, # Treat "n" as continuous
+                      direction = 1) + # Default color direction (ascending)
 
-  # format and customize the appearance of a timeline plot showing event mentions
-  # x-axis shows months, point size reflects frequency, and plot is styled for readability
-  # includes rotated labels, extended margins, and simplified legend
-  scale_x_date(date_breaks = "1 month", date_labels = "%B") + # x axis one label per month
-  scale_size_continuous(range = c(1, 10)) + # scale point sizes
-  geom_point(alpha = .5, shape = 15) + # semi-transparent square points
-  coord_cartesian(clip = "off") + # don't clip outer elements
+  # Format and customize the appearance of a timeline plot showing event mentions
+  # X-axis shows months, point size reflects frequency, and plot is styled for readability
+  # Includes rotated labels, extended margins, and simplified legend
+  scale_x_date(date_breaks = "1 month", date_labels = "%B") + # X-axis one label per month
+  scale_size_continuous(range = c(1, 10)) + # Scale point sizes
+  geom_point(alpha = .5, shape = 15) + # Semi-transparent square points
+  coord_cartesian(clip = "off") + # Don't clip outer elements
 
-  # appearance tweaks: legend, axis, margin, and label formatting
-  theme(legend.position = "bottom", # legend below plot
-        axis.text.x = element_text(angle = 45), # tilt x labels
-        plot.margin = unit(c(1, 20, 1, 1), "lines")) + # widen right margin
-  guides(shape = "none") + # hide shape legend
+  # Appearance tweaks: legend, axis, margin, and label formatting
+  theme(legend.position = "bottom", # Legend below plot
+        axis.text.x = element_text(angle = 45), # Tilt x-labels
+        plot.margin = unit(c(1, 20, 1, 1), "lines")) + # Widen right margin
+  guides(shape = "none") + # Hide shape legend
 
-  # axis labels and titles
-  labs(x = "when parliament spoke", # x label
-       y = "events mentioned in the past by number of mentions", # y label
-       subtitle = "In the Months Leading Up to August 1867") + # subtitle
-  ggtitle("Events Mentioned by Name") # main title
+  # Axis labels and titles
+  labs(x = "when parliament spoke", # X-label
+       y = "events mentioned in the past by number of mentions", # Y-label
+       subtitle = "In the Months Leading Up to August 1867") + # Subtitle
+  ggtitle("Events Mentioned by Name") # Main title
 ``` 
 
 What do we make of this timeline? It suggests a swell of public meetings referenced in parliament in the months leading up to August 1867, which received more intense attention than either the Crimean War or the Paris Exhibition.  Individual meetings such as those in Yorkshire or Clontarf received passing acknowledgment rather than deeper debate.  Understanding the results of the visualization deeper requires more cycles of research and reading.  
@@ -556,17 +505,19 @@ Next, let's return to the idea of finding events using what we have learned abou
 As _The Dangerous Art of Text Mining_ makes clear, we understand that there is no universal definition of the most important events in world history. Any controlled vocabulary list has its merits and its omissions. It is in comparing the subtleties of different lists of events that the historian begins to explore the changing political and cultural nature of memory -- for example, the fact that references to the Glorious Revolution began to disappear after the First Reform Act, gradually displaced by allusions to the Tudor past.
 
 ```{r}
-# load the scholar-created "events" dataset from hansardr
+# Load the scholar created "events" dataset from hansardr
 data("events")
 
-# process the dataset to get a cleaned list of historical events
-# each row represents a unique event with its assigned historical date
-# ensures lowercase names for matching and excludes events after 1840
-eventslist <- events %>% # create a new dataset
-  distinct(event_name, scholar_assigned_date) %>% # remove duplicates
-  filter(!scholar_assigned_date > 1840) %>% # exclude post-1840 events
-  mutate(event_name = tolower(event_name)) %>% # lowercase event names
-  select(event_name, scholar_assigned_date) # keep only name and date
+# Create a cleaned list of historical events and their assigned dates
+# - distinct() removes duplicate event and date combinations
+# - filter() excludes events dated after 1840
+# - mutate() converts event names to lowercase for matching
+# - select() keeps only the event name and assigned date
+eventslist <- events %>% # Create a new dataset
+  distinct(event_name, scholar_assigned_date) %>% # Remove duplicates
+  filter(!scholar_assigned_date > 1840) %>% # Exclude post-1840 events
+  mutate(event_name = tolower(event_name)) %>% # Lowercase event names
+  select(event_name, scholar_assigned_date) # Keep name and date
 
 head(eventslist)
 ```
@@ -582,33 +533,27 @@ data("debate_metadata_1830")
 
 # Merge the speech data with its metadata using a left join
 # All rows from hansard_1830 are retained, with metadata added where available
-hansard_1830 <- hansard_1830 %>% # create a new dataset
-  left_join(debate_metadata_1830) # join debate text and metadata
+hansard_1830 <- hansard_1830 %>% # Create a new dataset
+  left_join(debate_metadata_1830) # Join debate text and metadata
 
 # Tokenize the speech text into bigrams
 # - "ngram" is the name of the new column to store the bigrams
 # - "text" is the input column containing the speech text
 # - token = "ngrams" with n = 2 instructs the function to extract bigrams
-bigrams_1830 <- hansard_1830 %>% # create a new dataset
-  unnest_tokens(ngram, text, token = "ngrams", n = 2) # tokenize text column
+bigrams_1830 <- hansard_1830 %>% # Create a new dataset
+  unnest_tokens(ngram, text, token = "ngrams", n = 2) # Tokenize text column
 
 # Identify bigrams that match known historical events from "eventslist"
-# - Performs an inner join where the bigram matches the cleaned event name
+# - Uses an inner join where the bigram matches the cleaned event name
 # - Keeps only rows with a match, linking bigram use to historical context
-events_1830 <- bigrams_1830 %>% # create a new dataset
-  inner_join(eventslist, by = c("ngram" = "event_name")) # join the bigrams and events
+events_1830 <- bigrams_1830 %>% # Create a new dataset
+  inner_join(eventslist, by = c("ngram" = "event_name")) # Join the bigrams and events
 
+# Display sample two-word phrase events from the 1830 Hansard debates
 events_1830 %>%
   head() %>%
   mutate(ngram = str_trunc(ngram, 120)) %>%  
-  kable(format = "latex", 
-        booktabs = TRUE,
-        caption = "Sample two-word phrase events from the 1830 Hansard debates.") %>%
-  kable_styling(full_width = FALSE,
-                position = "left",
-                latex_options = c("hold_position", "scale_down"),
-                font_size = 7) %>% 
-  column_spec(3, width = "4cm")
+  kable(caption = "Sample two-word phrase events from the 1830 Hansard debates.")
 ```
 
 Notice that the resulting dataset contains speaker and date columns from the parliamentary speeches, but the only bigrams listed are those that correspond to events from `eventslist`. 
@@ -616,102 +561,129 @@ Notice that the resulting dataset contains speaker and date columns from the par
 In the next blocks of code, we use our new list of events to generate a visualization. 
 
 ```{r, message=FALSE}
-# count how many times each event bigram is mentioned on each speech date
-# extract year from date, group by relevant fields, and remove grouping after summarizing
-counted_events <- events_1830 %>% # create a new dataset
-  mutate(year = year(speechdate)) %>% # extract year from speech date
-  group_by(ngram, year, speechdate, scholar_assigned_date) %>% # group data
-  summarize(n = n()) %>% # count mentions
-  ungroup() # remove grouping
+# Count event mentions by speech date
+# - mutate() extracts the year from each speech date
+# - group_by() groups mentions by event, year, speech date, and a scholar assigned date
+# - summarize() counts the number of mentions in each group
+# - ungroup() removes the grouping when no longer needed
+counted_events <- events_1830 %>% # Create a new dataset
+  mutate(year = year(speechdate)) %>% # Extract year
+  group_by(ngram, year, speechdate, scholar_assigned_date) %>% # Group data
+  summarize(n = n()) %>% # Count mentions
+  ungroup() # Remove grouping
 
 head(counted_events)
 ```
 
 ```{r, message=FALSE}
-# summarize total mentions of each event across all speech dates
-# grouped by event name and assigned historical date
-# then sort chronologically for historical analysis
+# Summarize total mentions of each event and sort by assigned date
+# - group_by() groups mentions by event and assigned date
+# - summarize() calculates the total number of mentions for each event
+# - ungroup() removes the grouping after the totals are calculated
+# - arrange() sorts the events chronologically by their assigned date
 cleaned_events <- counted_events %>%
-  group_by(ngram, scholar_assigned_date) %>% # group by event and historical date
-  summarize(total = sum(n)) %>% # sum total mentions
-  ungroup() %>% # remove grouping
-  arrange(scholar_assigned_date) # sort by historical date
+  group_by(ngram, scholar_assigned_date) %>% # Group by event and date
+  summarize(total = sum(n)) %>% # Calculate total mentions
+  ungroup() %>% # Remove grouping
+  arrange(scholar_assigned_date) # Sort chronologically
 
 head(cleaned_events)
 ```
 
 ```{r}
-# create an index to divide the historical date range into 30 equal chronological bins
-# group by each bin and select the most frequently mentioned event within each
-# then join back with the full event data to recover speech-level detail
+# Divide the historical date range into 30 time periods and identify the top event in each
+# - mutate() assigns each event to one of 30 chronological time periods
+# - group_by() groups events by time period
+# - filter() keeps the most frequently mentioned event in each time period
+# - ungroup() removes the grouping
+# - left_join() adds the corresponding speech information
 indexed_events <- cleaned_events %>%
-  mutate(index = scholar_assigned_date %/% 
+  mutate(time_period = scholar_assigned_date %/% 
            ((max(scholar_assigned_date) - 
-               min(scholar_assigned_date)) / 30)) %>% # assign bin index
-  group_by(index) %>% # group by time bin
-  filter(total == max(total)) %>% # keep most mentioned event in each bin
-  ungroup() %>% # remove grouping
-  left_join(counted_events, by = c("ngram", "scholar_assigned_date")) # join data
+               min(scholar_assigned_date)) / 30)) %>% # Assign time period
+  group_by(time_period) %>% # Group by time period
+  filter(total == max(total)) %>% # Keep top event
+  ungroup() %>% # Remove grouping
+  left_join(counted_events, 
+            by = c("ngram", "scholar_assigned_date")) # Add speech data
 
 head(indexed_events)
 ```
 
 ```{r}
-# Define a boundary value by adding 8 days to the latest speech date in the dataset
-# Make the visualization easier to read by adding padding to the visualization
+# Set the end date 8 days after the latest speech date
+# - Adding 8 days provides extra space at the edge of the visualization
 left_range <- max(events_1830$speechdate) + 8
 ```
 
 ```{r, fig.cap="Plot of how often nineteenth-century MPs invoked earlier historical events in the debates of the 1830s. The x-axis shows when speeches were delivered (1830–1840), while the y-axis shows the historical date of the event being named. Each square marks at least one speech mentioning that event; larger and brighter squares indicate more frequent references, highlighting especially intensive discussion of late eighteenth- and early nineteenth-century events such as the Corn Laws, the French Revolution, and the American Constitution.", fig.width=7,fig.height=10, fig.fullwidth=TRUE}
-# create a bubble plot showing when historical events were mentioned in parliament
-# x-axis shows the date of mention; y-axis shows the historical date of the event
-# bubble size and color represent frequency of mentions
-ggplot(data = indexed_events, # provide the name of the dataset
-       aes(x = speechdate, # assign the x-axis
-           y = scholar_assigned_date, # assign the y-axis
-           size = n, # assign the size of the points
-           label = paste0("            ", ngram, " (", scholar_assigned_date, ")"),
-           color = n)) +  # assign the color
 
-# use viridis color scale with log transform for better contrast
-# set bubble size aesthetics for visual clarity
-# use viridis option A (purple to yellow-green gradient)
-# and use a forward gradient (low values = dark, high = bright)
-  scale_color_viridis(breaks = round, # round legend breaks
-                    trans = "log", # log scale
-                    option = "A", # viridis option
-                    discrete = FALSE, # continuous scale
-                    direction = 1) + # forward gradient
+# Create a bubble plot showing when historical events were mentioned in Parliament
+# - ggplot() creates the visualization using the indexed_events dataset
+# - x = speechdate places the date of each mention on the x-axis
+# - y = scholar_assigned_date places the historical date of each event on the y-axis
+# - size = n changes the size of each point based on the number of mentions
+# - label = paste0() creates a label with the event name and historical date
+# - color = n changes the color of each point based on the number of mentions
+ggplot(data = indexed_events, # Use the event data
+       aes(x = speechdate, # Set the x-axis
+           y = scholar_assigned_date, # Set the y-axis
+           size = n, # Set point size
+           label = paste0("            ", ngram, " (", scholar_assigned_date, ")"), # Create labels
+           color = n)) + # Set point color
 
-  # set up point appearance, plot boundaries, and x-axis formatting
-  # this controls how bubbles are sized, shaped, placed, and how time is shown
-  scale_size_continuous(range = c(1, 10)) + # bubble size range
-  geom_point(alpha = .5, shape = 15) + # square bubbles
-  coord_cartesian(clip = "off") + # no clipping of labels
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") + # yearly ticks on x-axis
-
-  # add one label per event, placed at the right edge and aligned with its historical date
-  geom_text(data = indexed_events %>% # assign data
-            group_by(ngram) %>% # group data
-            sample_n(1), # pick one speech instance per event
-            show.legend = FALSE, # no text in legend
-            aes(color = 1, # fixed color for all labels
-                x = left_range, # position label at far right
-                y = scholar_assigned_date, # align vertically with event date
-                hjust = 0, # left-align label text
-                size = 8)) + # label size
-
-  # style plot appearance for readability and layout
-  theme(legend.position = "bottom", # move legend below plot
-        plot.margin = unit(c(1, 250, 50, 1), unit = "pt"), # add right margin for labels
-        axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1), # rotate x-axis labels
-        axis.title.x = element_text(vjust = -0.5)) + # adjust x-axis title spacing
-  guides(shape = "none") + # remove shape legend
-
-  # add axis labels and title
-  labs(x = "when parliament spoke", # assign the x-axis
-       y = "events mentioned in the past") + # assign the y-axis
-  ggtitle("Events Mentioned by Name in Parliament") # create a title
+# Set the color scale for the bubbles
+# - scale_color_viridis() applies a color gradient based on the number of mentions
+# - breaks = round rounds the values shown in the legend
+# - trans = "log" uses a logarithmic scale to make differences easier to see
+# - option = "A" selects the viridis color palette
+# - discrete = FALSE treats the number of mentions as a continuous value
+# - direction = 1 applies the color gradient from low to high values
+scale_color_viridis(breaks = round, # Round legend values
+                    trans = "log", # Use log scale
+                    option = "A", # Set color palette
+                    discrete = FALSE, # Use continuous scale
+                    direction = 1) + # Set gradient direction
+  
+  # Set the appearance and placement of the bubbles
+  # - scale_size_continuous() sets the range of bubble sizes
+  # - geom_point() displays the data as semi-transparent square points
+  # - coord_cartesian() allows labels to extend beyond the plot area
+  # - scale_x_date() displays the x-axis in one-year intervals
+  scale_size_continuous(range = c(1, 10)) + # Set bubble sizes
+  geom_point(alpha = .5, shape = 15) + # Create square bubbles
+  coord_cartesian(clip = "off") + # Allow labels outside plot
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") + # Show yearly ticks
+  
+  # Add one label for each historical event
+  # - group_by() groups the data by event
+  # - sample_n() selects one mention of each event for labeling
+  # - x = left_range places the labels at the right side of the plot
+  # - y = scholar_assigned_date aligns each label with its historical date
+  # - hjust = 0 left-aligns the label text
+  geom_text(data = indexed_events %>% # Use event data
+              group_by(ngram) %>% # Group by event
+              sample_n(1), # Select one mention
+              show.legend = FALSE, # Hide label legend
+              aes(color = 1, # Set label color
+                  x = left_range, # Position labels
+                  y = scholar_assigned_date, # Align by event date
+                  hjust = 0, # Left-align labels
+                  size = 8)) + # Set label size
+  
+  # Adjust the plot layout for readability
+  # - theme() moves the legend, adds space for labels, and adjusts the x-axis text
+  # - guides() removes the shape legend
+  theme(legend.position = "bottom", # Move legend below plot
+        plot.margin = unit(c(1, 250, 50, 1), unit = "pt"), # Add space for labels
+        axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1), # Rotate year labels
+        axis.title.x = element_text(vjust = -0.5)) + # Adjust title spacing
+  guides(shape = "none") + # Remove shape legend
+  
+  # Add axis labels and title
+  labs(x = "when parliament spoke", # Assign the x-axis
+       y = "events mentioned in the past") + # Assign the y-axis
+  ggtitle("Events Mentioned by Name in Parliament") # Create a title
 ```
 
 Note that the visualization here resembles the visualization of events we generated above, but in this case, we have some extra information: the actual date of the event mentioned, e.g. 1789 for the French Revolution.  We have plotted this historical information on the y-axis. The resulting graph in fact shows two timelines rather than one -- a timeline of parliamentary speech on the x-axis and a timeline of historical references on the y-axis.
@@ -723,92 +695,75 @@ Why? we find ourselves asking. That verticality of temporal experience--the long
 We continue the explanation through reading.
 
 ```{r}
-# add a new column extracting the year from the speech date
+# Add a new column with the extracted year from the speech date
 hansard_1830 <- hansard_1830 %>%
   mutate(year = year(speechdate))
 
-# filter speeches from the year 1832 that mention the phrase "fifteenth century"
-# - str_detect() searches for the exact phrase in the text
-# - select() keeps only the "text" column of the matching speeches
-c15_mentions <- hansard_1830 %>% # create a new dataset
-  filter(year > 1831 & year < 1833, # filter for the date range
-         str_detect(text, "fifteenth century")) %>% # detect the phrase
-  select(text) # select just the text column
+# Find different ways of referring to the fifteenth century in speeches from 1832
+# - filter() keeps speeches for just the year 1832
+# - regex() searches for several possible forms of "fifteenth century"
+# - ignore_case = TRUE matches both uppercase and lowercase versions
+c15_mentions <- hansard_1830 %>% # Create a new dataset
+  filter(year == 1832, # Filter for 1832
+         str_detect(text,
+                    regex("fifteenth century|fifteenth-century|15th century|15th-century",
+                          ignore_case = TRUE))) %>% # Find references to the fifteenth century
+  select(text) # Keep the text column
 ```
 
 ```{r}
+# Display the filtered speech texts that mention "fifteenth century"
 c15_mentions %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable(format = "latex", 
-        booktabs = TRUE, 
-        longtable = TRUE, 
-        escape = FALSE,
-        caption = "") %>%
-  column_spec(1, width = "14cm")
+  kable()
 ```
 
 ```{r}
-# Filter speeches from the year 1832 that mention the phrase "fourteenth century"
-# - Only rows with "fourteenth century" in the text are retained
-# - Only the "text" column is selected
-c14_mentions <- hansard_1830 %>% # create a new dataset
-  filter(year > 1831 & year < 1833, # filter for the date range
-         str_detect(text, "fourteenth century")) %>% # detect the phrase
-  select(text) # select just the text column
+# Filter speeches from 1832 that mention "sixteenth century"
+# - filter() keeps speeches for just the year 1832
+# - str_detect() keeps speeches containing the phrase "sixteenth century"
+# - select() keeps only the text column
+c16_mentions <- hansard_1830 %>% # Create a new dataset
+  filter(year == 1832, # Filter for 1832
+         str_detect(text,
+                    regex("sixteenth century|sixteenth-century|16th century|16th-century",
+                          ignore_case = TRUE))) %>% # Find references to the sixteenth century
+  select(text) # Keep the text column
 ```
 
 ```{r}
-# display the filtered speech texts that mention "fourteenth century"
-c14_mentions %>%
+# Display sample speech text mentioning "sixteenth century"
+c16_mentions %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
-  column_spec(1, width = "14cm")
+  kable()
 ```
 
 ```{r}
-# Filter speeches from the year 1832 that mention the phrase "thirteenth century"
-# - year > 1831 & year < 1833 captures only the year 1832
-# - str_detect() looks for the exact phrase "thirteenth century" in the text
-# - select() keeps only the "text" column of matching speeches
-c13_mentions <- hansard_1830 %>% # create a new dataset
-  filter(year > 1831 & year < 1833, # filter for the date range
-         str_detect(text, "thirteenth century")) %>% # detect the phrase
-  select(text) # select just the text column
+# Filter speeches from 1832 that mention "seventeenth century"
+# - filter() keeps speeches for just the year 1832
+# - str_detect() keeps speeches containing different forms of "seventeenth century"
+# - select() keeps only the text column
+c17_mentions <- hansard_1830 %>% # Create a new dataset
+  filter(year == 1832, # Filter for 1832
+         str_detect(text,
+                    regex("seventeenth century|seventeenth-century|17th century|17th-century",
+                          ignore_case = TRUE))) %>% # Find references to the seventeenth century
+  select(text) # Keep the text column
 ```
 
 ```{r}
-# display the filtered speech texts that mention "thirteenth century"
-c13_mentions %>%
+# Display sample speech text mentioning "seventeenth century"
+c17_mentions %>%
   head() %>%
   mutate(text = str_wrap(text, 80)) %>%
   select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
-  column_spec(1, width = "14cm")
+  kable()
 ```
 
-```{r}
-# filter speeches from the year 1832 that mention the phrase "twelfth century"
-# - str_detect() searches for the exact phrase in the "text" column
-# - select() keeps only the "text" column
-c12_mentions <- hansard_1830 %>% # create a new dataset
-  filter(year > 1831 & year < 1833, # filter for the date range
-         str_detect(text, "twelfth century")) %>% # detect the phrase
-  select(text) # select just the text column
-```
-
-```{r}
-# display the filtered speech texts that mention "twelfth century"
-c12_mentions %>%
-  head() %>%
-  mutate(text = str_wrap(text, 80)) %>%
-  select(text) %>%
-  kable("latex", booktabs = TRUE, longtable = TRUE, escape = FALSE) %>%
-  column_spec(1, width = "14cm")
-```
 
 What we see is a collection of historical references which serve two purposes: one is explaining why the institutions of the past differ from the needs of the present, and one is invoking the fact that parliamentary institutions have changed in the past to support the cause of reform in the present. The arguments work together, not against each other.  
 
@@ -820,22 +775,33 @@ Throughout this chapter, we worked with large datasets and showed how to handle 
 
 Here is a typical workflow for handling large data like Hansard:
 
-- Load the Dataset: Import the dataset into your R environment using appropriate functions like `data()`.
+- Load the Dataset: Import the dataset into the R environment using appropriate functions like `data()`.
 
-- Filter or Subset the Dataset: Narrow down the dataset to include only the data relevant to your analysis. For example, if we are analyzing speeches by William Gladstone, we can filter rows where the speaker is Gladstone using functions like `filter()` from the `dplyr` package. Similarly, we could filter for speeches belonging to a specific debate by filtering the data based on a title. Subsetting early in the process reduces the amount of data that will be processed later, saving processing time and computational resources. 
+- Filter or Subset the Dataset: Narrow down the dataset to include only the data relevant to the analysis. For example, if we are analyzing speeches by William Gladstone, we can filter rows where the speaker is Gladstone using functions like `filter()` from the `dplyr` package. Similarly, we could filter for speeches belonging to a specific debate by filtering the data based on a title. Subsetting early in the process reduces the amount of data that will be processed later, saving processing time and computational resources. 
 
 - Clean the Dataset: After subsetting, clean the dataset to prepare it for analysis. Cleaning typically involves handling missing values, removing stop words, and normalizing text (e.g., converting text to lowercase). We can clean data with functions like `mutate()` from `dplyr`, or string processing functions like `str_to_lower()`, which transforms text to lower case, from the `stringr` package.
 
-- Analyze the Dataset: Now that the data has been filtered, apply analytical metrics to identify patterns and answer your research question. This may include counting occurrences, calculating averages or proportions, or using statistical methods to examine trends and relationships in the data.
+- Analyze the Dataset: Now that the data has been filtered, apply analytical metrics to identify patterns and answer the research question. This may include counting occurrences, calculating averages or proportions, or using statistical methods to examine trends and relationships in the data.
 
 Although it is possible clean the entire dataset before narrowing it down, doing so can strain our computer's processing power or even exceed its available memory. It is often more desirable to filter the dataset first, then clean the smaller, more manageable portion. Following the order: Load -> Subset -> Clean -> Analyze can optimize data processing, which may be especially useful when analyzing change over decades or centuries of data. 
 
 ## Exercises
 
-1) In the code above, we searched for 5-word phrases that reference "the people." Use the code to find two-word phrases in 1830, 1840, 1850, and 1860 that reference "meeting."  Write a paragraph, quoting at least 10 phrases from each decade.  For each of the phrases mentioned more than five times, describe what prejudices, positive or negative, the phrase encapsulates. Use your evidence to answer the question: how did parliamentary references to meetings change between 1830 and 1860?  
+1) In the code above, we searched for 5-word phrases that reference "the people." Use the code to find two-word phrases in 1830, 1840, 1850, and 1860 that reference "meeting."  Write a paragraph, quoting at least 10 phrases from each decade.  For each of the phrases mentioned more than five times, describe what prejudices, positive or negative, the phrase encapsulates. Use evidence to answer the question: how did parliamentary references to meetings change between 1830 and 1860?  
 
-Tips: Instead of joining every decade together, process the decades separately to avoiding using all your computer's resources. 
+Tips: Instead of joining every decade together, process the decades separately to avoiding using all the computer's resources. 
 
-2) In the code above, we created two kinds of timelines, one for 1867 using a controlled vocabulary of words such as "meeting" and the other for the 1830s using the list of historical events, `eventlist`. Make two more timelines.  Apply the controlled vocabulary to the 1830s, and search for the items in `eventlist` in the 1860s. Use the code above to graph the results. Keep in mind that you will need to adjust your controlled vocabulary to what you find in the data.  
+2) In the code above, we created two kinds of timelines, one for 1867 using a controlled vocabulary of words such as "meeting" and the other for the 1830s using the list of historical events, `eventlist`. Make two more timelines.  Apply the controlled vocabulary to the 1830s, and search for the items in `eventlist` in the 1860s. Use the code above to graph the results. Keep in mind that one may need to adjust the controlled vocabulary to what is found in the data.  
 
-3) Analyze the results of your timelines.  Use iterative investigations of phrases, as modeled above, to conduct a distant reading of the parliamentary speeches.  Using at least ten examples, compose a one-page essay investigating the question: how did parliamentary speakers use references to contemporary and historical events to make arguments for or against political change?
+3) Analyze the results of the timelines.  Use iterative investigations of phrases, as modeled above, to conduct a distant reading of the parliamentary speeches.  Using at least ten examples, compose a one-page essay investigating the question: how did parliamentary speakers use references to contemporary and historical events to make arguments for or against political change?
+
+4) Compare the language of "reform" across decades by finding three-word phrases containing the word "reform." Count the 25 most common phrases in each decade. Then compare the results. Based on the top 25 words, does the language seem to have changed much between these decades? If not, can we find which phrases appear only in one decade and not the other using `anti_join()`?
+
+5. How did Parliament describe "the people" in the 1830s? Generate five-word phrases containing "people" separately for each decade. Count the most frequent phrases. 
+
+6. How did Parliament refer to different forms of political protest in the 1830s and 1860s? Use `str_detect()` and `regex()` to search the original speeches for multiple forms of protest-related words, such as "protest", "protests", "protesting", "agitation", "agitate", "demonstration", and "demonstrations". Compare the results between the two decades. Read at least ten examples from each decade and answer: Did parliamentary descriptions of political protest change between the 1830s and 1860s?
+
+7. Can distant reading help us arrive at questions that close reading can answer? Create one of the chapter's event timelines for a new period. Identify one surprising cluster, increase, absence, or unusual historical reference in the visualization. Then use `str_detect()` to return to the relevant speeches and explain what produced the pattern.
+
+8. Do the most frequent phrases necessarily provide the most historically useful evidence? Generate the top 100 bigrams for one year or period and compare the highest-frequency phrases with less frequent phrases connected to the chapter's controlled vocabulary. Which phrases lead to more useful understanding of Hansard, and why?
+

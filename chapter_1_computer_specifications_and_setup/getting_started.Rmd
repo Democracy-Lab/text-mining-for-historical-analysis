@@ -132,7 +132,7 @@ install.packages("quanteda")
 install.packages("lubridate")
 
 # For stemming and lemmatization 
-# (reducing words to their dictionary or root forms for cleaner analysis)
+# (Reducing words to their dictionary or root forms for cleaner analysis)
 install.packages("textstem")
 ```
 

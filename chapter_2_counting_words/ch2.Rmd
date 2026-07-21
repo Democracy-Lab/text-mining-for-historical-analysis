@@ -24,8 +24,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The introduction to text mining in this book begins with tracking words' context by processing data, counting words, and visualizing the words that co-occur with one-another. As the linguist John Rupert Firth said, "You shall know a word by the company it keeps."^1^  Tracking subtle variations in the context with which different words are used helps historians and other analysts to understand the cultural biases that structure our collective thinking. They may help us to understand how a culture understands men and women differently, how a culture describes people of different nationalities, the difference between a concept like "the foreign" and its near synonyms like "outsider" that nevertheless are used in important and different ways, or how these concepts are changing over time. In the course of this book, we will offer a taste of the subtle and refined approaches that analysts have used to unpack the context of different words.  
-
+Our introduction to text mining begins with tracking words' context by processing data, counting words, and visualizing the words that co-occur with one-another. As the linguist John Rupert Firth said, "You shall know a word by the company it keeps."^1^  Tracking subtle variations in the context with which different words are used helps historians and other analysts to understand the cultural biases that structure our collective thinking. They may help us to understand how a culture understands men and women differently, how a culture describes people of different nationalities, the difference between a concept like "the foreign" and its near synonyms like "outsider" that nevertheless are used in important and different ways, or how these concepts are changing over time. In the course of this book, we will offer a taste of the subtle and refined approaches that analysts have used to unpack the context of different words.  
 Understanding the historical context of language begins with how we interpret and approach individual words. In this chapter, we treat the words we process as "keywords"--terms that are central to understanding culture and society, but whose meanings are often contested or have shifted over time.^2^ For example, the word "labour" may be a particularly interesting word to an analyst of 19th-century Britain, more so than the word "table." This is because in the 19th-century debates, the meaning of the word "labour" evolved alongside industrialization, class conflict, and political reform. Early in the century, labour was often used in economic terms, referring to the input of human work in production, as discussed by political economists like Adam Smith. But as the century progressed—and especially with the rise of trade unions, Chartism, and later the Labour movement—the term labour took on a more political and moral dimension. It began to signify not just work, but the working class itself, with connotations of exploitation, rights, and collective struggle. The meaning of the word "table" on the other hand, is generally stable, literal, and uncontroversial. It refers to a physical object--typically a piece of furniture--and does not carry the kind of cultural significance that keywords do. 
 
 Recognizing words as evolving and changing--rather than fixed--allows us to glean greater insight into how language reflects broader cultural transformations. It invites us not to take words at face value, but to remember that language is dynamic and often shaped by power struggles, and that the way we process data impacts our subsequent analyses of these power struggles.
@@ -88,7 +87,7 @@ Processing both text and dates is important for historical analysis. In this cha
 We can use `data()` to load one of these decade-based subsets of the Hansard corpus. 
 
 ```{r load_hansard_1850}
-# load the Hansard debate text for 1850
+# Load the Hansard debate text for 1850
 data("hansard_1850")
 ```
 
@@ -103,9 +102,11 @@ As shown by Table 2, the first column in this dataset is `sentence_id`, which gi
 Below is an excerpt from `hansardr`: 
 
 ```{r hansard_corpus_sentence_text, results='asis', warning=FALSE, message=FALSE}
+# Select the first five rows of the Hansard dataset
 df_head <- hansard_1850 %>% 
   slice_head(n = 5)
 
+# Display the selected rows as a formatted table
 kable(df_head, 
       caption = "Excerpt from the 1850 Hansard corpus showing 
                  sentence-level text with associated sentence ID values.")
@@ -135,12 +136,12 @@ To count words in Hansard, we will use the `unnest_tokens()` function from `tidy
 In this one-token-per-row format we can easily process our data. This approach to data processing is common in the humanities and handles text using the "Bags of Words" (BoW) approach, where text data is treated as a collection (or "bag") of individual words without regard to grammar, order, or context.^9^ The focus is instead on word frequency or occurrence.
 
 ```{r unnest_tokens}
-# tokenize the 'text' column of the hansard_1850 dataset into individual words
-# - 'unnest_tokens()' from the 'tidytext' package splits text into lowercase words
-# - the new column will be called 'word'
-# - each word becomes its own row 
-tokenized_hansard <- hansard_1850 %>% # create a new data frame
-  unnest_tokens(word, text) # tokenize the 'text' column 
+# tokenize the "text" column of the hansard_1850 dataset into individual words
+# - unnest_tokens() from the tidytext package splits text into lowercase words
+# - The new column will be called "word"
+# - Each word becomes its own row 
+tokenized_hansard <- hansard_1850 %>% # Create a new data frame
+  unnest_tokens(word, text) # Tokenize the "text" column 
 ```
 
 The above code also has new symbols, called "operators." Operators are essential for data processing. Throughout the course of this book we will introduce multiple different kinds of operators. 
@@ -156,14 +157,14 @@ As you inspect the arguments of each function, consider the fact that those argu
 Next, let's inspect the results of our unnesting using `head()`, which returns just the first rows of a data frame.
 
 ```{r show_tokenized_hansard}
-# show the first few rows of our tokenized data
+# Show the first few rows of our tokenized data
 head(tokenized_hansard)
 ```
 
 However, we have a preference for looking at more data since that can give us a fuller picture of the data. 
 
 ```{r show_tokenized_hansard_more_rows}
-# show the first fifteen rows of our tokenized data
+# Show the first fifteen rows of our tokenized data
 head(tokenized_hansard, n=15)
 ```
 
@@ -180,6 +181,7 @@ While `unnest_tokens()` automatically converted all tokens to lowercase and remo
 These preprocessing steps help to standardize the corpus, making subsequent analysis—such as counting words—more consistent. FFor example, in `hansard_1850`, sentences often include commas and periods attached to words, and the same word may appear with different capitalization. Both punctuation and case variation can impact our analysis unless punctuation is removed and capitalization is standardized.
 
 ```{r, results='asis'}
+# Display the first six sentences with their sentence IDs 
 hansard_1850 %>%
   slice_head(n = 6) %>%
   select(sentence_id, text) %>%
@@ -193,11 +195,12 @@ Now we can transform the text to lowercase and strip punctuation.
 # str_to_lower() transforms text to lowercase
 # str_remove_all() removes all matches of a pattern (here, punctuation) from text
 hansard_1850_clean <- hansard_1850 %>%
-  mutate(text = str_to_lower(text), # lowercase
-         text = str_remove_all(text, "[[:punct:]]")) # strip punctuation
+  mutate(text = str_to_lower(text), # Lowercase
+         text = str_remove_all(text, "[[:punct:]]")) # Strip punctuation
 ```
 
 ```{r, results='asis'}
+# Display the first six cleaned sentences with their sentence IDs
 hansard_1850_clean %>%
   slice_head(n = 6) %>%
   select(sentence_id, text) %>%
@@ -213,12 +216,13 @@ Now we are going to bring together what we have learned by chaining together mul
 The `count()` function from the `tidyverse` groups like tokens with like tokens, then counts them. Below, we are passing `count()` one argument, the name of the column to operate on--in this case, "word" from the tokenized hansard data. 
 
 ```{r show_tokenized_hansard_counts, warning=FALSE}
-# count the frequency of each word in the tokenized dataset
-# this creates a data frame with one row per unique word and a column 'n' for the count
+# Count the frequency of each word in the tokenized dataset
+# This creates a data frame with one row per unique word and a column "n" for the count
 tokenized_hansard_counts <- tokenized_hansard %>% # Create a new data frame 
-  count(word) %>% # count how many times each word appears
-  arrange(desc(n)) # sort the results in descending order of frequency
+  count(word) %>% # Count how many times each word appears
+  arrange(desc(n)) # Sort the results in descending order of frequency
 
+# Display the first six rows of the tokenized Hansard word counts
 head(tokenized_hansard_counts)
 ```
 
@@ -229,13 +233,14 @@ We now have a frequency count of every word recorded in the speeches of Hansard,
 The `tidytext` package comes with a prepared list of stop words.  We can remove them from our results by loading the "stop_words" dataset and then passing the dataset as an argument to the `anti_join()` function. `anti_join()` keeps all the rows in the first dataset that do not have a match in the second dataset. Using `anti_join()` we can remove words we do not want in our analysis from our data. 
 
 ```{r load_stopwords, message=FALSE}
-# load tidytext's dataset of common stop words
+# Load tidytext's dataset of common stop words
 data("stop_words")
 
-# remove common stop words from the tokenized word counts
+# Remove common stop words from the tokenized word counts
 stopworded_hansard_counts <- tokenized_hansard_counts %>% # create a new data frame 
   anti_join(stop_words) # exclude words that appear in the stop_words dataset
 
+# Display the first six rows of Hansard word counts with stop words removed
 head(stopworded_hansard_counts)
 ```
 
@@ -248,7 +253,8 @@ General words, of course, give us little insight into the business of parliament
 The `tidyverse` package provides several commands that we will use throughout this book to track individual keywords. The `filter()` function allows us to find an exact match within the data.  Suppose that we want to inspect the tenth sentence of the parliamentary speeches, series 3, volume 108, which has the id number "S3V0108P0_10."  Alternately, `filter()` can be used to subset the `stopworded_hansard_counts` data frame, returning only the rows where the word column contains the value "india". 
 
 ```{r filter_for_india}
-# filter the word column for "india"
+# Filter the word column for "india"
+# Without assigning the output to a variable name it will show automatically 
 stopworded_hansard_counts %>% 
   filter(word == "india")
 ```
@@ -258,13 +264,13 @@ In this code, we pass `filter()` two arguments: first, the name of the column we
 We can do the same for any other keyword of interest. 
 
 ```{r filter_for_france}
-# filter the word column for "france"
+# Filter the word column for "france"
 stopworded_hansard_counts %>% 
   filter(word == "france")
 ```
 
 ```{r filter_for_jamaica}
-# filter the word column for "jamaica"
+# Filter the word column for "jamaica"
 stopworded_hansard_counts %>% 
   filter(word == "jamaica")
 ```
@@ -274,8 +280,8 @@ Filtering for every word we wish to track, one-by-one, can be tedious and time c
 To do this, we can first create our own custom list of words we wish to analyze.
 
 ```{r define_feminine_terms}
-# create a list of words commonly used to identify or refer to women
-# the purpose is to help filter or analyze texts for references to women
+# Create a list of words commonly used to identify or refer to women
+# The purpose is to help filter or analyze texts for references to women
 identifiers_for_woman <- c("girl", "woman", "girls", "women", "wife", "wives", "widow", 
                            "widows", "sister", "sisters", "female", "females", 
                            "grandmother","grandmothers", "aunt", "aunts")
@@ -284,8 +290,8 @@ identifiers_for_woman <- c("girl", "woman", "girls", "women", "wife", "wives", "
 Now we can use the `%in%` operator to check if a word from our list, `identifiers_for_woman`, is in the "word" column. 
 
 ```{r filter_for_feminine_terms}
-# filter the word counts to keep only those words that identify or refer to women
-# this checks if each word is in the 'identifiers_for_woman' list
+# Filter the word counts to keep only those words that identify or refer to women
+# This checks if each word is in the "identifiers_for_woman" list
 stopworded_hansard_counts %>% 
   filter(word %in% identifiers_for_woman)
 ```
@@ -293,18 +299,18 @@ stopworded_hansard_counts %>%
 `filter()` is useful for more than just text data. It also works on quantitative data with comparison operators like the greater than, `>`, or less than, `<`, signs. This is handy if we want to filter for words that are said more or less than a specified number of times, as one example. For the sake of readability, we are only going to show the first 20 words that follow our filter. 
 
 ```{r filter_words_for_less_than_n}
-# filter the word counts to include only words that appear fewer than 474 times
 stopworded_hansard_counts %>% 
-  filter(n < 474) %>% # filter for words stated less than 474 times
+  filter(n < 474) %>% # Filter for words stated less than 474 times
   slice_max(order_by = n, n = 20) # select the 20 most frequent words
 ```
 
 We can also use multiple operators in conjunction with one-another. In the following code we do this by supplying the `&` operator to combine multiple conditions. The following example filters rows where n is greater than 474 and less than 476.
 
 ```{r filter_words_for_between_n}
+
 stopworded_hansard_counts %>% 
-  filter(n > 474 & n < 476) %>% # keep words that occur exactly 475 times
-  slice_max(order_by = n, n = 20) # select 20 words (all will have n = 475)
+  filter(n > 474 & n < 476) %>% # Keep words that occur exactly 475 times
+  slice_max(order_by = n, n = 20) # Select 20 words (all will have n = 475)
 ```
 
 In just this quick glimpse of our data, meaningful words are beginning to appear. The word "Jamaica," for example, appears along with the word "depositors." These words hint at the political, economic, and social issues of the time, specifically the declining state of the economy. Members of Parliament discussed the slave revolt in Jamaica, including its scale and significance. Since the 17th century, Jamaica had its own parliament but was placed under martial law during the revolt. Its appearance here demonstrates that Jamaica was significant enough to command parliamentary attention, elevating the revolt to a major historical event that could not be ignored by Parliament.
@@ -318,7 +324,7 @@ Our next function, `str_detect()`, treats data as patterns and detects their pre
 In the following example, we iterate through each word in the `identifiers_for_woman` list to check whether the value contains "girl."
 
 ```{r str_detect_girl}
-# check which words in 'identifiers_for_woman' contain "girl"
+# Check which words in identifiers_for_woman contain "girl"
 identifiers_for_woman %>% 
   str_detect("girl")
 ```
@@ -328,11 +334,11 @@ The results from `str_detect()` are not very telling for analysis. Instead, for 
 The following example searches `hansard_1850` for the keyword "coal." Notice that `str_detect()` is nested inside the command `filter()`.  Together, these commands tell the computer to filter for only those rows of the column "text" that contain the keyword "coal."
 
 ```{r str_detect_coal}
-# filter speeches that mention the exact word "coal"
+# Filter speeches that mention the exact word "coal"
 # \\b ensures "coal" is matched as a whole word, not as part of another word 
 # (e.g. "coalesce")
-hansard_coal <- hansard_1850 %>% # create a new data frame
-  filter(str_detect(text, "\\bcoal\\b")) # filter the text 
+hansard_coal <- hansard_1850 %>% # Create a new data frame
+  filter(str_detect(text, "\\bcoal\\b")) # Filter the text 
 ```
 
 Something else interesting is happening in our code. The word "coal" has a funny looking set of characters, `\\b`, on either side. Together with the word "coal," these special characters are make up part of a "regular expression" often abbreviated as "regex." Regular expressions are sequences of characters that define search patterns, typically used for string matching, processing, and extraction. 
@@ -342,8 +348,10 @@ One reason the `str_detect()` function is so special is because, unlike `filter(
 The result of our search is variable, `hansard_coal`, that contains only sentences from the 1850 debates that contain the word "coal."
 
 ```{r show_hansard_coal}
+# Load functions for creating formatted tables
 library(knitr)
 
+# Display the first six text entries from the filtered Hansard data
 hansard_coal %>%
   head() %>%
   select(text) %>%
@@ -359,17 +367,18 @@ We already have everything we need to make this happen: we can search for a keyw
 The following code chains multiple data processing steps together.
 
 ```{r find_coal_context, message=FALSE}
-# tokenize the 'text' column into individual lowercase words
-# remove common stop words (e.g., 'the', 'and') that carry little meaning
-# filter out any tokens that contain digits (e.g., years, numbers)
-# count the frequency of each remaining word
-# arrange the word counts in descending order for easier interpretation
-coal_context <- hansard_coal %>% # create a new data frame 
-  unnest_tokens(word, text) %>% # tokenize text
-  anti_join(stop_words) %>% # remove stop words
-  filter(!str_detect(word, "[:digit:]")) %>% # remove tokens with digits
-  count(word) %>% # count tokens
-  arrange(desc(n)) # sort by frequency
+# Tokenize and count words in the "text" column of the hansard_coal dataset
+# - unnest_tokens() splits the text into individual lowercase words
+# - anti_join() removes common stop words (e.g., "the", "and")
+# - str_detect() identifies and removes tokens that contain digits (e.g., years, numbers)
+# - count() counts the frequency of each remaining word
+# - arrange() sorts the word counts in descending order for easier reading
+coal_context <- hansard_coal %>% # Create a new data frame 
+  unnest_tokens(word, text) %>% # Tokenize the "text" column
+  anti_join(stop_words) %>% # Remove stop words
+  filter(!str_detect(word, "[:digit:]")) %>% # Remove tokens with digits
+  count(word) %>% # Count word frequencies
+  arrange(desc(n)) # Sort by frequency
 ```
 
 Instead of running these functions independently, we have chosen to chain them together with the pipe, `%>%`, operator. Using the pipe allows us to use many functions sequentially without storing intermediary variables. 
@@ -387,21 +396,21 @@ We can visualize just the top 20 words that co-occur with the word "coal" by sel
 To visualize our data, we will use `ggplot`. `ggplot` is an R package used for creating visualizations. It follows an approach that allows users to build plots layer by layer, combining data, aesthetics (e.g., axes, colors), and geometric objects (e.g., points, lines) to create visualizations. We will use `ggplot` frequently throughout this book. 
 
 ```{r visualize_coal_context, fig.cap="Top words in sentences mentioning coal (Hansard, 1850)", message=FALSE}
-# select the top 20 most frequent words from the 'coal_context' dataset
-# this will be used to limit the plot to the most relevant terms
+# Select the top 20 most frequent words from the coal_context dataset
+# This will be used to limit the plot to the most relevant terms
 top_coal <- coal_context %>%
-  top_n(20)  # top 20 words
+  top_n(20)  # Top 20 words
 
-# create a horizontal bar chart of word frequencies
-# this visualizes the most common terms in coal-related sentences
+# Create a horizontal bar chart of word frequencies
+# This visualizes the most common terms in coal-related sentences
 ggplot(data = top_coal) +  
-  geom_col(aes(x = reorder(word, n), y = n), # bar chart with reordered x-axis
-           fill = "steel blue") + # set bar color
-  coord_flip() + # flip for horizontal layout
-  labs(title = "Top Words from Sentences Mentioning Coal", # add title
-       subtitle = "From the 1850 Hansard debates", # add subtitle
-       x = "Word", # x-axis label
-       y = "Count") # y-axis label
+  geom_col(aes(x = reorder(word, n), y = n), # Bar chart with reordered x-axis
+           fill = "steel blue") + # Set bar color
+  coord_flip() + # Flip for horizontal layout
+  labs(title = "Top Words from Sentences Mentioning Coal", # Add title
+       subtitle = "From the 1850 Hansard debates", # Add subtitle
+       x = "Word", # X-axis label
+       y = "Count") # Y-axis label
 ```
 
 Figure 1.1 displays the results of our code: a bar chart showing how many times "coal" was mentioned, along with the most frequent words that co-occur with the term. Note that because we are analyzing collocates, these counts do not reflect the total number of times they were mentioned between 1850 to 1859. Instead, the counts represent the total number of times these words appear in the same context as "coal." 
@@ -415,19 +424,20 @@ Taken together, the visualization emphasizes the central role of coal in the Bri
 Our analysis will gain nuance the more we compare near concepts.  While coal was important to powering Britain's industrial revolution, perhaps the most controversial economic debates of the 1850s revolved around the issue of the Corn Laws, the system of taxation of wheat and other grains, which were originally introduced to protect British farmers.  Working-class demands for cheap bread led to the repeal of the Corn Laws in 1846.  Knowledge of these facts might lead us to ask: were coal and corn debated using the same language or different words?
 
 ```{r find_show_corn_context, message=FALSE}
-# filter the dataset to include only rows where the word "corn" appears as a whole word
-# tokenize the filtered text into individual lowercase words
-# remove stop words that carry little semantic weight
-# exclude any tokens containing digits (e.g., "1850", "2nd")
-# count the frequency of each remaining word
-# sort the words in descending order of frequency
-corn_context <- hansard_1850 %>% # create a new data frame
-  filter(str_detect(text, "\\bcorn\\b")) %>% # filter rows with 'corn' as a whole word
-  unnest_tokens(word, text) %>% # tokenize text
-  anti_join(stop_words) %>% # remove stop words
-  filter(!str_detect(word, "[:digit:]")) %>% # remove tokens with digits
-  count(word) %>% # count word frequency
-  arrange(desc(n)) # sort by frequency
+# Identify and count words that appear in text containing the word "corn"
+# - str_detect() filters rows where "corn" appears as a whole word
+# - unnest_tokens() splits the filtered text into individual lowercase words
+# - anti_join() removes common stop words (e.g., "the", "and")
+# - str_detect() identifies and removes tokens that contain digits (e.g., years, numbers)
+# - count() counts the frequency of each remaining word
+# - arrange() sorts the word counts in descending order for easier reading
+corn_context <- hansard_1850 %>% # Create a new data frame
+  filter(str_detect(text, "\\bcorn\\b")) %>% # Filter rows containing "corn" as a whole word
+  unnest_tokens(word, text) %>% # Tokenize the "text" column
+  anti_join(stop_words) %>% # Remove stop words
+  filter(!str_detect(word, "[:digit:]")) %>% # Remove tokens with digits
+  count(word) %>% # Count word frequencies
+  arrange(desc(n)) # Sort by frequency
 
 head(corn_context)
 ```
@@ -435,21 +445,21 @@ head(corn_context)
 Already we can see the words that most frequently co-occurred with our keyword "corn." Visualizing the top 20 words using `ggplot` makes this context easier to apprehend. 
 
 ```{r visualize_corn_context, fig.cap="Top words in sentences mentioning corn (Hansard, 1850)", message=FALSE}
-# select the 20 most frequent words from the corn-related word counts
-# this subset will be used to visualize the most relevant terms
+# Select the 20 most frequent words from the corn-related word counts
+# This subset will be used to visualize the most relevant terms
 top_corn <- corn_context %>%
-  top_n(20)  # top 20 words
+  top_n(20)  # Top 20 words
 
-# create a horizontal bar plot showing word frequencies
-# this plot highlights the most common words in sentences mentioning "corn"
+# Create a horizontal bar plot showing word frequencies
+# This plot highlights the most common words in sentences mentioning "corn"
 ggplot(data = top_corn) +
-  geom_col(aes(x = reorder(word, n), y = n), # draw bars sorted by count
-           fill = "steel blue") + # set bar color
-  coord_flip() + # flip axes for horizontal bars
-  labs(title = "Top Words Occurring in Sentences Mentioning Corn", # add title
-       subtitle = "From the 1850 Hansard debates", # add subtitle
-       x = "Word", # x-axis label
-       y = "Count") # y-axis label
+  geom_col(aes(x = reorder(word, n), y = n), # Draw bars sorted by count
+           fill = "steel blue") + # Set bar color
+  coord_flip() + # Flip axes for horizontal bars
+  labs(title = "Top Words Occurring in Sentences Mentioning Corn", # Add title
+       subtitle = "From the 1850 Hansard debates", # Add subtitle
+       x = "Word", # X-axis label
+       y = "Count") # Y-axis label
 ```
 
 Comparison between Figure 1.1, the words used in the context of coal, and Figure 1.2, the words used in the context of coal, gives us a foothold for beginning to think about how taxation was discussed in different contexts.  For instance, the context of both keywords reference the role of "time", "duties", "taxes", and the "government", but debates over corn are more linked to the question of Britain's dependence "foreign" powers, whereas debates over coal are more crucially related to the condition of "England" itself. 
@@ -481,7 +491,7 @@ We will cover joins in greater detail in Chapter 2. For now it's just important 
 
 ```{r show_hansard_1850_with_metadata, message=FALSE}
 # Merge the hansard_1850 text data with its corresponding metadata
-# using a left join to keep all rows from hansard_1850
+# A left join to keeps all rows from hansard_1850
 hansard_1850_with_metadata <- left_join(hansard_1850, debate_metadata_1850)
 
 hansard_1850_with_metadata %>%
@@ -495,8 +505,8 @@ In the following code we filter for speech dates that are on or after (greater t
 
 ```{r find_months}
 # Filter the dataset to include only speeches from February 1850
-top_month <- hansard_1850_with_metadata %>% # create a new data frame
-  filter(speechdate >= "1850-02-01", # filter
+top_month <- hansard_1850_with_metadata %>% # Create a new data frame
+  filter(speechdate >= "1850-02-01", # Filter
          speechdate <= "1850-02-28")
 ```
 
@@ -505,27 +515,29 @@ KWIC returns a concordance-style text output with the words that come directly b
 When using `KWIC()` we can specify the keyword, the maximum number of words to display before and after the keyword, and we can also tell `KWIC()` to do a case insensitive match so that we match with uppercase or lowercase instances of our keyword.
 
 ```{r intro_quanteda, message=FALSE, warning=FALSE}
-# load the quanteda package
+# Load the quanteda package
 library("quanteda")
 
-# convert the filtered february 1850 dataset into a quanteda corpus object
-# specify that the 'text' column contains the actual speech content
+# Convert the filtered february 1850 dataset into a quanteda corpus object
+# Specify that the "text" column contains the actual speech content
 my_corpus <- corpus(top_month, text_field = "text") 
 
-# search for instances of the word "corn" in the corpus
-# extract 5 words before and after each occurrence
-# make the search case-insensitive so it matches "corn", "Corn", etc.
-corn_kwic <- kwic(tokens(my_corpus), # tokenize corpus
-                  "corn", # keyword to search
-                  window = 5, # number of words before/after
-                  case_insensitive = TRUE) # match regardless of case
+# Search for instances of the word "corn" in the corpus
+# Extract 5 words before and after each occurrence
+# Make the search case-insensitive so it matches "corn", "Corn", etc.
+corn_kwic <- kwic(tokens(my_corpus), # Tokenize corpus
+                  "corn", # Keyword to search
+                  window = 5, # Number of words before/after
+                  case_insensitive = TRUE) # Match regardless of case
 ```
 
 We can convert our KWIC results into a regular data frame and display them using `kable()`, which formats the table neatly.
 
 ```{r create_corn_df}
+# Convert the corn KWIC results to a data frame
 corn_df <- as.data.frame(corn_kwic)
 
+# Display the first 15 rows as a formatted table
 corn_df %>%
   head(15) %>%
   kable()
@@ -542,7 +554,7 @@ With collocate analysis alone, we cannot trace discourses over time -- a crucial
 Our research questions might necessitate analytical steps that go beyond the built-in functions provided to us in R packages alone. We may want to create our own functions to customize how words are identified, filtered, or visualized so that the analysis reflects our specific research goals. Or, we might want to create reusable code that keeps us from rewriting the same data processing steps over and over. To demonstrate our point, we are going to write a basic, reusable function for counting and visualizing words. First, however, we want to provide a basic understanding of a function's underlying components, by creating a simple function: 
 
 ```{r function_demo}
-# define a custom function to add two numbers
+# Define a custom function to add two numbers
 add_numbers <- function(a, b) { 
   result <- a + b 
   return(result) }
@@ -562,7 +574,7 @@ We can now use our new `add_numbers()` function by passing arguments to the spec
 Now that we have defined this function, we can call upon it whenever we need to add two numbers without rewriting the steps involved. This kind of reuse becomes especially important in historical analysis, which is often iterative and rarely linear. As our interpretations shift and our questions evolve, we often return to the same operations with new purposes. Having stable tools like functions allows us to revisit and revise our analyses without starting from scratch each time.
 
 ```{r apply_function}
-# use the new function we created to add 2 and 3
+# Use the new function we created to add 2 and 3
 print(add_numbers(2, 3))
 ```
 
@@ -571,57 +583,57 @@ In the following code we create a function for filtering the Hansard data for a 
 Creating a function will allow us to automatically create a series of graphs for the keywords we wish to analyze. Producing many graphs in succession is good practice for exploratory data analysis (EDA), the stage of research where we look at the data to understand its basic patterns, structure, and possible meanings before doing formal interpretation or modeling. Performing a comparative analysis of graphs side-by-side is one of the main skills digital humanists use when considering the subtle structures of meaning and difference that define cultural and political conversations. A careful comparison between the charts above offers the beginnings of a nuanced analysis of overlapping terms used by British members of parliament to refer to people and forces from beyond Britain.
 
 ```{r generate_word_plot, message=FALSE}
-# define a function to generate a bar plot of top words that co-occur with a given keyword
-# filters the dataset for rows containing the keyword as a whole word
-# tokenizes the text, removes stop words and numeric tokens
-# keeps the top 20 most frequent words and plots them as a horizontal bar chart
+# Define a function to generate a bar plot of top words that co-occur with a given keyword
+# Filters the dataset for rows containing the keyword as a whole word
+# Tokenizes the text, removes stop words and numeric tokens
+# Keeps the top 20 most frequent words and plots them as a horizontal bar chart
 generate_word_plot <- function(keyword, hansard_data) {
     
     filtered_hansard_1850 <- hansard_data %>%
       filter(str_detect(text, regex(paste0("\\b", keyword, "\\b"), 
-                                    ignore_case = TRUE))) %>% # filter rows
-      unnest_tokens(word, text) %>% # tokenize text
-      anti_join(stop_words) %>% # remove stop words
-      filter(!str_detect(word, "[:digit:]")) %>% # remove numeric tokens
-      count(word) %>% # count word frequency
-      top_n(20) # keep top 20 words
+                                    ignore_case = TRUE))) %>% # Filter rows
+      unnest_tokens(word, text) %>% # Tokenize text
+      anti_join(stop_words) %>% # Remove stop words
+      filter(!str_detect(word, "[:digit:]")) %>% # Remove numeric tokens
+      count(word) %>% # Count word frequency
+      top_n(20) # Keep top 20 words
     
-    plot <- ggplot(filtered_hansard_1850) + # create a new dataset for the plot                       
-      geom_col(aes(x = reorder(word, n), y = n), # bar chart ordered by count
-               fill = "steel blue") + # set bar color
-      coord_flip() + # horizontal bars
+    plot <- ggplot(filtered_hansard_1850) + # Create a new dataset for the plot                       
+      geom_col(aes(x = reorder(word, n), y = n), # Bar chart ordered by count
+               fill = "steel blue") + # Set bar color
+      coord_flip() + # Horizontal bars
       labs(title = paste("Top Words Occurring in Sentences Mentioning", 
-                         toupper(keyword)), # plot title
-           subtitle = "From the 1850 Hansard debates", # plot subtitle
-           x = "Word", # x-axis label
-           y = "Count") # y-axis label
+                         toupper(keyword)), # Plot title
+           subtitle = "From the 1850 Hansard debates", # Plot subtitle
+           x = "Word", # X-axis label
+           y = "Count") # Y-axis label
     
-    print(plot) } # display the plot
+    print(plot) } # Display the plot
 ```
 
 ```{r generate_plot_foreign, fig.cap="Top words in sentences mentioning foreign (Hansard, 1850)", message=FALSE}
-# use our function to create a clean bar plot of the top 20 words in sentences 
-# mentioning the word "foreign"
+# Use our function to create a clean bar plot of the top 20 words in sentences 
+# Mentioning the word "foreign"
 generate_word_plot("foreign", hansard_1850)
 ```
 
 ```{r generate_plot_colonial, fig.cap="Top words in sentences mentioning colonial (Hansard, 1850)", message=FALSE}
-# do the same for sentences that mention the word "colonial"
+# Do the same for sentences that mention the word "colonial"
 generate_word_plot("colonial", hansard_1850)
 ```
 
 ```{r generate_plot_savage, fig.cap="Top words in sentences mentioning savage (Hansard, 1850)", message=FALSE}
-# do the same for sentences that mention the word "savage"
+# Do the same for sentences that mention the word "savage"
 generate_word_plot("savage", hansard_1850)
 ```
 
 ```{r generate_plot_native, fig.cap="Top words in sentences mentioning native (Hansard, 1850)", message=FALSE}
-# do the same for sentences that mention the word "native"
+# Do the same for sentences that mention the word "native"
 generate_word_plot("native", hansard_1850)
 ```
 
 ```{r generate_plot_barbarian, fig.cap="Top words in sentences mentioning barbarian (Hansard, 1850)", message=FALSE}
-# do the same for sentences that mention the word "barbarian"
+# Do the same for sentences that mention the word "barbarian"
 generate_word_plot("barbarian", hansard_1850)
 ```
 
@@ -645,6 +657,7 @@ Looking at the first lines of `hansard_1850`, you might ask yourself these quest
 Analyzing the entire data frame to further inspect the data can be distracting since a data frame usually contains multiple columns, some which may be irrelevant to our current query. 
 
 ```{r table_hansard_1850_with_metadata}
+# Display the first six rows of the Hansard dataset with metadata
 hansard_1850_with_metadata %>%
   head() %>%
   kable()
@@ -652,31 +665,23 @@ hansard_1850_with_metadata %>%
 
 We can make the data more readable by displaying just the data from the column of interest. 
 
-In the following code, we use `hansard_1850[1:10, 2]` to select a specific item from `hansard_1850`. `hansard_1850` refers to a data frame or matrix, and `[1, 2]` refers to the row and column indices we wish to look at. The structure of the syntax is this: `[row, column]`.  The numeric range, `1:10`, in the "row" field tells R to display rows 1 to 10.  We put "2" in the "column" field to tell R to display just the second column, which in this case is the column containing text. 
+In the following code, we use `hansard_1850[[2]][1:10]` to select the first ten text entries from the second column of hansard_1850. The double brackets, `[[2]]`, select the second column, which contains the text of the Hansard debates. We then use `[1:10]` to select the first ten entries from that column.
 
-```{r subset_hansard_1850, eval=FALSE}
-# view rows 1 to 10 from the 2nd column of the hansard_1850 dataset
-hansard_1850[1:10, 2]
-```
-
-```{r show_table_no_code, tidy=TRUE, tidy.opts=list(width.cutoff=60),echo=FALSE}
-# code does not show, only table 
-knitr::kable(setNames(hansard_1850[1:10, 2], NULL), format = "markdown")
+```{r subset_hansard_1850}
+# View rows 1 to 10 from the 2nd column of the hansard_1850 dataset
+hansard_1850[[2]][1:10]
 ```
 
 Some of the rows in the "text" field appear not to be complete sentences. We can investigate this oddity further. 
 
-```{r inspect_text, eval=FALSE}
-# view the first row from the 2nd column of the hansard_1850 dataset
-hansard_1850[1, 2]
+In the following code, we use `hansard_1850[[2]][1]` to select specific text from `hansard_1850`. This time we will view just the first row. 
+
+```{r inspect_text}
+# View the first row from the 2nd column of the hansard_1850 dataset
+hansard_1850[[2]][1]
 ```
 
-```{r show_table_inspection, tidy=TRUE, tidy.opts=list(width.cutoff=60),echo=FALSE}
-# code does not show, only table 
-knitr::kable(setNames(hansard_1850[1, 2], NULL), format = "markdown")
-```
-
-At this point the dataset is too broad to clearly display by printing, and some data is cut off. To view the whole text, double-click on the cell, copy and paste the text into a word processor. The content reads like so: 
+Viewing the dataset this way also displays additional formatting that can make longer passages difficult to read. To view the complete text more clearly, double-click the cell, then copy and paste the text into a word processor. The passage reads as follows:
 
 > ", which had been prorogued successively from the 1st of August to the 9th of October, from thence to the 20th of November, thence to the 16th of January, and from thence to the 31st January, met this day for despatch [sic] of business."
 
@@ -684,13 +689,9 @@ The first row appears to be a description of the opening of parliament.  Technic
 
 Let's keep inspecting the data, this time turning to the third row in our dataset.
 
-```{r keep_inspecting, eval=FALSE}
-# view the third row from the 2nd column of the hansard_1850 dataset
-hansard_1850[3, 2]
-```
-
-```{r keep_inspecting_2, tidy=TRUE, tidy.opts=list(width.cutoff=60),echo=FALSE}
-knitr::kable(setNames(hansard_1850[3, 2], NULL), format = "markdown")
+```{r keep_inspecting}
+# View the third row from the 2nd column of the hansard_1850 dataset
+hansard_1850[[2]][3]
 ```
 
 Here, we see another sentence fragment:
