@@ -1,0 +1,1167 @@
+---
+title: "Chapter 8 - revised jg 3-18-26"
+output: html_document
+date: "2026-03-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This notebook introduces a way of studying language that treats meaning not as a fixed definition, but as a pattern of use across a corpus. Instead of asking what a word means in the abstract, we ask how it behaves -- what other words it appears with, how those patterns cluster, and how they change over time. This approach draws on a long-standing insight in the humanities: that the meanings of concepts and other words are always changing, always being generated anew, from within the context of other events. Here, we operationalize that idea computationally, using large collections of congressional text about climate change.
+
+We begin with a simple but powerful structure: the term-co-occurrence matrix (TCM). This matrix records how often words appear near one another. Each row of the TCM can be read as a vector—a long list of counts describing the contexts in which a word occurs. These vectors are interpretable but unwieldy: they are large, sparse, and tied directly to observed frequencies. To move beyond this, we use the GloVe algorithm to compress these patterns into word embeddings—dense vectors that represent words as coordinates in a learned semantic space. These embeddings allow us to measure similarity, identify neighborhoods of meaning, and compare how words shift across time.
+
+The goal of the notebook is both methodological and interpretive. You will learn how to construct and inspect these representations step by step, from raw text to co-occurrence structure to embeddings. But more importantly, you will learn how to read them as historical evidence. When a word’s nearest neighbors change, its meaning is being renegotiated. When a vector shifts position in space, something in the discourse has moved. By the end, you will be able to move between close reading and computational analysis—using word vectors not as a replacement for interpretation, but as a tool for discovering patterns that invite it.
+
+
+```{r load-packages}
+library(text2vec)
+library(stringr)
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(tmha.data)
+library(stringr)
+library(stopwords)
+
+# define a text cleaning function
+clean_text_for_embeddings <- function(x) {
+  x %>%
+    str_replace_all("[\r\n\t]+", " ") %>%          # replace newlines / tabs with spaces
+    str_replace_all("[[:cntrl:]]", " ") %>%        # remove control characters
+    str_replace_all("’", "'") %>%                  # normalize curly apostrophes
+    str_replace_all("“|”", '"') %>%                # normalize curly quotes
+    str_replace_all("—|–", " ") %>%                # normalize long dashes
+    str_replace_all("[^[:alnum:]' ]+", " ") %>%    # strip most punctuation / non-word artifacts
+    str_squish()                                   # collapse repeated whitespace
+}
+
+# get speeches from 2000 to the present, divided by decade.
+
+# download the data from tmha.data 
+data("congress_daily_climate_change_2000_2020")
+
+# create a dataframe for 2000-10
+congress_daily_climate_change_2000 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2000") %>% # filter for the right decade
+  select(content) %>% # just the speeches
+  pull(content) %>% 
+  clean_text_for_embeddings()
+
+# create a dataframe for 2010-20
+congress_daily_climate_change_2010 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2010") %>% # filter for the right decade
+  select(content) %>% # just the speeches
+    pull(content) %>% 
+  clean_text_for_embeddings() 
+
+# create a dataframe for 2020 to the present
+congress_daily_climate_change_2020 <- congress_daily_climate_change_2000_2020 %>% 
+  filter(decade == "2020") %>% # just the speeches
+    pull(content) %>% 
+  clean_text_for_embeddings() 
+```
+
+The notebook will introduce several new functions, among them, the function pull(), which is used to extract a single column from a data frame as a simple vector. In a tidy workflow, this is often necessary because many analytical functions—such as tokenizers or modeling routines—expect a plain sequence of values rather than a structured table. By using pull(), we move from a tabular representation of the data to a one-dimensional object that can be processed directly, while still preserving the clarity of a pipeline. Conceptually, this step marks a shift from working with data as a collection of variables to working with a specific variable as the object of analysis. We perform this reduction of our data because we will be working with downstream software packages that require one-dimensional data, not tidy data.  
+
+In this notebook, we will also employ several non-tidy functions from the text2vec package. The software package we will use to create our word embeddings, text2vec, contains commands that we cannot execute in a tidy fashion. There are many other software packages used for embeddings and transformer-based embeddings, and most of them lie outside of the tidyverse family of functions that we have introduced so far.  Tidy commands remain important for processing the results of word embeddings, and we will return to them at several points below, as a way of interpreting, visualizing, and further peering into the levels of analysis that word embeddings make possible. 
+
+Notice that, even while the specific functions that follow may be new to you, we are still using the same research process -- tokenizing data, then inspecting the results, before using data science to manipulate the tokens.  
+
+
+```{r, include=FALSE}
+# tokenize text
+tokens <- word_tokenizer(str_to_lower(congress_daily_climate_change_2000))
+head(tokens[[1]])
+```
+
+'Tokens' is now a list. Each element is one speech, represented as a character vector of words
+  
+```{r, include=FALSE}
+  # Example:
+tokens[[1]][1:20]
+```
+
+At this step, we convert our list of tokenized texts into an iterator, a structured object that allows the text2vec functions to process the corpus efficiently. The itoken() function takes each element of our token list—each speech or document—and prepares it to be read sequentially, rather than all at once. By assigning ids = seq_along(tokens), we give each document a unique identifier, ensuring that the model can keep track of where each sequence of words comes from. Setting progressbar = FALSE simply suppresses visual output during processing. Conceptually, this step does not change the content of the data; it reorganizes it into a form that can be systematically passed through the vocabulary builder and matrix construction functions that follow.
+
+Next, we build a 'vocabulary,' meaning a list of every word in the corpus with its count. Here, we use the text2vec commands 'create_vocabulary()' and 'prune_vocabulary' to do work we might have done using count() and filter(). We use the text2vec vocabulary, rather than tidy format, because we are building a structured vocabulary object used for matrices.
+
+
+```{r, include=FALSE}
+it <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE)
+             
+vocab <- create_vocabulary(it) %>% 
+    prune_vocabulary(term_count_min = 5)
+  
+# Inspect vocabulary
+vocab %>% slice(500:520)
+```
+  
+At this step, we convert our vocabulary into something the model can use to build a matrix. The function vocab_vectorizer(vocab) creates a mapping between words and positions in a matrix.
+
+Concretely, every word in the vocabulary is assigned an index—an integer position. For example, ‘congress’ might be assigned position 127, ‘climate’ position 342, and so on. These positions correspond to rows and columns in the matrices we build next.
+
+The result is a vectorizer object. It does not yet contain counts or co-occurrences. Instead, it encodes the rules for how words will be translated into a numerical representation.
+
+If the vocabulary is a dictionary of words, the vectorizer is the indexing system that tells us where each word lives in a matrix. Without it, we would not be able to construct a consistent numerical representation of the corpus. This is a crucial step because matrices cannot store words directly. Matrices store numbers. The vectorizer is what makes it possible to consistently translate between words and their numeric positions.
+
+```{r, include=FALSE}
+vectorizer <- vocab_vectorizer(vocab)
+```
+  
+The next step constructs the term-co-occurrence matrix (TCM), which is the foundational representation of context in this pipeline. The TCM records how often each word appears near every other word within a defined window, producing a large matrix where rows represent target words, columns represent context words, and each cell contains a co-occurrence count. 
+
+To create the TCM, we will use the function create_tcm().  Create_tcm() takes as its arguments the 'it' iterator (that we produce with itoken() on the basis of our vocabulary and the vectorizer (that we produced above), and an argument called 'skip_grams_window.' The iterator (it, produced by itoken()) supplies the data itself—the ordered stream of tokens, grouped by document, that the function will scan through to look for co-occurrences. It tells the function what words appear, and in what sequence.  The vectorizer (vocab_vectorizer(vocab)) supplies the indexing system—a fixed mapping from words to numeric positions in the matrix. It tells the function where each word belongs in the rows and columns of the TCM. In other words, the iterator provides the content, while the vectorizer provides the structure. 
+
+When we construct the term–co-occurrence matrix, we must decide what counts as a “context window” for any given word.  The 'skip_grams_window' parameter specifies this context window for analysis as the span of text within which words are considered to co-occur. For each target word, the algorithm examines a fixed number of positions to the left and right—five, in this case—and records all words that fall within that range as part of its context. The term “skip-gram” simply indicates that these co-occurrences are not limited to immediately adjacent words; intervening terms may be “skipped,” so that words separated by one or more positions are still treated as contextually related. The size of this window has interpretive consequences. 
+
+A narrower window tends to capture local, syntactic relations—collocations and phrase structure—while a wider window draws in more diffuse, thematic associations across the sentence. In setting this parameter, one is therefore making an implicit decision about the scale at which meaning is to be modeled: whether as tightly bounded linguistic structure or as a broader field of conceptual association. This choice matters because it determines the scale at which meaning is captured. A smaller window emphasizes tight, phrase-level relationships—words that form expressions or grammatical units—while a larger window captures broader thematic associations across a sentence. By setting the window, we are implicitly making a claim about how meaning operates in language: whether it is primarily local and syntactic, or more diffuse and conceptual.
+
+In the code that follows, we set the context window at five, which means that each word is paired with other words that appear up to five positions away in the text. 
+  
+  
+```{r, include=FALSE}
+
+## Build the term-co-occurrence matrix (TCM)
+it_tcm <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE) #This line creates a document iterator specifically for building the TCM, even though it looks identical to the earlier itoken() call.
+tcm <- create_tcm(it_tcm, vectorizer, skip_grams_window = 5L)
+
+# inspect the results  
+tcm[350:360, 350:360]     # small slice (still sparse), not using the first words, which are numbers
+```
+
+Inspecting the data demonstrates that the TCM is another representation of collocates. On the rows are target words; in the columns are context words.  
+
+At this stage, nothing has been compressed or abstracted: this is the full, “unreduced” structure of observed language use, capturing the raw patterns from which semantic relationships will later be learned.
+
+However, the numbers are not literal collocation counts, showing how often the two words appear next to each other. Rather, they are decimals that represent we call a "weighted count." 
+
+The weighted count reflects the ratio of collocates over the context window.  A context window of five words does not treat every nearby term as equally informative. Words immediately adjacent to the target are given the greatest weight, while words that appear farther away contribute less. In effect, proximity is treated as a graded signal rather than an all-or-nothing condition: a word one position away counts more strongly than a word two or three positions away. 
+
+This is a sensible choice, since words closest to the target are often the most semantically revealing, while those at the edge of the window are more likely to introduce incidental noise. Weighting co-occurrences by distance therefore helps the model distinguish stronger contextual ties from weaker ones, improving the quality of the semantic structure learned by GloVe.
+
+The TCM as it stands is already a valuable instrument for research.
+
+### Using the TCM to Interpret Discourse
+
+Because the TCM is basically an index of collocates, we can use the TCM to inspect one word and its collocates.
+
+```{r, include=FALSE}
+# use the tcm to look at the co-occurrences of one word
+keyword <- "democracy" # choose a keyword to investigate
+
+tcm[keyword, 350:355]
+```
+This returns a sparse vector. It's mostly zeros, and not very readable.
+
+```{r, include=FALSE}
+# Look at a denser representation of the co-occurrences of one word
+
+# Extract one row from the TCM corresponding to a target word
+# This returns a sparse vector: most entries are zero (no co-occurrence)
+vec <- tcm["congress", ]
+
+# Convert the sparse vector into a regular numeric vector
+# This makes it easier to inspect, sort, and manipulate
+vec_dense <- as.numeric(vec)
+
+# Assign names to each entry in the vector
+# The names correspond to the context words (columns of the TCM)
+names(vec_dense) <- colnames(tcm)
+
+# Preview the first few values of the vector
+# (Most will be zero or very small)
+vec_dense[350:355]
+```
+
+Transforming the vector makes it more legible. 
+
+```{r, include=FALSE}
+
+# make it more legible
+tibble(
+  context_word = names(vec_dense),  # use the TCM for names of collocates
+  count = vec_dense) %>% # use the TCM for word counts  
+  filter(!context_word %in% stop_words$word) %>% # filter out stopwords
+  arrange(desc(count)) %>% # higher numbers first
+  slice_head(n = 20) # just the top 20 numbers
+```
+
+With a little manipulation, we can generate a view of the matrix showing what it looks like for terms that have a meaningful relationship with each other.  This is using the TCM, essentially, for discourse analysis. 
+
+```{r, include=FALSE}
+# Put your target words into a tibble
+target_words <- tibble(
+  word = c("democracy", "congress", "president", "courts", "people",
+           "market", "trade", "liberty", "rights",
+           "people", "rule", "goods", "prices", "revolution")
+)
+
+# Put TCM rownames into a tibble
+tcm_words <- tibble(
+  word = rownames(tcm)
+)
+
+# Keep only words that appear in BOTH tables
+words <- inner_join(target_words, tcm_words, by = "word") %>%
+  pull(word)
+
+# Convert the selected submatrix of the TCM into a regular dense matrix
+# Rows = the target words we selected
+# Columns = the same selected words as contexts
+m <- as.matrix(tcm[words, words])
+
+# Print the matrix so we can inspect the raw co-occurrence counts
+m
+
+```
+
+We can rapidly map the vectors into a heatmap that dramatizes collocates nicely. 
+
+```{r, include=FALSE}
+# Load plotting package
+library(ggplot2)
+
+# Load reshape2 so we can convert the matrix into long format for plotting
+library(reshape2)
+
+# Use hierarchical clustering to reorder the rows by similarity
+# dist(m) computes distances between row vectors
+# hclust(...) groups similar rows together
+# $order extracts the clustered row order
+row_ord <- hclust(dist(m))$order
+
+# Do the same for the columns
+# t(m) transposes the matrix so that columns can be treated like rows
+col_ord <- hclust(dist(t(m)))$order
+
+# Reorder the matrix using the clustered row and column orders
+# This makes similar words appear near one another in the heatmap
+m_ord <- m[row_ord, col_ord]
+
+# Convert the reordered matrix into a long data frame
+# Each row of df will now contain:
+# one target word, one context word, and one co-occurrence count
+df <- reshape2::melt(m_ord)
+
+# Rename the columns to make the long data frame readable
+colnames(df) <- c("target", "context", "count")
+
+# Plot the reordered co-occurrence matrix as a heatmap
+ggplot(df, aes(x = context, y = target, fill = count)) +
+  # Draw one tile per target-context pair
+  geom_tile() +
+  # Reverse the y-axis order so the matrix reads top-to-bottom naturally
+  scale_y_discrete(limits = rev(rownames(m_ord))) +
+  # Add title and axis labels
+  labs(title = "TCM heatmap", x = "Context word", y = "Target word") +
+  # Rotate x-axis labels so they do not overlap
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+## The TCM is Sparse Data
+
+Next, let's talk about the architecture of the TCM.  Most of the values are represented as periods, meaning that there is no co-occurrence between most words in a corpus. In data science, a matrix mainly composed of zeroes is known as a 'sparse' matrix.  
+
+We can ask R to give us some statistics on how sparse our matrix is. A 100% sparse matrix would be all zeroes.  
+
+```{r, include=FALSE}
+# how sparse is this matrix?
+100 * Matrix::nnzero(tcm) / (nrow(tcm) * ncol(tcm))
+```
+
+About 1.1% of the data set is non-zeroes. The TCM thus gives us a faithful but unwieldy record of language: every word is represented by a vast, mostly empty vector of counts reflecting where it appears. This sparsity is both a strength and a limitation.It preserves fine-grained evidence of usage, but it is difficult to compare words, detect broader patterns, or generalize across contexts, because most entries are zero and each word is tied to its immediate neighbors. 
+
+Translating this sparse matrix into GloVe embeddings addresses that problem by compressing co-occurrence patterns into a smaller, dense space where each word is represented by a set of learned coordinates. In this space, words that behave similarly across the corpus are drawn closer together, even if they never appear in exactly the same local contexts. For digital humanists, this shift is crucial: it moves us from a literal index of collocates to a model of semantic relationships, enabling us to trace conceptual neighborhoods, compare meanings across time, and detect patterns that are not visible at the level of raw counts alone.
+
+## Training GloVe
+
+The next step is to move us from raw co-occurrence counts to a learned semantic representation using the GloVe (Global Vectors) algorithm. Up to this point, each word has been represented by a very large, sparse vector of counts—how often it appears near every other word. GloVe compresses this information into a smaller number of dimensions (here, 50), learning a set of coordinates for each word that best reproduce the patterns in the co-occurrence matrix. The result is a dense vector for each word that captures its position in a semantic space, where words used in similar contexts end up close together.
+
+Several parameters shape how this learning happens. The embedding_dim sets the size of the vector space: higher values allow more nuance but increase complexity. The parameter x_max controls how much weight is given to very frequent co-occurrences; without it, common word pairs like “the–of” dominate the model, but with it, rarer and more meaningful relationships are amplified. The number of iterations (n_iter) determines how many times the model adjusts the vectors to better fit the data. Each iteration refines the positions of words in the space, gradually improving how well the learned vectors reflect the underlying structure of language in the corpus.
+
+Before training the GloVe model, it is important to understand that our co-occurrence data has an inherent direction. In the term-co-occurrence matrix, we record how often a target word appears near a context word. For example, we might count how often “congress” appears near “policy,” or “climate” appears near “risk.” This means that each word participates in the data in two distinct roles: sometimes as the word we are trying to describe (the target), and sometimes as part of the surrounding environment that helps describe other words (the context).
+
+GloVe preserves this structure during training by learning two sets of vectors simultaneously. One set (wv_main) represents words in their role as targets, capturing the distribution of contexts in which they appear. The other (wv_context) represents the same words in their role as contexts, capturing how they contribute to the environments of other words. These two representations encode complementary information about usage. After training, we will combine them into a single embedding for each word, but at this stage it is helpful to recognize that the model is learning from both directions of the co-occurrence relationship.
+  
+```{r setup, include=FALSE}
+
+# Set a random seed so results are reproducible
+# This ensures that running the model multiple times gives the same vectors
+seed <- 42
+set.seed(seed)
+
+# Define the number of dimensions in the embedding space
+# Each word will be represented by a vector of this length
+# The 'L' indicates this is stored as an integer
+embedding_dim <- 50L
+
+# Set the weighting parameter for GloVe
+# x_max controls how much influence very frequent word pairs have
+# Without x_max:
+#   extremely common pairs (like "the–of") dominate the learning
+# With x_max:
+#   rare and mid-frequency co-occurrences contribute more,
+#   leading to better semantic structure
+x_max = 10  
+
+# Set the number of training iterations (passes over the data)
+# Each iteration:
+#   updates the word vectors
+#   improves how well they approximate co-occurrence patterns
+n_iter = 20 
+
+# Initialize the GloVe model
+# rank = number of dimensions in the embedding space
+# x_max = weighting parameter for co-occurrence counts
+glove <- GlobalVectors$new(rank = embedding_dim, x_max = x_max)
+
+# Fit the GloVe model to the term-co-occurrence matrix (TCM)
+# This learns the main word vectors by optimizing their fit to the data
+# n_iter controls how many times the model refines the vectors
+wv_main <- glove$fit_transform(tcm, n_iter = n_iter)
+
+# Extract the context word vectors learned during training
+# GloVe learns two sets of vectors:
+#   - main vectors (for target words)
+#   - context vectors (for surrounding words)
+wv_context <- glove$components
+```
+
+After training the GloVe model, we obtain two sets of vectors: one for words in their role as targets (wv_main), and one for words in their role as contexts (wv_context). These are learned separately during training, but they encode complementary information about how words relate to one another in the corpus. To produce a single, unified representation for each word, we combine these two components by adding the main vector to the corresponding context vector (after transposing the context matrix so the dimensions align).
+
+```{r setup, include=FALSE}
+# Combine main + context vectors
+  word_embeddings <- wv_main + t(wv_context)
+  
+  # word_embeddings:
+  # rows = words
+  # columns = embedding dimensions
+  # values = learned coordinates in semantic space
+```  
+The resulting object is a matrix in which each row corresponds to a word in the corpus, and each column represents one dimension of the learned embedding space. The entries in the matrix are the coordinates that locate each word within that space. Taken together, these coordinates define the position of a word relative to all others, so that words used in similar ways across the corpus are situated near one another.
+
+This combined representation tends to perform better in practice because it captures both how a word appears in context and how it serves as context for others. From this point forward, each row of word_embeddings can be treated as the coordinate of a word in semantic space, enabling us to measure similarity, explore neighborhoods of meaning, and track semantic change over time.
+
+### Applying the GloVe Model to Investigate Words
+
+Now that we have trained our model, each word in the corpus is represented as a vector—a set of numerical coordinates locating it in a shared semantic space. To make this concrete, we select a single word (here, “congress”) and inspect its vector directly. Each entry in this vector corresponds to one latent dimension of meaning learned by the model. Unlike the term-co-occurrence matrix, where values were counts of nearby words, these numbers are abstract: they encode patterns of usage distributed across the entire corpus. By examining the length of the vector and its individual values, we begin to see how meaning is represented numerically. We then translate this representation back into something interpretable by comparing the vector for “congress” to all other word vectors using cosine similarity. This allows us to identify the words that occupy nearby positions in semantic space—that is, the words used in similar contexts. In this way, we move from raw coordinates to a reconstructed “neighborhood” of meaning, making the geometry of the embedding legible in human terms.
+
+
+```{r, include=FALSE}
+# Inspect one individual word vector
+
+  # Pick a word that exists in the vocabulary
+# Here we choose "congress" as an example word to inspect
+# (Alternatively, you could select the first available word with rownames(word_embeddings)[1])
+example_word <- "congress"
+
+# Extract the embedding vector for this word
+# This pulls the row corresponding to "congress" from the embedding matrix
+# Result: a numeric vector of length = embedding_dim (e.g., 50)
+example_vector <- word_embeddings[example_word, ]
+
+# Print the full vector (all dimensions)
+# Each number is the coordinate of "congress" along a latent semantic dimension
+example_vector
+
+# Check how many dimensions the vector has
+# This should match embedding_dim (e.g., 50)
+length(example_vector)
+
+# View just the first few dimensions for readability
+# Useful for quick inspection without printing the entire vector
+head(example_vector)
+
+# Convert the vector into a tidy table for easier inspection
+# Each row = one dimension of the embedding
+# dimension = index (1 to embedding_dim)
+# value = coordinate of the word in that dimension
+example_vector_tbl <- tibble(
+  word = example_word,
+  dimension = seq_along(example_vector),
+  value = as.numeric(example_vector)
+)
+
+# Display the tidy version of the vector
+# This makes it easier to sort, filter, or visualize dimensions later
+example_vector_tbl
+```
+
+The output of this code makes explicit what it means to represent a word as a vector in an embedding space. Rather than a list of neighboring terms, we now see a sequence of numerical values, each corresponding to one dimension of the learned representation. The length of the vector confirms the dimensionality of the model (for example, fifty), while the individual entries give the coordinates of the word along each latent axis. Presented as a table, these values can be inspected, sorted, or visualized, but they are not directly interpretable in isolation. Each dimension reflects a pattern of variation inferred from the corpus as a whole, and only acquires meaning through comparison with other words. In this form, the vector provides a compact but abstract encoding of how the word behaves across all of its contexts.
+
+Having represented each word as a point in a high-dimensional space, we can now make that representation interpretable by asking a relational question: which other words occupy nearby positions? Rather than examining the coordinates of a single vector in isolation, we compare it to all other vectors in the model. Similarity is measured using cosine similarity, which evaluates how closely two vectors align in direction. This allows us to identify words that are used in similar ways across the corpus, even if they do not frequently appear together in the same local context.
+
+```{r, include=FALSE}
+# Find the most similar words to the example word
+
+# Extract the vector again, but keep it as a 1-row matrix
+# drop = FALSE ensures the result stays a matrix (required by sim2)
+kw_vec <- word_embeddings[example_word, , drop = FALSE]
+
+# Compute cosine similarity between this word and ALL other words
+# sim2 compares each row in word_embeddings to kw_vec
+# method = "cosine" → measures similarity in direction (not magnitude)
+# norm = "l2" → normalizes vectors before comparison
+# [,1] extracts the similarity scores as a numeric vector
+sim_words <- sort(
+  sim2(word_embeddings, kw_vec, method = "cosine", norm = "l2")[,1],
+  decreasing = TRUE
+)[2:11]  # skip the first result (the word itself, similarity = 1)
+
+# Inspect the top similarity scores
+head(sim_words)
+
+# Convert results into a readable table
+# word = neighboring word
+# similarity = cosine similarity score (higher = more similar context)
+tibble(word = names(sim_words), similarity = sim_words)
+```
+
+The result is a ranked list of words that are closest to the target term in semantic space. These neighboring words can be understood as forming a semantic field: a set of terms that share patterns of usage across the corpus. This differs fundamentally from the co-occurrence lists derived from the term–co-occurrence matrix, which reflect immediate proximity in the text. Here, proximity is defined geometrically rather than positionally. Words may appear close together in this space because they participate in similar discursive structures, not because they are adjacent in sentences. In this way, the embedding makes it possible to reconstruct meaning as a pattern of relationships distributed across the corpus as a whole.
+
+What this block of code reveals is a very different kind of object from the TCM row we inspected earlier. When we extract the vector for “congress,” we are no longer looking at a list of neighboring words and their counts. Instead, we are looking at a set of coordinates—fifty numbers, in this case—that locate “congress” within a learned semantic space. Each number corresponds to a latent dimension: not something directly interpretable like “appears near policy,” but a compressed signal that blends many patterns of co-occurrence across the corpus. The values can be positive or negative, large or small, depending on how strongly “congress” aligns with one end or another of these underlying axes of variation. On their own, these numbers are abstract; they do not yet “mean” anything in a human-readable sense.
+
+The meaning becomes visible when we use this vector relationally. By comparing the vector for “congress” to all other word vectors using cosine similarity, we reconstruct its semantic neighborhood. The output—a ranked list of nearby words—is the interpretable surface of this geometric structure. These are the words that behave most similarly to “congress” across the entire corpus, not just those that happen to occur immediately beside it. In this sense, the embedding allows us to move from inspecting one row in isolation to situating that row within a system of relationships.
+
+This is the crucial difference from the TCM. A TCM vector is literal and local: it tells us which words appear near “congress,” and how often. It is transparent but narrow, tied to immediate proximity in the text. The embedding vector, by contrast, is abstract and global: it encodes patterns aggregated across all contexts in which “congress” appears. Two words can end up close in this space even if they never co-occur directly, so long as they share similar distributions of context. What we gain is the ability to model meaning as a position within a larger semantic field rather than as a simple list of collocates.
+
+## Inspect negative and positive values in one word vector
+  
+Now that we have trained the model, we are no longer working with raw co-occurrence counts (the TCM), but with a transformed space in which each word is represented as a point in a high-dimensional geometry. In this space, each word is a vector: a list of coordinates that captures how it behaves across many different contextual patterns in the corpus. These dimensions are not directly interpretable in advance—they are learned by the model as the most efficient way to encode patterns of co-occurrence.
+
+It is helpful to think of this space as having underlying “axes” of variation. In physics, an object like a tennis racket has preferred axes along which it naturally spins—these are called eigenvectors. In word embeddings, we have something analogous: the model discovers latent dimensions that organize variation in language use. However, these are not eigenvectors in a strict mathematical sense here, and, crucially, they are shared across all words, not unique to each one.
+
+Each word’s vector can therefore be understood as its position relative to these shared axes. The positive and negative values in a word vector indicate how strongly that word aligns with one end or the other of a given dimension. For example, one dimension might loosely separate technical policy language from everyday speech, or domestic from international discourse. These patterns were only implicit in the TCM; after training, they become explicit as coordinates in a structured space.
+
+```{r setup, include=FALSE}
+# ------------------------------------------------------------
+# Identify the most extreme dimensions for a single word
+# ------------------------------------------------------------
+
+# Create a tidy table of the word's vector
+# Each row = one dimension of the embedding
+# dimension = index (1 to embedding_dim)
+# value = the coordinate of "congress" along that dimension
+example_vector_tbl <- tibble(
+  dimension = seq_along(example_vector),
+  value = as.numeric(example_vector)
+) %>%
+  arrange(value)  # sort from most negative → most positive
+
+# Extract the dimensions where the word is MOST negative
+# These are the axes where "congress" aligns strongly with the negative pole
+most_negative_dims <- example_vector_tbl %>% slice(1:5)
+
+# Extract the dimensions where the word is MOST positive
+# These are the axes where "congress" aligns strongly with the positive pole
+most_positive_dims <- example_vector_tbl %>% slice((n() - 4):n())
+
+
+# ------------------------------------------------------------
+# Function: inspect words at the extremes of a dimension
+# ------------------------------------------------------------
+
+# This function helps interpret a dimension by showing:
+#   - which words are most negative on that dimension
+#   - which words are most positive
+# In other words: what semantic contrast this dimension captures
+
+inspect_dimension_words <- function(dim_num, word_embeddings, n = 8) {
+  
+  # Extract all words' values for a single dimension
+  # This gives us a vector of length = vocabulary size
+  vals <- word_embeddings[, dim_num]
+  
+  tibble(
+    word = rownames(word_embeddings),   # word labels
+    value = as.numeric(vals)            # their coordinate on this dimension
+  ) %>%
+    arrange(value) %>%                  # sort from most negative → most positive
+    
+    # Summarise into two lists:
+    #   - bottom n words (negative extreme)
+    #   - top n words (positive extreme)
+    summarise(
+      most_negative_words = list(slice(cur_data(), 1:n)),
+      most_positive_words = list(slice(cur_data(), (nrow(cur_data()) - n + 1):nrow(cur_data())))
+    )
+}
+
+
+# ------------------------------------------------------------
+# Inspect dimensions where "congress" is most negative
+# ------------------------------------------------------------
+
+# For each dimension where "congress" has a strong negative value:
+#   - extract all words' values on that dimension
+#   - identify the words at both extremes
+negative_dimension_word_lists <- lapply(most_negative_dims$dimension, function(d) {
+  
+  vals <- word_embeddings[, d]
+  
+  tibble(
+    word = rownames(word_embeddings),
+    value = as.numeric(vals)
+  ) %>%
+    arrange(value) %>%  # sort from most negative → most positive
+    
+    list(
+      dimension = d,                         # which dimension we are inspecting
+      congress_value = example_vector[d],    # value of "congress" on this axis
+      
+      # Words most aligned with the negative pole
+      most_negative_words = slice(., 1:8),
+      
+      # Words most aligned with the positive pole
+      most_positive_words = slice(., (nrow(.) - 7):nrow(.))
+    )
+})
+
+
+# ------------------------------------------------------------
+# Inspect dimensions where "congress" is most positive
+# ------------------------------------------------------------
+
+# Same process, but for dimensions where "congress" is strongly positive
+positive_dimension_word_lists <- lapply(most_positive_dims$dimension, function(d) {
+  
+  vals <- word_embeddings[, d]
+  
+  tibble(
+    word = rownames(word_embeddings),
+    value = as.numeric(vals)
+  ) %>%
+    arrange(value) %>%
+    
+    list(
+      dimension = d,
+      congress_value = example_vector[d],
+      most_negative_words = slice(., 1:8),
+      most_positive_words = slice(., (nrow(.) - 7):nrow(.))
+    )
+})
+
+
+# ------------------------------------------------------------
+# Inspect results
+# ------------------------------------------------------------
+
+# Look at a few dimensions where "congress" is strongly positive
+head(positive_dimension_word_lists)
+
+# Look at a few dimensions where "congress" is strongly negative
+head(negative_dimension_word_lists)
+```
+ 
+The positive and negative values that appear within a word vector do not correspond to evaluative judgments such as “good” or “bad,” nor do they function like sentiment scores. Instead, they indicate a word’s position along a learned dimension of variation within the embedding space. Each dimension is an axis that the model has inferred from patterns of co-occurrence in the corpus, and the sign of a value simply reflects direction along that axis. Crucially, this direction is arbitrary: the entire dimension could be multiplied by −1 without altering the underlying relationships among words. What matters, therefore, is not whether a value is positive or negative, but how words are distributed relative to one another across the dimension.
+
+For this reason, interpretation should focus on the contrast between the two extremes of a dimension. By examining the words that occupy the most negative and most positive positions, we can begin to infer the kind of distinction the model is capturing—whether, for example, it separates bureaucratic from rhetorical language, domestic from international contexts, or technical from everyday speech. The dimension itself does not come with a predefined label; its meaning emerges only through the relational pattern formed by the words that cluster at either end. In this way, embeddings do not assign fixed meanings to dimensions but instead encode latent structures that must be interpreted through comparison and context.
+
+## Inspecting One Word: Vectors vs. Embeddings
+
+Next, we can take a single word—-say, “democracy”-—and ask, what other words live closest to it in the semantic space learned from the corpus?
+
+This is a way of operationalizing a familiar humanistic question: What does this word mean, given how it is used?
+
+We begin by comparing two approaches. First, we inspect the term-co-occurrence matrix (TCM), which shows the most frequent neighboring words based on counts alone. Then we shift to embeddings, where each word is represented as a vector in a high-dimensional space. By extracting the vector for a keyword and comparing it to all other word vectors using cosine similarity, we identify its nearest semantic neighbors. That is, we are finding words that appear in similar contexts across the corpus.  The embeddings method allows us to reconstruct meaning not as a definition, but as a neighborhood: a pattern of proximity within a learned geometric space.
+
+The analyst should attend to the difference between "word vectors" in the TCM and "word embeddings" in the high-dimensional space.  
+- In the TCM, each word is represented as a vector of counts: how often it appears near every other word. These vectors are large, sparse, and local—they reflect immediate proximity in the text. 
+- By contrast, embeddings transform this information into dense, low-dimensional vectors that capture patterns across the entire corpus. 
+
+By extracting the vector for a keyword and comparing it to all other word vectors using cosine similarity, we move from counting neighbors to identifying semantic neighborhoods. This is the key shift: from observing who appears next to a word, to modeling how a word behaves across the entire system of language.
+
+```{r setup, include=FALSE}
+# ------------------------------------------------------------
+# Define a keyword to investigate
+# ------------------------------------------------------------
+
+# Choose the word whose meaning / context we want to explore
+keyword <- "democracy"
+
+
+# ------------------------------------------------------------
+# Function: inspect co-occurrences in the TCM (pre-embedding)
+# ------------------------------------------------------------
+
+# This function looks at the raw co-occurrence counts
+# It shows which words appear most often near the given word
+# (This is BEFORE embeddings — purely count-based context)
+inspect_tcm_word <- function(word, tcm, n = 10) {
+  
+  # Extract the row corresponding to the target word
+  # This is a sparse vector of co-occurrence counts
+  vec <- tcm[word, ]
+  
+  # Convert sparse vector → dense numeric vector
+  # (easier to manipulate and sort)
+  vec_dense <- as.numeric(vec)
+  
+  # Attach word labels (column names of the TCM)
+  names(vec_dense) <- colnames(tcm)
+  
+  # Sort from most frequent → least frequent and return top n
+  sort(vec_dense, decreasing = TRUE)[1:n]
+}
+
+
+# ------------------------------------------------------------
+# Move from TCM → embeddings
+# ------------------------------------------------------------
+
+# Extract the embedding vector for the keyword
+# This gives us its coordinates in semantic space
+# drop = FALSE ensures this stays a 1-row matrix (not a vector)
+kw_vec <- word_embeddings[keyword, , drop = FALSE]
+
+# Print the vector
+kw_vec
+
+
+# ------------------------------------------------------------
+# Inspect structure of the embedding
+# ------------------------------------------------------------
+
+# Confirm the keyword
+keyword
+
+# Dimensions of the full embedding matrix:
+# rows = words, columns = dimensions
+dim(word_embeddings)
+
+# Dimensions of the keyword vector:
+# should be 1 × embedding_dim
+dim(kw_vec)
+
+# Look at the first few coordinates of the vector
+# These are abstract semantic coordinates (not counts)
+kw_vec[1, 1:5]
+
+
+# ------------------------------------------------------------
+# Compute similarity to ALL other words
+# ------------------------------------------------------------
+
+# sim2 compares every word vector to the keyword vector
+# method = "cosine":
+#   compares direction of vectors (semantic similarity)
+# norm = "l2":
+#   normalizes vectors to unit length before comparison
+# [,1] extracts the result as a numeric vector
+cos_sim <- sim2(
+  word_embeddings,
+  kw_vec,
+  method = "cosine",
+  norm = "l2"
+)[, 1]
+
+
+# ------------------------------------------------------------
+# Convert similarity scores into a readable table
+# ------------------------------------------------------------
+
+# Create a tibble:
+#   word = vocabulary term
+#   similarity = cosine similarity to keyword
+similarity_table <- tibble(
+  word = names(cos_sim),
+  similarity = unname(cos_sim)
+)
+
+# Inspect a middle slice of the distribution
+# (not the top words, but mid-ranked associations)
+similarity_table %>%
+  slice(300:310)
+
+
+# ------------------------------------------------------------
+# Extract the nearest semantic neighbors
+# ------------------------------------------------------------
+
+similarity_table %>%
+  arrange(desc(similarity)) %>%   # sort from most similar → least
+  filter(word != keyword) %>%     # remove the word itself (always = 1)
+  slice_head(n = 20)              # take top 20 nearest neighbors
+```
+
+When we look at the word embeddings, structures of broader meaning becomes visible. We begin to see the semantic neighborhood of the word emerge. 
+
+## A Function for Retrieving Similar Embeddings
+
+Next, let's operationalize our work so far. Our pipeline is this. We take a word, locate it in semantic space, compare it to every other word, rank those comparisons, and extract the closest neighbors.  All of these steps can be packaged into one function, which we can use to rapidly call the most similar words for any keyword.
+
+We can make helper functions run Glove on different parts of the data and to retrieve similar words. Having these functions ready to go will make it easier to do larger forms of analysis down the line. For now, simply peruse the functions and confirm that you understand how to package code as a function. 
+
+```{r setup, include=FALSE}
+# ------------------------------------------------------------
+# Function: get_similar
+# ------------------------------------------------------------
+
+# This function returns the top N words most similar to a given keyword
+# based on cosine similarity in embedding space
+
+get_similar <- function(keyword, word_embeddings, top_n = top_n_default) {
+  
+  # Step 1: Extract the vector for the keyword
+  # This selects the row corresponding to the keyword
+  # drop = FALSE ensures the result stays a 1-row matrix (required by sim2)
+  kw_vec <- word_embeddings[keyword, , drop = FALSE]
+  
+  # Step 2: Compute cosine similarity between the keyword and ALL words
+  # sim2 compares each word vector (rows of word_embeddings)
+  # to the keyword vector (kw_vec)
+  # method = "cosine" → similarity based on direction of vectors
+  # norm = "l2" → normalizes vectors to unit length before comparison
+  # [,1] extracts the similarity scores as a numeric vector
+  cos_sim <- sim2(word_embeddings, kw_vec, method = "cosine", norm = "l2")[, 1]
+  
+  # Step 3: Convert results into a tidy table
+  # word = vocabulary term
+  # similarity = cosine similarity score
+  tibble(word = names(cos_sim), similarity = unname(cos_sim)) %>%
+    
+    # Step 4: Remove the keyword itself
+    # (it will always have similarity = 1 with itself)
+    filter(word != keyword) %>%
+    
+    # Step 5: Sort words from most similar → least similar
+    arrange(desc(similarity)) %>%
+    
+    # Step 6: Return the top N most similar words
+    slice_head(n = top_n)
+}
+
+find_word_embeddings <- function(data,
+                                 rank = 50,
+                                 window = 5L,
+                                 term_count_min = 5,
+                                 x_max = 10,
+                                 n_iter = 30,
+                                 seed = 42,
+                                 remove_stopwords = FALSE,
+                                 min_token_length = 3) {
+  
+  # clean raw text first
+  data <- clean_text_for_embeddings(as.character(data))
+  
+  # tokenize
+  tokens <- word_tokenizer(str_to_lower(data))
+  
+  # clean tokens document by document
+  sw <- stopwords::stopwords("en")
+  
+  tokens <- lapply(tokens, function(doc) {
+    doc <- doc[!is.na(doc)]
+    doc <- doc[str_detect(doc, "[a-z]")] # keep tokens with at least one letter
+    doc <- doc[!str_detect(doc, "^[0-9]+$")] # remove pure numbers
+    doc <- doc[nchar(doc) >= min_token_length] # remove very short tokens
+    doc <- doc[!str_detect(doc, "^n[a-z]+$")]   # remove likely newline artifacts like ninstead
+    if (remove_stopwords) {
+      doc <- doc[!doc %in% sw]
+    }
+    doc
+  })
+  
+  # drop empty documents
+  tokens <- tokens[lengths(tokens) > 0]
+  
+  it <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE)
+  
+  vocab <- create_vocabulary(it) %>%
+    prune_vocabulary(term_count_min = term_count_min)
+  
+  vectorizer <- vocab_vectorizer(vocab)
+  
+  # create a fresh iterator for TCM construction
+  it_tcm <- itoken(tokens, ids = seq_along(tokens), progressbar = FALSE)
+  tcm <- create_tcm(it_tcm, vectorizer, skip_grams_window = window)
+  
+  set.seed(seed)
+  glove <- GlobalVectors$new(rank = rank, x_max = x_max)
+  wv_main <- glove$fit_transform(tcm, n_iter = n_iter)
+  wv_context <- glove$components
+  
+  word_embeddings <- wv_main + t(wv_context)
+  word_embeddings
+}
+
+quiet_run <- function(expr) {
+  tf <- tempfile()
+  zz <- file(tf, open = "wt")
+  on.exit({
+    try(sink(type = "message"), silent = TRUE)
+    try(sink(), silent = TRUE)
+    close(zz)
+    unlink(tf) }, add = TRUE)
+
+  sink(zz)
+  sink(zz, type = "message")
+  force(expr) }
+
+get_similar <- function(keyword, word_embeddings, top_n = 20) {
+  
+  kw_vec <- word_embeddings[keyword, , drop = FALSE]
+  cos_sim <- sim2(word_embeddings, kw_vec, method = "cosine", norm = "l2")[, 1]
+
+  tibble(word = names(cos_sim), similarity = unname(cos_sim)) %>%
+    filter(word != keyword) %>%
+    arrange(desc(similarity)) %>%
+    slice_head(n = top_n) }
+```
+
+## Change Over Time
+
+Next, we can use our function to inspect the changing meaning of  words over time.  Our insights will draw on laws of linguistics that claim that if the neighborhood of a word changes over time, then its meaning is being renegotiated.
+
+The core idea here is that a word’s meaning is literally encapsulated in its vector. Therefore, change in meaning can be calculated from the distance between its vectors across years. 
+
+### One Word's Change Over Time, Via Embeddings
+
+Let's start by studying one word and how it was used differently at three points over the period 2000 to the present.  We can use the helper functions we created above to consolidate the process of creating an embedding model and searching it for the terms most similar to a keyword.   
+
+
+```{r, echo=FALSE}
+
+# create three word embedding models, each corresponding to one period between 2000 and the present.  
+word_embeddings_2000 <- quiet_run(find_word_embeddings(congress_daily_climate_change_2000, term_count_min = 5,
+                                             remove_stopwords = FALSE))
+
+
+word_embeddings_2010 <- quiet_run(find_word_embeddings(climate_change_text_2010,
+                                             term_count_min = 5,
+                                             remove_stopwords = FALSE))
+
+word_embeddings_2020 <- quiet_run(find_word_embeddings(climate_change_text_2020,
+                                             term_count_min = 5,
+                                             remove_stopwords = FALSE))
+
+
+# compare over time
+sim_2000 <- get_similar(keyword, word_embeddings_2000) %>%
+  mutate(year = "2000")
+
+sim_2010 <- get_similar(keyword, word_embeddings_2010) %>%
+  mutate(year = "2010")
+
+sim_2020 <- get_similar(keyword, word_embeddings_2020) %>%
+  mutate(year = "2020")
+
+combined <- bind_rows(sim_2000, sim_2010, sim_2020)
+
+kable(
+  combined,
+  caption = paste("Semantic Neighbors of '", keyword, "' Across Time", sep = "")
+)
+```
+
+When we track the nearest neighbors of a word across time using embeddings, we are no longer simply listing the words that appear beside it most often. Instead, we are reconstructing its position within a larger semantic field. In a term–co-occurrence matrix (TCM), change over time would be visible as a shift in collocates: different words appearing near our target in different decades. That view is local and literal—it captures adjacency. By contrast, embedding-based neighbors are relational and global: they identify words that behave similarly across many contexts, whether or not they ever appear directly alongside the target. This means that two words can become close in embedding space even if they rarely co-occur, so long as they participate in similar patterns of usage. For the analyst, the implication is crucial. Changes in TCM collocates tell us about shifting phrasing or topical proximity, while changes in embedding neighbors reveal deeper reorganizations in how a concept is situated within discourse as a whole.
+
+## Vector Subtraction
+
+Vector subtraction in word embeddings asks: what part of the meaning belongs to word1 but not word2? Because embeddings place words inside a multidimensional geometric “meaning space,” where similar words live closer together, subtracting one vector from another isolates the semantic direction unique to the first term. Vector subtraction lets us reason about conceptual differences directly in mathematical space — extracting the portion of meaning that distinguishes one concept from another.
+
+```{r}
+
+
+vector_subtraction <- function(word1, word2, embeddings, top_n = 10) {
+
+   # Check that both words exist in the vocabulary
+  vocab <- rownames(embeddings)
+  
+  if (!word1 %in% vocab) {
+    stop(paste0("Word not found in embeddings: '", word1, "'"))
+  }
+  
+  if (!word2 %in% vocab) {
+    stop(paste0("Word not found in embeddings: '", word2, "'"))
+
+    
+  # keep 1×d matrices so sim2() gets matrices on both sides
+  a <- embeddings[word1, , drop = FALSE]
+  b <- embeddings[word2, , drop = FALSE]
+  target <- a - b
+
+  sims <- sim2(embeddings, target, method = "cosine", norm = "l2")[, 1]
+
+  tibble(word = names(sims), similarity = unname(sims)) %>%
+    filter(!word %in% c(word1, word2)) %>%
+    arrange(desc(similarity)) %>%
+    slice_head(n = top_n) }
+```
+
+```{r}
+vector_subtraction("renewable", "fossil", word_embeddings_2000)
+```
+
+This operation allows us to isolate the semantic features that distinguish one concept from another. By subtracting the vector for “fossil” from that of “renewable,” we construct a new vector that represents what is characteristic of renewable energy in contrast to fossil fuels. The resulting list of nearest neighbors can be read as terms that align with this difference: not simply words related to “renewable” in general, but words that capture the specific direction of meaning that separates it from “fossil.” In this way, vector subtraction provides a tool for probing conceptual contrasts within the embedding space, revealing how distinctions between ideas are structured across the corpus rather than defined in isolation.
+
+
+
+```{r}
+vector_subtraction("renewable", "fossil", word_embeddings_2000)
+
+vector_subtraction("renewable", "fossil", word_embeddings_2010)
+
+vector_subtraction("renewable", "fossil", word_embeddings_2020)
+```
+
+What stands out across these results is not a stable set of keywords, but a shifting pattern in how the distinction between “renewable” and “fossil” is articulated over time. In 2000, the contrast is framed in clearly policy-oriented terms—incentives, tax, investment, credit—suggesting that renewable energy is understood primarily through mechanisms of governmental support and economic encouragement. By 2010, this coherence weakens: the results are more diffuse, mixing procedural language (assignment, forms), proper names (Murkowski, Klobuchar), and less obviously related terms, indicating that the distinction is embedded in a wider and more heterogeneous set of discourses. By 2020, a more technical and infrastructural vocabulary emerges—microgrids, watersheds, autonomy—pointing toward systems-level thinking and implementation. Analysts should therefore focus less on any single word in the list and more on the broader shift in framing: from policy incentives, to discursive diffusion, to infrastructural and environmental systems.
+
+## Vector Addition
+
+If vector subtraction isolates the semantic difference between two concepts, vector addition allows us to explore how meanings combine. By adding the vectors for two words, we construct a new point in semantic space that reflects the joint context in which those words tend to appear. This operation can be understood as asking: what terms are most closely associated with the intersection of these two concepts? Rather than highlighting contrast, as in subtraction, addition highlights convergence, revealing how ideas are linked together in practice across the corpus.
+
+```{r}
+vector_addition <- function(word1, word2, embeddings, top_n = 10) {
+  a <- embeddings[word1, , drop = FALSE]
+  b <- embeddings[word2, , drop = FALSE]
+
+  target <- a + b
+
+  sims <- sim2(embeddings, target, method = "cosine", norm = "l2")[,1]
+
+  tibble(word = names(sims), similarity = unname(sims)) %>%
+    filter(!word %in% c(word1, word2)) %>%
+    arrange(desc(similarity)) %>%
+    slice_head(n = top_n) }
+```
+
+
+If one of the words does not exist in the corpus, we will see the error `Error in FUN(left, right) : non-numeric argument to binary operator`.
+
+```{r, error=TRUE}
+vector_addition("man", "woman", word_embeddings_2000)
+
+vector_addition("man", "woman", word_embeddings_2010)
+
+vector_addition("man", "woman", word_embeddings_2020)
+
+```
+
+Vector addition makes it possible to observe not only how concepts differ, but how they are brought together in practice. By combining “man” and “woman,” we generate a composite point in semantic space that reflects how gender is jointly represented in discourse at a given moment. What is striking across these results is not any single neighboring word, but the shifting pattern of association over time. In 2000, the combined field is diffuse and somewhat narrative, with terms such as theory, moon, and witness suggesting loosely connected contexts. By 2010 and 2020, the results become more centered on generalized human categories—person, young, guy—and increasingly incorporate markers of identity such as black and African. Analysts can read this not as a stable definition of gender, but as evidence of changing ways of grouping and describing people: from scattered narrative references toward more explicit, and sometimes more differentiated, categories of identity. More broadly, vector addition reveals how concepts coalesce in discourse, allowing us to trace not only what ideas mean in isolation, but how they are combined, generalized, and reconfigured over time.
+
+
+
+### Scaling Up
+
+But what if we want to move from looking at one word at a time to looking at the words that changed their meanings the most over the decades?
+
+We can use the word embeddings method to create an approach to aggregate semantic change.   If changes to words' meaning is represented by larger distances between vectors, then we can find the words whose movement across time is characterized by the largest distances between each period vector.  We can use this measurement to select for the words that changed their context the most in a given corpus. 
+
+A critical part of the method necessary to perform this task is known as "alignment." The three period-based models (2000, 2010, 2020) are trained separately, so their vector spaces are rotated differently. The analyst cannot compare them directly.  You must align them first.
+
+Alignment is the process of bringing these separately learned spaces into a common coordinate system so that the positions of words can be meaningfully compared across time. Because the geometry of an embedding is invariant to rotation, two models may encode the same relationships but orient them differently, making raw comparisons misleading. 
+
+To execute an alginment, we need a mathematical instrument such as a 'Procrustes rotation,' a method for turning and aligning one word-embedding space to match another so that the same words can be compared meaningfully across models. By applying a transformation such as Procrustes rotation to one space relative to another, we preserve the internal structure of each model while ensuring that corresponding dimensions are properly aligned. 
+
+In working with computational data, we often encounter objects that are not simple tables but collections of elements grouped together—for example, a list containing multiple matrices or models. The function pluck() provides a consistent way to extract a specific element from such a structure by name, while remaining within a pipeline of operations. Rather than interrupting the flow of analysis to index into an object using base R syntax, pluck() allows us to select the desired component—such as the “base” matrix from an aligned set of embeddings—and immediately continue transforming it. In this sense, pluck() is less about introducing new functionality than about preserving readability and continuity: it keeps the sequence of data transformations visible as a single, coherent chain of steps.
+
+```{r, include=FALSE}
+# install.packages("vegan")   # run once
+library(vegan)
+library(dplyr)
+library(tibble)
+
+# Create a function to align one embedding space to another using Procrustes rotation
+align_embeddings <- function(base, other) {
+  
+  # Keep only words that appear in both matrices
+  common_words <- intersect(rownames(base), rownames(other))
+  
+  # Subset both matrices to the shared vocabulary
+  base_mat <- base[common_words, ]
+  other_mat <- other[common_words, ]
+  
+  # Learn the optimal rotation from 'other' into 'base'
+  fit <- procrustes(base_mat, other_mat)
+  
+  # Apply that rotation
+  other_aligned <- other_mat %*% fit$rotation
+  rownames(other_aligned) <- common_words
+  
+  list(base = base_mat, other = other_aligned)
+}
+
+
+# Now, let's apply the rotation function to align multiple embeddings and measure the words that change their meanings the most.
+
+# Align 2010 and 2020 embeddings to the 2000 embedding space
+aligned_2010 <- align_embeddings(word_embeddings_2000, word_embeddings_2010)
+aligned_2020 <- align_embeddings(word_embeddings_2000, word_embeddings_2020)
+
+# Extract aligned matrices
+emb_2000 <- aligned_2010 %>%
+  pluck('base')
+emb_2010 <- aligned_2010 %>%
+  pluck('other')
+emb_2020 <- aligned_2020 %>%
+  pluck('other')
+
+# Restrict all three to the vocabulary shared across all aligned spaces
+common_words <- bind_rows(
+  tibble(word = rownames(emb_2000)),
+  tibble(word = rownames(emb_2010)),
+  tibble(word = rownames(emb_2020)),
+  .id = "source"
+) %>%
+  count(word) %>%
+  filter(n == 3) %>%   # appears in all three
+  pull(word)
+
+emb_2000 <- emb_2000[common_words, ]
+emb_2010 <- emb_2010[common_words, ]
+emb_2020 <- emb_2020[common_words, ]
+
+# Convert each aligned embedding matrix into tidy form
+to_tidy <- function(mat, year) {
+  as_tibble(mat, rownames = "word") %>%
+    mutate(year = year)
+}
+
+tidy_2000 <- to_tidy(emb_2000, "2000")
+tidy_2010 <- to_tidy(emb_2010, "2010")
+tidy_2020 <- to_tidy(emb_2020, "2020")
+
+# Stack all years into one long table
+combined_aligned_vectors <- bind_rows(
+  tidy_2000,
+  tidy_2010,
+  tidy_2020
+)
+
+combined_aligned_vectors
+```
+
+In the code above, we restrict all three datasets to the same set of words so that comparisons across time are valid. We are not just matching words—we are also enforcing the same row order, so that ‘congress’ in 2000, 2010, and 2020 all line up exactly.
+
+Now that the periods are aligned, we can use cosine distance to measure each word in terms of the distance it moved from the beginning to the end of the period.  With some organization of the resulting distance table, we can produce a list of words who changed their context the most. 
+
+```{r, include=FALSE}
+
+# ------------------------------------------------------------
+# Reshape so that each word has all years side-by-side
+# ------------------------------------------------------------
+
+# Pivot from long → wide format
+# Now each row = one word, and columns contain its vector in each year
+wide_vectors <- combined_aligned_vectors %>%
+  pivot_wider(names_from = year, values_from = starts_with("V"))
+
+# ------------------------------------------------------------
+# Define cosine distance function
+# ------------------------------------------------------------
+
+# Cosine distance measures how different two vectors are in direction
+# (1 - cosine similarity)
+cosine_distance <- function(x, y) {
+  1 - sum(x * y) / (sqrt(sum(x^2)) * sqrt(sum(y^2)))
+}
+
+# ------------------------------------------------------------
+# Compute semantic shift across time
+# ------------------------------------------------------------
+
+# For each word:
+# - extract its vector in each year
+# - compute distances between years
+# - summarize how much it moves overall
+compute_shift <- function(df){
+  df %>%
+    rowwise() %>%  # operate one word at a time
+    mutate(
+      # Collect all dimensions for each year into a vector
+      vec_2000 = list(c_across(ends_with("2000"))),
+      vec_2010 = list(c_across(ends_with("2010"))),
+      vec_2020 = list(c_across(ends_with("2020"))),
+      
+      # Measure how much the word moves between time periods
+      shift_00_10 = cosine_distance(unlist(vec_2000), unlist(vec_2010)),
+      shift_10_20 = cosine_distance(unlist(vec_2010), unlist(vec_2020)),
+      shift_00_20 = cosine_distance(unlist(vec_2000), unlist(vec_2020)),
+      
+      # Combine into a single summary measure of change
+      total_shift = mean(c(shift_00_10, shift_10_20, shift_00_20))
+    ) %>%
+    ungroup() %>%
+    select(word, total_shift) %>%        # keep only word + shift score
+    arrange(desc(total_shift))           # rank from most changed to least
+}
+
+# Run the shift computation
+shift_table <- compute_shift(wide_vectors)
+
+# a little cleanup
+shift_table_clean <- shift_table %>%
+  filter(!str_detect(word, "^[0-9]+$")) %>%   # remove numbers
+  filter(!str_detect(word, "^n[a-z]+$")) %>%  # remove likely newline artifacts
+  filter(nchar(word) >= 4)                    # keep words of useful length
+
+head(shift_table_clean, 20)
+```
+
+ We have now measured semantic change by how far a word moves in vector space between time periods. We can begin to talk about what we have discovered about aggregate change in Congress as a whole over this time period. 
+ 
+# Exercises: 
+
+1) Look at the top 20 words with the greatest semantic shift.
+
+Questions:
+	•	What do you notice immediately about this list?
+	•	Does it look like a coherent topic or semantic field? Why or why not?
+	•	Which words seem surprising or out of place?
+
+Task:
+Write 2–3 sentences describing your first impression of the list without interpreting it yet.
+
+2) Rather than treating the list as a single object, begin organizing it.
+
+Task:
+Divide the words into at least three categories of your own design.
+
+Possible starting points:
+	•	Proper names (people, places)
+	•	Policy or institutional language
+	•	Everyday or unexpected vocabulary
+
+Questions:
+	•	Which words cluster together?
+	•	Which categories are easiest to identify?
+	•	Which words are hardest to classify?
+	
+3) Focus on proper nouns.
+
+Task:
+	•	Identify all words that appear to be names (people, places, organizations).
+	•	Pick 2–3 of these and investigate them.
+
+Use:
+	•	get_similar() in each decade
+	•	or a KWIC / concordance view if available
+
+Questions:
+	•	In what contexts do these names appear?
+	•	Do they cluster around specific events, debates, or narratives?
+	•	Why might names produce strong or shifting embeddings?
+	
+4) Now focus on the most unexpected terms. 
+
+Task:
+Choose one surprising word and investigate it across time:
+	•	Look at its nearest neighbors in 2000, 2010, 2020
+	•	Look at sample sentences if possible
+
+Questions:
+	•	What does this word actually refer to in the corpus?
+	•	Is it part of a specific story, metaphor, or policy debate?
+	•	Does its meaning shift, or does its context shift?
+	
+5) The starting assumption of a historian might be that the greatest shifts since 2000 have to do with the war on terror, the invasions of Iraq and Afghanistan, the creation of universal healthcare, and the rise of international climate politics. Do you see evidence that any of these issues is expressed in the words whose semantic space changed the most?
+
+6) Do some investigation to understand what one of the words that changed its semantic space the most meant in the corpus and why their meaning shifted. First, ask AI for help with interpreting how that word changed its semantic space in Congress over the period.  Note that AI does not necessarily have access to the transcripts of Congress, which were not freely available as a dataset at the time when many AIs were trained.
+
+6) For the same word, investigate its changes of meanings using the tools you learned earlier in this book. Look up the word embeddings for each time period. Call up KWIC and/or collocate views to investigate further. Develop an argument about how the conversation shifted.
+
+7) Analyze your experience of using embeddings, AI, collocates and KWIC to produce knowledge.  What experiences would you count on? Which are less reliable or incomplete? What workflow would you recommend to others?
+
