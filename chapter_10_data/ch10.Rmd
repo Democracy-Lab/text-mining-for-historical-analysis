@@ -180,14 +180,18 @@ url <- "https://data.cityofnewyork.us/resource/wewp-mm3p.json"
 # Make GET request to extract JSON content
 response <- GET(url)
 
-# If accessing the server is successful it returns the code 200
+# Check whether the request was successful
+# - status_code() returns the HTTP status code
+# - a status code of 200 indicates a successful request
 if (status_code(response) == 200) {
-  # Extract and parse JSON content into a data frame
-  json_content <- content(response, "text", encoding = "UTF-8")
   
-  service_requests <- fromJSON(json_content, flatten = TRUE) %>%
-    as_tibble() } else {
-  stop("Failed to retrieve data. Status code: ", status_code(response)) }
+  # Extract the JSON content as text
+  json_content <- content(response, "text", encoding = "UTF-8") # Read the JSON response
+  
+  # Convert the JSON into a tibble
+  service_requests <- fromJSON(json_content, flatten = TRUE) %>% # Parse the JSON into a data frame
+    as_tibble() } else { 
+  stop("Failed to retrieve data. Status code: ", status_code(response)) } # Stop if the request failed
 ```
 
 Because this request was successful, we now have a data frame containing the shelter data: 
@@ -210,14 +214,24 @@ The window below gives an example of what that JSON data looks. Note that JSON u
 Clicking on the `json_content` data in the Global Environment panel will also provide the means to explore the JSON data.
 
 ```{r, echo=FALSE}
+# Convert the JSON text into an R data frame
 json_list <- fromJSON(json_content)
+
+# Keep only the first two records
 subset_list <- json_list[1:2, ] 
-cat(prettify(toJSON(subset_list, auto_unbox = TRUE)))
+
+# Display the records as formatted JSON
+# - toJSON() converts the data back to JSON
+# - auto_unbox = TRUE removes unnecessary brackets around single values
+# - prettify() formats the JSON for readability
+# - cat() prints the formatted JSON
+cat(prettify(toJSON(subset_list, auto_unbox = TRUE))) # Print formatted JSON
 ```
 
 When we made this request, we were only able to obtain 1,000 records (which is represented by 1,000 rows, where each row corresponds with a single record).  
 
 ```{r}
+# Count the number of rows in the dataset
 nrow(json_list) 
 ```
 
@@ -230,30 +244,33 @@ We can see that the site reports the dataset contains millions of records. Techn
 Most platforms open government data websites using the Socrata Open Data API (SODA) limit responses to 1,000 records per request by default. If a dataset exceeds the request limit, only the first 1,000 rows are returned unless pagination is used. In the following example we revise the above code to account for pagination. This code runs two cycles, collecting up to 1,000 records per cycle for a total of up to 2,000 records. This code can be modified to extract additional records. 
 
 ```{r}
+# Define the JSON API endpoint
 url <- "https://data.cityofnewyork.us/resource/wewp-mm3p.json"
 
-# Pagination settings
+# Set the number of records to retrieve per request
 limit <- 1000
-# Will store the output from each iteration 
-service_request_data <- tibble() 
 
-# Run for two iterations: first with offset = 0, then with offset = 1000.
-# This means the code will first collect rows 1–1000,
-# and then collect rows 1001–2000 on the second iteration.
+# Create an empty tibble to store the collected data
+service_requests <- tibble()
+
+# Retrieve the first two pages of results
+# - offset = 0 retrieves rows 1–1000
+# - offset = 1000 retrieves rows 1001–2000
 for (i in 0:1) {
-  offset <- i * limit
+  offset <- i * limit # Calculate the starting row for this request
   
-  # Make paginated request
-  response <- GET(url, query = list(`$limit` = limit, `$offset` = offset))
+  # Make a paginated request
+  response <- GET(url, query = list(`$limit` = limit, `$offset` = offset)) # Request one page of data
   
+  # Check whether the request was successful
   if (status_code(response) != 200) {
-    stop("Request failed. Status code: ", status_code(response)) }
+    stop("Request failed. Status code: ", status_code(response)) } # Stop if the request failed
   
-  # Parse the response
-  data_subset <- fromJSON(content(response, "text"), flatten = TRUE)
+  # Parse the JSON response
+  data_subset <- fromJSON(content(response, "text"), flatten = TRUE) # Convert the JSON into a data frame
   
-  # Save collected data 
-  service_requests <- bind_rows(service_requests, as_tibble(data_subset)) }
+  # Add the new records to the existing data
+  service_requests <- bind_rows(service_requests, as_tibble(data_subset)) } # Append the new rows
 ```
 
 Importantly, even if you use pagination, you may still violate a website’s Terms of Service. Some websites explicitly require delays—such as adding a sleep interval between requests—to avoid overloading their servers with requests that exceed typical human usage. 
@@ -264,25 +281,21 @@ The examples above demonstrate basic interactions with APIs that require only a 
 
 Numerous R packages have been developed to simply interactions with APIs. These R packages encapsulate the API's functionality within R functions and data structures, abstracting away the more complex tasks such as URL construction and parsing JSON responses. For example, the rOpenGov universe--composed of a community that develops open-source R packages to increase access to government data--offers several packages that simplify working with APIs, including `usdoj` and `oldbailey`. This section demonstrates the use of `usdoj`.^10^
 
-`usdoj` provides more intuitive access to data from the U.S. Department of Justice's API by wrapping complex API interactions into simple R functions. `usdoj` can be installed directly from the rOpenGov universe. To install it, we first need to tell R to check the rOpenGov repository, and then we can install the package using `install.packages("usdoj")` as usual. By default, R installs packages from CRAN (the Comprehensive R Archive Network), but by adding this additional repository, we can access a wider range of packages.
+`usdoj` provides more intuitive access to data from the U.S. Department of Justice's API by wrapping complex API interactions into simple R functions. `usdoj` can be installed directly from the rOpenGov universe. 
 
-```{r, echo=FALSE}
-library("usdoj")
-```
-
-```{r, warning=FALSE, eval=FALSE}
-options(repos = c(ropengov = 'https://ropengov.r-universe.dev'))
-
-install.packages("usdoj")
-
-library("usdoj")
+```{r, warning=FALSE}
+# Load the usdoj library
+library(usdoj)
 ```
 
 We can now use `usdoj` functions to collect data from the U.S. Department of Justice. The following code will extract just 10 blog entries from the U.S. Department of Justice. Specifying the search direction as `DESC` instructs `usdoj` to extract the most recent blog entries. 
 
 ```{r, warning=FALSE}
-blog_entries <- doj_blog_entries(n_results = 10, search_direction = "DESC")
-
+# Retrieve the 10 most recent Department of Justice blog entries
+# - n_results specifies how many blog entries to retrieve
+# - search_direction = "DESC" returns the newest entries first
+blog_entries <- doj_blog_entries(n_results = 10, # Retrieve 10 blog entries
+                                 search_direction = "DESC") # Sort from newest to oldest
 head(blog_entries$teaser, 5)
 ```
 
