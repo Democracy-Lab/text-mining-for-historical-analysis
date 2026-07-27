@@ -385,9 +385,10 @@ Demmen, Jane, Lesley Jeffries, and Brian Walker. “Charting the Semantics of La
 
 In New Digital Worlds (2018), Roopika Risam argues that data in the digital humanities must be understood as a product of cultural and historical processes.
 
+
+
 Cite this: https://www.nature.com/articles/sdata201618
 
-Underwood novel TM dataset
 
 For
 example, they might show that in the United States Congressional Record, the word man became increasingly

@@ -59,36 +59,49 @@ data("speaker_metadata_1840")
 ```
 
 ```{r, message=FALSE}
+# Add metadata to the 1820s Hansard data
+# - left_join() adds debate and speaker metadata
+# - mutate() extracts the year from the speech date
+# - select() keeps only the relevant columns
 annotated_1820 <- hansard_1820 %>%
-  left_join(debate_metadata_1820) %>%
-  mutate(year = year(speechdate)) %>%
-  left_join(speaker_metadata_1820) %>%
-  select(text, year, speechdate, suggested_speaker)
+  left_join(debate_metadata_1820) %>% # Add debate metadata
+  mutate(year = year(speechdate)) %>% # Extract the year
+  left_join(speaker_metadata_1820) %>% # Add speaker metadata
+  select(text, year, speechdate, suggested_speaker) # Keep the relevant columns
 
+# Do the same for the 1830s Hansard data
 annotated_1830 <- hansard_1830 %>%
-  left_join(debate_metadata_1830) %>%
-  mutate(year = year(speechdate)) %>%
+  left_join(debate_metadata_1830) %>% 
+  mutate(year = year(speechdate)) %>% 
   left_join(speaker_metadata_1830) %>%
   select(text, year, speechdate, suggested_speaker)
 
+# Do the same for the 1840s Hansard data
 annotated_1840 <- hansard_1840 %>%
-  left_join(debate_metadata_1840) %>%
+  left_join(debate_metadata_1840) %>% 
   mutate(year = year(speechdate)) %>%
   left_join(speaker_metadata_1840) %>%
   select(text, year, speechdate, suggested_speaker)
 ```
 
 ```{r}
-# DO i need as.Date ?
+# Create the prereform dataset
+# - bind_rows() combines the 1820s and 1830s data
+# - filter() keeps speeches between 1822 and the Second Reform Act
+# - mutate() labels the time period
 prereform <- bind_rows(annotated_1820, annotated_1830) %>%
-  filter(speechdate >= as.Date("1822-06-04"),
-         speechdate <= as.Date("1832-06-04")) %>%
-  mutate(period = "prereform")
+  filter(speechdate >= as.Date("1822-06-04"), # Keep speeches on or after June 4, 1822
+         speechdate <= as.Date("1832-06-04")) %>% # Keep speeches on or before June 4, 1832
+  mutate(period = "prereform") # Label the period
 
+# Create the postreform dataset
+# - bind_rows() combines the 1830s and 1840s data
+# - filter() keeps speeches between the Second Reform Act and 1842
+# - mutate() labels the time period
 postreform <- bind_rows(annotated_1830, annotated_1840) %>%
-  filter(speechdate >= as.Date("1832-06-04"),
-         speechdate <= as.Date("1842-06-04")) %>%
-  mutate(period = "postreform")
+  filter(speechdate >= as.Date("1832-06-04"), # Keep speeches on or after June 4, 1832
+         speechdate <= as.Date("1842-06-04")) %>% # Keep speeches on or before June 4, 1842
+  mutate(period = "postreform") # Label the period
 ```
 
 `hansard` is a large dataset that includes three decades of parliamentary debates along with multiple layers of metadata that make the text analyzable. The debate metadata (which includes information such as the date of the speech and the title of the debate) and the speaker metadata (which includes the original speaker name and the disambiguated canonical name) are linked to each sentence through a shared `sentence_id`.
@@ -100,44 +113,65 @@ First, let's organize the data into two groupings -- the words spoken prereform 
 Let's break the data up into individual words and count how many words are in each category.
 
 ```{r, echo=FALSE}
-# tokenize words (this may be slow -- give it time)
-prereform_words <- prereform %>% 
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  filter(!str_detect(word, "^[0-9]+$")) 
+# Tokenize and clean the prereform speeches
+# - unnest_tokens() tokenizes the text into words
+# - anti_join() removes common stop words
+# - filter() removes words containing only digits
+prereform_words <- prereform %>%
+  unnest_tokens(word, text) %>% # Tokenize text
+  anti_join(stop_words) %>% # Remove stop words
+  filter(!str_detect(word, "^[0-9]+$")) # Remove words containing only digits
 
+# Count the words in the prereform period
+# - count() counts the occurrences of each word
 prereform_word_count <- prereform_words %>%
-  count(period, word, name = "wordcount")
+  count(period, word, name = "wordcount") # Count words by period
 
-postreform_words <- postreform %>% 
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  filter(!str_detect(word, "^[0-9]+$")) 
+# Tokienize and clean the postreform speeches
+# - unnest_tokens() tokenizes text
+# - anti_join() removes common stop words
+# - filter() removes words containing only digits
+postreform_words <- postreform %>%
+  unnest_tokens(word, text) %>% # Tokenize text
+  anti_join(stop_words) %>% # Remove stop words
+  filter(!str_detect(word, "^[0-9]+$")) # Remove words containing only digits
 
+# Count the words in the postreform period
+# - count() counts the occurrences of each word
 postreform_word_count <- postreform_words %>%
-  count(period, word, name = "wordcount") 
+  count(period, word, name = "wordcount") # Count words by period
 
-# # add up the total words for each period
+# Count the total number of words in each period
+# - bind_rows() combines the two datasets
+# - group_by() groups the data by period
+# - summarize() adds the word counts within each period
 both_periods_word_count_totals <- prereform_word_count %>%
-  bind_rows(postreform_word_count) %>%
-  group_by(period) %>%
-  summarize(total = sum(wordcount))
+  bind_rows(postreform_word_count) %>% # Combine the two periods
+  group_by(period) %>% # Group by period
+  summarize(total = sum(wordcount)) # Calculate the total words
 ```
 
 
 ```{r}
+# Visualize the total number of words spoken in each period
+# - geom_col() creates a bar chart
+# - scale_x_discrete() orders the periods on the x-axis
+# - scale_fill_grey() uses grayscale shading
+# - scale_y_continuous() formats the y-axis with commas
+# - geom_text() labels each bar with its total word count
+# - labs() adds the title and axis labels
 ggplot(both_periods_word_count_totals,
-       aes(x = period, y = total, fill = period)) +
-  geom_col(show.legend = FALSE) +
-  scale_x_discrete(limits = c("prereform", "postreform")) +
-  scale_fill_grey() +
-  scale_y_continuous(labels = comma) +
-  geom_text(aes(label = paste0(comma(total), " words")),
-            color = "white",
-            vjust = 1.5) +
-  labs(title = "How Many Words Were Spoken in Each Period?",
-       x = "period",
-       y = "words")
+       aes(x = period, y = total, fill = period)) + # Plot periods on the x-axis, word totals on the y-axis, fill bars by period
+  geom_col(show.legend = FALSE) + # Create a bar chart
+  scale_x_discrete(limits = c("prereform", "postreform")) + # Order the periods on the x-axis
+  scale_fill_grey() + # Use grayscale shading
+  scale_y_continuous(labels = comma) + # Format the y-axis with commas
+  geom_text(aes(label = paste0(comma(total), " words")), # Label each bar
+            color = "white", # Make the text white
+            vjust = 1.5) + # # Vertically position the text inside the bar
+  labs(title = "How Many Words Were Spoken in Each Period?", # Add a chart title
+       x = "Period", # Label the x-axis
+       y = "Words") # Label the y-axis
 ```
 
 Many more words were spoken in the ten years after the reform than the ten years before. How many more? Text mining means we never have to guess.
@@ -151,21 +185,23 @@ print(both_periods_word_count_totals$total[1] - both_periods_word_count_totals$t
 Next, let's look at the actual words spoken in each period and see how they compare.
 
 ```{r, echo=FALSE}
-# Extract the top 10 most frequent words for each period
-# sort by highest word count and
-# keep the top 10 words per period
-
-
+# Keep the 10 most frequent words from each period
+# - bind_rows() combines the prereform and postreform word counts
+# - group_by() groups the words by period
+# - slice_max() keeps the top 10 words in each period
+# - ungroup() removes the grouping
 top_words <- prereform_word_count %>%
-  bind_rows(postreform_word_count) %>%
-  group_by(period) %>%
-  slice_max(order_by = wordcount, n = 10) %>%
-  ungroup()
+  bind_rows(postreform_word_count) %>% # Combine the two periods
+  group_by(period) %>% # Group by period
+  slice_max(order_by = wordcount, n = 10) %>% # Keep the top 10 words
+  ungroup() # Remove the grouping
 
-# Create a clean table with kable
+# Display the most frequent words in each period
+# - kable() formats the results as a table
 top_words %>%
-  mutate(wordcount = comma(wordcount)) %>%
-  kable(caption = "The Top Ten Words Spoken in Prereform and Postreform Parliament")
+  kable(caption = "The Top Ten Words Spoken in Prereform and Postreform Parliament", # Add a table caption
+        format.args = list(big.mark = ",", # Display commas in large numbers
+                           scientific = FALSE)) # Don't use scientific notation
 ```
 
 The analyst will discern that there are only very minor differences between the top words of both categories. What are we to make of that?  
@@ -197,10 +233,14 @@ Let's do that now to answer the question, how many words did each speaker speak 
 ## Investigating Speakers' Wordcounts, Pre- and Post-Reform
 
 ```{r, echo=FALSE}
+# Count the words spoken by each speaker in each year and period
+# - bind_rows() combines the prereform and postreform data
+# - unnest_tokens() Tokenize text into words
+# - count() counts the words by period, speaker, and year
 both_periods_speakers <- prereform %>%
-  bind_rows(postreform) %>%
-  unnest_tokens(word, text) %>%
-  count(period, suggested_speaker, year, name = "wordcount")
+  bind_rows(postreform) %>% # Combine the two periods
+  unnest_tokens(word, text) %>% # Tokenize the text
+  count(period, suggested_speaker, year, name = "wordcount") # Count words by period, speaker, and year
 
 head(both_periods_speakers)
 ```
@@ -208,13 +248,16 @@ head(both_periods_speakers)
 Let's look at the speakers who spoke the most.
 
 ```{r, echo=FALSE}
-# take the top speakers by wordcount
+# Find the speakers who spoke the most across both periods
+# - group_by() groups the data by speaker
+# - summarize() adds the total words spoken by each speaker
+# - slice_max() keeps the five speakers with the highest word counts
 top_speakers <- both_periods_speakers %>%
-  group_by(suggested_speaker) %>%
-  summarize(wordsperspeaker = sum(wordcount)) %>%
-  slice_max(wordsperspeaker, n = 5)
+  group_by(suggested_speaker) %>% # Group by speaker
+  summarize(wordsperspeaker = sum(wordcount)) %>% # Count the total words spoken
+  slice_max(wordsperspeaker, n = 5) # Keep the top five speakers
 
-# inspect the data      
+# Inspect the data
 head(top_speakers)
 ```
 
@@ -231,42 +274,52 @@ Information scientists theorize several ways to combine data through what is cal
 To find the prereform-only and postreform-only speakers, we will find the "difference" between the two sets by using a function named `anti_join()`.  The `anti_join()` function excludes from one dataset all the data that appear in a second dataset.  If we begin with a dataset of all members of parliament who spoke prereform and perform an "anti-join" with the set of speakers who spoke postreform, the resulting dataset is a list of speakers who only spoke prereform.
 
 ```{r, echo=FALSE}
-# Use counting to investigate how many distinct speakers are in the data, pre and postreform
-# How many speakers were there prereform?
+# Find the distinct speakers in the prereform period
+# - filter() keeps only the prereform speeches
+# - distinct() keeps one row for each speaker
 prereform_speakers <- both_periods_speakers %>%
-  filter(period == "prereform") %>%
-  distinct(suggested_speaker)
+  filter(period == "prereform") %>% # Keep the prereform period
+  distinct(suggested_speaker) # Keep distinct speakers
 
+# Find the distinct speakers in the postreform period
+# - filter() keeps only the postreform speeches
+# - distinct() keeps one row for each speaker
 postreform_speakers <- both_periods_speakers %>%
-  filter(period == "postreform") %>%
-  distinct(suggested_speaker)
+  filter(period == "postreform") %>% # Keep the postreform period
+  distinct(suggested_speaker) # Keep distinct speakers
 ```
 
 
 ```{r}
+# Find the speakers who appear only in the prereform period
+# - anti_join() keeps speakers who do not appear in the postreform period
+# - mutate() labels the speakers by category
 prereform_only_speakers <- prereform_speakers %>%
-  anti_join(postreform_speakers, by = "suggested_speaker") %>%
-  mutate(class = "prereform only")
+  anti_join(postreform_speakers, by = "suggested_speaker") %>% # Keep speakers unique to the prereform period
+  mutate(class = "prereform only") # Label the speaker category
 
+# Display a random sample of prereform-only speakers
+# - sample_n() selects 10 random speakers
 prereform_only_speakers %>%
-  sample_n(10)
+  sample_n(10) # Display 10 random speakers
 ```
 
 How many speakers are there in our dataset? To answer the question, we just need to know the number of rows, given that the dataset lists one distinct speaker for each row. The function `nrow()` will provide an answer to how many rows there are in any dataset.
 
 ```{r, echo=FALSE}
-# count the number of speakers in the dataset
+# Count the number of speakers in the prereform only dataset
 nrow(prereform_only_speakers)
 ```
 
 Performing the same operation again, beginning with postreform speeches and removing the rows of data that appear prereform, yields a dataset of speakers who only spoke after the reform.
 
 ```{r, echo=FALSE}
-# How many speakers were there postreform?
-
+# Find the speakers who appear only in the postreform period
+# - anti_join() keeps speakers who do not appear in the prereform period
+# - mutate() labels the speakers by category
 postreform_only_speakers <- postreform_speakers %>%
-  anti_join(prereform_speakers, by = "suggested_speaker") %>%
-  mutate(class = "postreform only")
+  anti_join(prereform_speakers, by = "suggested_speaker") %>% # Keep speakers unique to the postreform period
+  mutate(class = "postreform only") # Label the speaker category
 
 head(postreform_only_speakers)
 ```
@@ -274,7 +327,7 @@ head(postreform_only_speakers)
 How many speakers were there postreform?
 
 ```{r, echo=FALSE}
-# count the number of speakers in the dataset
+# Count the number of speakers in the postreform only dataset
 nrow(postreform_only_speakers)
 ```
 
@@ -285,6 +338,7 @@ The basic finding is that there were more speakers after the reform period. Our 
 Substantively more different members of parliament were elected in the ten years following 1832 than in the decade before. How many more members were there among the postreform only members than the prereform only members?
 
 ```{r, echo=FALSE}
+# Find the number of speakers unique to the prereform period
 nrow(postreform_only_speakers) - nrow(prereform_only_speakers)
 ```
 
@@ -299,10 +353,12 @@ We might guess that it was vanishingly small, because a reform of historical sig
 In any case, to identify the speakers who appear in both the prereform and postreform datasets, we will use another function -- `inner_join()` -- to identify what is known as the "intersection" of the two datasets. That is, we are looking for speakers who occupy a row in both the `prereform_speakers_wordcount` data frame and the `postreform_speakers_wordcount` data frame. The syntax for `inner_join()` is just like that of `anti_join()`, but the result is to keep rows that appear in both datasets, not to exclude those rows.
 
 ```{r, echo=FALSE}
-# How Many Members of Parliament Spoke Both Prereform and Postreform?
+# Find the speakers who appear in both periods
+# - inner_join() keeps only speakers found in both datasets
+# - mutate() labels the speakers by category
 continuous_speakers <- prereform_speakers %>%
-  inner_join(postreform_speakers, by = "suggested_speaker") %>%
-  mutate(class = "both periods")
+  inner_join(postreform_speakers, by = "suggested_speaker") %>% # Keep speakers found in both periods
+  mutate(class = "both periods") # Label the speaker category
 
 nrow(continuous_speakers)
 ```
@@ -313,31 +369,38 @@ Let's represent our results visually.
 Rename all_classes and mention that we are going to use it a lot 
 
 ```{r, echo=FALSE}
-# use color instead of color
+# Combine the speaker categories into one dataset
+# - bind_rows() stacks the three datasets into one table
+all_classes <- bind_rows(prereform_only_speakers,
+                         postreform_only_speakers,
+                         continuous_speakers)
 
 # Count the number of speakers in each category
-
-# glue together the data from each smaller dataset
-all_classes <- bind_rows(prereform_only_speakers, postreform_only_speakers, continuous_speakers)
-
-# group by period and count the number of speakers
+# - group_by() groups the data by speaker category
+# - summarize() counts the speakers in each category
 all_classes_count <- all_classes %>%
-  group_by(class) %>%
-  summarize(speakercount = n()) 
+  group_by(class) %>% # Group by speaker category
+  summarize(speakercount = n()) # Count the speakers
 ```
 
 ```{r}
+# Visualize the number of speakers in each category
+# - geom_col() creates a bar chart
+# - scale_x_discrete() places the categories in the desired order
+# - scale_fill_grey() uses grayscale shading
+# - geom_text() labels each bar with the speaker count
+# - labs() adds the title and axis labels
 ggplot(all_classes_count,
-       aes(x = class, y = speakercount, fill = class)) +
-  geom_col(show.legend = FALSE) +
-  scale_x_discrete(limits = c("prereform only", "postreform only", "both periods")) +
-  scale_fill_grey() +
-  geom_text(aes(label = paste(speakercount, "speakers")),
-            color = "white",
-            vjust = 1.5) +
-  labs(title = "How Many Speakers are in Each Category?",
-       x = "category",
-       y = "speakers")
+       aes(x = class, y = speakercount, fill = class)) + # Plot categories, speaker counts, and bar fill
+  geom_col(show.legend = FALSE) + # Create a bar chart
+  scale_x_discrete(limits = c("prereform only", "postreform only", "both periods")) + # Place the categories in order
+  scale_fill_grey() + # Use grayscale shading
+  geom_text(aes(label = paste(speakercount, "speakers")), # Label each bar
+            color = "white", # Make the text white
+            vjust = 1.5) + # Position the text inside the bar
+  labs(title = "How Many Speakers are in Each Category?", # Add a chart title
+       x = "Category", # Label the x-axis
+       y = "Speakers") # Label the y-axis
 ```
 
 Certain caveats are important for interpreting this number. While the speaker data gives us reliable insights into relative trends in membership and speech, the numbers are only so good as our dataset. 
@@ -347,11 +410,9 @@ One of the great advantages of text mining is that we can analyze not just the s
 ## Working With Word Count
 
 ```{r, echo=FALSE}
-## Using Word Count: 
-## How much did speakers speak before and after the reform act?
-
+# Add each speaker's category to the speaker word counts
 all_speakers_annotated <- both_periods_speakers %>%
-  left_join(all_classes, by = "suggested_speaker")
+  left_join(all_classes, by = "suggested_speaker") 
 
 head(all_speakers_annotated)
 ```
@@ -367,18 +428,22 @@ To find the speakers who spoke the most, we'll want to first create a new column
 we'll use `group_by()` to group the data by "class," then use the `arrange()` and `slice_head()` functions to take the top wordcounts for each category.
 
 ```{r, echo=FALSE}
-# find the total wordcount_per_speaker
-wordcount_per_speaker <-  all_speakers_annotated %>%
-  group_by(class, suggested_speaker) %>%
-  summarize(wordcount_per_speaker = sum(wordcount)) 
+# Calculate the total number of words spoken by each speaker
+# - group_by() groups the data by speaker category and speaker
+# - summarize() adds the total words spoken by each speaker
+wordcount_per_speaker <- all_speakers_annotated %>%
+  group_by(class, suggested_speaker) %>% # Group by speaker category and speaker
+  summarize(wordcount_per_speaker = sum(wordcount)) # Calculate the total words spoken
 
-# find the most prolific n speakers of each period
+# Find the most prolific speakers in each category
+# - group_by() groups the speakers by category
+# - slice_max() keeps the five speakers with the highest word counts
+# - mutate() labels the selected speakers
 top_speakers <- wordcount_per_speaker %>%
-  group_by(class) %>%
-  slice_max(wordcount_per_speaker, n = 5) %>%
-  mutate(top = TRUE)
+  group_by(class) %>% # Group by speaker category
+  slice_max(wordcount_per_speaker, n = 5) %>% # Keep the top five speakers
+  mutate(top = TRUE) # Label the top speakers
 
-#inspect the data
 head(top_speakers)
 ```
 
@@ -397,13 +462,16 @@ After we choose one name to use from the full Hansard list of literal speaker re
 Let's try it.
 
 ```{r, echo=FALSE}
-# clean up speaker names
+# Create a lookup table of unique speaker names
+# - bind_rows() combines the speaker metadata from all decades
+# - select() keeps only the speaker names
+# - distinct() keeps one row for each speaker
 speaker_key <- bind_rows(annotated_1820, annotated_1830, annotated_1840) %>%
-  select(suggested_speaker) %>%
-  distinct()
+  select(suggested_speaker) %>% # Keep the speaker names
+  distinct() # Keep unique speakers
 
-# inspect the data
-speaker_key %>% 
+# Display speaker names containing "peel_"
+speaker_key %>%
   filter(str_detect(suggested_speaker, "peel_"))
 ```
 
@@ -418,15 +486,23 @@ That is, in `all_speakers_annotated`, we have a list of speakers and how many wo
 The function `left_join()` takes as its first argument the name of the dataset with which we're merging our data. A second optional argument is the "by" argument, which allows us to specify a column or set of columns to use for matching. In the case of the first join, we'll specify two fields, concatenated into a list, using the syntax `by = c("suggested_speaker", "class").` 
 
 ```{r, echo=FALSE}
+# Add the top-speaker labels and speaker names
+# - left_join() adds the top-speaker labels
+# - left_join() adds the cleaned speaker names
 speakers_w_top_and_speaker_key <- all_speakers_annotated %>%
-  left_join(top_speakers, by = c("suggested_speaker", "class")) %>%
-  left_join(speaker_key)
+  left_join(top_speakers, by = c("suggested_speaker", "class")) %>% # Add the top speaker labels
+  left_join(speaker_key) # Add the speaker names
 
-speakers_w_top_and_speaker_key %>% 
-  filter(str_detect(suggested_speaker, "peel_")) %>% 
-  select(suggested_speaker, top, year, wordcount, class) %>%
-  head() %>%
-  kable()
+# Inspect the data for speakers whose names contain "peel_"
+# - filter() keeps matching speakers
+# - select() keeps the relevant columns
+# - head() displays the first six rows
+# - kable() formats the results as a table
+speakers_w_top_and_speaker_key %>%
+  filter(str_detect(suggested_speaker, "peel_")) %>% # Keep speakers containing "peel_"
+  select(suggested_speaker, top, year, wordcount, class) %>% # Keep the relevant columns
+  head() %>% # Display the first six rows
+  kable() # Format the results as a table
 ```
 
 # Visualize the Results
@@ -444,34 +520,24 @@ in the code block below, we'll create a "dot plot," mapping one point for each o
 Because labeling all the speakers would result in an unreadable graphic, we will only label those speakers who are classified as `TRUE` in the column `top`, where we annotated if a speaker was among the top n speakers of each class by wordcount. The syntax for this operation is given inside the parentheses of `geom_label_repel()`, where the coder has an opportunity to point to a new dataset as the source of the text in the labels.  Here, we tell the computer which dots to label and which to leave blank with  the use of `subset(graph_ready, top == TRUE)`. Operations of this type are extremely useful for the kind of dense, text-forward information that implementors of text mining often want from their analysis.
 
 ```{r, echo=FALSE}
-# visualize it 
-ggplot(speakers_w_top_and_speaker_key, 
-       aes(x = year, y = wordcount, color = class, shape = class)) +
-  geom_jitter(size = 3) +
-  scale_color_grey(guide = guide_legend()) +
-  geom_label_repel(data = subset(speakers_w_top_and_speaker_key, top == TRUE),
-                   aes(label=suggested_speaker, color = class)) +
-  guides(fill = "none", label = "none", size = "none") + 
-  theme(legend.position="bottom") +
-  labs(title = "How Much Did Speakers Speak", 
-       subtitle = "Before and After the Second Reform Act of 1832?") 
-
-# ggplot(speakers_w_top_and_speaker_key, aes(x = year, 
-#                                            y = wordcount,
-#                                            color = class,
-#                                            shape = class)) +
-#   geom_jitter(size = 3) +
-#   scale_color_grey() +
-#   geom_label_repel(
-#     data = speakers_w_top_and_speaker_key %>% 
-#       filter(top == TRUE, !is.na(suggested_speaker), suggested_speaker != ""),
-#     aes(label = suggested_speaker),
-#     show.legend = FALSE,
-#     max.overlaps = Inf
-#   ) +
-#   theme(legend.position = "bottom") +
-#   labs(title = "How Much Did Speakers Speak",
-#        subtitle = "Before and After the Reform Act of 1832?")
+# Visualize how much speakers spoke over time
+# - aes() maps year, word count, speaker category, and point shape
+# - geom_jitter() spreads overlapping points
+# - scale_color_grey() uses grayscale colors
+# - geom_label_repel() labels the top speakers
+# - guides() removes unnecessary legend entries
+# - theme() places the legend below the plot
+# - labs() adds the title and subtitle
+ggplot(speakers_w_top_and_speaker_key,
+       aes(x = year, y = wordcount, color = class, shape = class)) + # Map the variables to the plot
+  geom_jitter(size = 3) + # Spread overlapping points
+  scale_color_grey(guide = guide_legend()) + # Use grayscale colors
+  geom_label_repel(data = subset(speakers_w_top_and_speaker_key, top == TRUE), # Label the top speakers
+                   aes(label = suggested_speaker, color = class)) +
+  guides(fill = "none", label = "none", size = "none") + # Remove unnecessary legend entries
+  theme(legend.position = "bottom") + # Place the legend below the plot
+  labs(title = "How Much Did Speakers Speak", # Add a chart title
+       subtitle = "Before and After the Second Reform Act of 1832?") # Add a subtitle
 ```
 
 What do we learn from this plot?  A great deal. One is about the relatively higher counts of speeches in the 1830s than the 1820s, irrespective of the reform Act.  Speeches by Lord Althorp, Robert Peel, and Henry Brougham regularly reached into range of 150,000 to 200,000 words -- which if delivered at breakneck speed would have taken a stunning fifteen hours to deliver.  
@@ -499,26 +565,44 @@ Text mining gives us an opportunity to approach the issue on the basis of the wo
 By using tf-idf as our tool for understanding, we will privilege a strict filter: we will look for words spoken in 1822-32 that were almost never spoken in 1832-42, and vice-versa. What might the silences and expansions of the period reveal that we did not previously know? 
 
 ```{r}
+# Calculate the tf-idf score for each word in each period
+# - bind_rows() combines the prereform and postreform word counts
+# - bind_tf_idf() calculates how distinctive each word is within each period
 period_tfidf <- bind_rows(prereform_word_count, postreform_word_count) %>%
-  bind_tf_idf(word, period, wordcount)
+  bind_tf_idf(word, period, wordcount) # Calculate the tf-idf scores
 
+# Keep the most distinctive words from each period
+# - group_by() groups the words by period
+# - slice_max() keeps the 15 words with the highest tf-idf scores in each period
+# - ungroup() removes the grouping
 top_words <- period_tfidf %>%
-  group_by(period) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  group_by(period) %>% # Group by period
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words in each period
+  ungroup() # Remove the grouping
 
+# Visualize the most distinctive words in each period
+# - reorder_within() orders words by tf-idf separately within each period
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each period
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - scale_y_continuous() formats the tf-idf scores with commas
+# - scale_fill_grey() uses grayscale shading
+# - labs() adds the title, subtitle, and axis labels
 ggplot(top_words,
-       aes(x = reorder_within(word, tf_idf, period), y = tf_idf, fill = period)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ period, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() +
-  scale_y_continuous(labels = label_comma()) +
-  scale_fill_grey() +
-  labs(title = "Distinctive Words Before and After the Reform Act of 1832",
-       subtitle = "TF-IDF highlights vocabulary distinctive to each period",
-       x = "word",
-       y = "tf-idf")
+       aes(x = reorder_within(word, tf_idf, period), # Order words by tf-idf separately within each period
+           y = tf_idf, # Plot tf-idf scores on the y-axis
+           fill = period)) + # Shade bars by period
+  geom_col(show.legend = FALSE) + # Create a bar chart and hide the legend
+  facet_wrap(~period, scales = "free") + # Create one panel for each period
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  scale_y_continuous(labels = label_comma()) + # Format the tf-idf scores
+  scale_fill_grey() + # Use grayscale shading
+  labs(title = "Distinctive Words Before and After the Reform Act of 1832", # Add a chart title
+       subtitle = "TF-IDF highlights vocabulary distinctive to each period", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "tf-idf") # Label the y-axis
 ```
 
 The results are interesting. The top most ranked prereform word is "quamina," a word that references Quamina Gladstone, the leader of the 1823 slave revolt in Demerara led by an enslaved carpenter born in Ghana and sold into slavery with his mother in 1817. Gladstone was prohibited from taking time off of work to look after his ill wife, Peggy. After Peggy's death, Quamina's son Jack Gladstone organized a peaceful strike of thousands. In the aftermath of the revolt, Quamina was assassinated, his body displayed in chains beside the public road.
@@ -543,59 +627,91 @@ If tf-idf is a tool for identifying the characterstics of an orange that can't b
 The `dhmeasures` package contains the `log_likelihood()` function, which acts much like `bind_tf_idf()`, accepting a data frame with columns `word`, `group`, and `n`, and producing a score of distinctiveness ("ll") for each word-group pair. 
 
 ```{r}
+# Combine the word counts from both periods
+# - bind_rows() combines the prereform and postreform word counts
+# - rename() changes wordcount to n for the log-likelihood calculation
 all_word_counts <- bind_rows(prereform_word_count, postreform_word_count) %>%
-  rename(n = wordcount)
+  rename(n = wordcount) # Rename the word count column
 
-# Log-likelihood scores
+# Calculate the log-likelihood score for each word
+# - log_likelihood() compares word use between the two periods
+# - transmute() keeps the word and renames the score column
 ll_scores <- log_likelihood(all_word_counts,
-                            group = "period",
-                            group_list = c("prereform", "postreform")) %>%
-  transmute(word, log_likelihood = prereform)
+                            group = "period", # Compare words by period
+                            group_list = c("prereform", "postreform")) %>% # Compare periods
+  transmute(word, log_likelihood = prereform) # Keep the word and log-likelihood score
 
+# Keep the prereform word counts
+# - filter() keeps only the prereform period
+# - select() keeps the word and renames the count column
 pre_counts <- all_word_counts %>%
-  filter(period == "prereform") %>%
-  select(word, pre_reform = n)
+  filter(period == "prereform") %>% # Keep the prereform period
+  select(word, pre_reform = n) # Keep the word and prereform count
 
+# Keep the postreform word counts
+# - filter() keeps only the postreform period
+# - select() keeps the word and renames the count column
 post_counts <- all_word_counts %>%
-  filter(period == "postreform") %>%
-  select(word, post_reform = n)
+  filter(period == "postreform") %>% # Keep the postreform period
+  select(word, post_reform = n) # Keep the word and postreform count
 
-# Join counts and replace missing values with 0
+# Combine the word counts from both periods
+# - full_join() keeps all words from both periods
+# - coalesce() replaces missing counts with zero
 word_counts <- full_join(pre_counts, post_counts, by = "word") %>%
-  mutate(pre_reform = coalesce(pre_reform, 0L),
-         post_reform = coalesce(post_reform, 0L))
+  mutate(pre_reform = coalesce(pre_reform, 0L), # Replace missing prereform counts with zero
+         post_reform = coalesce(post_reform, 0L)) # Replace missing postreform counts with zero
 
-# Total tokens in each period
-pre_total <- sum(word_counts$pre_reform)
-post_total <- sum(word_counts$post_reform)
+# Find the total number of words in each period
+# - sum() adds the word counts within each period
+pre_total <- sum(word_counts$pre_reform) # Find the prereform total
+post_total <- sum(word_counts$post_reform) # Find the postreform total
 
-# Compute relative frequencies and assign distinctive period
+# Find relative word frequencies and identify the more distinctive period
+# - left_join() adds the log-likelihood scores
+# - mutate() calculates relative frequencies and labels the more common period
 distinctive_words <- word_counts %>%
-  left_join(ll_scores, by = "word") %>%
-  mutate(pre_rate  = pre_reform / pre_total,
-         post_rate = post_reform / post_total,
-         distinctive_period = if_else(pre_rate > post_rate, "pre_reform", "post_reform"))
+  left_join(ll_scores, by = "word") %>% # Add the log-likelihood scores
+  mutate(pre_rate = pre_reform / pre_total, # Find the prereform relative frequency
+         post_rate = post_reform / post_total, # Find the postreform relative frequency
+         distinctive_period = if_else(pre_rate > post_rate,
+                                      "pre_reform",
+                                      "post_reform")) # Label the period where the word is more common
 
-# Top words per period
+# Keep the most distinctive tf-idf words from each period
+# - group_by() groups the words by period
+# - slice_max() keeps the 15 words with the highest tf-idf scores
+# - ungroup() removes the grouping
 top_words <- period_tfidf %>%
-  group_by(period) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  group_by(period) %>% # Group by period
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words in each period
+  ungroup() # Remove the grouping
 ```
 
 ```{r}
-ggplot(top_words, 
-       aes(x = reorder_within(word, tf_idf, period), y = tf_idf, fill = period)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ period, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() +
-  scale_y_continuous(labels = label_comma()) +
-  scale_fill_grey() +
-  labs(title = "Distinctive Words Before and After the Reform Act of 1832",
-       subtitle = "TF-IDF highlights vocabulary distinctive to each period",
-       x = "word",
-       y = "tf-idf")
+# Visualize the most distinctive words in each period
+# - reorder_within() orders words by tf-idf separately within each period
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each period
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - scale_y_continuous() formats the tf-idf scores with commas
+# - scale_fill_grey() uses grayscale shading
+# - labs() adds the title, subtitle, and axis labels
+ggplot(top_words,
+       aes(x = reorder_within(word, tf_idf, period), # Order words by tf-idf separately within each period
+           y = tf_idf, # Plot tf-idf scores on the y-axis
+           fill = period)) + # Shade bars by period
+  geom_col(show.legend = FALSE) + # Create a bar chart and hide the legend
+  facet_wrap(~period, scales = "free") + # Create one panel for each period
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  scale_y_continuous(labels = label_comma()) + # Format the tf-idf scores
+  scale_fill_grey() + # Use grayscale shading
+  labs(title = "Distinctive Words Before and After the Reform Act of 1832", # Add a chart title
+       subtitle = "TF-IDF highlights vocabulary distinctive to each period", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "tf-idf") # Label the y-axis
 ```
 
 ## Distinctiveness Continued: Those Who Weren't Reelected
@@ -605,96 +721,137 @@ The mathematics of distinctiveness can be applied to the same dataset in myriad 
 To be sure, the analysis would be better if we only measured the effects of change on members of the House of Commons, whose seats are elected, rather than the appointed members of the House of Lords.  In one version of the data, we are able to pull apart these questions. But in the slightly more efficient dataset available in the hansardr package, we have neglected information about the house in which each speech originated.
 
 ```{r, message=FALSE, warning=FALSE}
-# Count words per speaker in each period
+# Count the words spoken by each speaker in the prereform period
+# - count() counts the occurrences of each word spoken by each speaker
 prereform_speakers_wordcount <- prereform_words %>%
-  count(suggested_speaker, word, name = "wordcount")
+  count(suggested_speaker, word, name = "wordcount") # Count words by speaker
 
+# Do the same thing to count the words spoken by each speaker in the postreform period
 postreform_speakers_wordcount <- postreform_words %>%
-  count(suggested_speaker, word, name = "wordcount")
+  count(suggested_speaker, word, name = "wordcount") # Count words by speaker
 ```
 
 
 ```{r}
-# Speakers who appear in both periods
+# Find the speakers who appear in the prereform period
+# - distinct() keeps one row for each speaker
 prereform_unique_speakers <- prereform_speakers_wordcount %>%
-  distinct(suggested_speaker)
+  distinct(suggested_speaker) # Keep unique speakers
 
+# Do the same thing to find the speakers who appear in the postreform period
 postreform_unique_speakers <- postreform_speakers_wordcount %>%
-  distinct(suggested_speaker)
+  distinct(suggested_speaker) 
 ```
 
 
 ```{r}
+# Find the speakers who appear in both periods
+# - inner_join() keeps only speakers found in both periods
+# - mutate() labels the speaker category
 continuous_speakers <- prereform_unique_speakers %>%
-  inner_join(postreform_unique_speakers, by = "suggested_speaker") %>%
-  mutate(class = "both periods")
+  inner_join(postreform_unique_speakers, by = "suggested_speaker") %>% # Keep speakers appearing in both periods
+  mutate(class = "both periods") # Label the speaker category
 
+# Do the same to find speakers who appear only in the prereform period
 prereform_only_speakers <- prereform_unique_speakers %>%
-  anti_join(postreform_unique_speakers, by = "suggested_speaker") %>%
-  mutate(class = "prereform only")
+  anti_join(postreform_unique_speakers, by = "suggested_speaker") %>% 
+  mutate(class = "prereform only") 
 
+# Do the same to find the speakers who appear only in the postreform period
 postreform_only_speakers <- postreform_unique_speakers %>%
-  anti_join(prereform_unique_speakers, by = "suggested_speaker") %>%
-  mutate(class = "postreform only")
+  anti_join(prereform_unique_speakers, by = "suggested_speaker") %>% 
+  mutate(class = "postreform only") 
 ```
 
 
 ```{r}
-# Add speaker class onto prereform word counts
+# Calculate tf-idf scores for speaker categories in the prereform period
+# - left_join() adds the speaker category for each speaker
+# - count() counts the words spoken by each speaker category
+# - bind_tf_idf() calculates the tf-idf score for each word
 prereform_words_w_speaker_classifications_tfidf <- prereform_speakers_wordcount %>%
-  left_join(all_classes, by = "suggested_speaker") %>%
-  count(class, word, name = "wordsperclass") %>%
-  bind_tf_idf(word, class, wordsperclass)
+  left_join(all_classes, by = "suggested_speaker") %>% # Add the speaker category
+  count(class, word, name = "wordsperclass") %>% # Count words by speaker category
+  bind_tf_idf(word, class, wordsperclass) # Calculate the tf-idf scores
 
+# Keep the most distinctive words for each speaker category
+# - group_by() groups the words by speaker category
+# - slice_max() keeps the 15 words with the highest tf-idf scores
+# - ungroup() removes the grouping
 prereform_top_words_w_speaker_classifications_tfidf <- prereform_words_w_speaker_classifications_tfidf %>%
-  group_by(class) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  group_by(class) %>% # Group by speaker category
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words
+  ungroup() # Remove the grouping
 ```
 
 ```{r}
-ggplot(prereform_top_words_w_speaker_classifications_tfidf, 
-       aes(x = reorder_within(word, tf_idf, class), y = tf_idf)) +
-  geom_col() +
-  facet_wrap(~ class, scales = "free_y") +
-  coord_flip() +
-  scale_x_reordered() +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = "Which Words Are Most Distinctive",
-       subtitle = "Prereform decade (1822–1832): prereform-only speakers vs speakers who also spoke after 1832",
-       y = "tf-idf",
-       x = "word")
+# Visualize the most distinctive words for each speaker category
+# - reorder_within() orders words by tf-idf separately within each speaker category
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each speaker category
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - scale_y_continuous() formats the y-axis labels
+# - labs() adds the title and axis labels
+ggplot(prereform_top_words_w_speaker_classifications_tfidf,
+       aes(x = reorder_within(word, tf_idf, class), # Order words by tf-idf separately within each speaker category
+           y = tf_idf)) + # Plot tf-idf scores on the y-axis
+  geom_col() + # Create a bar chart
+  facet_wrap(~class, scales = "free_y") + # Create one panel per speaker category
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  scale_y_continuous(labels = label_comma()) + # Format the y-axis labels
+  labs(title = "Which Words Are Most Distinctive", # Add a chart title
+       subtitle = "Prereform decade (1822–1832): prereform-only speakers vs speakers who also spoke after 1832", # Add a subtitle
+       y = "tf-idf", # Label the y-axis
+       x = "Word") # Label the x-axis
 ```
 
 The same transformation can be applied to postreform-only speakers. Were the statesmen newly elected in 1832-33 different in their words from those who had held office continually?
 
 
 ```{r}
+# Calculate tf-idf scores for speaker categories in the postreform period
+# - left_join() adds the speaker category for each speaker
+# - count() counts the words spoken by each speaker category
+# - bind_tf_idf() calculates the tf-idf score for each word
 postreform_words_w_speaker_classifications_tfidf <- postreform_words %>%
-  left_join(all_classes, by = "suggested_speaker") %>%
-  count(class, word, name = "words_per_period") %>%
-  bind_tf_idf(word, class, words_per_period)
+  left_join(all_classes, by = "suggested_speaker") %>% # Add the speaker category
+  count(class, word, name = "words_per_period") %>% # Count words by speaker category
+  bind_tf_idf(word, class, words_per_period) # Calculate the tf-idf scores
 
-# 6) top words
+# Keep the most distinctive words for each speaker category
+# - group_by() groups the words by speaker category
+# - slice_max() keeps the 15 words with the highest tf-idf scores
+# - ungroup() removes the grouping
 postreform_top_words_w_speaker_classifications_tfidf <- postreform_words_w_speaker_classifications_tfidf %>%
-  group_by(class) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  group_by(class) %>% # Group by speaker category
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words
+  ungroup() # Remove the grouping
 ```
 
 
 ```{r}
-ggplot(postreform_top_words_w_speaker_classifications_tfidf, 
-       aes(x = reorder_within(word, tf_idf, class), y = tf_idf)) +
-  geom_col() +
-  facet_wrap(~ class, scales = "free_y") +
-  coord_flip() +
-  scale_x_reordered() +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = "Most Distinctive Words",
-       subtitle = "Postreform-only speakers vs those who also spoke before the Reform Act of 1832",
-       y = "tf-idf",
-       x = "word")
+# Visualize the most distinctive words for each speaker category
+# - reorder_within() orders words by tf-idf separately within each speaker category
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each speaker category
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - scale_y_continuous() formats the y-axis labels
+# - labs() adds the title and axis labels
+ggplot(postreform_top_words_w_speaker_classifications_tfidf,
+       aes(x = reorder_within(word, tf_idf, class), # Order words by tf-idf separately within each speaker category
+           y = tf_idf)) + # Plot tf-idf scores on the y-axis
+  geom_col() + # Create a bar chart
+  facet_wrap(~class, scales = "free_y") + # Create one panel per speaker category
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  scale_y_continuous(labels = label_comma()) + # Format the y-axis labels
+  labs(title = "Most Distinctive Words", # Add a chart title
+       subtitle = "Postreform-only speakers vs those who also spoke before the Reform Act of 1832", # Add a subtitle
+       y = "tf-idf", # Label the y-axis
+       x = "Word") # Label the x-axis
 ```
 
 Again, a list of words emerges which is hard to interpret. We choose to ask the analyst to supply their own interpretation in the exercises for this chapter. 
@@ -702,36 +859,53 @@ Again, a list of words emerges which is hard to interpret. We choose to ask the 
 An alternative approach to measurement is to look exclusively at the speakers who only held office before or after the Reform Act.  This means measuring the words of those who weren't reelected after 1832 with those who were only elected in 1832 or after. 
 
 ```{r}
-# Applying Tf-idf with a Different Data Architecture Part 2:
-# Measure the most distinctive words of prereform only vs postreform only speakers
+# Calculate tf-idf scores for prereform-only and postreform-only speakers
+# - bind_rows() combines the prereform and postreform words
+# - left_join() adds each speaker's category
+words_w_speaker_classifications <- prereform_words %>%
+  bind_rows(postreform_words) %>% # Combine the two periods
+  left_join(all_classes, by = "suggested_speaker") # Add the speaker category
 
-words_w_speaker_classifications <- prereform_words %>% 
-  bind_rows(postreform_words) %>%
-  left_join(all_classes, by = "suggested_speaker")
-
+# Calculate tf-idf scores for each speaker category
+# - count() counts the words spoken by each category
+# - bind_tf_idf() finds the tf-idf score for each word
 words_w_speaker_classifications_tfidf <- words_w_speaker_classifications %>%
-  count(class, word, name = "words_per_period") %>%
-  bind_tf_idf(word, class, words_per_period) 
+  count(class, word, name = "words_per_period") %>% # Count words by speaker category
+  bind_tf_idf(word, class, words_per_period) # Find tf-idf scores
 
+# Keep the most distinctive words for prereform-only and postreform-only speakers
+# - filter() removes speakers who appear in both periods
+# - group_by() groups the words by speaker category
+# - slice_max() keeps the 15 words with the highest tf-idf scores
+# - ungroup() removes the grouping
 top_words_w_speaker_classifications_tfidf <- words_w_speaker_classifications_tfidf %>%
-  filter(class != "both periods") %>%
-  group_by(class) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  filter(class != "both periods") %>% # Remove speakers who appear in both periods
+  group_by(class) %>% # Group by speaker category
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words
+  ungroup() # Remove the grouping
 ```
 
 ```{r}
+# Visualize the most distinctive words for prereform-only and postreform-only speakers
+# - reorder_within() orders words by tf-idf separately within each speaker category
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each speaker category
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - scale_y_continuous() formats the y-axis labels
+# - labs() adds the title and axis labels
 ggplot(top_words_w_speaker_classifications_tfidf,
-       aes(x = reorder_within(word, tf_idf, class), y = tf_idf)) +
-  geom_col() +
-  facet_wrap(~ class, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = "Which Words Are Most Distinctive",
-       subtitle = "Of the speakers who only spoke before or after the Reform Act of 1832",
-       x = "word",
-       y = "tf-idf")
+       aes(x = reorder_within(word, tf_idf, class), # Order words by tf-idf separately within each speaker category
+           y = tf_idf)) + # Plot tf-idf scores on the y-axis
+  geom_col() + # Create a bar chart
+  facet_wrap(~class, scales = "free") + # Create one panel per speaker category
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  scale_y_continuous(labels = label_comma()) + # Format the y-axis labels
+  labs(title = "Which Words Are Most Distinctive", # Add a chart title
+       subtitle = "Of the speakers who only spoke before or after the Reform Act of 1832", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "tf-idf") # Label the y-axis
 ```
 
 ## Critical Thinking About the Results
@@ -741,59 +915,81 @@ Parliament included many backbench MPs whose total output in words was relativel
 This kind of thinking can help us to refine our approach to research. The first step is to investigate how many speakers spoke in each period, and how much each contributed. 
 
 ```{r}
+# Calculate the total words spoken by prereform-only speakers
+# - filter() keeps only prereform-only speakers
+# - group_by() groups the data by speaker
+# - summarize() adds the total words spoken by each speaker
 prereform_only_speakers_wordcount <- all_speakers_annotated %>%
-  filter(class == "prereform only") %>%
-  group_by(suggested_speaker) %>%
-  summarize(wordcount = sum(wordcount))
+  filter(class == "prereform only") %>% # Keep prereform-only speakers
+  group_by(suggested_speaker) %>% # Group by speaker
+  summarize(wordcount = sum(wordcount)) # Find the total words spoken
 
-ggplot(prereform_only_speakers_wordcount, 
-       aes(x = wordcount)) +
-  geom_histogram() +
-  scale_x_continuous(labels = comma) +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Word Count Distribution: Prereform-Only Speakers",
-       x = "word count",
-       y = "number of speakers")
+# Visualize the distribution of speaker word counts
+# - geom_histogram() groups speakers into word-count bins
+# - scale_x_continuous() formats the x-axis labels with commas
+# - scale_y_continuous() formats the y-axis labels with commas
+# - labs() adds the title and axis labels
+ggplot(prereform_only_speakers_wordcount,
+       aes(x = wordcount)) + # Plot word counts on the x-axis
+  geom_histogram() + # Create a histogram
+  scale_x_continuous(labels = comma) + # Format the x-axis labels
+  scale_y_continuous(labels = comma) + # Format the y-axis labels
+  labs(title = "Word Count Distribution: Prereform-Only Speakers", # Add a chart title
+       x = "Word Count", # Label the x-axis
+       y = "Number of Speakers") # Label the y-axis
 ```
 
 ```{r}
-ggplot(prereform_only_speakers_wordcount, 
-       aes(x = wordcount)) +
-  geom_histogram(binwidth = 1000) +
-  labs(title = "How many prereform speakers spoke how many words?",
-       x = "words spoken",
-       y = "number of speakers")
+# Visualize the distribution of speaker word counts
+# - geom_histogram() groups speakers into 1,000 word bins
+# - labs() adds the title and axis labels
+ggplot(prereform_only_speakers_wordcount,
+       aes(x = wordcount)) + # Plot word counts on the x-axis
+  geom_histogram(binwidth = 1000) + # Create 1,000 word bins
+  labs(title = "How many prereform speakers spoke how many words?", # Add a chart title
+       x = "Words Spoken", # Label the x-axis
+       y = "Number of Speakers") # Label the y-axis
 ```
 
 Many speakers -- nearly 2000 in all -- only spoke less than 7000 words, total, in the prereform period.  Let's look at just those who spoke 7000 words or more. 
 
 ```{r }
-# Use Basic Counting and a Histogram to Investigate How Many Speakers Spoke at the Maximum and Minimum Amounts
-# Part 2: Postreform
-
+# Keep prereform-only speakers who spoke at least 7,000 words
+# - filter() keeps only prereform-only speakers
+# - group_by() groups the data by speaker
+# - summarize() adds the total words spoken by each speaker
+# - filter() keeps speakers with at least 7,000 words
 prereform_only_speakers_wordcount <- all_speakers_annotated %>%
-  filter(class == "prereform only") %>%
-  group_by(suggested_speaker) %>%
-  summarize(wordcount = sum(wordcount)) %>%
-  filter(wordcount >= 7000)
+  filter(class == "prereform only") %>% # Keep prereform-only speakers
+  group_by(suggested_speaker) %>% # Group by speaker
+  summarize(wordcount = sum(wordcount)) %>% # Find the total words spoken
+  filter(wordcount >= 7000) # Keep speakers with at least 7,000 words
 
-ggplot(prereform_only_speakers_wordcount, 
-       aes(x = wordcount)) +
-  geom_histogram() +
-  scale_x_continuous(labels = comma) +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Word Count Distribution: Prereform-Only Speakers",
-       x = "word count",
-       y = "number of speakers")
+# Visualize the distribution of high-volume speakers
+# - geom_histogram() groups speakers into word-count bins
+# - scale_x_continuous() formats the x-axis labels with commas
+# - scale_y_continuous() formats the y-axis labels with commas
+# - labs() adds the title and axis labels
+ggplot(prereform_only_speakers_wordcount,
+       aes(x = wordcount)) + # Plot word counts on the x-axis
+  geom_histogram() + # Create a histogram
+  scale_x_continuous(labels = comma) + # Format the x-axis labels
+  scale_y_continuous(labels = comma) + # Format the y-axis labels
+  labs(title = "Word Count Distribution: Prereform-Only Speakers", # Add a chart title
+       x = "Word Count", # Label the x-axis
+       y = "Number of Speakers") # Label the y-axis
 ```
 
 ```{r}
-ggplot(prereform_only_speakers_wordcount, 
-       aes(x = wordcount)) +
-  geom_histogram(binwidth = 1000) +
-  labs(title = "How many prereform speakers spoke 7000 words or more?",
-       x = "words spoken",
-       y = "number of speakers")
+# Visualize the distribution of speakers who spoke at least 7,000 words
+# - geom_histogram() groups speakers into 1,000 word bins
+# - labs() adds the title and axis labels
+ggplot(prereform_only_speakers_wordcount,
+       aes(x = wordcount)) + # Plot word counts on the x-axis
+  geom_histogram(binwidth = 1000) + # Create 1,000 word bins
+  labs(title = "How many prereform speakers spoke 7,000 words or more?", # Add a chart title
+       x = "Words Spoken", # Label the x-axis
+       y = "Number of Speakers") # Label the y-axis
 ```
 
 
@@ -808,62 +1004,95 @@ The histogram helps us to make informed decisions about where to put the cutoff 
 The code will also allow us to vary the cutoff number to see if doing so changes the outcome.  
 
 ```{r}
+# Calculate the total words spoken by postreform-only speakers
+# - filter() keeps only postreform only speakers
+# - group_by() groups the data by speaker
+# - summarize() adds the total words spoken by each speaker
 postreform_only_speakers_wordcount <- all_speakers_annotated %>%
-  filter(class == "postreform only") %>%
-  group_by(suggested_speaker) %>%
-  summarize(wordcount = sum(wordcount))
+  filter(class == "postreform only") %>% # Keep postreform only speakers
+  group_by(suggested_speaker) %>% # Group by speaker
+  summarize(wordcount = sum(wordcount)) # Find the total words spoken
 ```
 
 
 ```{r}
-# Applying Tf-idf with a Different Data Architecture Part 3:
-# For comparing postreform and prereform speech, does it matter whether we only look at the speakers who spoke a lot? 
-
+# Keep prereform only speakers who spoke at least 10,000 words
+# - filter() keeps speakers who meet the word-count cutoff
 major_prereform_speakers <- prereform_only_speakers_wordcount %>%
-  filter(wordcount >= 10000) # <--- here is the cutoff. Change it and see if the results differ!
- 
+  filter(wordcount >= 10000) # Keep speakers who spoke at least 10,000 words
+
+# Do the same for postreform only speakers who spoke at least 10,000 words
 major_postreform_speakers <- postreform_only_speakers_wordcount %>%
   filter(wordcount >= 10000)
 
-major_speakers <- bind_rows(major_prereform_speakers, major_postreform_speakers)
+# Combine the major speakers from both periods
+# - bind_rows() stacks the prereform and postreform speakers
+major_speakers <- bind_rows(major_prereform_speakers,
+                            major_postreform_speakers) # Combine the major speakers
 
+# Calculate tf-idf scores for words used by major speakers
+# - filter() keeps only the major speakers
+# - group_by() groups the words by speaker category
+# - summarize() counts the words used by each category
+# - bind_tf_idf() finds the tf-idf score for each word
 top_words_w_speaker_classifications_tfidf <- words_w_speaker_classifications %>%
-  filter(suggested_speaker %in% major_speakers$suggested_speaker) %>%
-  group_by(class, word) %>%
-  summarize(words_per_period = n()) %>%
-  bind_tf_idf(word, class, words_per_period) 
+  filter(suggested_speaker %in% major_speakers$suggested_speaker) %>% # Keep only major speakers
+  group_by(class, word) %>% # Group by speaker category and word
+  summarize(words_per_period = n()) %>% # Count words by speaker category
+  bind_tf_idf(word, class, words_per_period) # Find the tf-idf scores
 
+# Keep the most distinctive words for each speaker category
+# - group_by() groups the words by speaker category
+# - slice_max() keeps the 15 words with the highest tf-idf scores
+# - ungroup() removes the grouping
 top_words_w_speaker_classifications_tfidf <- top_words_w_speaker_classifications_tfidf %>%
-  group_by(class) %>%
-  slice_max(order_by = tf_idf, n = 15) %>%
-  ungroup()
+  group_by(class) %>% # Group by speaker category
+  slice_max(order_by = tf_idf, n = 15) %>% # Keep the top 15 words
+  ungroup() # Remove the grouping
 
+# Visualize the most distinctive words used by major speakers
+# - reorder_within() orders words by count separately within each speaker category
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each speaker category
+# - coord_flip() makes the word labels easier to read
+# - scale_fill_grey() shades bars according to tf-idf score
+# - scale_x_reordered() preserves word order within each panel
+# - labs() adds the title, subtitle, and axis labels
 ggplot(top_words_w_speaker_classifications_tfidf,
-        aes(x = reorder_within(word, words_per_period, class), y = words_per_period, fill = factor(tf_idf))) +
-   geom_col() +
-   facet_wrap(~ class, scales = "free") +
-   coord_flip() +
-   scale_fill_grey(guide = "none") +
-   scale_x_reordered() +
-   labs(title = "Which Words Are Most Distinctive",
-        subtitle = "of the speakers who only spoke before or after the Reform Act of 1832?",
-        x = "word",
-        y = "word count")
+       aes(x = reorder_within(word, words_per_period, class), # Order words by count within each speaker category
+           y = words_per_period, # Plot word counts on the y-axis
+           fill = factor(tf_idf))) + # Shade bars by tf-idf score
+  geom_col() + # Create a bar chart
+  facet_wrap(~class, scales = "free") + # Create one panel per speaker category
+  coord_flip() + # Flip the axes
+  scale_fill_grey(guide = "none") + # Use grayscale shading and hide the legend
+  scale_x_reordered() + # Preserve word order within each panel
+  labs(title = "Which Words Are Most Distinctive", # Add a chart title
+       subtitle = "Of the speakers who only spoke before or after the Reform Act of 1832?", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "Word Count") # Label the y-axis
 ```
 
 
 ```{r}
- ggplot(top_words_w_speaker_classifications_tfidf,
-         aes(x = reorder_within(word, tf_idf, class),
-             y = tf_idf)) +
-    geom_col() +
-    facet_wrap(~ class, scales = "free") +
-    coord_flip() +
-    scale_x_reordered() +
-    labs(title = "Which Words Are Most Distinctive",
-         subtitle = "of the speakers who only spoke before or after the Reform Act of 1832?",
-         x = "word",
-         y = "tf-idf")
+# Visualize the most distinctive words used by major speakers
+# - reorder_within() orders words by tf-idf separately within each speaker category
+# - geom_col() creates a bar chart
+# - facet_wrap() creates one panel for each speaker category
+# - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each panel
+# - labs() adds the title, subtitle, and axis labels
+ggplot(top_words_w_speaker_classifications_tfidf,
+       aes(x = reorder_within(word, tf_idf, class), # Order words by tf-idf separately within each speaker category
+           y = tf_idf)) + # Plot tf-idf scores on the y-axis
+  geom_col() + # Create a bar chart
+  facet_wrap(~class, scales = "free") + # Create one panel per speaker category
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve the word order within each panel
+  labs(title = "Which Words Are Most Distinctive", # Add a chart title
+       subtitle = "Of the speakers who only spoke before or after the Reform Act of 1832?", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "tf-idf") # Label the y-axis
 ```
 
 
@@ -874,41 +1103,58 @@ A final approach is to look at eaach time period on its own, freezing any other 
 
 
 ```{r, warning=FALSE, message=FALSE}
-
-# 1. Count words per speaker and calculate tf-idf
+# Calculate tf-idf scores for each speaker
+# - filter() keeps only the major speakers
+# - count() counts the words spoken by each speaker
+# - bind_tf_idf() calculates the tf-idf score for each word
 speaker_words_tfidf <- words_w_speaker_classifications %>%
-  filter(suggested_speaker %in% major_speakers$suggested_speaker) %>%
-  count(class, suggested_speaker, word, name = "wordsperspeaker") %>%
-  bind_tf_idf(word, suggested_speaker, wordsperspeaker)
+  filter(suggested_speaker %in% major_speakers$suggested_speaker) %>% # Keep only major speakers
+  count(class, suggested_speaker, word, name = "wordsperspeaker") %>% # Count words by speaker
+  bind_tf_idf(word, suggested_speaker, wordsperspeaker) # Calculate the tf-idf scores
 
-# 2. Find the five most distinctive speakers in each class
+# Find the most distinctive speakers in each category
+# - group_by() groups the data by speaker category and speaker
+# - summarize() calculates each speaker's total tf-idf score and total words
+# - slice_max() keeps the five speakers with the highest tf-idf scores
+# - ungroup() removes the grouping
 most_distinctive_speakers <- speaker_words_tfidf %>%
-  group_by(class, suggested_speaker) %>%
-  summarize(speaker_distinctiveness = sum(tf_idf),
-            total_words = sum(wordsperspeaker)) %>%
-  group_by(class) %>%
-  slice_max(speaker_distinctiveness, n = 5) %>%
-  ungroup()
+  group_by(class, suggested_speaker) %>% # Group by speaker category and speaker
+  summarize(speaker_distinctiveness = sum(tf_idf), # Calculate each speaker's total tf-idf score
+            total_words = sum(wordsperspeaker)) %>% # Calculate each speaker's total words
+  group_by(class) %>% # Group by speaker category
+  slice_max(speaker_distinctiveness, n = 5) %>% # Keep the five most distinctive speakers
+  ungroup() # Remove the grouping
 
-# 3. Find the top five words for each of those speakers
+# Find the most distinctive words for each speaker
+# - inner_join() keeps only the selected speakers
+# - group_by() groups the words by speaker
+# - slice_max() keeps the five words with the highest tf-idf scores
+# - mutate() numbers the words within each speaker
+# - ungroup() removes the grouping
 most_distinctive_speakers_top_words <- speaker_words_tfidf %>%
-  inner_join(most_distinctive_speakers, by = c("class", "suggested_speaker")) %>%
-  group_by(class, suggested_speaker) %>%
-  slice_max(tf_idf, n = 5) %>%
-  mutate(word_number = row_number()) %>%
-  ungroup()
+  inner_join(most_distinctive_speakers, by = c("class", "suggested_speaker")) %>% # Keep the selected speakers
+  group_by(class, suggested_speaker) %>% # Group by speaker category and speaker
+  slice_max(tf_idf, n = 5) %>% # Keep the top five words
+  mutate(word_number = row_number()) %>% # Number the words for each speaker
+  ungroup() # Remove the grouping
 ```
 
 ```{r}
+# Display each speaker's five most distinctive words
+# - select() keeps only the columns needed for the table
+# - pivot_wider() places each distinctive word in a separate column
+# - mutate() orders the speaker categories
+# - arrange() sorts the rows by category and speaker
+# - kable() formats the results as a table
 most_distinctive_speakers_top_words %>%
-  select(class, suggested_speaker, word_number, word) %>%
-  pivot_wider(names_from = word_number,
-              values_from = word,
-              names_prefix = "Word ") %>%
-  mutate(class = factor(class, levels = c("prereform only", "postreform only", "both periods"))) %>%
-  arrange(class, suggested_speaker) %>%
-  kable(col.names = c("Period", "Speaker", "Word 1", "Word 2", "Word 3", "Word 4", "Word 5"),
-        caption = "Most Distinctive Words by Speaker and Period. These are the speakers with more than 7000 words who had the most distinctive lexicons.")
+  select(class, suggested_speaker, word_number, word) %>% # Keep the relevant columns
+  pivot_wider(names_from = word_number, # Create one column for each word number
+              values_from = word, # Fill the columns with words
+              names_prefix = "Word ") %>% # Name the columns Word 1 through Word 5
+  mutate(class = factor(class, levels = c("prereform only", "postreform only", "both periods"))) %>% # Order the speaker categories
+  arrange(class, suggested_speaker) %>% # Sort by category and speaker
+  kable(col.names = c("Period", "Speaker", "Word 1", "Word 2", "Word 3", "Word 4", "Word 5"), # Label the columns
+        caption = "Most Distinctive Words by Speaker and Period. These are the speakers with more than 7,000 words who had the most distinctive lexicons.") # Add a table caption
 ```
 
 The Marquis of Blandford  was amongst the ultra-Tories who advocated the Reform Act as a way of containing Catholic power. The fact that he appears marked out for distinctiveness in the prereform era for his specific discussions of the intricacies of the vote ("burgess," "borough") as well as his engagement with radical advocates of reform ("tooke," an allusion to John Horne Tooke, the radical clergyman tried for treason in 1794) stands out.

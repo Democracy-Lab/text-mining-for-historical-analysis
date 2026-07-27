@@ -14,7 +14,9 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-One of the most important tasks in history is the study of events—moments when something changed. Historians ask not only what happened, but why those moments mattered and how people understood change as it unfolded. In this and future chapters, we adopt a historian’s perspective by asking what makes certain moments historically significant and how evidence allows us to interpret them.
+One of the most important tasks in history is the study of "events"—which we think of as moments when something changed. Historians ask not only what happened, but why those moments mattered and how people understood change as it unfolded. In this and future chapters, we will ask what makes certain moments historically significant and how different evidence might support our interpretation. 
+
+## Jo: Don't other chapters contribute to a research strategy? This sounds like our first time we are teaching research. I think the prior chapters are just more basic, but not code in a vacuum. 
 
 This chapter introduces a research strategy. Up to this point, each analytical technique has been practiced separately: counting words, identifying prolific speakers, examining preferred vocabulary, and analyzing collocates to understand how meaning forms around key terms. Now, these skills come together into a single coherent research task centered on understanding a historical event. Events punctuate time, marking moments when attention intensifies and language shifts in response to political or social change. Rather than studying discourse in isolation, the goal is to identify an event, find the speakers most active around it, examine the themes and collocates they used, compare how different individuals framed the moment, and interpret what changed and why it mattered. In earlier exercises, speakers, word use, and collocates were analyzed independently; here, those same methods are combined into a unified workflow that moves from computational analysis toward historical interpretation.
 
@@ -32,13 +34,11 @@ One question that might allow us to unpack the impact of abolition is how Britis
 
 # The Importance of Background Knowledge
 
-Before we begin to think about the contribution that text mining can make to the problem, we first need to be able to summarize the understanding and debates of the historians who have studied these questions. The paragraphs above summarize some of the different perspectives on the slavery question taken by historians from the recent and more distant past. In short, we need some background knowledge. But how does an analyst get there, if they don't first have a series of prepared paragraphs to introduce them to a historical problem? 
+Before we begin to think about the contribution that text mining can make to the problem, we first need to be able to summarize the understanding and debates of the historians who have studied these questions.^1^ The paragraphs above summarize some of the different perspectives on the slavery question taken by historians from the recent and more distant past. In short, we need some background knowledge. But how does an analyst get there, if they don't first have a series of prepared paragraphs to introduce them to a historical problem? 
 
 "Background knowledge" in a subject field refers to the kind of knowledge that one acquires by reading the major textbooks and secondary monographs from the field of History that cover the historical time period in question. Textbooks and secondary monographs provide extensive knowledge about which sources have been consulted, what scholars have debated, whether the actions of kings or parliaments or working-class people mattered at this period of time and why.  
 
-Remarks about the importance of reading background information may be experienced as off-putting by some undergraduate students of data, who want to be assured that in a course on text mining that they will acquire the tools to make wonderful discoveries.  But just as students of statistics must study more than an introductory course in statistics to make a novel contribution, so too students of text mining must enroll in more than one course to do really important work.  Reading a wikipedia entry cannot substitute for the kind of background knowledge that a student would acquire in the course of taking an introductory course on the History of Victorian England. Nor can Text Mining for Historical Analysis make up for courses in the undergraduate study of History, although this book’s companion volume, The Dangerous Art of Text Mining, includes many arguments about the specific kind of knowledge of sources, obfuscations, agency, and experience that historical study makes available.  Producing insight worthy of the attention of multiple fields is no simple game. It cannot be produced at the touch of a button or the application of a new algorithm to new data; it requires adjusting the algorithm, rethinking the questions, examining the data, and iterating through the work until something truly surprising has come to light. 
-
-A shortcut which Guldi recommends in The Dangerous Art of Text Mining for those who want to achieve results before enrolling in a specialist course on the historical background material is to engage in an ongoing collaboration with a professor, librarian, or graduate student already familiar with the background material, allowing that scholar’s sense of validation and surprise to guide the work with data. In these days, many LLMs can give adequate summaries of the events that pertain to a database. A useful prompt might look like, “Given the Hansard dataset, what are the most important political events of the 1830s that would appear in these debates? Do not hallucinate.” A request for more information might be, “Tell me about the British Abolition of Slavery in 1833. Use published works only. Do not hallucinate. Give links to the citations.” In our experience, at the current level of LLMs, it is worth checking on some of those links to make sure that they are real.^1^
+Remarks about the importance of reading background information may be experienced as off-putting by some undergraduate students of data, who want to be assured that in a course on text mining that they will acquire the tools to make wonderful discoveries.  But just as students of statistics must study more than an introductory course in statistics to make a novel contribution, so too students of text mining must enroll in more than one course to do really important work.  Reading a Wikipedia entry cannot substitute for the kind of background knowledge that a student would acquire in the course of taking an introductory course on the History of Victorian England. Nor can Text Mining for Historical Analysis make up for courses in the undergraduate study of History, although this book’s companion volume, The Dangerous Art of Text Mining, includes many arguments about the specific kind of knowledge of sources, obfuscations, agency, and experience that historical study makes available.  Producing insight worthy of the attention of multiple fields is no simple game. It cannot be produced at the touch of a button or the application of a new algorithm to new data; it requires adjusting the algorithm, rethinking the questions, examining the data, and iterating through the work until something truly surprising has come to light. 
 
 In ‘hybrid' work, where computer scientists and humanists work on the same team to produce new knowledge, collaborating over multiple iterations and investigations, there can be a division of labor around the research.  In general, a high caliber of work can only be accomplished by teams where at least one valued member is as serious about history as they are about algorithmic study.
 
@@ -83,84 +83,102 @@ In a previous chapter, we looked into the top speakers in parliament in a given 
 If you are new to code, take a moment to notice how changing only one line in the code below produces a different angle of analysis.  The code below is otherwise very similar to the code in the previous chapters. One of the great pleasures of coding is the facility with which a few skills can quickly become powerful in the hands of an analyst who has many questions.
 
 ```{r, warning=FALSE, message=FALSE}
-# load packages
-library("tidyverse")
-library("tidytext")
-library("lubridate")
-library("hansardr")
-library("ggrepel")
+# load libraries
+library(tidyverse)
+library(tidytext)
+library(lubridate)
+library(hansardr)
+library(ggrepel)
+library(textstem)
+library(knitr)
+library(scales)
 
 # load data
 data("hansard_1830")
 data("debate_metadata_1830")
 
-# merge the Hansard speech text with metadata (e.g., debate title and speech date)
-# create a new column 'year' by extracting the year from the full speech date
-# find just the debates about slavery and who spoke them 
-slavery_1830 <- hansard_1830 %>%  # Create a new dataset called 'debates_1830'
-  left_join(debate_metadata_1830, by = "sentence_id") %>% # Join with the debate metadata 
-  filter(str_detect(tolower(debate), "slavery")) %>% # filter title for 'slavery' 
-  mutate(year = year(speechdate)) # Extract and add the year from the 'speechdate' column
+# Find debates about slavery in the 1830 Hansard data
+# - left_join() adds debate titles and speech dates
+# - filter() keeps only debates with "slavery" in the title
+# - mutate() extracts the year from the speech date
+slavery_1830 <- hansard_1830 %>%  
+  left_join(debate_metadata_1830, by = "sentence_id") %>% # Add debate metadata
+  filter(str_detect(tolower(debate), "slavery")) %>% # Keep slavery debates
+  mutate(year = year(speechdate)) # Extract the year
 
-slavery_debates_1830 <- slavery_1830 %>%
-  left_join(speaker_metadata_1830, by = "sentence_id") %>% # join datasets 
-  select(sentence_id, speaker, suggested_speaker, text, year) %>% # keep relevant columns 
-  filter(suggested_speaker != "") # remove any lines with missing speaker information
+# Add speaker information to the slavery debates
+# - left_join() adds speaker metadata
+# - select() keeps only the variables needed for analysis
+# - filter() removes rows without a speaker name
+slavery_debates_1830 <- slavery_1830 %>%                           
+  left_join(speaker_metadata_1830, by = "sentence_id") %>% # Add speaker metadata
+  select(sentence_id, speaker, suggested_speaker, text, year) %>% # Keep relevant columns
+  filter(suggested_speaker != "") # Remove missing speaker names
 
-# break up the text into words
-slavery_words_1830 <- slavery_debates_1830 %>% # create a new dataset
-    unnest_tokens(word, text) # break up the text into words
+# Break the speeches into individual words
+# - unnest_tokens() tokenizes the text into one word per row
+slavery_words_1830 <- slavery_debates_1830 %>%  
+  unnest_tokens(word, text) 
 
-# count the words per speaker
-words_per_speaker_slavery_1830 <- slavery_words_1830 %>% # create a new dataset
-  group_by(speaker) %>% # group the data by speaker and year 
-  summarize(words_per_speaker = n()) %>% # create a column with total words per speaker
-  arrange(desc(words_per_speaker)) # arrange the words in descending order 
+# Count how many words each speaker contributed
+# - group_by() groups the data by speaker
+# - summarize() counts the total words spoken by each speaker
+# - arrange() sorts speakers from most to fewest words
+words_per_speaker_slavery_1830 <- slavery_words_1830 %>%        
+  group_by(speaker) %>% # Group by speaker
+  summarize(words_per_speaker = n()) %>% # Count words per speaker
+  arrange(desc(words_per_speaker)) # Sort from most to fewest words
 
-# find the top speakers 
-top_slavery_speakers <- words_per_speaker_slavery_1830 %>% # create a new dataset
-  ungroup() %>% # remove the previous data grouping 
-  arrange(desc(words_per_speaker)) %>% # arrange in descending order 
-  slice(1:20) # take only the top n speakers
+# Keep the speakers who contributed the most words
+# - ungroup() removes the previous grouping
+# - arrange() sorts speakers from most to fewest words
+# - slice() keeps the top 20 rows
+top_slavery_speakers <- words_per_speaker_slavery_1830 %>%   
+  ungroup() %>% # Remove the grouping
+  arrange(desc(words_per_speaker)) %>% # Sort from most to fewest words
+  slice(1:20) # Keep the top 20 rows
 
-# calculates the number of words each speaker said per year in the 1830 slavery dataset
-# group the text data by speaker and year, count the words, 
-# and arrange the results in descending order
-words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new dataset
-  group_by(speaker, year) %>% # group by speaker and year
-  summarize(words_pspy = n()) %>% # count words and store in new column
-  arrange(desc(words_pspy)) # sort in descending order of word count
+# Count the number of words spoken by each speaker in each year
+# - group_by() groups the data by speaker and year
+# - summarize() counts the words in each speaker-year combination
+# - arrange() sorts the results from most to fewest words
+words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>%
+  group_by(speaker, year) %>% # Group by speaker and year
+  summarize(words_pspy = n()) %>% # Count words per speaker per year
+  arrange(desc(words_pspy)) # Sort from most to fewest words
 
-# create a summary of the number of words each speaker contributed per year 
-# in the slavery debates of 1830
-# the resulting dataset helps identify the most vocal speakers 
-# and their yearly distribution of speech.
-words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>% # create a new dataset
-  group_by(speaker, year) %>% # group by speaker and year
-  summarize(words_pspy = n()) %>% # count words per speaker per year
-  arrange(desc(words_pspy)) # sort from highest to lowest word count
+# Count the number of words spoken by each speaker in each year
+# - group_by() groups the data by speaker and year
+# - summarize() counts the words in each speaker-year combination
+# - arrange() sorts the results from most to fewest words
+words_per_speaker_per_year_slavery_1830 <- slavery_words_1830 %>%   
+  group_by(speaker, year) %>% # Group by speaker and year
+  summarize(words_pspy = n()) %>% # Count words per speaker per year
+  arrange(desc(words_pspy)) # Sort from most to fewest words
 
-# find the words per speaker per year for just the top speakers
-top_words_pspy_slavery_1830 <- words_per_speaker_per_year_slavery_1830 %>%
-  filter(speaker %in% unique(top_slavery_speakers$speaker)) # retain only relevant rows
+# Keep yearly word counts for only the top speakers
+# - filter() keeps only speakers in the top speaker list
+# - %in% checks whether each speaker appears in that list
+top_words_pspy_slavery_1830 <- words_per_speaker_per_year_slavery_1830 %>% 
+  filter(speaker %in% unique(top_slavery_speakers$speaker)) # Keep only the top speakers
 ```
 
+Now we can visualize who spoke about slavery in 1830, how much they said, and when they spoke. Each point represents a speaker's total words for a given year. The x-axis shows years (rounded to whole numbers), and the y-axis shows word counts. 
+
 ```{r, fig.cap="Number of words spoken about slavery by individual members of Parliament from 1830 to 1838. Each point represents a speaker in a given year, plotted by the total number of words they contributed on the topic.", warning=FALSE, message=FALSE}
-# visualize who spoke about slavery in 1830, how much they said, and when they spoke.
-# each point represents a speaker's total words for a given year
-# the x-axis shows years (rounded to whole numbers), and the y-axis shows word counts.
-ggplot(top_words_pspy_slavery_1830, # make a graph
-       aes(x = year, # x axis = year
-           y = words_pspy, # y axis = word count
-           label = speaker)) + # use speaker names for labels
-  geom_text_repel(size = 2) + # repel overlapping text labels
-  geom_point() + # plot each point
-  ggtitle("Who spoke about slavery, how much, and when?") + # plot title
-  ylab("Number of words spoken") + # y axis label
-  scale_x_continuous(breaks = # whole number x axis
-                       function(x) 
-                         unique(floor(pretty(seq(min(x), 
-                                                 (max(x) + 1) * 1))))) 
+# Visualize when the top speakers discussed slavery
+# - ggplot() creates a scatterplot of yearly word counts
+# - geom_point() plots one point for each speaker-year combination
+# - geom_text_repel() labels speakers while reducing overlapping text
+ggplot(top_words_pspy_slavery_1830, 
+       aes(x = year, # Map year to the x-axis
+           y = words_pspy, # Map word count to the y-axis
+           label = speaker)) + # Label points with speaker names
+  geom_text_repel(size = 2) + # Add non-overlapping labels
+  geom_point() + # Plot each speaker-year point
+  ggtitle("Who spoke about slavery, how much, and when?") + # Add a title
+  ylab("Number of words spoken") + # Label the y-axis
+  scale_x_continuous(breaks = unique(top_words_pspy_slavery_1830$year)) # Show whole numbers for years
 ```
 
 You may notice that we have produced a different sort of visualization than the bar charts of the previous chapter. The ggplot library of graphics is a highly flexible language for producing many visualizations from the same data. Rather than the command for a bar chart -- `geom_col()` -- we have used a command for a dot plot -- `geom_point()`. With this plot we also introduce another library, `ggrepel`, which gives us tools for enhancing the readability of our plot by making sure that labels do not overlap.
@@ -178,19 +196,25 @@ Understanding how to group data by speaker and year gives us the possibility of 
 There are some new commands below that are used for demonstration purposes to show how one might navigate our newly joined dataset. Don't feel worried if you can't read every line. You will be learning how to aggregate data by speaker very soon.
 
 ```{r, message = FALSE, echo=FALSE}
-# find the words spoken about slavery in the year 1833
-slavery_debates_1833 <- slavery_debates_1830 %>%
-  filter(year == "1833") # filter for just the year 1833 
+# Keep only the slavery debates from 1833
+# - filter() keeps speeches from the year 1833
+slavery_debates_1833 <- slavery_debates_1830 %>% 
+  filter(year == 1833) # Keep only speeches from 1833
 
-# count how many times each speaker says each word in the slavery debates of 1833
-words_per_speaker_slavery_1833 <- slavery_debates_1833 %>%
-  unnest_tokens(word, text) %>% # tokenize the text column and create a new column called word
-  group_by(speaker) %>% # group the data by speaker
-  summarize(words_per_speaker = n()) %>% # create a new column for how many words each speaker says
-  arrange(desc(words_per_speaker)) %>% # arrange in descending order
-  slice(1:20) # retain just the top 20 words per speaker
+# Count how many words each speaker contributed in 1833
+# - unnest_tokens() splits the text into individual words
+# - group_by() groups the data by speaker
+# - summarize() counts the total words spoken by each speaker
+# - arrange() sorts speakers from most to fewest words
+# - slice() keeps the top 20 rows
+words_per_speaker_slavery_1833 <- slavery_debates_1833 %>% 
+  unnest_tokens(word, text) %>% # Break the text into words
+  group_by(speaker) %>% # Group by speaker
+  summarize(words_per_speaker = n()) %>% # Count words per speaker
+  arrange(desc(words_per_speaker)) %>%  # Sort from most to fewest words
+  slice(1:20) # Keep the top 20 rows
 
-# inspect the first few rows of the data to make sure it looks right
+# Inspect the first few rows of the data to make sure it looks right
 head(words_per_speaker_slavery_1833)
 ```
 
@@ -201,35 +225,40 @@ Nevertheless, distant reading--a technique where we read historical patterns acr
 In the following code, we provide a list of speakers and use the `%in%` operator to filter for any of these speakers. 
 
 ```{r, message = F}
-library(knitr)
+# Create a list of the top speakers to analyze
+top_speaker_names <- c("Mr. Fowell Buxton", "Mr. Buckingham", "Mr. Stanley",
+                       "The Duke of Wellington", "Sir Robert Peel")
 
-# make a list of the names of the top speakers
-pattern1 = c("Mr. Fowell Buxton", "Mr. Buckingham", "Mr. Stanley", 
-             "The Duke of Wellington", "Sir Robert Peel")
+# Keep speeches by only the selected speakers
+# - filter() keeps rows where the speaker is in top_speaker_names
+top_slavery_speakers_1833 <- slavery_debates_1833 %>% 
+  filter(speaker %in% top_speaker_names) # Keep the selected speakers
 
-# search for the words said by the speakers in pattern1 
-top_slavery_speakers_1833 <- slavery_debates_1833 %>%
-  filter(speaker %in% pattern1) # keep rows containing a speaker's name
-
-top_slavery_speakers_1833 %>%
-  head() %>% # just the first few lines
-  mutate(text = str_trunc(text, 120)) %>%  # just the first 120 characters
-  kable()
+# Preview the first few speeches
+# - head() shows the first few rows
+# - mutate() shortens the speech text for display
+# - kable() formats the output as a table
+top_slavery_speakers_1833 %>% 
+  head() %>% # Show the first rows
+  mutate(text = str_trunc(text, 120)) %>% # Shorten the speech text
+  kable() # Display the results as a table
 ```
 
 Next, let's break the text into words and clean it up, removing numbers and stop words. We're lemmatizing each word into its word stem so that we can count singular and plural of the same word as one.
 
 ```{r, message = F}
-library(textstem)
+# Clean and tokenize the speeches
+# - unnest_tokens() splits the text into individual words
+# - filter() removes tokens that contain only numbers
+# - anti_join() removes common stop words
+# - mutate() lemmatizes each word
+filtered_words_per_top_slavery_speaker_1833 <- top_slavery_speakers_1833 %>% # Start with the selected speakers
+  unnest_tokens(word, text) %>% # Break the text into words
+  filter(!str_detect(word, "^\\d+$")) %>% # Remove numbers
+  anti_join(stop_words, by = "word") %>% # Remove stop words
+  mutate(word = lemmatize_words(word)) # Lemmatize the words
 
-# clean up the list of words
-filtered_words_per_top_slavery_speaker_1833 <- top_slavery_speakers_1833 %>%
-  unnest_tokens(word, text) %>% # break up into words 
-  filter(!str_detect(word,"^\\s*[0-9]*\\s*$")) %>% # remove all numbers 
-  anti_join(stop_words, by = "word") %>% # remove stopwords 
-  mutate(word = lemmatize_words(word)) # lemmatize the word 
-
-# inspect the data
+# Inspect the cleaned data
 head(filtered_words_per_top_slavery_speaker_1833)
 ```
 
@@ -238,34 +267,44 @@ Next, let's count the words by how many times each speaker says them.
 For our visualization, we will look at only the words spoken most frequently.
 
 ```{r, message = F}
+# Count how often each speaker uses each word
+# - group_by() groups the data by speaker and word
+# - summarize() counts how many times each word appears
+# - arrange() sorts the words from most to fewest occurrences
 abolition_speaker_wordcounts <- filtered_words_per_top_slavery_speaker_1833 %>%
-  group_by(speaker, word) %>% # group the data by speaker 
-  summarize(n = n()) %>% # count how many times each word is spoken by each speaker
-  arrange(desc(n))  # arrange in descending order
-  
-top_words_per_abolition_speaker <- abolition_speaker_wordcounts %>%
-  slice(1:15)  # find the 15 words that each speaker says the most frequently 
-  
-kable(top_words_per_abolition_speaker) # make a table
+  group_by(speaker, word) %>% # Group by speaker and word
+  summarize(n = n()) %>% # Count occurrences of each word
+  arrange(desc(n)) # Sort from most to fewest occurrences
+
+# Keep the most frequently used words
+# - slice() keeps the first 15 rows
+top_words_per_abolition_speaker <- abolition_speaker_wordcounts %>% 
+  slice(1:15) # Keep the top 15 rows
+
+kable(top_words_per_abolition_speaker)
 ```
 
 Now visualize: 
 
 ```{r, fig.cap="Top words used by six major speakers in the 1833 debates on the abolition of slavery.", echo=FALSE}
-# create a plot of each speakers' favorite words 
+# Visualize the most frequently used words for each speaker
+# - mutate() reorders the words within each speaker
+# - ggplot() creates a faceted bar chart
+# - facet_wrap() creates a separate panel for each speaker
+# - coord_flip() rotates the chart for easier reading
 top_words_per_abolition_speaker %>% 
-  mutate(word = reorder_within(word, n, speaker)) %>% # within the grouping by speaker, rearrange the words in order by n
-  ggplot(aes(x = word, # word is on the x axis
-             y = n)) + # n (count) is on the y axis
-  geom_col() + # make a bar chart
-  facet_wrap(~speaker, # break the chart up into faceted charts, one for each speaker
-             scales = "free") + # label each x and y axis separately, so that we only see the words used by that speaker on his axis
-  coord_flip() + # switch the x and y axis labels (this is an elegant shortcut for other work moving labels that we'd have to do otherwise)
-  scale_x_reordered() + # reorder the column before plotting with faceting 
-  labs(title = "Speakers\' Favorite Words", # give a title
-       subtitle = "From the 1833 Debates on the Abolition of Slavery", # give a subtitle
-       x = "Word", # label the x axis 
-       y = "Count") # label the y axis
+  mutate(word = reorder_within(word, n, speaker)) %>% # Reorder words within each speaker
+  ggplot(aes(x = word, # Map words to the x-axis
+             y = n)) + # Map counts to the y-axis
+  geom_col() + # Draw the bars
+  facet_wrap(~speaker, # Create one panel per speaker
+             scales = "free") + # Scale each panel independently
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Apply the reordered word labels
+  labs(title = "Speakers' Favorite Words", # Add a title
+       subtitle = "From the 1833 Debates on the Abolition of Slavery", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "Count") # Label the y-axis
 ```
 
 ## From Concepts to ideas
@@ -301,14 +340,16 @@ Using the function `bind_tf_idf()` we can apply an index of how distinctive each
 The `bind_tf_idf()` function takes three arguments. The first two are the names of the facets of the data which are to be assessed for how distinctive they are in relationship to each other -- in this case, `word` and `speaker`. The third argument, `n`, the count of words per speaker. 
 
 ```{r, message = F}
-# calculate the measure of how distinctive each keyword is of each speaker
+# Calculate how distinctive each word is for each speaker
+# - bind_tf_idf() calculates the tf-idf score for each word
+# - arrange() sorts the words from highest to lowest tf-idf score
 tfidf_per_top_slavery_speaker_1833 <- abolition_speaker_wordcounts %>% 
-  bind_tf_idf(word, speaker, n) %>% 
-  arrange(desc(tf_idf))
+  bind_tf_idf(word, speaker, n) %>% # Calculate tf-idf scores
+  arrange(desc(tf_idf)) # Sort from highest to lowest tf-idf
 
-# inspect the data
-tfidf_per_top_slavery_speaker_1833 %>% head(50) %>% # just the first few rows
-   kable() # make a table
+tfidf_per_top_slavery_speaker_1833 %>%                  
+  head(50) %>%                                        
+  kable()                           
 ```
 
 Note that the `bind_tf_idf()` function creates three new columns -- `tf`, `idf`, and `tf_idf`. The one we really care about is the last, `tf_idf`, an index of how distinctive each word is of each speaker. A very high `tf_idf` marks words that are said very frequently by one speaker and never by any other speakers. A very low tf_idf marks words that are rarely said by anyone or said by everyone with nearly the same frequency.  Looking for the high `tf_idf` words for each speaker will tell us which words are most unique to them -- a useful clue to the distinctive arguments, ideas, and referents that each speaker contributed to the debate.
@@ -316,35 +357,54 @@ Note that the `bind_tf_idf()` function creates three new columns -- `tf`, `idf`,
 Now that we have an index of how distinctive each word is per speaker, we can use this distinctiveness tool to find which words are most distinctive of each speaker.
 
 ```{r, message = F}
-# find the words most distinctive of each speaker
+# Find the most distinctive words for each speaker
+# - group_by() groups the data by speaker
+# - arrange() sorts words from highest to lowest tf-idf score
+# - slice() keeps the top 15 words for each speaker
+# - mutate() adds a ranking column and rounds the tf-idf scores
+# - select() keeps only the columns needed for display
 most_distinctive_words_per_abolition_speaker <- tfidf_per_top_slavery_speaker_1833 %>%
-  group_by(speaker) %>% # group by speaker
-  arrange(desc(tf_idf)) %>% # arrange distinctive words in descending order
-  slice(1:15) %>% # find the top n words, ranked by tf_idf
-  ungroup() %>% # ungroup the words
-  mutate(index = row_number()) %>% # Add a column for each speaker’s top-ranked word
-  mutate(tf_idf = round(tf_idf, 4)) %>% # round the tf_idf score to only 4 decimal places 
-  select(index, word, tf_idf, n, speaker) # drop all columns except these
+  group_by(speaker) %>% # Group by speaker
+  arrange(desc(tf_idf)) %>% # Sort by tf-idf score
+  slice(1:15) %>% # Keep the top 15 words
+  ungroup() %>% # Remove the grouping
+  mutate(index = row_number(), # Add a ranking column
+         tf_idf = round(tf_idf, 4)) %>% # Round the tf-idf scores
+  select(index, word, tf_idf, n, speaker) # Keep the relevant columns
+```
 
-# create a series of smaller datasets reflecting the top speakers
-speaker1 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[1]) %>% 
-  select(word, tf_idf)
+To select each speaker, we will index the corresponding name in `top_speaker_names` using square brackets (`[]`). To see which speaker corresponds to each index, inspect `top_speaker_names`.
 
+```{r}
+top_speaker_names
+```
+
+```{r}
+# Create a dataset for the first speaker, Mr. Fowell Buxton
+# - filter() keeps only speeches by the first speaker in top_speaker_names
+# - select() keeps only the word and tf-idf columns
+speaker1 <- most_distinctive_words_per_abolition_speaker %>%
+  filter(speaker == top_speaker_names[1]) %>% # Keep the first speaker
+  select(word, tf_idf) # Keep the relevant columns
+
+# Do the same for speeches by the second speaker, Mr. Buckingham 
 speaker2 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[2]) %>% 
+  filter(speaker == top_speaker_names[2]) %>% 
   select(word, tf_idf)
 
+# Do the same for speeches by the third speaker, Mr. Stanley
 speaker3 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[3])%>% 
+  filter(speaker == top_speaker_names[3])%>% 
   select(word, tf_idf)
 
+# Do the same for speeches by the fourth speaker, The Duke of Wellington
 speaker4 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[4])%>% 
+  filter(speaker == top_speaker_names[4])%>% 
   select(word, tf_idf)
 
+# Do the same for speeches by the fifth speaker, Sir Robert Peel
 speaker5 <- most_distinctive_words_per_abolition_speaker %>% 
-  filter(speaker == pattern1[5])%>% 
+  filter(speaker == top_speaker_names[5])%>% 
   select(word, tf_idf)
 ```
 
@@ -353,19 +413,28 @@ Next, let's create a series of small tables displaying each speaker, their most 
 We could create a bar graph, of course, but because `tf_idf` measures represent an abstract concept -- distinctiveness -- visualizing this data risks confusing some possible readers, who might mistake the bar graph of `tf_idf` for a count of frequency.  Analysts often have to make choices about how to represent their data so as to generate the least confusion about the meaning of any statistical measure. For abstract indexes like `tf_idf`, generated in the course of our research, we recommend offering simple tables along with prose that explains the significance of the numbers.
 
 ```{r, message = F}
-kable(speaker1, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[1])
+kable(speaker1, 
+      caption = top_speaker_names[1])
 ```
+
 ```{r, message = F}
-kable(speaker2, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[2])
+kable(speaker2, 
+      caption = top_speaker_names[2])
 ```
+
 ```{r, message = F}
-kable(speaker3, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[3])
+kable(speaker3, 
+      caption = top_speaker_names[3])
 ```
+
 ```{r, message = F}
-kable(speaker4, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[4])
+kable(speaker4, 
+      caption = top_speaker_names[4])
 ```
+
 ```{r, message = F}
-kable(speaker5, caption = unique(most_distinctive_words_per_abolition_speaker$speaker)[5])
+kable(speaker5, 
+      caption = top_speaker_names[5])
 ```
 
 The first thing that our measure of distinctiveness helps to clarify is what is not distinctive. The words "freedom," "labour," and "slavery" are not particularly distinctive of any speaker -- all five speakers use these words a great deal, and no one uses any of the words so much more often than the others as to merit an index of the words as distinctive.  
@@ -387,38 +456,30 @@ We can check the significance of our distinctiveness measure by another kind of 
 
 ```{r, fig.cap="Distinctive vocabulary across six key speakers in the 1830s abolition debates. Words shown are those that appear significantly more often in one speaker’s speeches than compared with the other speakers.", message = F}
 
-most_distinctive_words_per_abolition_speaker <- most_distinctive_words_per_abolition_speaker %>%
-  mutate(word = reorder_within(word, n, speaker)) 
-
-# x-axis: words (flipped for readability)
-# y-axis: counts of each word
-# fill color: tf-idf score (converted to a factor so bars are shaded categorically, not continuously)
-# geom_col(): draws the bar chart
-# facet_wrap(): creates separate mini-plots by speaker
-# coord_flip(): makes long word labels readable
-# scale_x_reordered(): preserves word ordering within facets
-# scale_fill_grey(): use grayscale instead of color
-# guides(fill = "none"): hides the fill legend
-# scale_y_continuous(): forces whole number tick marks
-# labs(): titles, subtitles, captions, axis labels
-ggplot(data = most_distinctive_words_per_abolition_speaker,
-       aes(most_distinctive_words_per_abolition_speaker,
-           x = word,
-           y = n, 
-           fill = factor(tf_idf) )) +
-  geom_col() + 
-  facet_wrap(~speaker, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() + 
-  scale_fill_grey() + 
-  guides(fill = "none") + 
-  scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + 
-  labs(title = "Speakers\' Most Distinctive Words", 
-       subtitle = "From the 1830s debates on the abolition of slavery",
-       caption = "Pale shading indicates greater distinctiveness", 
-       x = "Word", 
-       y = "Count") 
+# Visualize the most distinctive words used by each speaker
+# - mutate() reorders words within each speaker
+# - ggplot() creates a faceted bar chart
+# - geom_col() draws bars showing each word's frequency
+# - facet_wrap() creates a separate panel for each speaker
+# - coord_flip() makes the word labels easier to read
+# - scale_fill_grey() represents tf-idf scores in grayscale
+most_distinctive_words_per_abolition_speaker %>%
+  mutate(word = reorder_within(word, n, speaker)) %>% # Order each speaker's words by frequency
+  ggplot(aes(x = word, # Map words to the x-axis
+             y = n, # Map word counts to the y-axis
+             fill = factor(tf_idf))) + # Shade bars by tf-idf score
+  geom_col() + # Draw the bars
+  facet_wrap(~speaker, scales = "free") + # Create one panel per speaker
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve word order within panels
+  scale_fill_grey() + # Use grayscale shading
+  guides(fill = "none") + # Hide the fill legend
+  scale_y_continuous(breaks = breaks_pretty()) + # Show whole number counts
+  labs(title = "Speakers' Most Distinctive Words", # Add a title
+       subtitle = "From the 1830s debates on the abolition of slavery", # Add a subtitle
+       caption = "Lighter shading indicates greater distinctiveness", # Add a caption
+       x = "Word", # Label the x-axis
+       y = "Count") # Label the y-axis
 ```
 
 As opposed to the list, our bar chart shows both tf-idf distinctiveness (represented as paleness of the bar) with count on the x axis.  This visualization can guide us as to whether we want to investigate a particular word because of its distinctiveness -- or whether that word might be a poor marker of significance. For instance, most of Stanley's distinctive words are revealed to have a wordcount of only 2, which is too few to be significant; it simply doesn't make sense that "rum," "mine," and "barrel" merit investigation when Stanley spoke them only twice in his voluminous speech-giving -- that is, unless we already had a previous interest in the rum trade and its intersection with slavery. Statistically distinctive these words might be; worthy of further investigation they are not (at least not necessarily). 
@@ -430,33 +491,40 @@ Nevertheless, there is room for caveats about settling for these words in partic
 ```{r, message = F}
 most_distinctive_words_per_abolition_speaker2 <- tfidf_per_top_slavery_speaker_1833 %>%
   group_by(speaker) %>%
-  filter(n > 5) %>% # <----------------  this is the only thing that's new 
+  filter(n > 5) %>% # <----------------  this is the only line that's new 
   arrange(desc(tf_idf)) %>%
   mutate(rank_tf_idf = row_number()) %>%
   slice(1:15) %>% 
-  ungroup() %>%
-  mutate(word = reorder_within(word, n, speaker))
+  ungroup() 
 
 most_distinctive_words_per_abolition_speaker
 ```
 
 ```{r, fig.cap="Most distinctive words used by six major speakers in the 1830s debates on the abolition of slavery, filtered to include only terms appearing more than five times. Pale bars indicate words that are more distinctive to each speaker relative to each other speaker.", message = F}
 
-ggplot(data = most_distinctive_words_per_abolition_speaker2, 
-       aes(x = word, y = n, fill = factor(tf_idf) )) +
-  geom_col() +
-  scale_fill_grey() +
-  facet_wrap(~speaker, scales = "free") +
-  coord_flip() +
-  scale_x_reordered() + 
-  guides(fill = "none") +
-   scale_y_continuous(breaks = function(x) 
-     unique(floor(pretty(seq(min(x), (max(x) + 1) * 1))))) + # use whole numbers on x-axis
-  labs(title = "Speakers\' Most Distinctive Words with N > 5",
-       subtitle = "From the Debates in the 1830s on the Abolition of Slavery",
-       caption = "Pale means more distinctive",
-       x = "Word",
-       y = "Count")
+# Visualize the most distinctive words used by each speaker
+# - mutate() reorders words by count within each speaker
+# - ggplot() creates a faceted bar chart
+# - geom_col() draws bars showing each word's frequency
+# - facet_wrap() creates a separate panel for each speaker
+# - coord_flip() makes the word labels easier to read
+# - scale_fill_grey() represents tf-idf scores in grayscale
+most_distinctive_words_per_abolition_speaker2 %>%           
+  mutate(word = reorder_within(word, n, speaker)) %>% # Reorder words by count within each speaker
+  ggplot(aes(x = word, # Map words to the x-axis
+             y = n, # Map word counts to the y-axis
+             fill = factor(tf_idf))) + # Shade bars by tf-idf score
+  geom_col() + # Draw the bars
+  scale_fill_grey() + # Use grayscale shading
+  facet_wrap(~speaker, scales = "free") + # Create one panel per speaker
+  coord_flip() + # Flip the axes
+  scale_x_reordered() + # Preserve word order within panels
+  guides(fill = "none") + # Hide the fill legend
+  labs(title = "Speakers' Most Distinctive Words with N > 5", # Add a title
+       subtitle = "From the Debates in the 1830s on the Abolition of Slavery", # Add a subtitle
+       caption = "Pale means more distinctive", # Add a caption
+       x = "Word", # Label the x-axis
+       y = "Count") # Label the y-axis
 ```
 
 With this new view, it is less clear that Mr. Buckingham wanted for distinctive words. His use of "enjoyment," "wage," "reward," and "grow" are notable.
@@ -468,30 +536,38 @@ Suppose we choose to investigate Mr. Buckingham. He is, after all, the outlier i
 What might we learn if we looked at Mr. Buckingham's words in greater detail?  The visualizations above limit us to a small number of words per speaker; but we might learn a great deal more by looking at Mr. Buckingham's favorite words, whether by count of by tf-idf. In fact, the computation for this problem is cheap, so let's do both. 
 
 ```{r, warning=FALSE, message=FALSE}
-mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>%
-  filter(speaker == "Mr. Buckingham") %>%
-  arrange(desc(n)) %>%
-  slice(1:40)
+# Keep the most frequent words used by Mr. Buckingham
+# - filter() keeps only rows for Mr. Buckingham
+# - arrange() sorts words from most to fewest occurrences
+# - slice() keeps the top 40 words
+mr_buckingham_slavery_debates <- tfidf_per_top_slavery_speaker_1833 %>% # Start with the tf-idf results
+  filter(speaker == "Mr. Buckingham") %>% # Keep only Mr. Buckingham's words
+  arrange(desc(n)) %>% # Sort by word count
+  slice(1:40) # Keep the top 40 rows
   
 mr_buckingham_slavery_debates
 ```
 
 ```{r, fig.cap="The most frequently used words in Mr. Buckingham’s speeches during the 1833 debates on the abolition of slavery. Bar shading reflects each word’s TF-IDF score, indicating how distinctive the term is relative to other abolitionist speakers. Dark coloring means the term is less distinctive, whereas the light coloring means the term is more distinctive."}
 
-ggplot(data = mr_buckingham_slavery_debates,
-  aes(x = reorder(word, n),
-      y = n,
-      fill = factor(tf_idf))) +
-  geom_col() +
-  scale_fill_grey() +
-  scale_y_continuous(
-    breaks = function(x) unique(
-      floor(pretty(seq(min(x), max(x)))))) +
-  coord_flip() +
-  labs(title = "Mr Buckingham's Most Frequently Spoken Words",
-       subtitle = "From the 1833 Debates on the Abolition of Slavery",
-       x = "Word",
-       y = "Count")
+# Visualize Mr. Buckingham's most frequently used words
+# - mutate() reorders words by count
+# - ggplot() creates a bar chart
+# - geom_col() draws bars showing each word's frequency
+# - coord_flip() makes the word labels easier to read
+# - scale_fill_grey() represents tf-idf scores in grayscale
+mr_buckingham_slavery_debates %>% 
+  mutate(word = reorder(word, n)) %>% # Reorder words by count
+  ggplot(aes(x = word, # Map words to the x-axis
+             y = n, # Map word counts to the y-axis
+             fill = factor(tf_idf))) + # Shade bars by tf-idf score
+  geom_col() + # Draw the bars
+  scale_fill_grey() + # Use grayscale shading
+  coord_flip() + # Flip the axes
+  labs(title = "Mr. Buckingham's Most Frequently Spoken Words", # Add a title
+       subtitle = "From the 1833 Debates on the Abolition of Slavery", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "Count") # Label the y-axis
 ```
 
 It is interesting that "labour" and "freedom" are used alongside "slavery" and "slave" as Buckingham"s favorite words. Also pronounced are his invocation of "rights," "wages," and "people," suggesting that Buckingham was interested in drawing equivalencies between the rights of working men in Britain and the rights of enslaved people in the West Indies.
@@ -507,20 +583,24 @@ mr_buckingham_slavery_debates2 <- tfidf_per_top_slavery_speaker_1833 %>%
   arrange(desc(tf_idf)) %>% # <------- the only line that changed
   slice(1:40)
 
-ggplot(data = mr_buckingham_slavery_debates2,
-       aes(x = reorder(word, n), # the x axis will show words ordered by their count 
-           y = n),
-          fill = factor(tf_idf)) + # the y axis will show n 
-  scale_fill_grey() +
-  scale_y_continuous(breaks = function(x) 
-    unique(floor(pretty(seq(min(x), 
-                            (max(x) + 1) * 1))))) + # use whole numbers for the x-axis
-  geom_col() + # create a bar graph 
-  coord_flip() + # switches the x and y axis for a more elegant presentation 
-  labs(title = "Mr Buckingham\'s Most Distinctive Words",
-       subtitle = "From the 1833 Debate on the Abolition of Slavery",
-       x = "Word",
-       y = "Count")
+# Visualize Mr. Buckingham's most distinctive words
+# - mutate() reorders words by count
+# - ggplot() creates a bar chart
+# - geom_col() draws bars showing each word's frequency
+# - coord_flip() makes the word labels easier to read
+# - scale_fill_grey() represents tf-idf scores in grayscale
+mr_buckingham_slavery_debates2 %>% # Start with Mr. Buckingham's words
+  mutate(word = reorder(word, n)) %>% # Reorder words by count
+  ggplot(aes(x = word, # Map words to the x-axis
+             y = n, # Map word counts to the y-axis
+             fill = factor(tf_idf))) + # Shade bars by tf-idf score
+  geom_col() + # Draw the bars
+  scale_fill_grey() + # Use grayscale shading
+  coord_flip() + # Flip the axes
+  labs(title = "Mr. Buckingham's Most Distinctive Words", # Add a title
+       subtitle = "From the 1833 Debate on the Abolition of Slavery", # Add a subtitle
+       x = "Word", # Label the x-axis
+       y = "Count") # Label the y-axis
 ```
 
 "Wages" emerges as a more distinctive word of Buckingham's that he said quite frequently -- 12 times in all. It is not his most distinctive word; to find that, we can very slightly alter the code above to find the word he uses more than anyone else -- but the result may be disappointing. 
@@ -565,18 +645,26 @@ buckingham_sentences <- slavery_debates_1833 %>%
 buckingham_on_wages <- buckingham_sentences %>%
   filter(str_detect(text, "wages"))
 
-buckingham_on_wages%>%
-  mutate(text = str_wrap(text, 80)) %>% # just the first few lines
-  mutate("Mr. Buckingham's mentions of wages in the slavery debates" = text) %>% # rename the text column 
-  select("Mr. Buckingham's mentions of wages in the slavery debates") %>% # only the one column 
-  kable()
+# Display Mr. Buckingham's speeches mentioning wages
+# - mutate() wraps long lines for readability
+# - select() keeps only the speech text and removes the column name
+# - kable() displays the results as a table with a caption
+buckingham_on_wages %>% 
+  mutate(text = str_wrap(text, 80)) %>% # Wrap the text for readability
+  select(text) %>% # Keep only the speech text
+  kable(col.names = NULL, # Don't display the column name
+    caption = "Mr. Buckingham's Mentions of Wages in the 1833 Slavery Debates") 
 ```
 
 Here they are as plaintext:
 
 ```{r}
-buckingham_on_wages %>% select(text) %>% 
-  mutate(text = str_wrap(text, 80))
+# Display Mr. Buckingham's speeches mentioning wages
+# - select() keeps only the speech text
+# - mutate() wraps long lines for readability
+buckingham_on_wages %>% 
+  select(text) %>% # Keep only the speech text
+  mutate(text = str_wrap(text, 80)) # Wrap the text for readability
 ```
 
 In the plaintext version, we see artifacts of the OCR process like \n, meaning "line break." It's also harder to read.  
@@ -588,6 +676,7 @@ When we read, we produce understanding.  In the lines above, we learn from readi
 But before continuing further, we should observe that the sentences in our dataset are not necessarily from a single speech or even debate. If we look at their sentence_id numbers, we will see that the numbers are not contiguous. These sentences came in the train of other sentences which are missing in this dataset. To interpret any individual sentence correctly, a data analyst must be aware of the importance of understanding that what we are seeing here is a series of discrete statements made on different days.  
 
 ```{r, message = F}
+# Show sentence IDs 
 buckingham_sentences$sentence_id
 ```
 
@@ -604,22 +693,27 @@ For the moment, let us proceed by reading a limited sample of Buckingham's speec
 The code for obtaining the speeches is given below; the full speech is printed in the Appendix.
 
 ```{r, message = F}
-# moving from a list of sentences to the full speeches for context
+# Keep the sentence IDs from Mr. Buckingham's speeches
+# - select() keeps only the sentence_id column
 buck_sentence_ids <- buckingham_sentences %>% 
-  select(sentence_id) 
+  select(sentence_id) # Keep only the sentence IDs
 
-# find the ids of Buckingham's speeches:
+# Find the speech IDs for Mr. Buckingham's speeches
+# - left_join() adds the speech IDs from the file metadata
+# - select() keeps only the speech_id column
 buck_speech_ids <- buck_sentence_ids %>%
-  left_join(file_metadata_1830) %>%  # find the file metadata, including speech_id, for each sentence
-  select(speech_id) # retain just the speech_id
+  left_join(file_metadata_1830) %>% # Add the speech IDs
+  select(speech_id) # Keep only the speech IDs
   
-# find all the sentences that correspond with those speeches
+# Find all sentences in Mr. Buckingham's speeches
+# - left_join() adds the sentence IDs for each speech
+# - select() keeps only the sentence_id column
+# - left_join() retrieves the corresponding Hansard sentences
 buck_speeches <- buck_speech_ids %>%
-  left_join(file_metadata_1830) %>% # call up all the sentence_id's that correspond to the speech id's %>%
-  select(sentence_id) %>% # we need only the sentence_id column 
-  left_join(hansard_1830, relationship = "many-to-many") # call up the sentences that correspond to those sentence_ids
+  left_join(file_metadata_1830) %>% # Add the sentence IDs
+  select(sentence_id) %>% # Keep only the sentence IDs
+  left_join(hansard_1830, relationship = "many-to-many") # Retrieve the corresponding sentences
 
-# make a table
 buck_speeches %>%
   head() %>%
   kable()
@@ -642,34 +736,43 @@ In this reading, the word "wages" is a category that allows Buckingham to naviga
 But we are not done. We can use the distinctive words in our list  to investigate other aspects of the speech.
 
 ```{r, message = F}
-# Find the speeches about slavery where Mr. Buckingham mentions 'enjoyment'
+# Find Mr. Buckingham's speeches mentioning "enjoyment"
+# - left_join() adds speaker information
+# - filter() keeps only Mr. Buckingham's speeches that mention "enjoyment"
 buckingham_sentences_enjoyment <- slavery_debates_1830 %>%
-  left_join(speaker_metadata_1830) %>%
-  filter(speaker == "Mr. Buckingham",
-         str_detect(text, "enjoyment"))
+  left_join(speaker_metadata_1830) %>% # Add speaker metadata
+  filter(speaker == "Mr. Buckingham", # Keep only Mr. Buckingham's speeches
+         str_detect(text, "enjoyment")) # Keep speeches mentioning "enjoyment"
 
-# make a table
+# Display Mr. Buckingham's speeches mentioning enjoyment
+# - mutate() creates a descriptive column name
+# - select() keeps only the speech text
+# - kable() displays the results as a table without a column name
 buckingham_sentences_enjoyment %>%
-  mutate("Mr. Buckingham's mentions of enjoyment" = text) %>% # rename the text column 
-  select("Mr. Buckingham's mentions of enjoyment") %>% # only the one column 
-  kable()
+  select(text) %>% # Keep only the speech text
+  kable(col.names = NULL,
+        caption = "Mr. Buckingham's Mentions of Enjoyment in the 1833 Slavery Debates") 
 ```
 
 If the example of "wages" furnished sentences difficult to understand without broader context, the sentences about "enjoyment" give an example where Buckingham's case is clear without any further effort peering into the text. His utopian vision of capitalism becomes clear in these passages, which posit the conjecture that the freedom to work on a wage market gives labourers access to "enjoyment," and that enjoyment and its natural incentives therefore offers a reason why the slaves should be freed.
 
 ```{r, message = F}
-# filter Mr. Buckingham's contributions to the slavery debates for discussions of love.
-buckingham_sentences_love <- slavery_debates_1830 %>%
-  left_join(speaker_metadata_1830) %>%
-  filter(speaker == "Mr. Buckingham",
-         str_detect(text, "love"))
+# Find Mr. Buckingham's speeches mentioning love
+buckingham_sentences_love <- slavery_debates_1830 %>% 
+  left_join(speaker_metadata_1830) %>% # Add speaker metadata
+  filter(speaker == "Mr. Buckingham", # Keep only Mr. Buckingham's speeches
+         str_detect(text, "love")) # Keep speeches mentioning "love"
 
-# make a table
-buckingham_sentences_love %>%
-  mutate(text = str_wrap(text, 80)) %>% # just the first few lines
-  mutate("Mr. Buckingham's mentions of love" = text) %>% # rename the text column 
-  select("Mr. Buckingham's mentions of love") %>% # only the one column 
-  kable()
+# Display Mr. Buckingham's speeches mentioning love
+# - mutate() wraps long lines for readability
+# - mutate() creates a descriptive column name
+# - select() keeps only the speech text
+# - kable() displays the results as a table without a column name
+buckingham_sentences_love %>% # Start with speeches mentioning love
+  mutate(text = str_wrap(text, 80)) %>% # Wrap the text for readability
+  select(text) %>% # Keep only the speech text
+  kable(col.names = NULL,
+        caption = "Mr. Buckingham's Mentions of Love in the 1833 Slavery Debates")
 ```
 
 We might also elect to investigate "love," one of the words that appeared highly ranked through tf-idf but relatively sparse. We investigated the word because we felt that it might represent one of a set of virtues to which Buckingham looked -- alongside "universal," "desire," and "religion."
@@ -677,18 +780,19 @@ We might also elect to investigate "love," one of the words that appeared highly
 This is a dead end. When we consult the text, we do not find an endorsement of "love" as a universal virtue that we hypothesized when we looked at the word list. Instead, we find the use of phrases such as "love of ease," "love of liberty," and "love of repose," as Buckingham invokes conjectures about the motivations of humankind, endorsing none of them. It would be foolhardy to make any kind of a positive argument about statements so diverse as these. We could try to unify them under one statement, but we would be falsifying evidence.  In a research paper we will have no use for these examples, and we will pass over the word "love" without remark. 
 
 ```{r, message = F}
-# fine just those sentences where Mr. Buckingham says 'universal'
+# Find Mr. Buckingham's speeches mentioning "universal"
 buckingham_sentences_universal <- slavery_debates_1830 %>%
   left_join(speaker_metadata_1830) %>%
   filter(speaker == "Mr. Buckingham",
          str_detect(text, "universal"))
 
-# make a table
-buckingham_sentences_universal %>% head() %>% # just the first few rows
+# Make a table
+buckingham_sentences_universal %>% 
+  head() %>% # just the first few rows
   mutate(text = str_wrap(text, 80)) %>% # just the first few lines
-  mutate("Mr. Buckingham's mentions of the universal" = text) %>% # rename the text column 
-  select("Mr. Buckingham's mentions of the universal") %>% # only the one column 
-  kable()
+  select(text) %>% # only the one column 
+  kable(col.names = NULL,
+        caption = "Mr. Buckingham's Mentions of Universal in the 1833 Slavery Debates")
 ```
 
 We find in these sentences Buckingham invoking "universal" in the sense of an Enlightenment mandate, whether an expression of consensus or natural laws. Democratic demand for the abolition of slavery is an expression of a "universal" sentiment (sentences 1, 3 and 4). "Universal" laws govern behavior, including the fact that rebellion is more scarce in free nations (sentence 2). Universal truths, revealed through democratic processes, give the basis for legislation, according to Buckingham.
@@ -696,17 +800,18 @@ We find in these sentences Buckingham invoking "universal" in the sense of an En
 Presented with these particular sentences, having read some of Buckingham's arguments at greater length, we may feel confident that we understand how he has used the words. As we are making a wider argument about the use of words, buttressed by several examples, we do not necessarily need to follow every single sentence back to its original context.  
 
 ```{r, message = F}
+# Find Mr. Buckingham's speeches mentioning "desire"
 buckingham_sentences_desire <- slavery_debates_1830 %>%
   left_join(speaker_metadata_1830) %>%
   filter(speaker == "Mr. Buckingham",
          str_detect(text, "desire"))
 
-buckingham_sentences_desire %>%
+buckingham_sentences_desire %>% 
   head() %>% # just the first few rows
   mutate(text = str_wrap(text, 80)) %>% # just the first few lines
-  mutate("Mr. Buckingham's mentions of desire" = text) %>% # rename the text column 
-  select("Mr. Buckingham's mentions of desire") %>% # only the one column 
-  kable()
+  select(text) %>% # only the one column 
+  kable(col.names = NULL,
+        caption = "Mr. Buckingham's Mentions of Desire in the 1833 Slavery Debates")
 ```
 
 Buckingham invokes "desire" as the basis for understanding. Buckingham invokes universal desire in the spirit of Locke, Mandeville, and Smith as forces that incline men to leisure and pleasure and thus incentivize work (sentences 1, 2, 3, 6, 7).  Buckingham suggests that former enslaved persons could eventually follow the American model, growing wealthy enough to become consumers who would buy finished products from British manufactures. A process of mutual enrichment would be the consequence (sentence 4). 
@@ -720,14 +825,17 @@ buckingham_sentences_desire[5]
 The id of Sentence #5 is S3V0018P0_8993. Since we understand the gist of Buckingham's arguments about slavery, we might first try looking at the sentences immediately preceding this passage. The sentences are numbered chronologically, so all we have to do is to pull a few sentence numbers starting with S3V0018P0_8990.
 
 ```{r}
+# Retrieve the sentences surrounding the missing context
+# - filter() keeps only the selected sentence IDs
 missing_context <- hansard_1830 %>% 
-  filter(sentence_id %in% c("S3V0018P0_8990", "S3V0018P0_8991", "S3V0018P0_8992", 
-                            "S3V0018P0_8993"))
-
+  filter(sentence_id %in% c("S3V0018P0_8990",  # Keep the selected sentences
+                            "S3V0018P0_8991",
+                            "S3V0018P0_8992",
+                            "S3V0018P0_8993"))      
 missing_context %>%
-  head() %>% # just the first few rows of data
-  mutate(text = str_wrap(text, 80)) %>% # just the first few characters
-  select(text) %>% # just the text column 
+  head() %>% 
+  mutate(text = str_wrap(text, 80)) %>% 
+  select(text) %>%
   kable()
 ```
 
@@ -750,18 +858,23 @@ To make an argument about Buckingham's use of words, what we need is (1) a list 
 For the purpose, we do not need to show the reader the output of our tf-idf or word count process. Instead, a list of words will suffice. In the prose, we would spend a sentence or two describing the process we went through of applying tf-idf with and without a threshold to inspect Buckingham's distinctive words when compared with four other top speakers in the debates.  If we want the list formatted nicely, we might write some code like this:
 
 ```{r}
-# concatenate a list of the words I'm interested in
+# Create a list of words to analyze
 my_words <- c("wage", "enjoyment", "love", "universal", "desire")
 
-# find the tfidf scores for my words by looking in previous data
-my_words_w_tfidf <- tfidf_per_top_slavery_speaker_1833 %>% 
-  filter(speaker == "Mr. Buckingham", word %in% my_words) %>% # filter for words by Buckingham
-  ungroup() %>% # necessary because the previous dataset was grouped
-  select(word, n, tf_idf) %>% # retain three columns
-  mutate(tf_idf = round(tf_idf, 4)) %>% # round tf-idf to four decimal places
-  arrange(desc(tf_idf))
+# Find the tf-idf scores for the selected words
+# - filter() keeps only Mr. Buckingham's selected words
+# - ungroup() removes the previous grouping
+# - select() keeps only the relevant columns
+# - mutate() rounds the tf-idf scores
+# - arrange() sorts the words from highest to lowest tf-idf score
+my_words_w_tfidf <- tfidf_per_top_slavery_speaker_1833 %>% # Start with the tf-idf results
+  filter(speaker == "Mr. Buckingham", # Keep only Mr. Buckingham's words
+         word %in% my_words) %>% # Keep only the selected words
+  ungroup() %>% # Remove the grouping
+  select(word, n, tf_idf) %>% # Keep the relevant columns
+  mutate(tf_idf = round(tf_idf, 4)) %>% # Round the tf-idf scores
+  arrange(desc(tf_idf)) # Sort by tf-idf score
 
-# make a table
 kable(my_words_w_tfidf,
       caption = "Some of Mr. Buckingham's Most Distinctive Words in Debates About Slavery") 
 ```
@@ -787,63 +900,75 @@ One place to start is Peel's invocation of the word "assembly," a word that in t
 Most of the speakers didn't use the word "assembly" or used it rarely. But for Peel, "assembly" was a distinctive word, used 11 times in 1833 alone.  
 
 ```{r, message = F}
-# merge slavery_1830 with speaker metadata
-# keep only sentences by Peel
-# str_detect to search for capitalized, uncapitalized, singular and plural
-peel_sentences <- slavery_1830 %>% # start with the speeches about slavery 
-  left_join(speaker_metadata_1830) %>% # add information about the speakers of the speeches
-  filter(speaker == "Sir Robert Peel", # find just the speeches where Peel is the speaker and he mentions the assembly 
-         str_detect(text, "Assembl|assembl")) # look for uppercase OR lowercase (| = "or")
+# Find Sir Robert Peel's speeches mentioning "assembly"
+# - left_join() adds speaker information
+# - filter() keeps only Sir Robert Peel's speeches
+# - str_detect() searches for uppercase, lowercase, singular, and plural forms
+peel_sentences <- slavery_1830 %>% # Start with the slavery debates
+  left_join(speaker_metadata_1830) %>% # Add speaker metadata
+  filter(speaker == "Sir Robert Peel", # Keep only Sir Robert Peel's speeches
+         str_detect(text, "Assembl|assembl")) # Search for "Assembly", "assembly", "Assemblies", and "assemblies"
 
-# make a table
+# Display Mr. Peel's speeches mentioning "assembly"
+# - head() shows the first few rows
+# - mutate() wraps long lines for readability
+# - select() keeps only the speech text
+# - kable() displays the results as a table without a column name
 peel_sentences %>%
-  head() %>% # just the first few rows
-  mutate(text = str_wrap(text, 80)) %>% # wrap 
-  select(text) %>% #just the text colum 
-  rename("Mr. Peel's sentences about slavery where he mentions the word 'assembly'" = text) %>% # change the name of the column
-  kable() 
+  head() %>% # Show the first rows
+  mutate(text = str_wrap(text, 80)) %>% # Wrap the text for readability
+  select(text) %>% # Keep only the speech text
+  kable(col.names = NULL,
+        caption = "Mr. Peel's Sentences About Slavery Mentioning \"Assembly\"")
 ```
 
 Here again we must read the sentences in their original speeches to make sense of it. 
 
 ```{r, message=FALSE}
-# moving from a list of sentences to the full speeches for context
-# Trim each source to just the fields you need
-peel_base <- peel_sentences %>%
-  select(sentence_id)
-
-# make a dataset of just sentence_ids and the text column 
+# Keep the sentence IDs and text from the Hansard data
+# - select() keeps only the sentence_id and text columns
 hansard_trim <- hansard_1830 %>%
   select(sentence_id, text)
 
-# make a dataset for matching sentence_id and speaker
+# Keep the sentence IDs and speaker names
+# - select() keeps only the sentence_id and speaker columns
 speaker_meta_trim <- speaker_metadata_1830 %>%
   select(sentence_id, speaker)
 
-# make a dataset for matching sentence_id and speech_id
+# Keep the sentence IDs and speech IDs
+# - select() keeps only the sentence_id and speech_id columns
 file_meta_trim <- file_metadata_1830 %>%
   select(sentence_id, speech_id)
 
-# make a dataset of just the sentence ids and speech dates
+# Keep the sentence IDs and speech dates
+# - select() keeps only the sentence_id and speechdate columns
 debate_meta_trim <- debate_metadata_1830 %>%
   select(sentence_id, speechdate)
 
-# find the full text of the speeches where the original sentences originated
-peel_speeches <- peel_base %>% # start with the sentences 
-  left_join(hansard_trim,  by = "sentence_id") %>% # find their sentence_id numbers
-  left_join(speaker_meta_trim,  by = "sentence_id") %>% # find the corresponding speakers
-  left_join(file_meta_trim, by = "sentence_id") %>% # find the corresponding speech id's 
-  left_join(debate_meta_trim, by = "sentence_id") %>% # find the rest of the sentences for those speeches
-  group_by(speech_id, speaker, speechdate) %>% # prepare to aggregate data by speech, retaining information about each speech's speaker and date
-  summarise(speech = paste(text, collapse = " "), .groups = "drop") %>% # glue together the sentences from each speech 
-  mutate(speech = paste0(speechdate, ": ", toupper(speaker), ": ", speech)) %>% # glue together the date, speaker's name, and full speech text 
-  select(speech) # retain just one column 
+# Find the full text of the speeches where the original sentences originated
+# - select() keeps only the sentence IDs
+# - left_join() adds the sentence text and metadata
+# - group_by() groups the data by speech
+# - summarize() combines the sentences into complete speeches
+# - mutate() adds the speech date and speaker name
+peel_speeches <- peel_sentences %>%
+  select(sentence_id) %>% # Keep only the sentence IDs
+  left_join(hansard_trim, by = "sentence_id") %>% # Add the sentence text
+  left_join(speaker_meta_trim, by = "sentence_id") %>% # Add the speaker names
+  left_join(file_meta_trim, by = "sentence_id") %>% # Add the speech IDs
+  left_join(debate_meta_trim, by = "sentence_id") %>% # Add the speech dates
+  group_by(speech_id, speaker, speechdate) %>% # Group by speech
+  summarize(speech = paste(text, collapse = " ")) %>% # Combine the sentences
+  mutate(speech = paste0(speechdate, ": ",
+                         toupper(speaker), ": ",
+                         speech)) %>% # Add the date and speaker
+  select(speech) # Keep only the speech text
 
-# make a table
 peel_speeches %>%
   mutate(speech = str_trunc(speech, 520)) %>%  #
   kable(caption = "Three Speeches by Peel about Slavery Invoking the Word 'Wages'")
 ```
+
 
 In the three speeches above, we find Peel invoking the colonial assemblies of the West Indies in order to defend the principle of independent democracies being entitled to make their own laws, unhindered by empire -- even when the laws contained principles so odious as that of the enslavement of human beings. 
 
@@ -882,19 +1007,52 @@ The reason why the top speakers in any debate matter is the hypothesis that thei
 
 We can ask this question two ways: first, by asking about the debates around slavery before and after 1833, and secondly by asking the same question about all of Hansard for the same dates.
 
+We are going to do this method to data multiple times, so we create a function. 
+
+```{r}
+# Count the words used in speeches containing a search term
+# - data supplies the corpus or subset of speeches
+# - search_term supplies the word to search for
+# - period_label supplies the label for the time period
+count_collocates <- function(data, search_term, period_label) {
+  data %>%
+    mutate(when = period_label) %>% # Label the time period
+    filter(str_detect(tolower(text), search_term)) %>% # Keep speeches containing the search term
+    unnest_tokens(word, text) %>% # Tokenize the text into words
+    anti_join(stop_words, by = "word") %>% # Remove stop words
+    group_by(when, word) %>% # Group by time period and word
+    reframe(n = n()) %>% # Count word occurrences
+    arrange(desc(n)) } # Sort from most to fewest occurrences
+
+# Find the most distinctive words in each time period
+# - bind_rows() combines the two time periods
+# - bind_tf_idf() calculates the tf-idf score for each word
+# - group_by() groups the results by time period
+# - slice_max() keeps the words with the highest tf-idf scores
+find_distinctive_words <- function(before_data, after_data, top_words = 15) {
+  bind_rows(before_data, after_data) %>% # Combine the two time periods
+    bind_tf_idf(word, when, n) %>% # Calculate tf-idf scores
+    group_by(when) %>% # Group by time period
+    slice_max(tf_idf, n = top_words) %>% # Keep the top words
+    ungroup() %>% # Remove the grouping
+    arrange(when, desc(tf_idf))} # Sort by period and tf-idf score
+```
+
+
+
 ```{r, message=FALSE}
-slavery_debates_before_1833 <- slavery_1830 %>% 
-  filter(year < 1833) 
+# Keep only the slavery debates before 1833
+# - filter() keeps only speeches before 1833
+slavery_debates_before_1833 <- slavery_1830 %>%
+  filter(year < 1833)
 
-freedom_collocates_before_1833 <- slavery_debates_before_1833 %>%
-  mutate(when = "1830-32") %>%
-  filter(str_detect(tolower(text), "labour")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
+# Count the words used in speeches mentioning "free" before 1833
+# - count_collocates() counts the words in speeches containing a search term
+freedom_collocates_before_1833 <- count_collocates(slavery_debates_before_1833, # Use the debates before 1833
+                                                   search_term = "free", # Search for speeches mentioning "free"
+                                                   period_label = "1830-32") # Label the time period
 
+# Find the top 30 collocates
 top_freedom_collocates_before_1833 <- freedom_collocates_before_1833 %>%
   top_n(30) 
 
@@ -902,18 +1060,16 @@ top_freedom_collocates_before_1833
 ```
 
 ```{r, message=FALSE}
-slavery_debates_after_1833 <- slavery_1830 %>% 
-  filter(year > 1833) 
+# Keep only the slavery debates after 1833
+# - filter() keeps only speeches after 1833
+slavery_debates_after_1833 <- slavery_1830 %>%
+  filter(year > 1833) # Keep only speeches after 1833
 
-freedom_collocates_after_1833 <- slavery_debates_after_1833 %>%
-  mutate(when = "1834-36") %>%
-  filter(str_detect(tolower(text), "free")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
+freedom_collocates_after_1833 <- count_collocates(slavery_debates_after_1833,
+                                                  search_term = "free",
+                                                  period_label = "1834-36")
 
+# Find the top 30 collocates
 top_freedom_collocates_after_1833 <- freedom_collocates_after_1833 %>%
   top_n(30) 
 
@@ -923,47 +1079,36 @@ top_freedom_collocates_after_1833
 Let's use tf-idf to find the words that are most distinctive of each period -- before and after 1833 -- in the debates about slavery.
 
 ```{r, message=FALSE}
-freedom_collocates_before_1833 <- slavery_debates_before_1833 %>%
-  mutate(when = "1830-32") %>%
-  filter(str_detect(tolower(text), "free")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>% 
-  group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
+# Find the most distinctive words in each time period
+# - find_distinctive_words() combines the periods, calculates tf-idf,
+#   and keeps the top 15 words from each period
+tf_idf_freedom_collocates <- find_distinctive_words(freedom_collocates_before_1833,
+                                                    freedom_collocates_after_1833,
+                                                    top_words = 15)
 
-freedom_collocates_after_1833 <- slavery_debates_after_1833 %>%
-  mutate(when = "1834-36") %>%
-  filter(str_detect(tolower(text), "free")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
-  group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
-
-
-tf_idf_freedom_collocates <- bind_rows(freedom_collocates_after_1833, 
-                                       freedom_collocates_before_1833) %>%
-  bind_tf_idf(word, when, n) %>%
-  arrange(-tf_idf) %>%
-  select(when, word, n, tf_idf)
-
+# Keep the most distinctive words before 1833
+# - filter() keeps only the earlier time period
+# - select() removes the time period column
 tf_idf_freedom_collocates_before <- tf_idf_freedom_collocates %>%
-  filter(when == "1830-32") %>%
-  select(-when) %>%
-  top_n(15)
+  filter(when == "1830-32") %>% # Keep the earlier time period
+  select(-when) # Remove the time period column
 
+# Keep the most distinctive words after 1833
+# - filter() keeps only the later time period
+# - select() removes the time period column
 tf_idf_freedom_collocates_after <- tf_idf_freedom_collocates %>%
-  filter(when == "1834-36") %>%
-  select(-when) %>%
-  top_n(15)
+  filter(when == "1834-36") %>% # Keep the later time period
+  select(-when) # Remove the time period column
 
-# make a table
-kable(tf_idf_freedom_collocates_before, caption = "1830-32")
+# Display the most distinctive words before 1833
+kable(tf_idf_freedom_collocates_before,
+      caption = "1830-32")
 ```
 
 ```{r}
-kable(tf_idf_freedom_collocates_after, caption = "1834-36")
+# Display the most distinctive words after 1833
+kable(tf_idf_freedom_collocates_after,
+      caption = "1834-36")
 ```
 
 Let's look to see if freedom's meaning changed across everything.
@@ -980,74 +1125,63 @@ hansard_after_1833 <- hansard_1830 %>%
   mutate(year = year(speechdate)) %>%
   filter(year > 1833)
 
-freedom_collocates_before_1833 <- hansard_before_1833 %>%
-  mutate(when = "before 1833") %>%
-  filter(str_detect(tolower(text), "freedom")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>% 
- group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
+freedom_collocates_hansard_before_1833 <- count_collocates(hansard_before_1833,
+                                                           search_term = "freedom",
+                                                           period_label = "before 1833")
 
+freedom_collocates_hansard_after_1833 <- count_collocates(hansard_after_1833,
+                                                          search_term = "freedom",
+                                                          period_label = "after 1833")
 
-freedom_collocates_after_1833 <- hansard_after_1833 %>%
-  mutate(when = "after 1833") %>%
-  filter(str_detect(tolower(text), "freedom")) %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
- group_by(when, word) %>%
-  reframe(n = n()) %>%
-  arrange(desc(n)) 
+# Find the most distinctive words in each time period
+# - find_distinctive_words() combines the periods, calculates tf-idf,
+#   and keeps the top 15 words from each period
+tf_idf_freedom_collocates <- find_distinctive_words(freedom_collocates_before_1833,
+                                                    freedom_collocates_after_1833,
+                                                    top_words = 15)
 
-tf_idf_freedom_collocates <- bind_rows(freedom_collocates_after_1833, 
-                                       freedom_collocates_before_1833) %>%
-  bind_tf_idf(word, when, n) %>%
-  arrange(-tf_idf) %>%
-  select(when, word, n, tf_idf)
-
+# Keep the most distinctive words before 1833
+# - filter() keeps only the earlier time period
+# - select() removes the time period column
 tf_idf_freedom_collocates_before <- tf_idf_freedom_collocates %>%
-  filter(when == "before 1833") %>%
-  select(-when) %>%
-  #filter(n>5) %>%
-  top_n(15, wt = tf_idf)
+  filter(when == "before 1833") %>% # Keep the earlier time period
+  select(-when) # Remove the time period column
 
+# Keep the most distinctive words after 1833
+# - filter() keeps only the later time period
+# - select() removes the time period column
 tf_idf_freedom_collocates_after <- tf_idf_freedom_collocates %>%
-  filter(when == "after 1833") %>%
-  select(-when) %>%
-  top_n(15, wt = tf_idf)
+  filter(when == "after 1833") %>% # Keep the later time period
+  select(-when) # Remove the time period column
 ```
 
 ```{r}
-kable(tf_idf_freedom_collocates_before, caption = "1820-32")
+# Display the most distinctive words before 1833
+kable(tf_idf_freedom_collocates_before, 
+      caption = "1820-32")
 ```
 
 ```{r}
-kable(tf_idf_freedom_collocates_after, caption = "1834-39")
+# Display the most distinctive words after 1833
+kable(tf_idf_freedom_collocates_after, 
+      caption = "1834-39")
 ```
 
 Exercises:
 
-1. In the section, “Did the Concept of "Freedom" Change After the Debates of 1833?,” we don’t give an interpretation of the tables showing the collocates of the word “freedom over time. Examining the results, what do you see? Did the meaning of freedom change in these years? How? Specify as many words as possible in your answer. Adjust the number of words displayed to do your research.
+1. In the section, "Did the Concept of "Freedom" Change After the Debates of 1833?," we don't give an interpretation of the tables showing the collocates of the word "freedom" over time. Examining the results, what do you see? Did the meaning of freedom change in these years? 
 
-2. In this chapter, we used distinctiveness to find the top speakers about the British debates around the abolition of slavery in 1833. How would you use distinctiveness — tf-idf — to investigate the different attitudes about the next most important debate of the period, the debate over who qualified for welfare in the lead up the Poor Law Amendment of 1834?
+2. In this chapter, we used distinctiveness to find the top speakers about the British debates around the abolition of slavery in 1833. How would you use distinctiveness to investigate the different attitudes about the next most important debate of the period, the debate over who qualified for welfare in the lead up the Poor Law Amendment of 1834?
 
 3. In this chapter, we investigated the speeches of Mr. Buckingham. Choose one of the other top speakers on slavery and investigate his favorite words, calling up tables to show how those words were used in context. Share the tables you create. Read the related speeches, and explain what you have learned about how Buckingham and your speaker are different.
 
-4. Ask AI to tell you about the Abolition of Slavery, using a prompt that requires it to use published sources only and not hallucinate. Then read a Wikipedia article on the Abolition of Slavery. Compare both to what you learned about the Abolition of Slavery in the introduction to this chapter. Which did you find most digestible? Which is most based in fact? Which do you trust the most?
+4. In this chapter, we saw how tf-idf can help us to distinguish the words of different speakers. Compare these results to the analysis in Chapter 3, when we simply asked who spoke the most. What is added by investigating the speakers’ words that you couldn’t have known by just modeling word count? What is added by modeling word count that you couldn’t have known by just investigating words?
 
-5. Try using AI to summarize what the speakers said, how they converge and how they differ. Cut and paste the slavery_speakers (check the name!) dataset into an AI prompt. What are the results? Did the AI highlight any of the most distinctive words, or did it move straight to summary? If an AI performs a summary accurately but doesn’t highlight the speakers’ most distinctive words, what would you be missing?
-
-6. In this chapter, we saw how tf-idf can help us to distinguish the words of different speakers. Compare these results to the analysis in Chapter 3, when we simply asked who spoke the most. What is added by investigating the speakers’ words that you couldn’t have known by just modeling word count? What is added by modeling word count that you couldn’t have known by just investigating words?
-
-7. In our own readings, we shift attention from Westminster debates to enslaved peoples’ resistance in order to reconsider what counts as a “cause” of abolition. In the debates, test whether enslaved people appear as political actors or passive subjects. Do MPs talk about enslaved people differently than they talk about planters or parliament? Which actors appear most often? Are enslaved people described as agents or objects?
+5. In our own readings, we shift attention from Westminster debates to enslaved peoples’ resistance in order to reconsider what counts as a “cause” of abolition. In the debates, test whether enslaved people appear as political actors or passive subjects. Do MPs talk about enslaved people differently than they talk about planters or parliament? Which actors appear most often? Are enslaved people described as agents or objects?
 
 ```{r}
-library(tidyverse)
-library(tidytext)
-
-actor_terms <- c(
-  "slave", "slaves", "negro", "negroes", "planter", "planters", "assembly", 
-  "parliament")
+actor_terms <- c("slave", "slaves", "negro", "negroes", "planter", "planters", 
+                 "assembly", "parliament")
 
 actor_pattern <- str_c("\\b(", str_c(actor_terms, collapse = "|"), ")\\b")
 
@@ -1061,9 +1195,8 @@ actor_mentions
 
 ```{r}
 actor_sentences <- slavery_debates_1833 %>%
-  mutate(
-    text_lower = tolower(text),
-    actor = str_extract(text_lower, actor_pattern)) %>%
+  mutate(text_lower = tolower(text),
+         actor = str_extract(text_lower, actor_pattern)) %>%
   filter(!is.na(actor)) %>%
   select(sentence_id, speaker, actor, text)
 
