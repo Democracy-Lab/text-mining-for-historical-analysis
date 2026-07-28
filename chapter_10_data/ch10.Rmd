@@ -95,6 +95,16 @@ Our hope is to guide readers' imaginations without limiting them. The concepts w
 
 Through a series of exercises, the following chapter will introduce high-level concepts and best practices that will put the analyst on the way to data fluency. 
 
+Throughout this chapter, we will introduce several new libraries as they become relevant. We found it easier to explain each library alongside the analysis steps that use it. However, because `tidyverse` and `tidytext` are used throughout the chapter, and we are already familiar with `hansardr`, `knitr`, and `quanteda` from previous chapters, we'll load them now.
+
+```{r}
+library(hansardr)
+library(knitr)
+library(quanteda)
+library(tidyverse)
+library(tidytext)
+```
+
 # APIs 
 
 Although vast quantities of cultural and historical materials are now available online through APIs (Application Programming Interfaces, or mechanisms that allow one piece of software to request and receive data from another), the ability to actually retrieve and work with APIs remains unevenly distributed. Accessibility matters because an increasing share of cultural production is "born digital," meaning the digital record is the original form rather than a later digitized copy.^4^
@@ -170,9 +180,8 @@ Please note the following components of the API call:
 * The `flatten = TRUE` argument is necessary for simplifying any nested JSON structures into flat, readable columns suitable for analysis in R.
 
 ```{r, warning=FALSE, message=FALSE}
-library("tidyverse")
-library("httr")
-library("jsonlite")
+library(httr)
+library(jsonlite)
 
 # Define the JSON API endpoint
 url <- "https://data.cityofnewyork.us/resource/wewp-mm3p.json"
@@ -220,7 +229,7 @@ json_list <- fromJSON(json_content)
 # Keep only the first two records
 subset_list <- json_list[1:2, ] 
 
-# Display the records as formatted JSON
+# Show the records as formatted JSON
 # - toJSON() converts the data back to JSON
 # - auto_unbox = TRUE removes unnecessary brackets around single values
 # - prettify() formats the JSON for readability
@@ -302,25 +311,34 @@ head(blog_entries$teaser, 5)
 From this point, it is easy to analyze words.^11^
 
 ```{r, fig.cap="Top 10 words in United States Department of Justice Blog Entries, retrieved on November 24th, 2025."}
-library("tidyverse")
-library("tidytext")
-
-# Tokenize, remove stop words, and count word frequency
+# Find the ten most common words in the blog entries
+# - select() keeps only the blog text
+# - unnest_tokens() splits the text into individual words
+# - anti_join() removes common stop words
+# - count() counts the occurrences of each word
+# - slice_max() keeps the ten most frequent words
 top_words <- blog_entries %>%
-  select(body) %>%
-  unnest_tokens(word, body) %>%
-  anti_join(stop_words, by = "word") %>%
-  count(word, sort = TRUE) %>%
-  slice_max(n, n = 10)
+  select(body) %>% # Keep the blog text
+  unnest_tokens(word, body) %>% # Tokenize the text into words
+  anti_join(stop_words, by = "word") %>% # Remove common stop words
+  count(word, sort = TRUE) %>% # Count the occurrences of each word
+  slice_max(n, n = 10) # Keep the ten most frequent words
 
-# Plot the top words
-ggplot(top_words, aes(x = reorder(word, n), y = n)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  labs(title = "Top 10 Words in DOJ Blog Entries",
-       x = "Word",
-       y = "Frequency") +
-  theme_minimal()
+# Visualize the most common words
+# - aes() maps words and word counts to the plot
+# - geom_bar() creates a bar chart
+# - coord_flip() flips the axes for readability
+# - labs() adds the title and axis labels
+# - theme_minimal() applies a minimal theme
+ggplot(top_words,
+       aes(x = reorder(word, n), # Order words by frequency
+           y = n)) + # Plot word counts
+  geom_bar(stat = "identity") + # Create the bars
+  coord_flip() + # Flip the axes
+  labs(title = "Top 10 Words in DOJ Blog Entries", # Add the chart title
+       x = "Word", # Label the x-axis
+       y = "Frequency") + # Label the y-axis
+  theme_minimal() # Apply a minimal theme
 ```
 
 ## APIs for Scholarly Research
@@ -352,21 +370,27 @@ RSS feeds are a simpler alternative to APIs for data extraction. For example, BB
 In the following example, only the titles of the news articles and their associated hyperlinks are retrieved from the feed.^13^
 
 ```{r, message=FALSE, warning=FALSE}
-library("rvest")
-library("tidyverse")
-library("xml2")
+# Load the packages for working with XML and web pages
+library(rvest) # Read and scrape web pages
+library(xml2) # Read and parse XML files
 
+# Read the BBC News RSS feed
+# - read_xml() downloads and parses the XML document
 rss_url <- "https://feeds.bbci.co.uk/news/rss.xml"
 
-rss_page <- read_xml(rss_url)
+rss_page <- read_xml(rss_url) # Read the RSS feed
 
+# Extract the article titles and links
+# - xml_find_all() finds all matching XML nodes
+# - xml_text() extracts the text from each node
+# - tibble() stores the results in a data frame
 articles <- tibble(
-  title = rss_page %>% 
-    xml_find_all("//item/title") %>% 
-    xml_text(),
-  link = rss_page %>% 
-    xml_find_all("//item/link") %>% 
-    xml_text())
+  title = rss_page %>%
+    xml_find_all("//item/title") %>% # Find all article titles
+    xml_text(), # Extract the title text
+  link = rss_page %>%
+    xml_find_all("//item/link") %>% # Find all article links
+    xml_text()) # Extract the link text
 
 print(head(articles, 5))
 ```
@@ -413,13 +437,22 @@ In cases where large dataset has not been partitioned, it is often necessary to 
 Below is an example of code for reading a large dataset in 1000 row chunks. For the sake of our practice, we will not download a large dataset onto our computers. We are simply offering a code example. 
 
 ```{r, eval=FALSE}
-library("data.table")
+# Load data.table for reading large datasets
+library(data.table) 
 
-# Read the first 1,000 rows
-chunk1 <- fread("hansard_large.csv", nrows = 1000, skip = 0)
+# Read the first 1,000 rows of the dataset
+# - fread() imports data from a file
+# - nrows specifies how many rows to read
+# - skip specifies how many rows to skip before reading
+chunk1 <- fread("hansard_large.csv",
+                nrows = 1000, # Read the first 1,000 rows
+                skip = 0) # Skip no rows
 
-# Read the second 1,000 rows
-chunk2 <- fread("hansard_large.csv", nrows = 1000, skip = 1000)
+# Read the second 1,000 rows of the dataset
+# - fread() imports another chunk of the file
+chunk2 <- fread("hansard_large.csv",
+                nrows = 1000, # Read 1,000 rows
+                skip = 1000) # Skip the first 1,000 rows
 ```
 
 Below is the same process but automated, so the user will read up to 100,000 rows of the data. 
@@ -461,34 +494,44 @@ Egil's Saga blends historical narrative, legend, and poetry, while focusing on E
 Please note: The code that follows handles downloading and text extraction, but it does not include functionality for deleting the file afterward. Our omission is intentional: to prevent any risk of accidentally deleting important or unrelated files, we have left the task of file deletion to the user’s discretion. If the script is executed, the reader should manually delete the downloaded PDF file from their computer once it is no longer needed.^17^
 
 ```{r}
-library("httr")
-library("fs")
-library("pdftools")
+# Load the packages for downloading and reading PDF files
+library(httr) # Download files from the web
+library(fs) # Work with files and directories
+library(pdftools) # Extract text from PDF files
 
-# Define the URL with the PDF to be downloaded
+# Define the PDF to download
 url <- "https://sagadb.org/files/pdf/egils_saga.en.pdf"
 
-# Define the directory it will be downloaded to on one's computer
-# The file will be downloaded to folder named "tmha_data"
+# Define where the PDF will be saved
+# - path() creates a file path that works across operating systems
 destfile <- path("tmha_data", "egils_saga.en.pdf")
 
-# Create directory if it doesn't exist
+# Create the download directory if it does not already exist
+# - path_dir() extracts the directory from the file path
+# - dir_create() creates the directory
 dir_create(path_dir(destfile))
 
-# Download the PDF file
+# Download the PDF
+# - GET() downloads the file
+# - write_disk() saves it to the specified location
 GET(url, write_disk(destfile, overwrite = TRUE))
 
-# Extract text from the PDF
+# Extract the text from the PDF
+# - pdf_text() returns one character string per page
 pdf_text_raw <- pdf_text(destfile)
 
-# Convert into a tibble with one row per page
-tidy_egils_saga <- tibble(page = seq_along(pdf_text_raw),
-                          text = pdf_text_raw)
+# Create a data frame with one row per page
+# - seq_along() generates the page numbers
+# - tibble() stores the page numbers and text
+tidy_egils_saga <- tibble(page = seq_along(pdf_text_raw), # Number the pages
+                          text = pdf_text_raw) # Store the text from each page
 ```
 
 The result is a data frame (specifically, a tibble) named `tidy_egils_saga`, which has two columns: one column contains the page numbers, and the other contains the corresponding body text from each page.
 
 ```{r}
+# Show pages 50 through 60 of the PDF
+# - slice() keeps the specified rows
 tidy_egils_saga %>%
   slice(50:60)
 ```
@@ -496,46 +539,57 @@ tidy_egils_saga %>%
 With just a few lines of code to locate, download, and scrape the PDF file, it is now easy to count the top words in _Egil's Saga_.
 
 ```{r, fig.cap="Top 20 words in Egil's Saga with stop words removed."}
-library("tidyverse")
-library("tidytext")
+# Load the tidytext stop word list
+data("stop_words")
 
-data(stop_words)
-
-# Unnest tokens, remove stop words, count words, and select the top 20
+# Find the most common words in Egil's Saga
+# - unnest_tokens() splits the text into individual words
+# - anti_join() removes common stop words
+# - count() counts the occurrences of each word
+# - slice_max() keeps the 20 most frequent words
 top_words <- tidy_egils_saga %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words, by = "word") %>%
-  count(word, sort = TRUE) %>%
-  slice_max(n, n = 20)
+  unnest_tokens(word, text) %>% # Tokenize the text into words
+  anti_join(stop_words, by = "word") %>% # Remove common stop words
+  count(word, sort = TRUE) %>% # Count the occurrences of each word
+  slice_max(n, n = 20) # Keep the 20 most frequent words
 
-# Visualize top 20 words
-top_words %>% 
-  ggplot(aes(x = reorder(word, n), y = n)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Top 20 Words in Egil's Saga (after removing stop words)",
-       x = "Word",
-       y = "Count") +
-  theme_minimal()
+# Visualize the most common words
+# - aes() maps words and word counts to the plot
+# - geom_col() creates a bar chart
+# - coord_flip() flips the axes for readability
+# - labs() adds the title and axis labels
+# - theme_minimal() applies a minimal theme
+top_words %>%
+  ggplot(aes(x = reorder(word, n), # Order words by frequency
+             y = n)) + # Plot word counts
+  geom_col() + # Create the bars
+  coord_flip() + # Flip the axes
+  labs(title = "Top 20 Words in Egil's Saga (after removing stop words)", # Add the chart title
+       x = "Word", # Label the x-axis
+       y = "Count") + # Label the y-axis
+  theme_minimal() # Apply a minimal theme
 ```
 
 For transparency and book keeping, the analyst may want to add additional metadata—such as the book’s title (Egil's Saga), the author (Snorri Sturluson), and the publication date of the English translation (1893).
 
 ```{r}
+# Add metadata to the Egil's Saga dataset
+# - mutate() creates new columns for the author, book title, and publication date
 tidy_egils_saga_with_metadata <- tidy_egils_saga %>%
-  mutate(author = "Snorri Sturluson",
-         book = "Egil's Saga",
-         date = "1893")
+  mutate(author = "Snorri Sturluson", # Record the author
+         book = "Egil's Saga", # Record the book title
+         date = "1893") # Record the publication date
 ```
 
 The metadata helps an analyst keep track of key information about the book. However, because each row in the author, book, and date columns contains the same values, the metadata is redundantly stored in the data frame. 
 
 ```{r}
-library(knitr)
-
+# Show the first six rows of the dataset
+# - head() keeps the first six rows
+# - kable() formats the results as a table
 tidy_egils_saga_with_metadata %>%
-  head() %>%
-  kable()
+  head() %>% # Keep the first six rows
+  kable() # Format the results as a table
 ```
 
 ## Getting PDFs Ready for Computer Readability: Optical Character Recognition (OCR)
@@ -567,26 +621,35 @@ An additional precaution is to add code to slow down the web scraping process.  
 The following example illustrates the initial step in web scrapings: retrieving the HTML content of the GitHub repository page for this book followed by a snippet of the page's HTML. 
 
 ```{r}
+# Define the web page to download
 url <- "https://github.com/stephbuon/text-mining-for-historical-analysis"
 
-page <- read_html(url)
+# Read the web page
+# - read_html() downloads and parses the HTML document
+page <- read_html(url) # Read the HTML page
 ```
 
 ```{r, echo=FALSE}
-# Convert to character (raw HTML), split into lines, and preview a few lines
+# Show the first few lines of the HTML source
+# - as.character() converts the HTML document to text
+# - str_split() splits the text into separate lines
+# - unlist() converts the list of lines into a character vector
+# - str_trim() removes extra whitespace
 html_preview <- page %>%
-  as.character() %>%
-  str_split("\n") %>%
-  unlist() %>%
-  str_trim() %>%
-  .[1:5]
+  as.character() %>% # Convert the HTML to text
+  str_split("\n") %>% # Split the text into lines
+  unlist() %>% # Convert the list to a character vector
+  str_trim() %>% # Remove leading and trailing whitespace
+  .[1:5] # Keep the first five lines
 
-# Optionally truncate long lines to fit the page
-html_preview <- str_trunc(html_preview, width = 100)
+# Shorten long lines for readability
+# - str_trunc() truncates long strings
+html_preview <- str_trunc(html_preview, width = 100) # Limit each line to 100 characters
 
-# Print nicely
-cat(paste(html_preview, collapse = "\n"))
-
+# Show the HTML preview
+# - paste() combines the lines into a single string
+# - cat() prints the result
+cat(paste(html_preview, collapse = "\n")) # Print the HTML preview
 ```
 
 ## Understanding HTML Code and Finding the Content 
@@ -618,14 +681,17 @@ As an example, in the following code the CSS selector `p` would select both para
 To extract the content itself, the analyst uses selectors to locate relevant elements in the HTML tree and then retrieve their text. In practice, scraping involves three major steps: downloading the page's HTML, parsing it into a structured document, and applying CSS or XPath queries to extract the desired nodes. For example, using the `rvest` package in R, the following code retrieves all paragraph text from a webpage using the `p` tag as the selector:
 
 ```{r}
-# Step 1: Read the webpage
+# Read the web page
+# - read_html() downloads and parses the HTML document
 url <- "https://example.com"
 page <- read_html(url)
 
-# Step 2: Select and extract all <p> tags using a CSS selector
+# Extract the paragraph text from the web page
+# - html_elements() finds all HTML elements matching a CSS selector
+# - html_text() extracts the text from those elements
 paragraphs <- page %>%
-  html_elements("p") %>%      # CSS selector
-  html_text(trim = TRUE)      # extract clean text
+  html_elements("p") %>% # Find all paragraph elements
+  html_text(trim = TRUE) # Extract the paragraph text
 
 print(paragraphs)
 ```
@@ -659,26 +725,30 @@ We do not disagree with these points. Texts--especially historical ones--are med
 From the Hansard data, we provide the following example of an illogical text concatenation: the word "said" is included as part of the speaker's name. As a result, "The Bishop of Exeter" and "The Bishop of Exeter said" appear as two separate speakers in the dataset. If we were to group the data by speaker and count the most frequent words, this error would lead to treating a single individual as two distinct parliamentarians.
 
 ```{r}
-library("hansardr")
-
+# Load the 1840 speaker metadata
+# - data() loads the dataset into the R session
 data("speaker_metadata_1840")
 ```
 
 ```{r}
-speaker_metadata_1840 %>% 
-  filter(sentence_id == "S3V0051P0_728")
+# Display the speaker metadata for a specific sentence
+# - filter() keeps the row matching the specified sentence ID
+speaker_metadata_1840 %>%
+  filter(sentence_id == "S3V0051P0_728") # Keep the matching sentence
 ```
 
 In the following examples, an apostrophe is included at the beginning of the name "Mr. Speaker" and a hyphen appears before the name "Lord Ashley."
 
 ```{r}
-speaker_metadata_1840 %>% 
-  filter(sentence_id == "S3V0060P0_2194")
+# Do the same for another sentence
+speaker_metadata_1840 %>%
+  filter(sentence_id == "S3V0060P0_2194") 
 ```
 
 ```{r}
-speaker_metadata_1840 %>% 
-  filter(sentence_id == "S3V0051P0_18193")
+# Do the same for another sentence
+speaker_metadata_1840 %>%
+  filter(sentence_id == "S3V0051P0_18193") 
 ```
 
 These are just a few examples from the many typographical anomalies existing within the digitized version of the Hansard corpus. 
@@ -688,14 +758,19 @@ These are just a few examples from the many typographical anomalies existing wit
 The problem of cleaning data is a long one. A common approach to addressing the unwanted symbols, formatting issues, and inconsistencies is through the use of regular expressions (often shortened to "regex"). We have already demonstrated the regular expressions can be used to target specific, unwanted data. Here we briefly demonstrate a very simple use of a regular expression to clean the "`'`" from the name "Mr. Speaker." 
 
 ```{r}
+# Display the speaker metadata for a specific sentence
+# - filter() keeps the row matching the specified sentence ID
 speaker_metadata_1840 %>% 
-  filter(sentence_id == "S3V0060P0_2194")
+  filter(sentence_id == "S3V0060P0_2194") # Keep the matching sentence
 ```
 
 ```{r}
-speaker_metadata_1840 %>% 
-  filter(sentence_id == "S3V0060P0_2194") %>%
-  mutate(speaker = str_replace_all(speaker, "'", ""))
+# Display the speaker metadata for a specific sentence
+# - filter() keeps the row matching the specified sentence ID
+# - mutate() removes apostrophes from the speaker name
+speaker_metadata_1840 %>%
+  filter(sentence_id == "S3V0060P0_2194") %>% # Keep the matching sentence
+  mutate(speaker = str_replace_all(speaker, "'", "")) # Remove apostrophes from the speaker name
 ```
 
 Many guides exist for defining and using regular expressions. Therefore, we will not include one here and instead suggest reading CRAN's vignette on regular expressions (https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html) for a comprehensive encyclopedia of regular expressions in R. 
@@ -707,16 +782,16 @@ While effective, writing our own regular expression-based approaches to data cle
 messy_string <- paste0("<p>We!!!   can clean   messy--", 
                        "<b> text using </b>.. ,    regular expressions </p>")
 
-# Clean it with a complex regex pipeline that
-# removes all HTML tags
-# removes all non-word and non-space characters
-# replaces multiple spaces with a single space
-# trims leading/trainign spaces
+# Clean the text
+# - str_remove_all() removes HTML tags
+# - str_replace_all() removes punctuation
+# - the second str_replace_all() replaces multiple spaces with a single space
+# - str_trim() removes leading and trailing whitespace
 clean_string <- messy_string |>
-  str_remove_all("<[^>]+>") |>              
-  str_replace_all("[^\\w\\s]", "") |>     
-  str_replace_all("\\s+", " ") |>                  
-  str_trim()                                      
+  str_remove_all("<[^>]+>") |> # Remove HTML tags
+  str_replace_all("[^\\w\\s]", "") |> # Remove punctuation
+  str_replace_all("\\s+", " ") |> # Replace multiple spaces with a single space
+  str_trim() # Remove leading and trailing whitespace                              
 
 print(clean_string)
 ```
@@ -756,22 +831,25 @@ Since a single regular expression is often insufficient to handle all types of m
 Below, we provide an example of what the iterative steps might look like in pseudo-code, or code that resembles real code in order to communicate an idea, but is not actually intended to run. To use similar code, the reader will need to obtain and configure an API key for access to a LLM. 
 
 ```{eval=FALSE}
-library("stringr")
-
+# Repeatedly clean the text using LLM-generated regular expressions
+# - the outer for() loop repeats the cleaning process
+# - the inner for() loop processes one row at a time
+# - call_llm_api() requests a regular expression from the language model
+# - str_replace_all() applies the suggested regular expression
 max_iterations <- 5 
 
 for (i in 1:max_iterations) {
   for (row in 1:nrow(df)) {
     
-    text <- df$text[row]
+    text <- df$text[row] # Extract the current text
     
     llm_suggested_regex <- call_llm_api(
-      prompt = paste("Suggest a regular expression to further clean this text:\n", text))
+      prompt = paste("Suggest a regular expression to further clean this text:\n", text)) # Request a regular expression from the LLM
 
-    text <- str_replace_all(text, llm_suggested_regex, " ")
+    text <- str_replace_all(text, llm_suggested_regex, " ") # Apply the regular expression
 
     # Update the data frame with the cleaned text
-    df$text[row] <- text } }
+    df$text[row] <- text } } # Save the cleaned text back to the data frame
 ```
 
 # Interpreting Data Format, Type, and Structure
@@ -804,21 +882,30 @@ Data types determine how an object should be interpreted and used by R.  Data ty
 Consider, for example, the following code, where the value "42" is enclosed in quotation marks, which tells R to treat it as a "string" or "character," not as a number (a "numeric" object). 
 
 ```{r}
-my_number = "42"
-typeof(my_number)
+# Create a character string
+# - typeof() returns the data type of an object
+my_number <- "42"
+
+typeof(my_number) # Display the data type
 ```
 
 Because the the variable my_number is a character-type object, not a number-type object, we cannot add it to another number without producing an error.
 
 ```{r, error=TRUE}
-my_number + 2
+# Add 2 to the numeric value
+# - the + operator performs numeric addition
+my_number + 2 # Display the result
 ```
 
 However, we can use the base R function `as.numeric()` to tell R to treat my_number henceforth as a number, not a string.
 
 ```{r}
-my_number <- as.numeric(my_number) 
-my_number + 2
+# Convert the character string to a numeric value
+# - as.numeric() converts the character string to a number
+my_number <- as.numeric(my_number)
+
+# Add 2 to the numeric value
+my_number + 2 # Display the result
 ```
 
 The functions `as.character()`, `as.date()`, and `as.numeric()` are all useful for converting datatypes from one type to the next. When working with `hansardr`, some of us have struggled with deep confusion in our inability to work with the year, until we realized that at some point the year had been converted to a string object, not a numeric or date object. 
@@ -826,11 +913,13 @@ The functions `as.character()`, `as.date()`, and `as.numeric()` are all useful f
 Analysts can check the type of data stored in a column using the `typeof()` function. For example, the following code returns "character" as the type for the "text" column in Hansard:
 
 ```{r}
-library("hansardr")
-
+# Load the 1800 Hansard dataset
+# - data() loads the dataset into the R session
 data("hansard_1800")
 
-typeof("hansard_1800$text")
+# Display the data type of the text column
+# - typeof() returns the data type of an object
+typeof(hansard_1800$text)
 ```
 
 Throughout this book, we have primarily worked with character and integer data. For other types of historical analyses, however, we may encounter data types or values we have not addressed in detail. Below are some common data types in R: 
@@ -850,13 +939,11 @@ The meta-awareness that an analyst needs to become fluent with data types is not
 knitr::include_graphics("pipe.png")
 ```
 
-
 When observing _The Treachery of Images_, the viewer sees a pipe, despite the instructions emblazoned below the image. If an analyst stares at the image and puzzles for hours, they may still see just a pipe. 
 
 The caption serves to remind us that a representation is an object, different in its nature from the original object represented; the pipe that Magritte held in his hand and painted is different from the picture of the pipe he made. 
 
 Just so, a human analyst may stare at their code for hours while asking themselves why two seemingly identical objects are behaving differently once they run their code. The painting draws our attention away from its content (a pipe) back to the pieces making up the content (oil and canvas). Programming, too, asks us to practice shifting our attention away from the content of our constructions ("42") and onto the components that make up our constructions (the rules that govern data types within a programing language).
-
 
 ## When Data Type is Missing: NA and NULL Values
 
@@ -871,12 +958,13 @@ Here is just one example of how `NA`'s are treated differently than character va
 The "occupation" column (which records the species’ conservation status—e.g., endangered, threatened, or of least concern) contains character strings as well as `NA` values. As we will demonstrate, missing values (`NA`) behave yield a different result than text when undergoing string operations. 
 
 ```{r}
-library("tidyverse")
-
-census <- tibble(name = c("Mary Jenkins", "Samuel Price", "Hannah Lee", "Charles Morton", 
-                          "Unnamed Child"),
-                 occupation = c("washerwoman", NA, "seamstress", "laborer", NA),
-                 age = c(32, 44, 29, 51, 1))
+# Create a small census dataset
+# - tibble() creates a data frame
+# - c() combines multiple values into a column
+census <- tibble(name = c("Mary Jenkins", "Samuel Price", "Hannah Lee", "Charles Morton",
+                          "Unnamed Child"), # Record each person's name
+                 occupation = c("washerwoman", NA, "seamstress", "laborer", NA), # Record each occupation
+                 age = c(32, 44, 29, 51, 1)) # Record each person's age
 
 census
 ```
@@ -886,8 +974,11 @@ From printing just the first rows, multiple `NAs` appear.
 We can now process the dataset and observe what happens when we try to implement functions that expect a string for the value of dataset rows. Here, we use `str_detect()` to identify whether or not a value is equal to the word "domesticated." We return our results in a new column named "is_washerwoman." 
 
 ```{r}
+# Identify washerwomen in the census
+# - mutate() creates a new column
+# - str_detect() checks whether the occupation contains "washerwoman"
 census %>%
-  mutate(is_washerwoman = str_detect(occupation, "washerwoman"))
+  mutate(is_washerwoman = str_detect(occupation, "washerwoman")) # Create a TRUE/FALSE indicator
 ```
 
 `str_detect()` returned `TRUE` if the value in the row is equal to "domesticated" and `FALSE` if it is not. However, multiple rows are left with `NA`, even though the values of those rows were not equal to "domesticated." `NA` is a different data type than a string, and so `str_detect()`, a function that anticipates a string, did not assign a true or false value. 
@@ -895,22 +986,26 @@ census %>%
 We must use a different approach to identifying `NA` values:
 
 ```{r}
+# Identify rows with missing occupations
+# - mutate() creates a new column
+# - is.na() checks whether the occupation is missing
 census %>%
-  mutate(is_missing = is.na(occupation))
+  mutate(is_missing = is.na(occupation)) # Create a TRUE/FALSE indicator
 ```
 
 If we wish for the `NA` values to be treated like strings--which could be the case if we are analyzing historical records where some individuals’ occupations are missing, and we want to treat "unknown" as a searchable category--we could replace them with the word "missing" or with an empty string (`""`). The following code provides an example for how we can accomplish treating treating `NA`s as a string: 
 
 ```{r}
-library("tidyverse")
-
-# Replace NA in ""conservation" with the string "missing"
+# Replace missing occupations with the word "missing"
+# - mutate() updates the occupation column
+# - replace_na() replaces missing values with "missing"
 census <- census %>%
   mutate(occupation = replace_na(occupation, "missing"))
 
-# View the updated data
+# Display the first ten rows of the updated dataset
+# - slice() keeps the specified rows
 census %>%
-  slice(1:10)
+  slice(1:10) # Keep the first ten rows
 ```
 
 ## Mixed Methods: Lists as Data Type 
@@ -920,18 +1015,26 @@ Lists are an important data type in R that also function as a data structure (de
 Here, we define a list of continent names followed by their approximate population in millions. 
 
 ```{r}
+# Create a list containing continent names and populations
+# - list() stores objects of different types in a single container
 continents_population <- list('South America', 644.54, 'Africa', 1305, 'Europe', 745.64, 'Asia', 4587)
 ```
 
 ```{r}
+# Show the data type of the object
+# - typeof() returns the data type of an object
 typeof(continents_population)
 ```
 
 `continents_population` is the list type. But each item inside the list also has its own type. To inspect the data type, we can loop through the list and print each item's type like so: 
 
 ```{r}
+# Display the data type of each item in the list
+# - for() loops over each item in the list
+# - typeof() returns the data type of the current item
+# - print() displays the result
 for (item in continents_population) {
-  print(typeof(item))}
+  print(typeof(item)) }
 ```
 
 Lists can contain varying types, which makes them well-suited for representing complex data. They can provide a more memory-efficient alternative to data frames, particularly in applications such as text mining large datasets. However, the flexibility of lists introduces additional complexity in terms of data types. If these complexities are not carefully managed, code may execute without error but yield unintended results due to discrepancies in type.
@@ -985,32 +1088,42 @@ However, there are cases where a data frame may not be the most appropriate or e
 
 
 ```{r, message=FALSE, warning=FALSE}
-library("quanteda")
-library("tidyverse")
-library("hansardr")
-
+# Load the 1800 Hansard dataset
+# - data() loads the dataset into the R session
 data("hansard_1800")
 
+# Extract the speech text
+# - $ selects the text column from the dataset
 texts <- hansard_1800$text
 
-# Create a tokens object from the text column
+# Tokenize the speech text
+# - tokens() converts the text into a quanteda tokens object
 tokens_hansard <- tokens(texts)
 
-# Perform a KWIC search on the tokens object
-kwic_result <- kwic(tokens_hansard, pattern = "corn", window = 5)
+# Search for the word "corn" in context
+# - kwic() finds each occurrence of the keyword
+# - window specifies the number of words shown before and after the keyword
+kwic_result <- kwic(tokens_hansard,
+                    pattern = "corn", # Search for the word "corn"
+                    window = 5) # Show five words before and after each match
 ```
 
 Impressively, the results from running `KWIC()` on an entire decade of the Hansard debates are now ready to analyze. 
 
 ```{r}
+# Display the first ten KWIC results
+# - head() keeps the first ten results
+# - kable() formats the results as a table
 kwic_result %>%
-  head(10) %>% 
-  kable(caption = "KWIC results") 
+  head(10) %>% # Keep the first ten results
+  kable(caption = "KWIC results") # Format the results as a table
 ```
 
 However, attempting to use a `tidyverse` function on the `quanteda` tokens object returns an error. 
 
 ```{r, error=TRUE, eval=FALSE}
+# Show the first five tokenized documents
+# - slice() keeps the specified documents from the tokens object
 slice(tokens_hansard, 1:5)
 ```
 
@@ -1029,13 +1142,21 @@ While `quanteda`'s design improves efficiency, it also introduces certain limita
 To use `tidyverse` functions on the data we processed using `quanteda`, we must convert the data (in this case, the tokens object) to a tibble or data frame. 
 
 ```{r}
-tokens_tibble <- tibble(doc_id = rep(names(tokens_hansard), lengths(tokens_hansard)),
-                        token = unlist(tokens_hansard, use.names = FALSE))
+# Convert the tokens object into a data frame
+# - names() extracts the document IDs
+# - lengths() counts the number of tokens in each document
+# - rep() repeats each document ID for every token it contains
+# - unlist() converts the tokens object into a character vector
+# - tibble() stores the document IDs and tokens in a data frame
+tokens_tibble <- tibble(doc_id = rep(names(tokens_hansard), lengths(tokens_hansard)), # Repeat each document ID for every token
+                        token = unlist(tokens_hansard, use.names = FALSE)) # Store the individual tokens
 ```
 
-Now we can use `tidyverse` functions freely. 
+Now we can use `tidyverse` functions on our data. 
 
 ```{r}
+# Show the first five rows of the token data frame
+# - slice() keeps the specified rows
 slice(tokens_tibble, 1:5)
 ```
 
