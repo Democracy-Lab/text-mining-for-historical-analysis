@@ -36,7 +36,6 @@ In general, the learning curve on R is less steep for new comers, while giving u
 The first step is to ensure access to a computer that is set up to use the R programming language. The steps that follow explain how to install R on a Mac or PC (Windows machine).
 
 We also recommend installing a desktop app called RStudio designed to make working with R as intuitive as possible.  RStudio is a "code editor" that makes it easy to interact with the R language and one's data as it undergoes transformations. A code editor is to the language R what Microsoft Word is to writing a document: there are ultimately many applications which one could use to write a document, but Microsoft word is a standard because it makes outlining, drafting, printing, and footnotes easy to manage.  Just so, RStudio will be our preferred app for accessing R.  
-
 Afterwards, the R interface may alert the user of occasional updates to the software, which is important to keep up-to-date. When these updates are necessary, the R interface will provide its own instructions, and for the most part, it is sufficient to simply type whatever is indicated on the computer screen, perhaps restarting the computer if the user encounters difficulty.  
 
 If R and RStudio (or a comparable development environment) are already installed, skip to section "Loading Libraries" below. 

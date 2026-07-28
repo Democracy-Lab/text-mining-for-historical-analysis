@@ -9,7 +9,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Troubleshooting Code with Chatbots
 
-Chatbots backed by large language models (LLMs), like ChatGPT, are now commonly used to troubleshoot and debug code. Sometimes chatbots are used to supplement traditional approaches to scanning and interpreting Software documentation. Other times, Chatbots might be used to replace traditional approaches to troubleshooting, such as in cases where a programming language or library has a wide internet presence—such as R's tidyverse or base Python. Large amounts of code, documentation, and common usage patterns are included in LLM training data. As a result, the chatbot can often replace traditional troubleshooting methods by providing an interactive, conversational style of debugging that adapts to the user's questions and code in real time.
+Online chatbots that use large language models (LLMs), like ChatGPT or Claude, are now commonly used to troubleshoot and debug code. 
+
+Sometimes chatbots are used to supplement traditional approaches to scanning and interpreting Software documentation. Other times, Chatbots might be used to replace traditional approaches to troubleshooting, such as in cases where a programming language or library has a wide internet presence—such as R's tidyverse or base Python. Large amounts of code, documentation, and common usage patterns are included in LLM training data. As a result, the chatbot can often replace traditional troubleshooting methods by providing an interactive, conversational style of debugging that adapts to the user's questions and code in real time.
 
 We do this by providing what is called a "prompt" to the chatbot, or a written out set of instructions that tells the model what task to perform. The prompt establishes the initial context the chatbot uses to generate a response, and guides how it will respond to the problem.
 
