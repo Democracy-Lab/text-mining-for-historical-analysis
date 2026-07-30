@@ -14,7 +14,6 @@ We begin with a simple but powerful structure: the term-co-occurrence matrix (TC
 
 The goal of the notebook is both methodological and interpretive. You will learn how to construct and inspect these representations step by step, from raw text to co-occurrence structure to embeddings. But more importantly, you will learn how to read them as historical evidence. When a word’s nearest neighbors change, its meaning is being renegotiated. When a vector shifts position in space, something in the discourse has moved. By the end, you will be able to move between close reading and computational analysis—using word vectors not as a replacement for interpretation, but as a tool for discovering patterns that invite it.
 
-
 ```{r load-packages}
 library(text2vec)
 library(stringr)

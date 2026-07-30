@@ -202,7 +202,7 @@ slavery_debates_1833 <- slavery_debates_1830 %>%
   filter(year == 1833) # Keep only speeches from 1833
 
 # Count how many words each speaker contributed in 1833
-# - unnest_tokens() splits the text into individual words
+# - unnest_tokens() tokenizes the text into one word per row
 # - group_by() groups the data by speaker
 # - summarize() counts the total words spoken by each speaker
 # - arrange() sorts speakers from most to fewest words
@@ -248,7 +248,7 @@ Next, let's break the text into words and clean it up, removing numbers and stop
 
 ```{r, message = F}
 # Clean and tokenize the speeches
-# - unnest_tokens() splits the text into individual words
+# - unnest_tokens() tokenizes the text into one word per row
 # - filter() removes tokens that contain only numbers
 # - anti_join() removes common stop words
 # - mutate() lemmatizes each word
@@ -690,7 +690,7 @@ If we were working on a paper analyzing these speeches, we would likely want to 
 
 For the moment, let us proceed by reading a limited sample of Buckingham's speeches about slavery -- just those speeches in which he invoked the word "wages." 
 
-The code for obtaining the speeches is given below; the full speech is printed in the Appendix.
+The code for obtaining the speeches is given below.
 
 ```{r, message = F}
 # Keep the sentence IDs from Mr. Buckingham's speeches
@@ -1011,33 +1011,44 @@ We are going to do this method to data multiple times, so we create a function.
 
 ```{r}
 # Count the words used in speeches containing a search term
-# - data supplies the corpus or subset of speeches
-# - search_term supplies the word to search for
-# - period_label supplies the label for the time period
+# - data is the corpus or subset of speeches
+# - search_term is the word to search for
+# - period_label is the label for the time period
+# - mutate() adds a label identifying the time period
+# - filter() keeps speeches containing the search term
+# - unnest_tokens() splits the text into individual words
+# - anti_join() removes common stop words
+# - group_by() groups the words by time period and word
+# - reframe() counts the occurrences of each word
+# - arrange() sorts the results from most to fewest occurrences
 count_collocates <- function(data, search_term, period_label) {
   data %>%
     mutate(when = period_label) %>% # Label the time period
     filter(str_detect(tolower(text), search_term)) %>% # Keep speeches containing the search term
     unnest_tokens(word, text) %>% # Tokenize the text into words
-    anti_join(stop_words, by = "word") %>% # Remove stop words
+    anti_join(stop_words, by = "word") %>% # Remove common stop words
     group_by(when, word) %>% # Group by time period and word
-    reframe(n = n()) %>% # Count word occurrences
+    reframe(n = n()) %>% # Count the occurrences of each word
     arrange(desc(n)) } # Sort from most to fewest occurrences
 
 # Find the most distinctive words in each time period
+# - before_data is the first time period
+# - after_data is the second time period
+# - top_words is the number of words to keep for each period
 # - bind_rows() combines the two time periods
 # - bind_tf_idf() calculates the tf-idf score for each word
 # - group_by() groups the results by time period
 # - slice_max() keeps the words with the highest tf-idf scores
+# - ungroup() removes the grouping
+# - arrange() sorts the results by time period and tf-idf score
 find_distinctive_words <- function(before_data, after_data, top_words = 15) {
   bind_rows(before_data, after_data) %>% # Combine the two time periods
     bind_tf_idf(word, when, n) %>% # Calculate tf-idf scores
     group_by(when) %>% # Group by time period
     slice_max(tf_idf, n = top_words) %>% # Keep the top words
     ungroup() %>% # Remove the grouping
-    arrange(when, desc(tf_idf))} # Sort by period and tf-idf score
+    arrange(when, desc(tf_idf)) } # Sort by time period and tf-idf score
 ```
-
 
 
 ```{r, message=FALSE}
@@ -1114,24 +1125,39 @@ kable(tf_idf_freedom_collocates_after,
 Let's look to see if freedom's meaning changed across everything.
 
 ```{r, warning=FALSE, message=FALSE}
+# Combine the Hansard datasets before 1833
+# - left_join() adds the debate metadata
+# - mutate() extracts the year from the speech date
+# - filter() keeps speeches before 1833
+# - bind_rows() adds the 1820 Hansard dataset
 hansard_before_1833 <- hansard_1830 %>% 
-  left_join(debate_metadata_1830, by = "sentence_id") %>%
-  mutate(year = year(speechdate)) %>%
-  filter(year < 1833) %>%
-  bind_rows(hansard_1820)
+  left_join(debate_metadata_1830, by = "sentence_id") %>% # Add the debate metadata
+  mutate(year = year(speechdate)) %>% # Extract the year
+  filter(year < 1833) %>% # Keep speeches before 1833
+  bind_rows(hansard_1820) # Add the 1820 Hansard dataset
 
+# Create the Hansard dataset after 1833
+# - left_join() adds the debate metadata
+# - mutate() extracts the year from the speech date
+# - filter() keeps speeches after 1833
 hansard_after_1833 <- hansard_1830 %>%
-  left_join(debate_metadata_1830, by = "sentence_id") %>%
-  mutate(year = year(speechdate)) %>%
-  filter(year > 1833)
+  left_join(debate_metadata_1830, by = "sentence_id") %>% # Add the debate metadata
+  mutate(year = year(speechdate)) %>% # Extract the year
+  filter(year > 1833) # Keep speeches after 1833
 
+# Count the words used in speeches containing "freedom" before 1833
+# - count_collocates() counts the words used in matching speeches
 freedom_collocates_hansard_before_1833 <- count_collocates(hansard_before_1833,
-                                                           search_term = "freedom",
-                                                           period_label = "before 1833")
+                                                           search_term = "freedom", # Search for speeches containing "freedom"
+                                                           period_label = "before 1833") # Label the time period
 
+
+# Count the words used in speeches containing "freedom" after 1833
+# - count_collocates() counts the words used in matching speeches
 freedom_collocates_hansard_after_1833 <- count_collocates(hansard_after_1833,
-                                                          search_term = "freedom",
-                                                          period_label = "after 1833")
+                                                          search_term = "freedom", # Search for speeches containing "freedom"
+                                                          period_label = "after 1833") # Label the time period
+
 
 # Find the most distinctive words in each time period
 # - find_distinctive_words() combines the periods, calculates tf-idf,
