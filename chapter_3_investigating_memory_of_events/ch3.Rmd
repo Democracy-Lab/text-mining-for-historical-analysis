@@ -1,5 +1,5 @@
 ---
-title: 'Chapter 2: Investigating the Memory of Events Using N-Grams, Controlled Vocabulary, and Joins'
+title: 'Chapter 3: Investigating the Memory of Events Using N-Grams, Controlled Vocabulary, and Joins'
 output: 
   pdf_document:
     number_sections: false
@@ -11,7 +11,7 @@ header-includes:
   - \usepackage{xcolor}
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{2}
+  - \setcounter{chapter}{3}
   - \counterwithin{table}{chapter}
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Chapter 7: Decoding Grammar to Uncover the Language of Agency"
+title: "Chapter 8: Decoding Grammar to Uncover the Language of Agency"
 output:
   html_document
 fontsize: 11pt
@@ -11,7 +11,7 @@ header-includes:
   - \usepackage{xcolor}
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{7}
+  - \setcounter{chapter}{8}
   - \counterwithin{table}{chapter}
 ---
 

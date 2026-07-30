@@ -11,7 +11,7 @@ header-includes:
   - \usepackage[most]{tcolorbox}
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{1}
+  - \setcounter{chapter}{2}
   - \counterwithin{table}{chapter} 
 ---
 

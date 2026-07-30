@@ -1,5 +1,5 @@
 ---
-title: "Chapter 9: Working with Data"
+title: "Chapter 10: Working with Data"
 output:
   pdf_document:
     latex_engine: xelatex
@@ -10,7 +10,7 @@ md_extensions: -smart
 header-includes:
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{9}
+  - \setcounter{chapter}{10}
   - \counterwithin{table}{chapter}
 ---
 

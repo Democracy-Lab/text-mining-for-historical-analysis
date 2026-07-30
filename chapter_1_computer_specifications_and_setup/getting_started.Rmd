@@ -1,6 +1,14 @@
 ---
 title: "Chapter 1: Getting Started"
 output: html_document
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{DejaVu Serif}
+  - \usepackage[most]{tcolorbox}
+  - \usepackage{chngcntr}
+  - \newcounter{chapter}
+  - \setcounter{chapter}{1}
+  - \counterwithin{table}{chapter} 
 ---
 
 ```{r setup, include=FALSE}

@@ -7,7 +7,7 @@ geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{6}
+  - \setcounter{chapter}{7}
   - \counterwithin{table}{chapter}
 ---
 

@@ -1,12 +1,12 @@
 ---
-title: "Chapter 4: Distinctive Language in the 1833 Debates About the Abolition of Slavery and 1832 Reform Bill"
+title: "Chapter 5: Distinctive Language in the 1833 Debates About the Abolition of Slavery and 1832 Reform Bill"
 output: 
   html_document
 geometry: "left=1in,right=1in,top=2in,bottom=1in"
 header-includes:
   - \usepackage{chngcntr}
   - \newcounter{chapter}
-  - \setcounter{chapter}{4}
+  - \setcounter{chapter}{5}
   - \counterwithin{table}{chapter}
 ---
 
