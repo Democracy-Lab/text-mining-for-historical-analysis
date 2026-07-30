@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.21)  30 JUL 2026 08:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.7.21)  30 JUL 2026 10:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -783,65 +783,66 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 219.
 
-Overfull \hbox (76.2434pt too wide) in paragraph at lines 234--234
+Overfull \hbox (76.2434pt too wide) in paragraph at lines 236--236
 []\T1/lmtt/m/n/10 ## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors[] 
  []
 
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 277.
+[2]
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 283.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [2] [3{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
-Overfull \hbox (8.1331pt too wide) in paragraph at lines 342--345
+) [3{/home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
+Overfull \hbox (8.1331pt too wide) in paragraph at lines 348--351
 []\T1/lmr/m/n/10 In ad-di-tion to the de-bate meta-data, \T1/lmtt/m/n/10 hansardr \T1/lmr/m/n/10 pro-vides two ad-di-tional meta-data files: \T1/lmtt/m/n/10 speaker_metadata_1860
  []
 
 [4] [5]
-Overfull \hbox (24.43362pt too wide) in paragraph at lines 544--545
+Overfull \hbox (24.43362pt too wide) in paragraph at lines 550--551
 []\T1/lmr/m/n/10 sentence_id  
  []
 
 
-Overfull \hbox (21.77002pt too wide) in paragraph at lines 548--549
+Overfull \hbox (21.77002pt too wide) in paragraph at lines 554--555
 []\T1/lmr/m/n/10 speechdate  
  []
 
 
-Overfull \hbox (24.43362pt too wide) in paragraph at lines 556--557
+Overfull \hbox (24.43362pt too wide) in paragraph at lines 562--563
 []\T1/lmr/m/n/10 sentence_id  
  []
 
 
-Overfull \hbox (21.77002pt too wide) in paragraph at lines 560--561
+Overfull \hbox (21.77002pt too wide) in paragraph at lines 566--567
 []\T1/lmr/m/n/10 speechdate  
- []
-
-
-Overfull \hbox (34.51665pt too wide) in paragraph at lines 568--568
-[]|\T1/lmr/m/n/10 S3V0156P0_0|  
- []
-
-
-Overfull \hbox (34.51665pt too wide) in paragraph at lines 571--571
-[]|\T1/lmr/m/n/10 S3V0156P0_1|  
  []
 
 
 Overfull \hbox (34.51665pt too wide) in paragraph at lines 574--574
-[]|\T1/lmr/m/n/10 S3V0156P0_2|  
+[]|\T1/lmr/m/n/10 S3V0156P0_0|  
  []
 
 
 Overfull \hbox (34.51665pt too wide) in paragraph at lines 577--577
-[]|\T1/lmr/m/n/10 S3V0156P0_3|  
+[]|\T1/lmr/m/n/10 S3V0156P0_1|  
  []
 
 
 Overfull \hbox (34.51665pt too wide) in paragraph at lines 580--580
-[]|\T1/lmr/m/n/10 S3V0156P0_4|  
+[]|\T1/lmr/m/n/10 S3V0156P0_2|  
  []
 
 
 Overfull \hbox (34.51665pt too wide) in paragraph at lines 583--583
+[]|\T1/lmr/m/n/10 S3V0156P0_3|  
+ []
+
+
+Overfull \hbox (34.51665pt too wide) in paragraph at lines 586--586
+[]|\T1/lmr/m/n/10 S3V0156P0_4|  
+ []
+
+
+Overfull \hbox (34.51665pt too wide) in paragraph at lines 589--589
 []|\T1/lmr/m/n/10 S3V0156P0_5|  
  []
 
@@ -849,98 +850,90 @@ Overfull \hbox (34.51665pt too wide) in paragraph at lines 583--583
 <ch3_files/figure-latex/unnamed-chunk-27-1.pdf, id=103, 505.89pt x 404.51125pt>
 File: ch3_files/figure-latex/unnamed-chunk-27-1.pdf Graphic file (type pdf)
 <use ch3_files/figure-latex/unnamed-chunk-27-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-27-1.pdf  used on input line 1374.
+Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-27-1.pdf  used on input line 1382.
 (pdftex.def)             Requested size: 505.88875pt x 404.51025pt.
 [18] [19 <./ch3_files/figure-latex/unnamed-chunk-27-1.pdf>] [20]
-Overfull \hbox (7.63551pt too wide) in paragraph at lines 1513--1514
+Overfull \hbox (7.63551pt too wide) in paragraph at lines 1521--1522
 []\T1/lmr/m/n/10 speechdate  
  []
 
 
-Overfull \hbox (21.18094pt too wide) in paragraph at lines 1519--1520
+Overfull \hbox (21.18094pt too wide) in paragraph at lines 1527--1528
  []\T1/lmr/m/n/10 scholar_assigned_date
  []
 
 
-Overfull \hbox (7.63551pt too wide) in paragraph at lines 1527--1528
+Overfull \hbox (7.63551pt too wide) in paragraph at lines 1535--1536
 []\T1/lmr/m/n/10 speechdate  
  []
 
 
-Overfull \hbox (21.18094pt too wide) in paragraph at lines 1533--1534
+Overfull \hbox (21.18094pt too wide) in paragraph at lines 1541--1542
  []\T1/lmr/m/n/10 scholar_assigned_date
  []
 
 
-Overfull \hbox (18.29018pt too wide) in paragraph at lines 1539--1539
+Overfull \hbox (18.29018pt too wide) in paragraph at lines 1547--1547
 []|\T1/lmr/m/n/10 S2V0022P0_158|  
  []
 
 
-Overfull \hbox (23.29018pt too wide) in paragraph at lines 1541--1541
+Overfull \hbox (23.29018pt too wide) in paragraph at lines 1549--1549
 []|\T1/lmr/m/n/10 S2V0022P0_1722|  
  []
 
 
-Overfull \hbox (23.29018pt too wide) in paragraph at lines 1543--1543
+Overfull \hbox (23.29018pt too wide) in paragraph at lines 1551--1551
 []|\T1/lmr/m/n/10 S2V0022P0_1729|  
  []
 
 
-Overfull \hbox (23.29018pt too wide) in paragraph at lines 1545--1545
+Overfull \hbox (23.29018pt too wide) in paragraph at lines 1553--1553
 []|\T1/lmr/m/n/10 S2V0022P0_1735|  
  []
 
 
-Overfull \hbox (23.29018pt too wide) in paragraph at lines 1547--1547
+Overfull \hbox (23.29018pt too wide) in paragraph at lines 1555--1555
 []|\T1/lmr/m/n/10 S2V0022P0_1833|  
  []
 
 
-Overfull \hbox (23.29018pt too wide) in paragraph at lines 1549--1549
+Overfull \hbox (23.29018pt too wide) in paragraph at lines 1557--1557
 []|\T1/lmr/m/n/10 S2V0022P0_1923|  
  []
 
-[21] [22] [23]
-Underfull \vbox (badness 10000) detected at line 1730
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1730
- []
-
-[24]
+[21] [22] [23] [24]
 <ch3_files/figure-latex/unnamed-chunk-34-1.pdf, id=145, 505.89pt x 722.7pt>
 File: ch3_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (type pdf)
 <use ch3_files/figure-latex/unnamed-chunk-34-1.pdf>
-Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-34-1.pdf  used on input line 1734.
+Package pdftex.def Info: ch3_files/figure-latex/unnamed-chunk-34-1.pdf  used on input line 1742.
 (pdftex.def)             Requested size: 505.88875pt x 722.69823pt.
 
-LaTeX Warning: Float too large for page by 82.00078pt on input line 1743.
+LaTeX Warning: Float too large for page by 82.00078pt on input line 1751.
 
 [25] [26 <./ch3_files/figure-latex/unnamed-chunk-34-1.pdf>] [27] [28]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1977.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1985.
 (/home/stephbuongiorno/.TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [29] [30] (./ch3.aux)
+) [29] [30] [31] (./ch3.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 27163 strings out of 469158
- 514305 string characters out of 5459411
- 916600 words of memory out of 5000000
+ 27164 strings out of 469158
+ 514312 string characters out of 5459411
+ 913600 words of memory out of 5000000
  55656 multiletter control sequences out of 15000+600000
  649476 words of font info for 53 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  98i,8n,108p,720b,641s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></home/stephbuongiorno/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on ch3.pdf (30 pages, 319629 bytes).
+Output written on ch3.pdf (31 pages, 320006 bytes).
 PDF statistics:
- 281 PDF objects out of 1000 (max. 8388607)
- 222 compressed objects within 3 object streams
- 64 named destinations out of 1000 (max. 500000)
+ 286 PDF objects out of 1000 (max. 8388607)
+ 226 compressed objects within 3 object streams
+ 65 named destinations out of 1000 (max. 500000)
  95 words of extra memory for PDF output out of 10000 (max. 10000000)
 

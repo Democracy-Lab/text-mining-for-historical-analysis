@@ -83,15 +83,23 @@ In a previous chapter, we looked into the top speakers in parliament in a given 
 If you are new to code, take a moment to notice how changing only one line in the code below produces a different angle of analysis.  The code below is otherwise very similar to the code in the previous chapters. One of the great pleasures of coding is the facility with which a few skills can quickly become powerful in the hands of an analyst who has many questions.
 
 ```{r, warning=FALSE, message=FALSE}
-# load libraries
+# For accessing Hansard
+library(hansardr)
+
+# For data processing and text analysis
 library(tidyverse)
 library(tidytext)
-library(lubridate)
-library(hansardr)
-library(ggrepel)
 library(textstem)
-library(knitr)
+
+# For working with dates and times
+library(lubridate)
+
+# For creating and formatting visualizations
+library(ggrepel)
 library(scales)
+
+# For formatting tables
+library(knitr)
 
 # load data
 data("hansard_1830")

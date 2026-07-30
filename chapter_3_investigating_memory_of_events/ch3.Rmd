@@ -31,13 +31,19 @@ One essential concept in data processing is "joining" datasets. A join combines 
 
 As with the previous chapter, this chapter will emphasize the skills of moving from analyzing text as data to performing a close reading of historical speeches in context. It models the iterative process of working with a controlled vocabulary and reading words in context with the idea of demonstrating a method of inquiry about how and why events happen. The approach we model provides analysts with the tools of deciding for themselves how the patterns identified throughout text mining relate back to their primary sources, that is, the full Hansard debates. As we had previously discussed, our analytic process is iterative, emphasizing that researchers transition from data processing to counting words to applying metrics on those word counts to visualizing trends, and then repeating this deductive process. Throughout the process, it may prove valuable to inspect and re-evaluate the intermediary steps that were taken to arrive at any conclusions about the corpus. This cyclical process may lead to additional historical questions and associations, which may mean more measuring, more visualization, and more guided reading in pursuit of a historical analysis.  
 
-```{r}
-# Load the packages used in this chapter
-library(hansardr)   # Access the Hansard data
-library(tidyverse)  # Load the tidyverse packages
-library(tidytext)   # Tokenize and analyze text
-library(lubridate)  # Work with dates
-library(viridis)    # Color palettes for visualizations
+```{r, message=F, warning=F}
+# For accessing Hansard
+library(hansardr) 
+
+# For data processing, analysis, and visualization
+library(tidyverse) 
+library(tidytext) 
+
+# For working with dates and times 
+library(lubridate)
+
+# For color palettes
+library(viridis)
 ```
 
 ## Joining Debate Metadata
@@ -58,7 +64,7 @@ library(knitr)
 library(kableExtra)
 library(tidyverse)
 
-df_head <- hansard_1860 %>% 
+hansard_1860_first_five_rows <- hansard_1860 %>% 
   slice_head(n = 5)
 ```
 
@@ -66,7 +72,7 @@ df_head <- hansard_1860 %>%
 # Display the sample sentences as a formatted table
 # - kable() formats the data as a table
 # - column_spec() widens the text column for readability
-df_head %>%
+hansard_1860_first_five_rows %>%
   kable(caption = "Sample sentences from 1860s Hansard, including each sentence's 
                    unique identifier and the corresponding text as extracted from 
                    the debate transcripts.") %>% # Format the results as a table
@@ -82,11 +88,11 @@ data("debate_metadata_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-df_head <- debate_metadata_1860 %>% 
+debate_metadata_1860_first_five_rows <- debate_metadata_1860 %>% 
   slice_head(n = 5)
 
 # Display the debate-level metadata as a formatted table
-df_head %>%
+debate_metadata_1860_first_five_rows %>%
   kable(caption = "Debate-level metadata from 1860s Hansard, including each sentence's 
                    identifier, the date of the speech, and the title of the corresponding debate.")
 ```
@@ -102,11 +108,11 @@ data("speaker_metadata_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-df_head <- speaker_metadata_1860 %>% 
+speaker_metadata_1860_first_five_rows <- speaker_metadata_1860 %>% 
   slice_head(n = 5)
 
 # Display the speaker metadata as a formatted table
-df_head %>% 
+speaker_metadata_1860_first_five_rows %>% 
 kable(caption = "Speaker metadata for sample sentences from the 1860 Hansard corpus, 
                  including the recorded speaker name, the algorithmically suggested speaker 
                  match, and indicators for name ambiguity, fuzzy matching, and ignored cases.")
@@ -131,11 +137,11 @@ data("file_metadata_1860")
 
 ```{r, results='asis', warning=FALSE, message=FALSE, echo=FALSE}
 # This code does not show, just the table
-df_head <- file_metadata_1860 %>% 
+file_metadata_1860_first_five_rows <- file_metadata_1860 %>% 
   slice_head(n = 5)
 
 # Display the source file metadata as a formatted table
-df_head %>%
+file_metadata_1860_first_five_rows %>%
   kable(caption = "Source file metadata for selected sentences from the 1860 Hansard corpus,
                    including the identifiers for the sentence, speech, and debate, as well as 
                    the source file, source image, and original column location.")
@@ -210,7 +216,7 @@ The following code uses the `unnest_tokens()` function, which we previously used
 
 ```{r}
 # Generate bigrams (two-word sequences) from the text
-# - unnest_tokens() tokenizes the text
+# - unnest_tokens() tokenizes the text into bigrams
 # - token = "ngrams" creates sequences of words instead of single words
 # - n = 2 creates two-word sequences (bigrams)
 bigrams_1867 <- hansard_1867 %>% # Start with the 1867 Hansard data
@@ -291,6 +297,7 @@ We also see a reference to "public meetings."  Why did speakers in parliament in
 
 ```{r}
 # Keep speeches that mention the phrase "public meetings"
+# - filter() keeps only rows that meet the condition specified by str_detect
 # - str_detect() searches the text for the specified phrase
 my_reading <- hansard_1867 %>% # Start with the 1867 Hansard data
   filter(str_detect(text, "public meetings")) # Keep speeches containing the phrase
@@ -421,6 +428,7 @@ controlled_vocab = c("riot", "meeting", "famine", "revolt", "exhibition", "massa
                      "strike", "war")
 
 # Keep bigrams containing one of the event keywords
+# - filter() keeps only rows that meet a condition
 # - paste() combines the keywords into a single search pattern
 # - str_detect() searches each bigram for a keyword
 # - select() keeps only the bigram and speech date
@@ -541,13 +549,13 @@ data("events")
 # - filter() excludes events dated after 1840
 # - mutate() converts event names to lowercase for matching
 # - select() keeps only the event name and assigned date
-eventslist <- events %>% # Create a new dataset
+events_list <- events %>% # Create a new dataset
   distinct(event_name, scholar_assigned_date) %>% # Remove duplicates
   filter(!scholar_assigned_date > 1840) %>% # Exclude post-1840 events
   mutate(event_name = tolower(event_name)) %>% # Lowercase event names
   select(event_name, scholar_assigned_date) # Keep name and date
 
-head(eventslist)
+head(events_list)
 ```
 
 Notice that events contains two columns: events by their name, and the historical dates on which those events occurred. 
@@ -572,9 +580,9 @@ bigrams_1830 <- hansard_1830 %>% # Start with the 1830 Hansard data
   unnest_tokens(ngram, text, token = "ngrams", n = 2) # Create bigrams
 
 # Keep only bigrams that match historical events
-# - inner_join() matches bigrams to event names in eventslist
+# - inner_join() matches bigrams to event names in events_list
 events_1830 <- bigrams_1830 %>% # Start with the bigram data
-  inner_join(eventslist, by = c("ngram" = "event_name")) # Keep matching historical events
+  inner_join(events_list, by = c("ngram" = "event_name")) # Keep matching historical events
 
 # Display sample historical event bigrams
 # - head() keeps the first six rows
@@ -586,7 +594,7 @@ events_1830 %>%
   kable(caption = "Sample two-word phrase events from the 1830 Hansard debates.") # Format the results as a table
 ```
 
-Notice that the resulting dataset contains speaker and date columns from the parliamentary speeches, but the only bigrams listed are those that correspond to events from `eventslist`. 
+Notice that the resulting dataset contains speaker and date columns from the parliamentary speeches, but the only bigrams listed are those that correspond to events from `events_list`. 
 
 In the next blocks of code, we use our new list of events to generate a visualization. 
 

@@ -1,5 +1,5 @@
 ---
-title: "Troubleshooting spacyr Installation"
+title: "Appendix D: Troubleshooting spacyr Installation"
 output: html_document
 ---
 

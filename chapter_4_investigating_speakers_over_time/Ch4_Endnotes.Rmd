@@ -39,14 +39,22 @@ Our first exercise is finding the most "wordy" Parliamentarians from 1830--that 
 To analyze speakers in Hansard, we will first need to import a new category of data from `hansardr`: `speaker_metadata`.^1^ 
 
 ```{r, message = F}
-# Load the packages used in this chapter
-library(tidytext) # Tokenize and analyze text
-library(tidyverse) # Load the core tidyverse packages
-library(lubridate) # Work with dates
-library(kableExtra) # Format tables
-library(hansardr) # Download and work with Hansard data
-library(ggrepel) # Add non-overlapping text labels to plots
-library(scales) # Format axes and labels in plots
+# For accessing Hansard
+library(hansardr)
+
+# For data processing and text analysis
+library(tidyverse)
+library(tidytext) 
+
+# For working with dates
+library(lubridate)
+
+# For creating and formatting visualizations
+library(ggrepel) 
+library(scales) 
+
+# For formatting tables
+library(kableExtra)
 
 # Load speaker metadata for 1830
 data("speaker_metadata_1830")

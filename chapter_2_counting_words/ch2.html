@@ -601,14 +601,14 @@ a distinct sentence of text. These speeches were broken into sentences
 during the dataset creation stage, where the authors wrote a script to
 detect punctuation and line breaks.</p>
 <p>Below is an excerpt from <code>hansardr</code>:</p>
-<pre class="r"><code># Keep the first five rows of the Hansard dataset
+<pre class="r"><code># Keep the first rows of the Hansard dataset
 # - slice_head() selects the first five rows
-df_head &lt;- hansard_1850 %&gt;%
-  slice_head(n = 5) # Keep the first five rows
+first_five_rows &lt;- hansard_1850 %&gt;%
+  slice_head(n = 5)
 
-# Display the selected rows as a formatted table
+# View the selected rows as a formatted table
 # - kable() formats the data as a table
-kable(df_head,
+kable(first_five_rows,
       caption = &quot;Excerpt from the 1850 Hansard corpus showing 
                  sentence-level text with associated sentence ID values.&quot;) # Add a table caption</code></pre>
 <table>
@@ -724,12 +724,11 @@ using the “Bags of Words” (BoW) approach, where text data is treated as
 a collection (or “bag”) of individual words without regard to grammar,
 order, or context.<sup>9</sup> The focus is instead on word frequency or
 occurrence.</p>
-<pre class="r"><code># tokenize the &quot;text&quot; column of the hansard_1850 dataset into individual words
+<pre class="r"><code># tokenize the &quot;text&quot; column of the hansard_1850 dataset into one word per row
 # - unnest_tokens() from the tidytext package splits text into lowercase words
 # - The new column will be called &quot;word&quot;
-# - Each word becomes its own row 
-tokenized_hansard &lt;- hansard_1850 %&gt;% # Create a new data frame
-  unnest_tokens(word, text) # Tokenize the &quot;text&quot; column </code></pre>
+tokenized_hansard &lt;- hansard_1850 %&gt;% # Create a new data frame named tokenized_hansard
+  unnest_tokens(word, text) # Tokenize the text column of hansard_1850</code></pre>
 <p>The above code also has new symbols, called “operators.” Operators
 are essential for data processing. Throughout the course of this book we
 will introduce multiple different kinds of operators.</p>
@@ -776,7 +775,7 @@ with the arguments “word” and “text.”</p>
 <p>Next, let’s inspect the results of our unnesting using
 <code>head()</code>, which returns just the first rows of a data
 frame.</p>
-<pre class="r"><code># Show the first few rows of our tokenized data
+<pre class="r"><code># Show the first six rows of the tokenized data
 head(tokenized_hansard)</code></pre>
 <pre><code>## # A tibble: 6 × 2
 ##   sentence_id word        
@@ -848,11 +847,11 @@ different capitalization. Both punctuation and case variation can impact
 our analysis unless punctuation is removed and capitalization is
 standardized.</p>
 <pre class="r"><code># Display the first six sentences and their sentence IDs
-# - slice_head() keeps the first six rows
+# - head() keeps the first six rows
 # - select() keeps only the sentence ID and text columns
 # - kable() formats the results as a table
 hansard_1850 %&gt;%
-  slice_head(n = 6) %&gt;% # Keep the first six rows
+  head() %&gt;% # Keep the first six rows
   select(sentence_id, text) %&gt;% # Keep the sentence IDs and text
   kable() # Format the results as a table</code></pre>
 <table>
@@ -919,11 +918,11 @@ hansard_1850_clean &lt;- hansard_1850 %&gt;%
   mutate(text = str_to_lower(text), # Lowercase
          text = str_remove_all(text, &quot;[[:punct:]]&quot;)) # Strip punctuation</code></pre>
 <pre class="r"><code># Display the first six cleaned sentences and their sentence IDs
-# - slice_head() keeps the first six rows
+# - head() keeps the first six rows
 # - select() keeps only the sentence ID and text columns
 # - kable() formats the results as a table
 hansard_1850_clean %&gt;%
-  slice_head(n = 6) %&gt;% # Keep the first six rows
+  head() %&gt;% # Keep the first six rows
   select(sentence_id, text) %&gt;% # Keep the sentence IDs and cleaned text
   kable() # Format the results as a table</code></pre>
 <table>
@@ -1005,7 +1004,7 @@ tokenized_hansard_counts &lt;- tokenized_hansard %&gt;% # Start with the tokeniz
   count(word) %&gt;% # Count the occurrences of each word
   arrange(desc(n)) # Sort from most to fewest occurrences
 
-# Display the first six rows of the tokenized Hansard word counts
+# View the first six rows of the word counts
 head(tokenized_hansard_counts)</code></pre>
 <pre><code>## # A tibble: 6 × 2
 ##   word        n
@@ -1076,9 +1075,9 @@ parliamentary speeches, series 3, volume 108, which has the id number
 “S3V0108P0_10.” Alternately, <code>filter()</code> can be used to subset
 the <code>stopworded_hansard_counts</code> data frame, returning only
 the rows where the word column contains the value “india”.</p>
-<pre class="r"><code># Find the word &quot;india&quot; in the word-count table
+<pre class="r"><code># Find the word &quot;india&quot; in the word count table
 # - filter() keeps only rows where the word is &quot;india&quot;
-# - without assigning the result, R displays the output
+# - without assigning the result with &quot;&lt;-,&quot; R displays the output
 stopworded_hansard_counts %&gt;%
   filter(word == &quot;india&quot;) # Keep only the word &quot;india&quot;</code></pre>
 <pre><code>## # A tibble: 1 × 2
@@ -1330,7 +1329,7 @@ keywords and compare them in visual form.</p>
 <p>The following code chains multiple data processing steps
 together.</p>
 <pre class="r"><code># Tokenize and count words in the &quot;text&quot; column of the hansard_coal dataset
-# - unnest_tokens() splits the text into individual lowercase words
+# - unnest_tokens() tokenizes the text into one word per row
 # - anti_join() removes common stop words (e.g., &quot;the&quot;, &quot;and&quot;)
 # - str_detect() identifies and removes tokens that contain digits (e.g., years, numbers)
 # - count() counts the frequency of each remaining word
@@ -1435,7 +1434,7 @@ Corn Laws in 1846. Knowledge of these facts might lead us to ask: were
 coal and corn debated using the same language or different words?</p>
 <pre class="r"><code># Identify and count words that appear in text containing the word &quot;corn&quot;
 # - str_detect() filters rows where &quot;corn&quot; appears as a whole word
-# - unnest_tokens() splits the filtered text into individual lowercase words
+# - unnest_tokens() splits the filtered text into one word per row
 # - anti_join() removes common stop words (e.g., &quot;the&quot;, &quot;and&quot;)
 # - str_detect() identifies and removes tokens that contain digits (e.g., years, numbers)
 # - count() counts the frequency of each remaining word
@@ -1694,14 +1693,14 @@ library(quanteda)
 # Convert the February 1850 speeches into a quanteda corpus
 # - corpus() creates a corpus from the data frame
 # - text_field specifies which column contains the text
-my_corpus &lt;- corpus(top_month, text_field = &quot;text&quot;)
+quanteda_corpus &lt;- corpus(top_month, text_field = &quot;text&quot;)
 
 # Find each occurrence of the word &quot;corn&quot; in the corpus
 # - tokens() tokenizes the corpus into words
 # - kwic() extracts the keyword with surrounding context
 # - window specifies the number of words to keep as context before and after the keyword
 # - case_insensitive = TRUE matches &quot;corn&quot;, &quot;Corn&quot;, etc.
-corn_kwic &lt;- kwic(tokens(my_corpus), # Tokenize the corpus
+corn_kwic &lt;- kwic(tokens(quanteda_corpus), # Tokenize the corpus
                   &quot;corn&quot;, # Search for the word &quot;corn&quot;
                   window = 5, # Keep five words before and after each occurrence
                   case_insensitive = TRUE) # Ignore capitalization</code></pre>
@@ -1913,8 +1912,7 @@ simple function:</p>
 # - return() returns the sum
 add_numbers &lt;- function(a, b) {
   result &lt;- a + b # Add the two numbers
-  return(result) # Return the result
-}</code></pre>
+  return(result) } # Return the result</code></pre>
 <p>The above code can be broken down into these core parts:</p>
 <ol style="list-style-type: decimal">
 <li>Function Name: The name given to the function. In this example, the

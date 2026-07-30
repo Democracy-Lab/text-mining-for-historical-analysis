@@ -98,11 +98,16 @@ Through a series of exercises, the following chapter will introduce high-level c
 Throughout this chapter, we will introduce several new libraries as they become relevant. We found it easier to explain each library alongside the analysis steps that use it. However, because `tidyverse` and `tidytext` are used throughout the chapter, and we are already familiar with `hansardr`, `knitr`, and `quanteda` from previous chapters, we'll load them now.
 
 ```{r}
+# For accessing Hansard
 library(hansardr)
-library(knitr)
-library(quanteda)
+
+# For data processing and text analysis
 library(tidyverse)
 library(tidytext)
+library(quanteda)
+
+# For formatting tables
+library(knitr)
 ```
 
 # APIs 

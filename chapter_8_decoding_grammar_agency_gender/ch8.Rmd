@@ -86,9 +86,10 @@ By now, it should be clear that tokenization can be performed using a range of p
 To install `spacyr`, we begin by using the standard `install.packages()` function. This gives us access to the `spacy_install()` function. Running `spacy_install()` sets up the required Python environment and installs the spaCy library along with its dependencies, integrating spaCy's capabilities within the R environment.^19^ 
 
 ```{r, eval=FALSE, warning=FALSE, message=FALSE}
-# First time only -- installing spacyr on your computer
+# Install spacyr
 install.packages("spacyr") 
 
+# Load spacyr
 library(spacyr)
 
 # Install spaCy and the small English model
@@ -99,7 +100,6 @@ spacy_initialize(model = "en_core_web_sm")
 ```
 
 ```{r, echo=FALSE, warning=FALSE}
-# After the first time, this will go quicker:
 library(spacyr)
 ```
 
@@ -113,13 +113,15 @@ By default, spacyr installs an English language model that used to tag words wit
 `SpaCy` supports many languages beyond English. The other LMs can be downloaded using the `spacy_download_langmodel()` function. For example, the following code demonstrates how to download and initialize a small German model, which is specifically trained on a news corpus. For a complete list of available models and their details, visit the official spaCy models page: https://spacy.io/usage/models.
 
 ```{r, eval=FALSE}
-spacy_download_langmodel("de_core_news_sm") # load the German model
+# Load the German model
+spacy_download_langmodel("de_core_news_sm")
 ```
 
 In our analysis we will use the `en_core_web_sm` model to analyze text in the English language. Once spaCy has installed, we can initialize the model we wish to use. 
 
 ```{r, message=FALSE, warning=FALSE}
-spacy_initialize(model = "en_core_web_sm") # load the English model
+# Load the English model
+spacy_initialize(model = "en_core_web_sm")
 ```
 
 In each future session, we will need to not only load the spacyr library, but also initialize the model like so: 
@@ -131,9 +133,11 @@ invisible(spacy_initialize(model = "en_core_web_sm"))
 ```
 
 ```{r, eval=FALSE}
-library(spacyr) # load the library
+# Load spacyr
+library(spacyr)
 
-spacy_initialize(model = "en_core_web_sm") # load the English model
+# Load the English model
+spacy_initialize(model = "en_core_web_sm")
 ```
 
 ### `spacyr` in Action: Outlining the Dependency Grammar of a Single Sentence
@@ -196,22 +200,40 @@ We employ a series of data processing steps to reveal how different dimensions o
 To begin, we preprocess the text of the 1860 Hansard debates.^20^ This involves filtering the corpus to include only sentences that contain the word "woman" or "women," regardless of capitalization. Because our focus is on sentences involving references to these words, we limit the scope of the data processing by first filtering the Hansard data. This filtering step narrows the dataset considerably, allowing for a more manageable analysis using `spacyr`.
 
 ```{r, warning=FALSE, message=FALSE}
-library(tidyverse)
+# For accessing Hansard
 library(hansardr)
 
+# For data processing and text analysis
+library(tidyverse)
+library(tidytext)
+library(quanteda)
+
+# For formatting tables
+library(kableExtra)
+
+# Load the 1860 Hansard data
 data("hansard_1860")
 
+# Keep speeches that mention "woman" or "women"
+# - filter() keeps only rows that meet a condition
+# - str_detect() checks whether the text contains the specified regex
+# - regex() searches for "woman" or "women" without considering capitalization
 hansard_woman_1860 <- hansard_1860 %>%
-  filter(str_detect(text, regex("woman|women", ignore_case = TRUE)))
+  filter(str_detect(text, regex("woman|women", ignore_case = TRUE))) # Keep speeches with "woman" or "women"
 ```
 
 We then provide our filtered hansard data to the `spacy_parse()` function to tokenize just the text column. From the text column, we extract linguistic features like part-of-speech tags by specifying `dep = TRUE`. To save computational resources and focus on only the features relevant to our analysis, we then disable lemmatization (`lemma = FALSE`) and named entity recognition (`entity = FALSE`).
 
 ```{r}
-parsed_hansard_woman <- spacy_parse(hansard_woman_1860$text, 
-                                    dep = TRUE, 
-                                    lemma = FALSE, 
-                                    entity = FALSE)
+# Parse the text using spaCy
+# - spacy_parse() tokenizes the text and performs part-of-speech tagging
+# - dep = TRUE includes dependency relationships
+# - lemma = FALSE skips lemmatization
+# - entity = FALSE skips named entity recognition
+parsed_hansard_woman <- spacy_parse(hansard_woman_1860$text, # Parse the speech text
+                                    dep = TRUE, # Parse dependency relationships
+                                    lemma = FALSE, # Do not parse lemmas
+                                    entity = FALSE) # Do not predict named entities
 
 head(parsed_hansard_woman)
 ```
@@ -219,16 +241,21 @@ head(parsed_hansard_woman)
 `spacy_parse()` returns a new data frame in which each row represents an individual token from the text. This data now includes the token's part-of-speech (POS) tag and syntactic dependency, which can be used for further analysis. For instance, I can filter and count to find the top adjectives stated in the Hansard sentences containing the word "woman" or "women." 
 
 ```{r, message=FALSE, warning=FALSE}
-# Filter for just words tagged by spacyr as adjectives 
-adjectives <- filter(parsed_hansard_woman, pos == "ADJ")
+# Keep only adjectives
+# - filter() keeps only rows that meet a condition
+adjectives <- filter(parsed_hansard_woman, pos == "ADJ") # Keep words tagged as adjectives
 
-# Count occurrences of each adjective and sort in descending order
+# Count the frequency of each adjective
+# - count() counts the occurrences of each adjective
+# - sort = TRUE orders the results from most to fewest
 top_adjectives <- adjectives %>%
-  count(token, sort = TRUE)  
+  count(token, sort = TRUE) # Count adjective frequencies
 
-# View the top adjectives
-head(top_adjectives, 30) %>% 
-  kable()
+# Display the thirty most common adjectives
+# - head() keeps the first thirty rows
+# - kable() formats the results as a table
+head(top_adjectives, 30) %>% # Keep the first thirty adjectives
+  kable() # Format the results as a table
 ```
 
 The results of this process show that the sentences that mention "woman" or "women" from the 1860s most often also contain the word "married." The finding is hardly earth-shattering; some of these debates led up to the first Married Women's Property Act (1870), which overturned centuries of precedent that had ruled that married women could not own or inherit property. The new act allowed married women to keep wages and inherit property up to £200 -- giving women a wide degree of freedom if they found themselves divorced, abandoned, or married to an abusive or otherwise incompatible husband from whom they needed to separate. The point is that the adjective "married" doesn't give us an exceptionally new information about history. We should look down the list further.
@@ -236,15 +263,21 @@ The results of this process show that the sentences that mention "woman" or "wom
 However, many of our top words are common stop words (e.g. "other," "such," "many," and "same"), which can obscure more meaningful patterns when attempting to analyze the words that co-occured in the same sentence as "woman" or "women." Removing stop words using the `tidytext` package can help uncover more insightful trends in the corpus.
 
 ```{r, message=FALSE, warning=FALSE}
-library(tidytext)
+# Keep only adjectives
+# - filter() keeps only rows that meet a condition
+adjectives <- filter(parsed_hansard_woman, pos == "ADJ") # Keep words tagged as adjectives
 
-data(stop_words)
+# Count the frequency of each adjective
+# - count() counts the occurrences of each adjective
+# - sort = TRUE orders the results from most to fewest
+top_adjectives <- adjectives %>%
+  count(token, sort = TRUE) # Count adjective frequencies
 
-top_adjectives_clean <- top_adjectives %>%
-  anti_join(stop_words, by = c("token" = "word"))
-
-head(top_adjectives_clean, 30) %>% 
-  kable()
+# Display the thirty most common adjectives
+# - head() keeps the first thirty rows
+# - kable() formats the results as a table
+head(top_adjectives, 30) %>% # Keep the first thirty adjectives
+  kable() # Format the results as a table
 ```
 
 Removing stop words reveals something interesting: several of the remaining adjectives refer to a woman's marital status, such as "single" and "unmarried." Others suggest class distinctions, including words like "poor," "noble," "common," and "domestic." Some discuss issues with inheritance, like "deceased." Others suggest debates about crime and punishment -- "guilty," "bad," and "impossible."  The words about which we have the most questions are "Turkish" -- what were Turkish women doing in Britain in the 1860s, and why were women in particular gaining the attention of parliament? 
@@ -254,18 +287,22 @@ Removing stop words reveals something interesting: several of the remaining adje
 We can also use part-of-speech extraction to analyze nouns. Nouns often indicate the focus of discourse, showing what ideas, objects, or individuals are central to the narrative or argument. Repeated nouns might signify motifs. In the following code, we filter for the top nouns that occur in sentences with the word "woman" or "women" (other than "woman" or "women" themselves).
 
 ```{r}
-# Filter for just nouns from this same data
-nouns <- filter(parsed_hansard_woman, pos == "NOUN")
+# Keep only nouns
+# - filter() keeps only rows that meet a condition
+nouns <- filter(parsed_hansard_woman, pos == "NOUN") # Keep words tagged as nouns
 
-# Exclude 'woman' and 'women' from the nouns
+# Remove "woman" and "women"
+# - filter() with ! excludes the specified words
 filtered_nouns <- nouns %>%
-  filter(!(token %in% c("woman", "women")))
+  filter(!(token %in% c("woman", "women"))) # Remove "woman" and "women"
 
-# Count occurrences of each noun and sort in descending order
+# Count the frequency of each noun
+# - count() counts the occurrences of each noun
+# - sort = TRUE orders the results from most to fewest
 top_nouns <- filtered_nouns %>%
-  count(token, sort = TRUE) 
+  count(token, sort = TRUE) # Count noun frequencies
 
-# View the top nouns
+# View the top twenty nouns
 head(top_nouns, 20)
 ```
 
@@ -274,46 +311,60 @@ The top nouns to appear in sentences containing the word "woman" or "women" are 
 Comparing the top nouns in sentences containing "woman" or "women" against those containing "man" or "men" reveals significant differences in how these genders were discussed in 19th-century parliamentary debates. To demonstrate this, we perform the same data processing steps but on just sentence with the words "man" or "men." 
 
 ```{r}
+# Keep speeches that mention "man" or "men"
+# - filter() keeps only rows that meet a condition
+# - str_detect() checks whether the text contains the specified pattern
+# - regex() searches for "man" or "men" as whole words without considering capitalization
 hansard_man_1860 <- hansard_1860 %>%
-  filter(str_detect(text, regex("\\b(man|men)\\b", ignore_case = T)))
+  filter(str_detect(text, regex("\\b(man|men)\\b", ignore_case = TRUE))) # Keep matching speeches
 
-parsed_hansard_man <- spacy_parse(hansard_man_1860$text, 
-                                  dep = TRUE, 
-                                  lemma = FALSE, 
-                                  entity = FALSE)
+# Parse the text using spaCy
+# - spacy_parse() tokenizes the text and performs part-of-speech tagging
+# - dep = TRUE includes dependency relationships
+# - lemma = FALSE skips lemmatization
+# - entity = FALSE skips named entity recognition
+parsed_hansard_man <- spacy_parse(hansard_man_1860$text, # Parse the speech text
+                                  dep = TRUE, # Parse dependency relationships
+                                  lemma = FALSE, # Do not parse lemmas
+                                  entity = FALSE) # Do not predict named entities
 
-nouns <- filter(parsed_hansard_man, pos == "NOUN")
+# Keep only nouns
+# - filter() keeps only rows that meet a condition
+nouns <- filter(parsed_hansard_man, pos == "NOUN") # Keep words tagged as nouns
 
-# Exclude 'man' and 'men' from the nouns
+# Remove "man" and "men"
+# - filter() with ! excludes the specified words
 filtered_nouns <- nouns %>%
-  filter(!(token %in% c("man", "men")))
+  filter(!(token %in% c("man", "men"))) # Remove "man" and "men"
 
-# Count occurrences of each noun and sort in descending order
+# Count the frequency of each noun
+# - count() counts the occurrences of each noun
+# - sort = TRUE orders the results from most to fewest
 top_nouns <- filtered_nouns %>%
-  count(token, sort = TRUE)
+  count(token, sort = TRUE) # Count noun frequencies
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-# Split into three blocks of 15
+# Split the top 45 nouns into three groups of 15
 block1 <- top_nouns %>%
-  slice(1:15) %>%
+  slice(1:15) %>% # Keep the first 15 nouns
   select(`Noun (1–15)` = token,
          `Count` = n)
 
 block2 <- top_nouns %>%
-  slice(16:30) %>%
+  slice(16:30) %>% # Keep nouns 16 through 30
   select(`Noun (16–30)` = token,
-         `Count ` = n)  # extra space just to avoid duplicate column name
+         `Count ` = n) # Add a space to make the column name unique
 
 block3 <- top_nouns %>%
-  slice(31:45) %>%
+  slice(31:45) %>% # Keep nouns 31 through 45
   select(`Noun (31–45)` = token,
-         `Count  ` = n) # same trick here
+         `Count  ` = n) # Add two spaces to make the column name unique
 
-# Bind them side by side
+# Combine the three groups into a single table
 top_nouns_wide <- bind_cols(block1, block2, block3)
 
-# Make a single kable table
+# View the table
 top_nouns_wide %>%
   kable(caption = "Top 45 Nouns Grouped in Three Columns")
 ```
@@ -337,78 +388,82 @@ When we processed the Hansard text using the `spacyr` package, it automatically 
 We then define a function, `get_adjective_noun_pairs()`, that extracts adjective-noun pairs from text. While the present analysis focuses on utterances containing the terms "woman" and "women," the function is designed for broader applicability. By encapsulating these steps in a reusable function we can easily use these data processing steps in a subsequent analysis of sentences involving the terms "man" and "men." 
 
 ```{r}
-# Filter for adjectives and their associated nouns
-# Extract adjective-noun pairs where the adjective modifies 
-# the noun within the same document
-
+# Find adjective-noun pairs
+# - group_by() processes one document at a time
+# - filter() keeps adjectives that modify nouns
+# - select() keeps only the columns needed
+# - inner_join() matches each adjective to the noun it modifies
+# - mutate() combines each adjective and noun into a single phrase
+# - ungroup() removes the grouping
 get_adjective_noun_pairs <- function(parsed_data, nouns) {
   adjective_noun_pairs <- parsed_data %>%
     
-    # Process each document separately using a grouping variable
-    group_by(doc_id) %>%
+    group_by(doc_id) %>% # Process one document at a time
     
-    # Filter for adjectives with the dependency relation 
-    # "amod" (adjective modifying noun)
-    filter(pos == "ADJ" & dep_rel == "amod") %>%
+    filter(pos == "ADJ" & dep_rel == "amod") %>% # Keep adjectives modifying nouns
     
-    # Select columns for adjective token, its token ID, and the head 
-    # noun's token ID
-    select(doc_id, token_id, token, head_token_id) %>%
+    select(doc_id, token_id, token, head_token_id) %>% # Keep the columns needed
     
-    # Join to match adjectives to their corresponding nouns within 
-    # the same document
-    inner_join(
-      parsed_data %>%
-        select(doc_id, token_id, token),
-      by = c("doc_id", "head_token_id" = "token_id"),
-      relationship = "many-to-many",
-      suffix = c("_adjective", "_noun")) %>%
+    inner_join(parsed_data %>%
+                 select(doc_id, token_id, token), # Keep the columns needed
+               by = c("doc_id", "head_token_id" = "token_id"), # Match adjectives to their nouns
+               relationship = "many-to-many",
+               suffix = c("_adjective", "_noun")) %>%
     
-    # Filter for cases where the noun is specified in the 'nouns' argument
-    filter(token_noun %in% nouns) %>%
+    filter(token_noun %in% nouns) %>% # Keep only the specified nouns
     
-    # Combine adjectives and nouns into a single string for readability
-    mutate(adjective_noun_pair = paste(token_adjective, token_noun)) %>%
+    mutate(adjective_noun_pair = paste(token_adjective, token_noun)) %>% # Combine adjective and noun
     
-    # Ungroup after processing
-    ungroup() %>%
-    select(adjective_noun_pair)
+    ungroup() %>% # Remove the grouping
+    select(adjective_noun_pair) # Keep only the adjective-noun pairs
   
-  return(adjective_noun_pairs)}
+  return(adjective_noun_pairs) }
 
+# Specify the nouns to keep
 nouns_to_filter <- c("woman", "women")
-adjective_noun_pairs_woman <- get_adjective_noun_pairs(parsed_hansard_woman, 
-                                                       nouns_to_filter)
+
+# Find adjective-noun pairs for "woman" and "women"
+get_adjective_noun_pairs(parsed_hansard_woman,
+                         nouns_to_filter)
 ```
 
 The code performs a series of steps: first it filters for adjectives with the dependency label `amod`, which stands for "adjectival modifier." Adjectival modifiers are adjectives that directly modify nouns. The code then joins each adjective with the noun it modifies. At this point, we have processed all adjective-noun pairs within these sentences. We are, however, only interested in adjective-noun pairs containing the word "woman" or "women." Therefore, we added a filtering step to only keep relevant pairs. Finally, the code combines the adjective and noun into a single string to make the results easier to read. The final result is a data frame that lists all such adjective-noun combinations found in the corpus.
 
 ```{r}
+# Count the frequency of each adjective-noun pair
+# - count() counts the occurrences of each pair
+# - arrange() sorts the results from most to fewest
 adjective_noun_pair_counts_woman <- adjective_noun_pairs_woman %>%
-  count(adjective_noun_pair, name = "count") %>%
-  arrange(desc(count))
+  count(adjective_noun_pair, name = "count") %>% # Count each adjective-noun pair
+  arrange(desc(count)) # Sort from most to fewest
 ```
 
 ```{r}
+# Split the top adjective-noun pairs into three columns
+# - slice() keeps a range of rows
+# - select() renames the columns for display
 block1 <- adjective_noun_pair_counts_woman %>%
-  slice(1:15) %>%
+  slice(1:15) %>% # Keep rows 1 through 15
   select(`Pair (1–15)` = adjective_noun_pair,
          `Count` = count)
 
 block2 <- adjective_noun_pair_counts_woman %>%
-  slice(16:30) %>%
+  slice(16:30) %>% # Keep rows 16 through 30
   select(`Pair (16–30)` = adjective_noun_pair,
-         `Count ` = count)   # space avoids duplicate column name
+         `Count ` = count) 
 
 block3 <- adjective_noun_pair_counts_woman %>%
-  slice(31:45) %>%
+  slice(31:45) %>% # Keep rows 31 through 45
   select(`Pair (31–45)` = adjective_noun_pair,
-         `Count  ` = count)  # another spaced name to avoid duplication
+         `Count  ` = count)
 
+# Combine the three tables into one
+# - bind_cols() joins the tables side by side
 wide_pairs <- bind_cols(block1, block2, block3)
 
+# View the table
 wide_pairs %>%
-  kable(caption = "Top 45 Adjective–Noun Pairs (Women): Displayed in Three Columns")
+  kable(caption = "Top 45 Adjective–Noun Pairs for the Word \"Women\"") 
 ```
 
 It is easy to explore the top 10, 20, or even top 100 adjective-noun pairs by slicing the data and presenting the results in a table. Adjusting the number of pairs displayed allows us to shift between a broader overview and a more focused examination of the corpus. 
@@ -420,18 +475,29 @@ Other questions are easily raised for which the analyst needs to resort to close
 Returning to a single debate helps clarify one way a Parliamentarian might use the word "poor" in relation to "woman."
 
 ```{r}
+# Keep speeches mentioning "Chinese wom"
+# - filter() keeps only rows that meet a condition
+# - str_detect() checks whether the text contains the specified pattern
+# - regex() searches without considering capitalization
+# - select() keeps only the text column
 woman_context <- hansard_woman_1860 %>%
-  filter(str_detect(text, regex("Chinese wom", ignore_case = TRUE))) %>%
-  select(text)
+  filter(str_detect(text, regex("Chinese wom", ignore_case = TRUE))) %>% # Keep matching speeches
+  select(text) # Keep only the text column
 ```
 
 ```{r, echo=FALSE}
+# Display the first five matching speeches
+# - slice() keeps the first five rows
 woman_context_show <- woman_context %>%
-  slice(1:5)
+  slice(1:5) # Keep the first five speeches
 
+# Print each speech
+# - sapply() applies the same code to each speech
+# - strwrap() wraps long lines for readability
+# - cat() prints the formatted text
 invisible(sapply(woman_context_show$text, function(x) {
-  cat(paste(strwrap(x, width = 80), collapse = "\n"))
-  cat("\n\n") })) # separator between entries
+  cat(paste(strwrap(x, width = 80), collapse = "\n")) # Wrap long lines
+  cat("\n\n") })) # Separate speeches
 ```
 
 The speech refers to the questioning of managing British colonies in the West Indies. After the abolition of slavery in the British Empire in 1834, plantation owners in the Caribbean (notably in British Guiana, Trinidad, and Jamaica) sought replacement labor for sugar plantations. They turned to indentured labor from India, China, and other parts of Asia and Africa.  Laborers were often recruited (or deceived) into contracts. The Chinese laborers were typically from southern China, especially Fujian and Guangdong.
@@ -443,106 +509,128 @@ We see parliament here managing ethnic populations -- and specifically women fro
 The point is that, if we were to trace the mentions of the Chinese, Irish, and Turkish women in the 1860s, or the women of different ethnicities mentioned in parliament overall, we would have an index of some of the most prominent and publicly-acknowledged ways that Britain's government was using female bodies around the world -- the policies they set, the utilitarian imaginings of how women's bodies could be used to make empire more productive. That source might not be all we need for a sensitive portrait of women's experience of a global empire, but text mining may nevertheless be a part of a larger process. We can use parliament as an index for important events that punctuate the flow of time over decades or centuries, and then turn to other archives to elaborate the cases as needed. 
 
 ```{r}
-nouns_to_filter <- c("man", "men")
-adjective_noun_pairs_man <- get_adjective_noun_pairs(parsed_hansard_man,
-                                                     nouns_to_filter)
+# Find adjective-noun pairs for "man" and "men"
+get_adjective_noun_pairs(parsed_hansard_man,
+                         nouns_to_filter)
 
+# Count the frequency of each adjective-noun pair
+# - count() counts the occurrences of each pair
+# - arrange() sorts the results from most to fewest
 adjective_noun_pair_counts_man <- adjective_noun_pairs_man %>%
-  count(adjective_noun_pair, name = "count") %>%
-  arrange(desc(count)) 
-
+  count(adjective_noun_pair, name = "count") %>% # Count each adjective-noun pair
+  arrange(desc(count)) # Sort from most to fewest
 ```
 
 ```{r}
-# ---- Block 1: rows 1–15 ----
+# Split the top adjective-noun pairs into three columns
+# - slice() keeps a range of rows
+# - select() renames the columns for display
 block1 <- adjective_noun_pair_counts_man %>%
-  slice(1:15) %>%
+  slice(1:15) %>% # Keep rows 1 through 15
   select(`Pair (1–15)` = adjective_noun_pair,
          `Count` = count)
 
-# ---- Block 2: rows 16–30 ----
 block2 <- adjective_noun_pair_counts_man %>%
-  slice(16:30) %>%
+  slice(16:30) %>% # Keep rows 16 through 30
   select(`Pair (16–30)` = adjective_noun_pair,
-         `Count ` = count)   # space avoids duplicate column name
+         `Count ` = count) # Space avoids a duplicate column name
 
-# ---- Block 3: rows 31–45 ----
 block3 <- adjective_noun_pair_counts_man %>%
-  slice(31:45) %>%
+  slice(31:45) %>% # Keep rows 31 through 45
   select(`Pair (31–45)` = adjective_noun_pair,
-         `Count  ` = count)  # double-space avoids duplicate names
+         `Count  ` = count) # Space avoids a duplicate column name
 
-# ---- Combine blocks side-by-side ----
+# Combine the three tables into one
+# - bind_cols() joins the tables side by side
 wide_pairs_man <- bind_cols(block1, block2, block3)
 
-# ---- Render with kable ----
+# View the table
 wide_pairs_man %>%
-  kable(caption = "Top 45 Adjective–Noun Pairs (Men): Displayed in Three Columns")
+  kable(caption = "Top 45 Adjective–Noun Pairs for the Word \"Men\"")
 ```
 
 To compare the words used of each gender, the appropriate next step is to make a list of just the adjectives and to subtract the counts for one gender from the counts for the other.  This step, known as "vector subtraction," will reveal the words that are most distinctive of each gender.
 
 ```{r, fig.cap="Differences in how frequently particular adjectives are applied to men versus women in the 1860s Hansard debates, based on counts of adjective-noun pairs.", message=FALSE, fig.height=12, fig.width=8}
-# Vector subtraction: words applied to men vs words applied to women
+# Extract the adjectives used to describe men
+# - separate() splits each adjective-noun pair into two columns
+# - group_by() groups rows with the same adjective
+# - summarize() adds the counts for each adjective
+man_adjectives <- adjective_noun_pair_counts_man %>%
+  separate(adjective_noun_pair, into = c("adjective", "noun"), sep = " ") %>% # Split each pair into two columns
+  group_by(adjective) %>% # Group matching adjectives
+  summarize(count = sum(count)) # Add the counts for each adjective
 
-# extract just the adjectives used to describe men
-man_adjectives <- adjective_noun_pair_counts_man %>%    
-  separate(adjective_noun_pair, into = c("adjective", "noun"), sep = " ") %>% # split into two columns
-  count(adjective, name = "count")
-
-# extract just the adjectives used to describe women
+# Extract the adjectives used to describe women
 woman_adjectives <- adjective_noun_pair_counts_woman %>%
-    separate(adjective_noun_pair, into = c("adjective", "noun"), sep = " ") %>% # split into two columns
-  count(adjective, name = "count")
+  separate(adjective_noun_pair, into = c("adjective", "noun"), sep = " ") %>% # Split each pair into two columns
+  group_by(adjective) %>% # Group matching adjectives
+  summarize(count = sum(count)) # Add the counts for each adjective
 
-# join the two into one database and subtract the count of men from the count of women.
-comparison <- full_join(man_adjectives, woman_adjectives, by = "adjective", 
-                        suffix = c("_1", "_2")) %>% #join
-  mutate(count_1 = replace_na(count_1, 0),
-         count_2 = replace_na(count_2, 0), 
-         count_diff = count_2 - count_1) %>% # subtract men's count from women's
-  filter(count_diff!=0) # delete all entries where there is no difference
+# Compare adjective frequencies
+# - full_join() combines the two datasets
+# - replace_na() replaces missing values with zero
+# - mutate() calculates the difference in counts
+# - filter() removes adjectives with no difference
+comparison <- full_join(man_adjectives, woman_adjectives,
+                        by = "adjective",
+                        suffix = c("_men", "_women")) %>% # Combine the two datasets
+  mutate(count_men = replace_na(count_men, 0), # Replace missing men's counts
+         count_women = replace_na(count_women, 0), # Replace missing women's counts
+         count_diff = count_women - count_men) %>% # Subtract men's counts from women's counts
+  filter(count_diff != 0) # Remove adjectives with no difference
 
-# In this dataset, there are a large number of adjectives with a count of two
-# We will therefore "sample" from the results to draw our visualization
-# This means each regeneration of the visualization will produce different results.
-
-# take the top adjectives unique to women
+# Select the adjectives used more often for women
+# - filter() keeps positive differences
+# - arrange() sorts from largest to smallest
+# - slice_head() keeps the first twenty rows
 positive_sample <- comparison %>%
-  filter(count_diff > 0) %>% # must show a difference 
-  arrange(desc(count_diff)) %>%
-  top_n(20) %>%
-  mutate(Category = "Women")
+  filter(count_diff > 0) %>% # Keep adjectives used more often for women
+  arrange(desc(count_diff)) %>% # Sort from largest to smallest
+  slice_head(n = 20) %>% # Keep the first twenty rows
+  mutate(Category = "Women") # Label the category
 
-# take the top adjectives unique to men
-# because there are so many with a max of 2, sample some positives
+# Select a random sample of adjectives used more often for men
+# - filter() keeps negative differences
+# - slice_sample() selects twenty rows at random
 negative_sample <- comparison %>%
-  filter(count_diff < 0) %>% # must show a difference 
-  sample_n(20) %>% # random sample
-  mutate(Category = "Men")
+  filter(count_diff < 0) %>% # Keep adjectives used more often for men
+  slice_sample(n = 20) %>% # Randomly select twenty rows
+  mutate(Category = "Men") # Label the category
 
+# Combine and order the selected adjectives
+# - bind_rows() combines the two datasets
+# - fct_reorder() orders the adjectives by count difference
 filtered_df <- negative_sample %>%
-  arrange(desc(count_diff)) %>%
-  bind_rows(positive_sample) %>%
-    mutate(adjective = fct_reorder(adjective, count_diff))
+  bind_rows(positive_sample) %>% # Combine the two datasets
+  mutate(adjective = fct_reorder(adjective, count_diff)) # Order adjectives by count difference
 
-# Plot
-filtered_df %>%  
+# Visualize the differences in adjective use
+# - aes() maps the adjectives, count differences, and categories to the plot
+# - geom_col() creates a bar for each adjective
+# - coord_flip() flips the axes to make the labels easier to read
+# - scale_fill_manual() assigns colors to the two categories
+# - labs() adds the title, axis labels, and legend title
+# - geom_hline() marks where there is no difference between men and women
+filtered_df %>%
   ggplot(aes(x = adjective, y = count_diff, fill = Category)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_manual(values = c("Women" = "red", "Men" = "blue"), 
-                    name = "Phrases used more about") +
-  theme_minimal() +
+  geom_col() + # Create the bars
+  coord_flip() + # Flip the axes
+  scale_fill_manual(values = c("Women" = "red",
+                               "Men" = "blue"),
+                    name = "Phrases used more about") + # Set the colors and legend title
+  theme_minimal() + # Apply a minimal theme
   labs(title = "Difference in Adjective-Noun Pair Counts",
        x = NULL,
        y = "Count Difference",
-       fill = "Category") +
-  geom_hline(yintercept = 0, color = "black")
+       fill = "Category") + # Add the title and axis labels
+  geom_hline(yintercept = 0, color = "black") # Mark zero difference
 ```
 
+## WHAT IS THIS: 
+
 ```{r, message=FALSE, warning=FALSE, results='asis'}
-library(kableExtra)
+
 # take the top adjectives unique to men; because 
 # there are so many with a max of 2, sample some positives
 positive_sample <- comparison %>%
@@ -701,9 +789,6 @@ For this analysis, we will also perform lemmatization on the sentences.  We will
 We will also transition to analyzing the 1870 debates, a period when women's voting rights were frequently contested in Parliament, revealing deeper struggles over power and political agency.
 
 ```{r}
-library(tidyverse)
-library(hansardr)
-
 data("hansard_1870")
 
 hansard_woman_1870 <- hansard_1870 %>%
@@ -872,8 +957,6 @@ Here, women are seen, interviewed, searched for, talked about, and prevented fro
 One last exercise with Hansard. We can also look for SVO triples where the verb is "vote," and see who is doing the voting. In the code below, we  use the `kwic()` (Key Word in Context) function from the `quanteda` library (introduced in earlier chapters) to revisit the original documents and provide context for our analysis.^21^ By specifying "vote" as the pattern to match, we focus on instances of this word in the text. Additionally, we can define the size of the window, which determines the number of words displayed before and after each occurrence of the pattern, giving us insight into its surrounding context. To ensure we capture all instances of the word "vote" regardless of capitalization (e.g., "Vote" or "VOTE"), we can enable case-insensitive matching. We will use `sample()` to show just 20 of the results, randomly selected. Therefore, your 20 results might look different from ours. Using `sample()` multiple times could reveal more interesting results. 
 
 ```{r, message=FALSE, warning=FALSE}
-library(quanteda)
-
 hansard_woman_1870_corpus <- corpus(hansard_woman_1870, 
                                     text_field = "text")
 

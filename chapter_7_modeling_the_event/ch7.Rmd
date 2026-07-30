@@ -28,18 +28,22 @@ In the previous chapters, we worked with intentionally small, subsetted datasets
 Previously, we demonstrated techniques were we worked with chunks of the data at a time to save computer memory. We chunked the data so the code will be able to process it on a laptop.^1^ 
 
 ```{r, message=FALSE, warning=FALSE}
-# load libraries for cleaning, analyzing and visualizing data
+# For accessing Hansard
+library(hansardr)
+
+# For data processing and text analysis
 library(tidyverse)
 library(tidytext)
 library(lubridate)
 
-# load libraries for measurement and the hansard corpus
+# For "white-box" statistical functions
 library(dhmeasures)
-library(hansardr)
 
-# load libraries for formatting and styling plots
+# For creating and formatting visualizations
 library(scales)
 library(ggrepel)
+
+# For formatting tables
 library(kableExtra)
 
 # load the hansard debate text

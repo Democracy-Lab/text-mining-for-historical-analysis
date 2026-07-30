@@ -1,5 +1,5 @@
 ---
-title: 'Appendix D: How to Use TMHA in a U.S. History Course'
+title: 'Appendix C: How to Use TMHA in a U.S. History Course'
 output: pdf_document
 ---
 
