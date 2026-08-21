@@ -423,8 +423,10 @@ get_adjective_noun_pairs <- function(parsed_data, nouns) {
 nouns_to_filter <- c("woman", "women")
 
 # Find adjective-noun pairs for "woman" and "women"
-get_adjective_noun_pairs(parsed_hansard_woman,
-                         nouns_to_filter)
+adjective_noun_pairs_woman <- get_adjective_noun_pairs(parsed_hansard_woman,
+                                                       nouns_to_filter)
+
+adjective_noun_pairs_woman
 ```
 
 The code performs a series of steps: first it filters for adjectives with the dependency label `amod`, which stands for "adjectival modifier." Adjectival modifiers are adjectives that directly modify nouns. The code then joins each adjective with the noun it modifies. At this point, we have processed all adjective-noun pairs within these sentences. We are, however, only interested in adjective-noun pairs containing the word "woman" or "women." Therefore, we added a filtering step to only keep relevant pairs. Finally, the code combines the adjective and noun into a single string to make the results easier to read. The final result is a data frame that lists all such adjective-noun combinations found in the corpus.
@@ -439,31 +441,27 @@ adjective_noun_pair_counts_woman <- adjective_noun_pairs_woman %>%
 ```
 
 ```{r}
-# Split the top adjective-noun pairs into three columns
-# - slice() keeps a range of rows
-# - select() renames the columns for display
-block1 <- adjective_noun_pair_counts_woman %>%
-  slice(1:15) %>% # Keep rows 1 through 15
-  select(`Pair (1–15)` = adjective_noun_pair,
-         `Count` = count)
-
-block2 <- adjective_noun_pair_counts_woman %>%
-  slice(16:30) %>% # Keep rows 16 through 30
-  select(`Pair (16–30)` = adjective_noun_pair,
-         `Count ` = count) 
-
-block3 <- adjective_noun_pair_counts_woman %>%
-  slice(31:45) %>% # Keep rows 31 through 45
-  select(`Pair (31–45)` = adjective_noun_pair,
-         `Count  ` = count)
-
-# Combine the three tables into one
-# - bind_cols() joins the tables side by side
-wide_pairs <- bind_cols(block1, block2, block3)
+# Display the top adjective-noun pairs for women in three columns
+# - slice_head() keeps the top 45 adjective-noun pairs
+# - mutate() assigns each pair a row and column position
+# - pivot_wider() spreads the pairs across three sets of columns
+# - mutate() adds blank columns between the three groups
+# - select() orders the columns for display
+wide_pairs_woman <- adjective_noun_pair_counts_woman %>%
+  slice_head(n = 45) %>% # Keep the top 45 pairs
+  mutate(row = rep(1:15, length.out = n()),
+         column = rep(1:3, each = 15, length.out = n())) %>% # Assign row and column positions
+  pivot_wider(names_from = column,
+              values_from = c(adjective_noun_pair, count)) %>% # Create three sets of columns
+  mutate(` ` = "", `  ` = "") %>% # Add spacing columns
+  select(adjective_noun_pair_1, count_1, ` `,
+         adjective_noun_pair_2, count_2, `  `,
+         adjective_noun_pair_3, count_3) # Order the columns
 
 # View the table
-wide_pairs %>%
-  kable(caption = "Top 45 Adjective–Noun Pairs for the Word \"Women\"") 
+# - kable() displays the table
+wide_pairs_woman %>%
+  kable(caption = "Top 45 Adjective–Noun Pairs for the Word 'Women'")
 ```
 
 It is easy to explore the top 10, 20, or even top 100 adjective-noun pairs by slicing the data and presenting the results in a table. Adjusting the number of pairs displayed allows us to shift between a broader overview and a more focused examination of the corpus. 
@@ -510,8 +508,8 @@ The point is that, if we were to trace the mentions of the Chinese, Irish, and T
 
 ```{r}
 # Find adjective-noun pairs for "man" and "men"
-get_adjective_noun_pairs(parsed_hansard_man,
-                         nouns_to_filter)
+adjective_noun_pairs_man <- get_adjective_noun_pairs(parsed_hansard_man,
+                                                     nouns_to_filter)
 
 # Count the frequency of each adjective-noun pair
 # - count() counts the occurrences of each pair
@@ -522,31 +520,27 @@ adjective_noun_pair_counts_man <- adjective_noun_pairs_man %>%
 ```
 
 ```{r}
-# Split the top adjective-noun pairs into three columns
-# - slice() keeps a range of rows
-# - select() renames the columns for display
-block1 <- adjective_noun_pair_counts_man %>%
-  slice(1:15) %>% # Keep rows 1 through 15
-  select(`Pair (1–15)` = adjective_noun_pair,
-         `Count` = count)
-
-block2 <- adjective_noun_pair_counts_man %>%
-  slice(16:30) %>% # Keep rows 16 through 30
-  select(`Pair (16–30)` = adjective_noun_pair,
-         `Count ` = count) # Space avoids a duplicate column name
-
-block3 <- adjective_noun_pair_counts_man %>%
-  slice(31:45) %>% # Keep rows 31 through 45
-  select(`Pair (31–45)` = adjective_noun_pair,
-         `Count  ` = count) # Space avoids a duplicate column name
-
-# Combine the three tables into one
-# - bind_cols() joins the tables side by side
-wide_pairs_man <- bind_cols(block1, block2, block3)
+# Display the top adjective-noun pairs for men in three columns
+# - slice_head() keeps the top 45 adjective-noun pairs
+# - mutate() assigns each pair a row and column position
+# - pivot_wider() spreads the pairs across three sets of columns
+# - mutate() adds blank columns between the three groups
+# - select() orders the columns for display
+wide_pairs_man <- adjective_noun_pair_counts_man %>%
+  slice_head(n = 45) %>% # Keep the top 45 pairs
+  mutate(row = rep(1:15, length.out = n()),
+         column = rep(1:3, each = 15, length.out = n())) %>% # Assign row and column positions
+  pivot_wider(names_from = column,
+              values_from = c(adjective_noun_pair, count)) %>% # Create three sets of columns
+  mutate(` ` = "", `  ` = "") %>% # Add spacing columns
+  select(adjective_noun_pair_1, count_1, ` `,
+         adjective_noun_pair_2, count_2, `  `,
+         adjective_noun_pair_3, count_3) # Order the columns
 
 # View the table
+# - kable() displays the three-column table
 wide_pairs_man %>%
-  kable(caption = "Top 45 Adjective–Noun Pairs for the Word \"Men\"")
+  kable(caption = "Top 45 Adjective–Noun Pairs for the Word 'Men'")
 ```
 
 To compare the words used of each gender, the appropriate next step is to make a list of just the adjectives and to subtract the counts for one gender from the counts for the other.  This step, known as "vector subtraction," will reveal the words that are most distinctive of each gender.
@@ -562,15 +556,18 @@ man_adjectives <- adjective_noun_pair_counts_man %>%
   summarize(count = sum(count)) # Add the counts for each adjective
 
 # Extract the adjectives used to describe women
+# - separate() splits each adjective-noun pair into separate columns
+# - group_by() groups matching adjectives
+# - summarize() adds the counts for each adjective
 woman_adjectives <- adjective_noun_pair_counts_woman %>%
   separate(adjective_noun_pair, into = c("adjective", "noun"), sep = " ") %>% # Split each pair into two columns
   group_by(adjective) %>% # Group matching adjectives
   summarize(count = sum(count)) # Add the counts for each adjective
 
-# Compare adjective frequencies
-# - full_join() combines the two datasets
-# - replace_na() replaces missing values with zero
-# - mutate() calculates the difference in counts
+# Compare adjective frequencies for men and women
+# - full_join() combines the men's and women's adjectives
+# - replace_na() replaces missing counts with zero
+# - mutate() calculates the difference between women's and men's counts
 # - filter() removes adjectives with no difference
 comparison <- full_join(man_adjectives, woman_adjectives,
                         by = "adjective",
@@ -581,9 +578,10 @@ comparison <- full_join(man_adjectives, woman_adjectives,
   filter(count_diff != 0) # Remove adjectives with no difference
 
 # Select the adjectives used more often for women
-# - filter() keeps positive differences
-# - arrange() sorts from largest to smallest
+# - filter() keeps adjectives with positive differences
+# - arrange() sorts adjectives from largest to smallest difference
 # - slice_head() keeps the first twenty rows
+# - mutate() labels the adjectives as associated with women
 positive_sample <- comparison %>%
   filter(count_diff > 0) %>% # Keep adjectives used more often for women
   arrange(desc(count_diff)) %>% # Sort from largest to smallest
@@ -591,25 +589,29 @@ positive_sample <- comparison %>%
   mutate(Category = "Women") # Label the category
 
 # Select a random sample of adjectives used more often for men
-# - filter() keeps negative differences
-# - slice_sample() selects twenty rows at random
+# - filter() keeps adjectives with negative differences
+# - slice_sample() selects twenty adjectives at random
+# - mutate() labels the adjectives as associated with men
 negative_sample <- comparison %>%
   filter(count_diff < 0) %>% # Keep adjectives used more often for men
   slice_sample(n = 20) %>% # Randomly select twenty rows
   mutate(Category = "Men") # Label the category
 
 # Combine and order the selected adjectives
-# - bind_rows() combines the two datasets
-# - fct_reorder() orders the adjectives by count difference
+# - bind_rows() combines the men's and women's adjectives
+# - mutate() reorders the adjectives by count difference
+# - fct_reorder() orders adjectives from lower to higher count difference
 filtered_df <- negative_sample %>%
   bind_rows(positive_sample) %>% # Combine the two datasets
   mutate(adjective = fct_reorder(adjective, count_diff)) # Order adjectives by count difference
 
 # Visualize the differences in adjective use
+# - ggplot() creates the bar chart
 # - aes() maps the adjectives, count differences, and categories to the plot
 # - geom_col() creates a bar for each adjective
 # - coord_flip() flips the axes to make the labels easier to read
 # - scale_fill_manual() assigns colors to the two categories
+# - theme_minimal() applies a minimal theme
 # - labs() adds the title, axis labels, and legend title
 # - geom_hline() marks where there is no difference between men and women
 filtered_df %>%
@@ -630,144 +632,133 @@ filtered_df %>%
 ## WHAT IS THIS: 
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
-
-# take the top adjectives unique to men; because 
-# there are so many with a max of 2, sample some positives
+# Find the top adjectives used more often for women
+# - filter() keeps adjectives with a positive difference
+# - arrange() sorts adjectives from largest to smallest difference
+# - top_n() keeps the top 20 adjectives
+# - mutate() labels the adjectives as associated with women and assigns a color
 positive_sample <- comparison %>%
-  filter(count_diff > 0) %>%
-  arrange(desc(count_diff)) %>%
-  top_n(20) %>%
-  mutate(Category = "Women", Color = "blue")
+  filter(count_diff > 0) %>% # Keep adjectives used more often for women
+  arrange(desc(count_diff)) %>% # Sort by largest difference
+  top_n(20) %>% # Keep the top 20 adjectives
+  mutate(Category = "Women", Color = "blue") # Label as women and assign blue
 
-# take the top adjectives unique to women
+# Find the top adjectives used more often for men
+# - filter() keeps adjectives with a negative difference
+# - top_n() keeps the 20 adjectives with the largest differences for men
+# - mutate() labels the adjectives as associated with men and assigns a color
 negative_sample <- comparison %>%
-  filter(count_diff < 0) %>%
-  top_n(-20) %>%
-  mutate(Category = "Men", Color = "red")
+  filter(count_diff < 0) %>% # Keep adjectives used more often for men
+  top_n(-20) %>% # Keep the top 20 adjectives for men
+  mutate(Category = "Men", Color = "red") # Label as men and assign red
 
-# combine men and women
+# Combine the top adjectives for men and women
+# - bind_rows() combines the men's and women's adjectives
+# - mutate() reorders adjectives by the difference in counts
+# - arrange() sorts adjectives by the difference in counts
+# - select() keeps only the columns needed for analysis
+# - arrange() then sorts adjectives by the size of the difference
+# - mutate() reorders the adjectives again for plotting
 filtered_df <- negative_sample %>%
-  bind_rows(positive_sample) %>%
-  mutate(adjective = fct_reorder(adjective, count_diff)) %>%
-  arrange(desc(count_diff)) %>%
-  select(adjective, count_diff, Category, Color) %>%
-  arrange(desc(abs(count_diff))) %>%
-  mutate(adjective = fct_reorder(adjective, count_diff))
+  bind_rows(positive_sample) %>% # Combine the men's and women's adjectives
+  mutate(adjective = fct_reorder(adjective, count_diff)) %>% # Reorder adjectives by count difference
+  arrange(desc(count_diff)) %>% # Sort by count difference
+  select(adjective, count_diff, Category, Color) %>% # Keep the relevant columns
+  arrange(desc(abs(count_diff))) %>% # Sort by the size of the difference
+  mutate(adjective = fct_reorder(adjective, count_diff)) # Reorder adjectives for plotting
 
-make_kable_table <- function(data_slice) {
-  data_slice %>%
-    mutate(
-      `Used More About` = if_else(
-        Category == "Women",
-        cell_spec(Category, format = "latex", color = "blue"),
-        cell_spec(Category, format = "latex", color = "red")
-      )
-    ) %>%
-    select(
-      Adjective        = adjective,
-      `Count Difference` = count_diff,
-      `Used More About`
-    ) %>%
-    kable(
-      format   = "latex",
-      booktabs = TRUE,
-      escape   = FALSE
-    ) %>%
-    kable_styling(
-      full_width = FALSE,
-      position   = "center",
-      font_size  = 7
-    )
-}
-
-
-table1 <- make_kable_table(filtered_df %>% 
-                             slice(1:100))
-
-table2 <- make_kable_table(filtered_df %>% 
-                             slice(101:200))
-
-table3 <- make_kable_table(filtered_df %>% 
-                             slice(201:300))
+# Print the first 100 rows
+# - slice() keeps rows 1 through 100
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(1:100) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 ```{r}
-table1
+# Print rows 101 through 200
+# - slice() keeps rows 101 through 200
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(101:200) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 ```{r}
-table2
+# Print rows 201 through 300
+# - slice() keeps rows 201 through 300
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(201:300) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 ```{r}
-table3
-```
-
-```{r}
-# top adjectives used more about women (count_diff > 0)
+# Select the top adjectives used more often for women
+# - filter() keeps adjectives with positive count differences
+# - slice_max() keeps the 20 adjectives with the largest count differences
+# - mutate() labels the adjectives as associated with women
 positive_sample <- comparison %>%
-  filter(count_diff > 0) %>%
-  slice_max(order_by = count_diff, n = 20) %>%
-  mutate(Category = "Women")
+  filter(count_diff > 0) %>% # Keep adjectives used more often for women
+  slice_max(order_by = count_diff, n = 20) %>% # Keep the top 20 differences
+  mutate(Category = "Women") # Label the category
 
-# top adjectives used more about men (count_diff < 0)
+# Select the top adjectives used more often for men
+# - filter() keeps adjectives with negative count differences
+# - slice_min() keeps the 20 adjectives with the largest differences for men
+# - mutate() labels the adjectives as associated with men
 negative_sample <- comparison %>%
-  filter(count_diff < 0) %>%
-  slice_min(order_by = count_diff, n = 20) %>%
-  mutate(Category = "Men")
+  filter(count_diff < 0) %>% # Keep adjectives used more often for men
+  slice_min(order_by = count_diff, n = 20) %>% # Keep the top 20 differences
+  mutate(Category = "Men") # Label the category
 
-# combine, with Women first and all Women rows together
-filtered_df <- bind_rows(positive_sample, negative_sample) %>%
-  mutate(
-    Category = factor(Category, levels = c("Women", "Men")),
-    adjective = fct_reorder(adjective, count_diff)
-  ) %>%
-  arrange(Category, desc(abs(count_diff))) %>%
-  select(adjective, count_diff, Category)
+# Combine and order the selected adjectives, with women first
+# - bind_rows() combines the women's and men's adjectives
+# - mutate() sets the category order and reorders adjectives by count difference
+# - arrange() keeps women and men together and sorts by the size of the difference
+# - select() keeps only the columns needed for display
+filtered_df <- bind_rows(positive_sample, negative_sample) %>% # Combine the women's and men's adjectives
+  mutate(Category = factor(Category, levels = c("Women", "Men")), # Put women before men
+         adjective = fct_reorder(adjective, count_diff)) %>% # Reorder adjectives by count difference
+  arrange(Category, desc(abs(count_diff))) %>% # Group by category and sort by largest difference
+  select(adjective, count_diff, Category) # Keep the relevant columns
 
-make_kable_table <- function(data_slice) {
-  data_slice %>%
-    mutate(
-      UsedMoreAbout = if_else(
-        Category == "Women",
-        cell_spec(Category, format = "latex", color = "blue"),
-        cell_spec(Category, format = "latex", color = "red"))) %>%
-    select(
-      Adjective = adjective,
-      `Count Difference` = count_diff,
-      `Used More About` = UsedMoreAbout    # Category not shown, just used for color
-    ) %>%
-    kable(
-      format = "latex",
-      booktabs = TRUE,
-      escape = FALSE
-    ) %>%
-    kable_styling(full_width = FALSE, position = "center")
-}
-
-# ---- Create slices (adjust ranges as needed) ----
-# If you have fewer rows, make these smaller (e.g., 1:20, 21:40, etc.)
-
-table1 <- make_kable_table(filtered_df %>% 
-                             slice(1:200))
-
-table2 <- make_kable_table(filtered_df %>% 
-                             slice(201:400))
-
-table3 <- make_kable_table(filtered_df %>% 
-                             slice(401:600))
+# Print the first 200 rows
+# - slice() keeps rows 1 through 200
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(1:200) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 ```{r}
-table1
+# Print rows 201 through 400
+# - slice() keeps rows 201 through 400
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(201:400) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 ```{r}
-table2
-```
-
-```{r}
-table3
+# Print rows 401 through 600
+# - slice() keeps rows 401 through 600
+# - select() keeps and renames the columns needed for display
+filtered_df %>%
+  slice(401:600) %>%
+  select(Adjective = adjective,
+         `Count Difference` = count_diff,
+         `Used More About` = Category)
 ```
 
 When tested, we find that there are very few words that are used much more often to refer to one gender than the other, and those that there are occur quite rarely -- a maximum of two times over all of the 1860s. The small numbers are a warning against overinterpreting our findings. Nevertheless, the differences are instructive.  Along with being "pregnant," women are more likely to be depicted as vulnerable -- "forlorn," "delicate," "deserted," "destitute" -- and as an aesthetic object of desire -- "charming," "attractive," "ideal," "passionate." When women are depicted as dangerous, they show a surplus of passion; they are "angry," "infuriat[ing]." Men are more likely to be assigned virtues of character ("intellectual," "enterprising," "courageous," "determined," "devoted," "humble," "honourable," "holy," "reasonable," "scrupulous") or capacity ("sturdy," "hale," "robust," "strongest) -- or vices that show them as agents ("dangerous," "evil," "selfish," "reckless") or as having had their agency temporarily taken away ("aggrieved", "inefficient," "ignorant").  
@@ -789,15 +780,25 @@ For this analysis, we will also perform lemmatization on the sentences.  We will
 We will also transition to analyzing the 1870 debates, a period when women's voting rights were frequently contested in Parliament, revealing deeper struggles over power and political agency.
 
 ```{r}
+# Load Hansard debate text for 1870
 data("hansard_1870")
 
+# Find sentences mentioning women in the 1870 Hansard data
+# - filter() keeps sentences containing "woman" or "women"
+# - str_detect() identifies sentences containing the search terms
+# - regex() makes the search case-insensitive
 hansard_woman_1870 <- hansard_1870 %>%
-  filter(str_detect(text, regex("woman|women", ignore_case = T)))
+  filter(str_detect(text, regex("woman|women", ignore_case = T))) # Keep sentences mentioning women
 
-parsed_hansard_woman_1870 <- spacy_parse(hansard_woman_1870$text, 
-                                         dep = TRUE, 
-                                         lemma = TRUE, 
-                                         entity = FALSE)
+# Parse the text using spaCy
+# - spacy_parse() tokenizes the text and performs part-of-speech tagging
+# - dep = TRUE includes dependency relationships
+# - lemma = FALSE skips lemmatization
+# - entity = FALSE skips named entity recognition
+parsed_hansard_woman_1870 <- spacy_parse(hansard_woman_1870$text, , # Parse the speech text
+                                  dep = TRUE, # Parse dependency relationships
+                                  lemma = TRUE, # Parse lemmas
+                                  entity = FALSE) # Do not predict named entities
 
 head(parsed_hansard_woman_1870)
 ```
@@ -809,57 +810,67 @@ A single sentence can contain multiple subjects, verbs, and objects, but not all
 Instead of matching raw tokens we match on lemmas. Lemmas are the "base" forms of words — their simplest and most fundamental forms, without any inflectional changes. Inflection refers to grammatical modifications of a word, such as changes in tense, case, or number. For example, "run," "runs," and "ran" are inflectional variations of the same base word, or lemma, "run." By shifting to lemma-based matching, we reduce the variability in the extracted triples. This approach unifies different forms of the same word, enabling us to identify broader patterns. As a result, our text analysis becomes more comprehensive for our purposes by focusing on the underlying meaning of the triples rather than their morphological variations.
 
 ```{r}
+# Extract simple lemmatized subject-verb-object triples
+# - group_by() groups tokens by document and sentence
+# - filter() identifies ROOT tokens, subjects, and objects
+# - select() keeps and renames the relevant columns
+# - left_join() connects subjects and objects to their root verbs
+# - mutate() combines the subject, verb, and object into a readable string
+# - str_squish() removes excess white space
+# - filter() removes incomplete triples
+# - ungroup() removes the grouping
+# - select() keeps only the final SVO columns
+# - return() returns the completed SVO triples
 get_simple_lemmatized_triples <- function(parsed_data) {
+  
   svo_triples <- parsed_data %>%
-    group_by(doc_id, sentence_id) %>%
+    group_by(doc_id, sentence_id) %>% # Group tokens by document and sentence
     
-    # Identify ROOT tokens (usually verbs) by doc and sentence
-    filter(dep_rel == "ROOT") %>%
+    filter(dep_rel == "ROOT") %>% # Keep ROOT tokens
     select(doc_id, 
            sentence_id, 
            root_token_id = token_id, 
-           verb = lemma) %>%
-    ungroup() %>%
+           verb = lemma) %>% # Keep and rename the root verb information
+    ungroup() %>% # Remove the grouping
     
-    # Join with subject tokens
     left_join(parsed_data %>%
-                filter(dep_rel %in% c("nsubj", "nsubjpass")) %>%
+                filter(dep_rel %in% c("nsubj", "nsubjpass")) %>% # Keep subject tokens
                 select(doc_id, 
                        sentence_id, 
                        head_token_id, 
-                       subject = lemma),
+                       subject = lemma), # Keep and rename the subject information
               by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
-              relationship = "many-to-many") %>%
+              relationship = "many-to-many") %>% # Join subjects to their root verbs
     
-    # Join with object tokens
     left_join(parsed_data %>%
-                filter(dep_rel %in% c("dobj", "obj", "pobj", "iobj")) %>%
+                filter(dep_rel %in% c("dobj", "obj", "pobj", "iobj")) %>% # Keep object tokens
                 select(doc_id, 
                        sentence_id, 
                        head_token_id, 
-                       object = lemma),
+                       object = lemma), # Keep and rename the object information
               by = c("doc_id", "sentence_id", "root_token_id" = "head_token_id"),
-              relationship = "many-to-many") %>%
+              relationship = "many-to-many") %>% # Join objects to their root verbs
     
-    # Combine SVO into a single string for readability, skipping NAs
     mutate(svo_triple = paste(if_else(is.na(subject), "", subject),
                               if_else(is.na(verb), "", verb),
                               if_else(is.na(object), "", object),
                               sep = " "),
-           svo_triple = str_squish(svo_triple)) %>% # Remove excess white space
+           svo_triple = str_squish(svo_triple)) %>% # Combine the SVO terms and remove excess white space
     
     filter(!is.na(subject),
            !is.na(verb),
-           !is.na(object)) %>%
+           !is.na(object)) %>% # Remove incomplete SVO triples
     
-    ungroup() %>%
-    select(doc_id, sentence_id, subject, verb, object, svo_triple)
+    ungroup() %>% # Remove the grouping
+    select(doc_id, sentence_id, subject, verb, object, svo_triple) # Keep the final SVO columns
   
-  return(svo_triples) }
+  return(svo_triples) } # Return the SVO triples
 ```
 
 ```{r}
-simple_svo_triples_1870 <- get_simple_lemmatized_triples(parsed_hansard_woman_1870)
+# Extract simple SVO triples from the 1870 Hansard sentences mentioning women
+# - get_simple_lemmatized_triples() extracts lemmatized subject-verb-object triples
+simple_svo_triples_1870 <- get_simple_lemmatized_triples(parsed_hansard_woman_1870) # Extract the SVO triples
 
 head(simple_svo_triples_1870)
 ```
@@ -871,20 +882,30 @@ We can now visualize our results. Within the top most frequent subject-verb-obje
 Not all of the extracted triples are easy to interpret. The top triple, "he tell we," results from idiosyncracies in how spaCy predicts grammatical relationships, especially when analyzing historic texts or sentences with complex structures. Older forms of English might use pronouns like "we" in ways that modern models misinterpret, or phrases like "He tells us what we must do" might be incorrectly simplified, leading to outputs such as "he tell we." Such misrepresentations of language highlight the limitations of applying modern NLP tools to historical or linguistically diverse texts. Further preparing the data for presentation could include manually removing these oddities from the output. For the sake of transparency, we will leave these constructions for now.
 
 ```{r, fig.cap="Top twenty most frequent lemmatized subject–verb–object (SVO) triples from the 1870s Hansard sentences that contain the word woman or women."}
-# Find the Most Common Simple SVO Triples 
+# Find the most common simple SVO triples
+# - count() counts each SVO triple and sorts from most to least frequent
+# - slice_head() keeps the top 20 SVO triples
 triples_counts_1870 <- simple_svo_triples_1870 %>%
-  count(svo_triple, sort = TRUE) %>%
-  slice_head(n = 20)
+  count(svo_triple, sort = TRUE) %>% # Count and sort the SVO triples
+  slice_head(n = 20) # Keep the top 20 triples
   
+# Visualize the 20 most frequent SVO triples
+# - ggplot() creates a bar chart
+# - aes() maps the SVO triples and their counts to the plot
+# - reorder() orders the SVO triples by frequency
+# - geom_col() creates a bar for each SVO triple
+# - coord_flip() flips the axes to make the labels easier to read
+# - labs() adds the title and axis labels
+# - theme_minimal() applies a minimal theme
 ggplot(triples_counts_1870, 
-       aes(x = reorder(svo_triple, n),
-           y = n)) +
-  geom_col(fill = "steelblue") +
-  coord_flip() + 
-  labs(x = "SVO triple",
-       y = "Count",
-       title = "Top 20 Most Frequent SVO Triples") +
-  theme_minimal()
+       aes(x = reorder(svo_triple, n), # Order SVO triples by frequency
+           y = n)) + # Map counts to the y-axis
+  geom_col(fill = "steelblue") + # Create the bars
+  coord_flip() + # Flip the axes
+  labs(x = "SVO triple", # Label the x-axis
+       y = "Count", # Label the y-axis
+       title = "Top 20 Most Frequent SVO Triples") + # Add a title
+  theme_minimal() # Apply a minimal theme
 ```
 
 If the phrases look ungrammatical, remember that we have lemmatized the words previous to analyzing their grammatical dependencies. Thus "I asked him" is rendered "I ask he," because we have gathered instances like "I ask him," "I am asking him," etc., counting them all the same.  
@@ -898,17 +919,25 @@ We read many sentences in this chart where gender and rights are foregrounded, i
 We could perform different kinds of analyses with our extracted triples. We could compare times in which women and men are imagined to have the vote. But perhaps the first thing we should do is to call up some context for the handful of phrases alluding to women having rights or the vote.  
 
 ```{r}
+# Find sentences mentioning "right" or "vote" in the 1870 Hansard data about women
+# - filter() keeps sentences containing the search terms
+# - str_detect() identifies sentences containing "right" or "vote"
+# - regex() makes the search case-insensitive
+# - select() keeps only the sentence text
 svo_triples_context_1870 <- hansard_woman_1870 %>%
-  filter(str_detect(text, 
-                    regex("right|vote", 
-                          ignore_case = TRUE))) %>%
-  select(text)
+  filter(str_detect(text, # Search the sentence text
+                    regex("right|vote", # Search for "right" or "vote"
+                          ignore_case = TRUE))) %>% # Ignore capitalization
+  select(text) # Keep only the sentence text
 ```
 
 ```{r, echo=FALSE}
-svo_out1 <- head(svo_triples_context_1870, 5)
-
-kable(svo_out1)
+# Display the first five sentences
+# - head() keeps the first five rows
+# - kable() displays the results as a table
+svo_triples_context_1870 %>%
+  head(5) %>% # Keep the first five rows
+  kable() # Display the table
 ```
 
 What we see is mainly parliament entertaining a series of propositions about the circumstnaces under which women gain or lose rights through marriage or naturalization. In one case, a debate is taking place on empowering women through removing the "electoral disabilities of women," but it does not seem to have gone very far -- in fact, the last excerpt contains a speaker wondering why so few members of parliament are speaking up for women's rights.   
@@ -922,14 +951,20 @@ We can better explore how parliament spoke about women more by searching for all
 To specifically match rows where the subject is "woman," we can take one of two approaches. The first option is to filter directly on the subject column, identifying rows where the word "woman" appears. Alternatively, we can use the `str_detect()` function on the `svo_triple` column to find triples that start with "woman." By applying the regular expression ^woman, we ensure that only strings beginning with the word "woman" are matched, as the `^` symbol anchors the pattern to the start of the string. 
 
 ```{r}
-# Finding Triples Where Women are the Subject 
+# Find SVO triples where "woman" is the subject
+# - filter() keeps triples beginning with "woman"
+# - str_detect() identifies triples that begin with the search term
 triples_with_woman_as_subject_1870 <- simple_svo_triples_1870 %>%
-  filter(str_detect(svo_triple, "^woman"))
+  filter(str_detect(svo_triple, "^woman")) # Keep triples where "woman" is the subject
 
+# Find the 10 most common SVO triples where "woman" is the subject
+# - count() counts each SVO triple
+# - arrange() sorts triples from most to least frequent
+# - slice() keeps the top 10 triples
 top_10_triples_with_woman_as_subject_1870 <- triples_with_woman_as_subject_1870 %>%
-  count(svo_triple) %>%
-  arrange(desc(n)) %>%
-  slice(1:10)
+  count(svo_triple) %>% # Count each SVO triple
+  arrange(desc(n)) %>% # Sort from most to least frequent
+  slice(1:10) # Keep the top 10 triples
 
 head(top_10_triples_with_woman_as_subject_1870, 10)
 ```
@@ -937,15 +972,20 @@ head(top_10_triples_with_woman_as_subject_1870, 10)
 As shown in the above table, the top triple with the word woman as subject in the 1860's British Parliamentary debates is "woman have vote" followed by "woman have right." Other top triples discuss women's agency, such as "woman exercise right." Women are also presented as having trades, doing work, earning their bread, and having interests -- in other words, in the era of the Married Women's Property Act, women are very much represented as participating in the economy. 
 
 ```{r}
-# Finding Triples Where Women are the Object 
+# Find SVO triples with "woman" as object
+# - filter() keeps triples containing the search term
+# - str_detect() identifies triples containing "woman"
+triples_with_woman_as_object_1870 <- simple_svo_triples_1870 %>%
+  filter(str_detect(svo_triple, " woman")) # Match triples with "woman" as object
 
-triples_with_woman_as_subject_1870 <- simple_svo_triples_1870 %>%
-  filter(str_detect(svo_triple, " woman"))
-
-top_10_triples_with_woman_as_object_1870 <- triples_with_woman_as_subject_1870 %>%
-  count(svo_triple) %>%
-  arrange(desc(n)) %>%
-  slice(1:10)
+# Find the 10 most common SVO triples where "woman" is the object
+# - count() counts each SVO triple
+# - arrange() sorts triples from most to least frequent
+# - slice() keeps the top 10 triples
+top_10_triples_with_woman_as_object_1870 <- triples_with_woman_as_object_1870 %>%
+  count(svo_triple) %>% # Count each SVO triple
+  arrange(desc(n)) %>% # Sort from most to least frequent
+  slice(1:10) # Keep the top 10 triples
 
 head(top_10_triples_with_woman_as_object_1870, 10)
 ```

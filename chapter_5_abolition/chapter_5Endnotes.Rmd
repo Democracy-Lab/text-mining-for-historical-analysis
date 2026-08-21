@@ -345,7 +345,7 @@ Distinctiveness can help us to answer the question: what were the words that Buc
 
 Using the function `bind_tf_idf()` we can apply an index of how distinctive each word is of each speaker. The tf-idf function will create an index for each term-speaker pair -- a number which, if high, tells us that the word was very distinctive of each speaker, and if low, tell us that many of the speakers used the same word. 
 
-The `bind_tf_idf()` function takes three arguments. The first two are the names of the facets of the data which are to be assessed for how distinctive they are in relationship to each other -- in this case, `word` and `speaker`. The third argument, `n`, the count of words per speaker. 
+The `bind_tf_idf()` function takes three arguments. The first two are the names of the facets of the data which are to be assessed for how distinctive they are in relationship to each other -- in this case, `word` and `speaker`. The third argument, `n`, the count of words per speaker.
 
 ```{r, message = F}
 # Calculate how distinctive each word is for each speaker
@@ -369,6 +369,7 @@ Now that we have an index of how distinctive each word is per speaker, we can us
 # - group_by() groups the data by speaker
 # - arrange() sorts words from highest to lowest tf-idf score
 # - slice() keeps the top 15 words for each speaker
+# - ungroup() removes the previous grouping
 # - mutate() adds a ranking column and rounds the tf-idf scores
 # - select() keeps only the columns needed for display
 most_distinctive_words_per_abolition_speaker <- tfidf_per_top_slavery_speaker_1833 %>%
@@ -421,16 +422,21 @@ Next, let's create a series of small tables displaying each speaker, their most 
 We could create a bar graph, of course, but because `tf_idf` measures represent an abstract concept -- distinctiveness -- visualizing this data risks confusing some possible readers, who might mistake the bar graph of `tf_idf` for a count of frequency.  Analysts often have to make choices about how to represent their data so as to generate the least confusion about the meaning of any statistical measure. For abstract indexes like `tf_idf`, generated in the course of our research, we recommend offering simple tables along with prose that explains the significance of the numbers.
 
 ```{r, message = F}
+# Display the first speaker, Mr. Buxton, as a table
+# - kable() formats Mr. Buxton's data as a table
+# - caption adds the first speaker's name as the table title
 kable(speaker1, 
       caption = top_speaker_names[1])
 ```
 
 ```{r, message = F}
+# Do the same for the next speaker, Mr. Buckingham
 kable(speaker2, 
       caption = top_speaker_names[2])
 ```
 
 ```{r, message = F}
+# Do the same for the third speaker, Mr. Stanley
 kable(speaker3, 
       caption = top_speaker_names[3])
 ```
@@ -441,6 +447,7 @@ kable(speaker4,
 ```
 
 ```{r, message = F}
+# Do the same for the fifth speaker, Sir Robert Peel
 kable(speaker5, 
       caption = top_speaker_names[5])
 ```
@@ -470,7 +477,10 @@ We can check the significance of our distinctiveness measure by another kind of 
 # - geom_col() draws bars showing each word's frequency
 # - facet_wrap() creates a separate panel for each speaker
 # - coord_flip() makes the word labels easier to read
+# - scale_x_reordered() preserves the word order within each speaker's panel
 # - scale_fill_grey() represents tf-idf scores in grayscale
+# - scale_y_continuous() controls the values shown on the y-axis
+# - labs() adds the title, subtitle, caption, and axis labels
 most_distinctive_words_per_abolition_speaker %>%
   mutate(word = reorder_within(word, n, speaker)) %>% # Order each speaker's words by frequency
   ggplot(aes(x = word, # Map words to the x-axis
@@ -497,6 +507,14 @@ We can use wordcount with distinctiveness to identify a set of words that we do 
 Nevertheless, there is room for caveats about settling for these words in particular.  From the point of view of text mining, where we look to the number of words as significant, these results are unsatisfying. There are too many small results, where the count is smaller than 5. If we want to write an analysis of each speakers' referents, this might be a beginning, but we should not rest content that we have the best words for examining the speakers yet. Let's rerun the code, this time adding instructions to only show us words that appear above a certain threshold by adding just a single line of code. You can play with the number in the filter to see how the results change as we look for more and less distinctive words.
 
 ```{r, message = F}
+# Find the most distinctive frequently used words for each speaker
+# - group_by() groups the data by speaker
+# - filter() keeps words used more than five times
+# - arrange() sorts words from highest to lowest tf-idf score
+# - mutate() adds a ranking based on tf-idf score
+# - slice() keeps the top 15 words for each speaker
+# - ungroup() removes the previous grouping
+most_distinctive_words_per_abolition_speaker2 <- tfi
 most_distinctive_words_per_abolition_speaker2 <- tfidf_per_top_slavery_speaker_1833 %>%
   group_by(speaker) %>%
   filter(n > 5) %>% # <----------------  this is the only line that's new 
@@ -514,10 +532,13 @@ most_distinctive_words_per_abolition_speaker
 # - mutate() reorders words by count within each speaker
 # - ggplot() creates a faceted bar chart
 # - geom_col() draws bars showing each word's frequency
+# - scale_fill_grey() represents tf-idf scores in grayscale
 # - facet_wrap() creates a separate panel for each speaker
 # - coord_flip() makes the word labels easier to read
-# - scale_fill_grey() represents tf-idf scores in grayscale
-most_distinctive_words_per_abolition_speaker2 %>%           
+# - scale_x_reordered() preserves the word order within each speaker's panel
+# - guides() hides the fill legend
+# - labs() adds the title, subtitle, caption, and axis labels
+most_distinctive_words_per_abolition_speaker2 %>%
   mutate(word = reorder_within(word, n, speaker)) %>% # Reorder words by count within each speaker
   ggplot(aes(x = word, # Map words to the x-axis
              y = n, # Map word counts to the y-axis
@@ -562,9 +583,10 @@ mr_buckingham_slavery_debates
 # - mutate() reorders words by count
 # - ggplot() creates a bar chart
 # - geom_col() draws bars showing each word's frequency
-# - coord_flip() makes the word labels easier to read
 # - scale_fill_grey() represents tf-idf scores in grayscale
-mr_buckingham_slavery_debates %>% 
+# - coord_flip() makes the word labels easier to read
+# - labs() adds the title, subtitle, and axis labels
+mr_buckingham_slavery_debates %>%
   mutate(word = reorder(word, n)) %>% # Reorder words by count
   ggplot(aes(x = word, # Map words to the x-axis
              y = n, # Map word counts to the y-axis
@@ -586,6 +608,10 @@ If we want to see the words that Buckingham used more than other speakers, we ca
 
 ```{r, fig.cap="Mr. Buckingham’s most distinctive words in the 1833 debate on the abolition of slavery, showing the terms that appear disproportionately often in his speeches compared to the rest of the abolitionist speakers.", warning=FALSE, message=FALSE}
 
+# Find Mr. Buckingham's 40 most distinctive words
+# - filter() keeps only words used by Mr. Buckingham
+# - arrange() sorts words from highest to lowest tf-idf score
+# - slice() keeps the top 40 words
 mr_buckingham_slavery_debates2 <- tfidf_per_top_slavery_speaker_1833 %>%
   filter(speaker == "Mr. Buckingham") %>%
   arrange(desc(tf_idf)) %>% # <------- the only line that changed
@@ -595,8 +621,9 @@ mr_buckingham_slavery_debates2 <- tfidf_per_top_slavery_speaker_1833 %>%
 # - mutate() reorders words by count
 # - ggplot() creates a bar chart
 # - geom_col() draws bars showing each word's frequency
-# - coord_flip() makes the word labels easier to read
 # - scale_fill_grey() represents tf-idf scores in grayscale
+# - coord_flip() makes the word labels easier to read
+# - labs() adds the title, subtitle, and axis labels
 mr_buckingham_slavery_debates2 %>% # Start with Mr. Buckingham's words
   mutate(word = reorder(word, n)) %>% # Reorder words by count
   ggplot(aes(x = word, # Map words to the x-axis
@@ -614,6 +641,10 @@ mr_buckingham_slavery_debates2 %>% # Start with Mr. Buckingham's words
 "Wages" emerges as a more distinctive word of Buckingham's that he said quite frequently -- 12 times in all. It is not his most distinctive word; to find that, we can very slightly alter the code above to find the word he uses more than anyone else -- but the result may be disappointing. 
 
 ```{r, warning=FALSE, message=FALSE}
+# Find Mr. Buckingham's most distinctive word
+# - filter() keeps only words used by Mr. Buckingham
+# - arrange() sorts words from highest to lowest tf-idf score
+# - slice() keeps only the most distinctive word
 mr_buckingham_most_distinctive_word <- tfidf_per_top_slavery_speaker_1833 %>%
   filter(speaker == "Mr. Buckingham") %>%
   arrange(desc(tf_idf)) %>% 
@@ -646,12 +677,16 @@ More interesting are substantive words that (perhaps) indicate Buckingham's valu
 The "perhaps" is crucial. We are noting possible avenues for investigation for ourselves; this is not yet a proven list of findings from digital history. We should not be too quick to leap to conclusions about how Buckingham used these words without reading directly from his speeches. 
 
 ```{r, message = F}
-# finding just the sentences where Buckingham uses the word "wages"
+# Find all sentences spoken by Mr. Buckingham
+# - filter() keeps only sentences where the speaker is Mr. Buckingham
 buckingham_sentences <- slavery_debates_1833 %>%
-  filter(speaker == "Mr. Buckingham")
+  filter(speaker == "Mr. Buckingham") # Keep only Mr. Buckingham's sentences
 
+# Find Mr. Buckingham's sentences containing the word "wages"
+# - filter() keeps only sentences containing the word "wages"
+# - str_detect() checks each sentence for the word "wages"
 buckingham_on_wages <- buckingham_sentences %>%
-  filter(str_detect(text, "wages"))
+  filter(str_detect(text, "wages")) # Keep sentences containing "wages"
 
 # Display Mr. Buckingham's speeches mentioning wages
 # - mutate() wraps long lines for readability
@@ -972,9 +1007,13 @@ peel_speeches <- peel_sentences %>%
                          speech)) %>% # Add the date and speaker
   select(speech) # Keep only the speech text
 
+# Display Peel's speeches about slavery that use the word "wages"
+# - mutate() shortens each speech to 520 characters
+# - str_trunc() truncates longer speeches for easier display
+# - kable() displays the speeches as a table
 peel_speeches %>%
-  mutate(speech = str_trunc(speech, 520)) %>%  #
-  kable(caption = "Three Speeches by Peel about Slavery Invoking the Word 'Wages'")
+  mutate(speech = str_trunc(speech, 520)) %>%  # Shorten each speech to 520 characters
+  kable(caption = "Three Speeches by Peel about Slavery Invoking the Word 'Wages'") # Display the speeches as a table
 ```
 
 
@@ -1066,7 +1105,7 @@ slavery_debates_before_1833 <- slavery_1830 %>%
   filter(year < 1833)
 
 # Count the words used in speeches mentioning "free" before 1833
-# - count_collocates() counts the words in speeches containing a search term
+# - count_collocates() counts the words in speeches containing the search term
 freedom_collocates_before_1833 <- count_collocates(slavery_debates_before_1833, # Use the debates before 1833
                                                    search_term = "free", # Search for speeches mentioning "free"
                                                    period_label = "1830-32") # Label the time period
@@ -1084,6 +1123,8 @@ top_freedom_collocates_before_1833
 slavery_debates_after_1833 <- slavery_1830 %>%
   filter(year > 1833) # Keep only speeches after 1833
 
+# Count words that appear in speeches containing "free" after 1833
+# - count_collocates() counts the words in speeches containing the search term
 freedom_collocates_after_1833 <- count_collocates(slavery_debates_after_1833,
                                                   search_term = "free",
                                                   period_label = "1834-36")
