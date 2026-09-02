@@ -22,7 +22,7 @@ Understanding change over time begins with the question of what is to be underst
 
 In this chapter, we will learn how to count over time -- and the more general principle, which is analyzing one variable against another variable. We may count words by time, or words by speaker to find which speakers said these words the most. 
 
-In the language of the algorithm, understanding the association between variables is accomplished by "grouping" the data, allowing us to take other fields, like speaker name, year, and debate title, into account. This chapter will use these groupings to gain insight into the discourse of speakers in Parliament. 
+In the language of the algorithm, understanding the association between variables is accomplished by "grouping" the data, allowing us to take other columns, like speaker name, year, and debate title, into account. This chapter will use these groupings to gain insight into the discourse of speakers in Parliament. 
 
 At this point, critical thinking about what we count is appropriate.The prospect of analyzing the individual writers in a corpus is an obvious way to understand the poles of debate. But when the subject of analysis is the parliament of Great Britain, one understandable reaction may be skepticism. Why study the language of individual speakers in Parliament when 19th-century British Parliament was mostly a small group of elite white men and not people who reflected the British population?
 
@@ -62,7 +62,7 @@ data("speaker_metadata_1830")
 head(speaker_metadata_1830)
 ```
 
-To analyze speakers in Parliament, we first need to connect the debates to consistent speaker identities. The `speaker` field records the name as originally transcribed in Hansard, but these names are not standardized. The same person may appear as "William Gladstone," "William E. Gladstone," "W. Gladstone," or "Mr. Gladstone." Speakers may also be identified by changing office titles, such as "Prime Minister." Different speakers are sometimes recorded by the same name. For instance, two people named Sir Robert Peel served in Parliament during the 1820s and both are evoked by the same spelling of the name; the older Sir Robert Peel (1750-1830), the industrialist, briefly overlapped with his son, Sir Robert Peel (1841-46), the future prime minister.  Meanwhile, "Mr. W. Gladstone" could refer to William Ewart Gladstone or his son William Henry Gladstone. To make analysis of speaker names more challenging yet, during the digitization processes, optical character recognition (OCR) errors were introduced into the speaker names. Common OCR error include interpreting a lower case "L" as an "i," or the lower case letter "a" as an "o."
+To analyze speakers in Parliament, we first need to connect the debates to consistent speaker identities. The `speaker` column records the name as originally transcribed in Hansard, but these names are not standardized. The same person may appear as "William Gladstone," "William E. Gladstone," "W. Gladstone," or "Mr. Gladstone." Speakers may also be identified by changing office titles, such as "Prime Minister." Different speakers are sometimes recorded by the same name. For instance, two people named Sir Robert Peel served in Parliament during the 1820s and both are evoked by the same spelling of the name; the older Sir Robert Peel (1750-1830), the industrialist, briefly overlapped with his son, Sir Robert Peel (1841-46), the future prime minister.  Meanwhile, "Mr. W. Gladstone" could refer to William Ewart Gladstone or his son William Henry Gladstone. To make analysis of speaker names more challenging yet, during the digitization processes, optical character recognition (OCR) errors were introduced into the speaker names. Common OCR error include interpreting a lower case "L" as an "i," or the lower case letter "a" as an "o."
 
 Because of these variations in the transcriptions, any attempt to count words by the original speaker names would replicate these underlying inconsistencies. Therefore, we created an index that links variations in speaker names to consistent speaker identities. These standardized identities are recorded in the `suggested_speaker` column. We use the term "suggested" because the identities are informed estimates rather than definitive matches. The names were curated by historians and computer scientists using historical knowledge, bibliographic research, and custom written edit-distance algorithms. Our efforts build upon the work completed by the Digging into Linked Parliamentary Data Project and the Egger and Spirling database.^2^
 
@@ -70,7 +70,7 @@ Each suggested speaker has a unique ID to help differentiate between speakers wh
 
 We can now use these speaker identities to analyze how much each Parliamentarian spoke. 
 
-In the following code, we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" fields before tokenizing the data into individual words.
+In the following code, we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" columns before tokenizing the data into individual words.
 
 ```{r, warning=FALSE, message=FALSE}
 # Load Hansard data
@@ -282,7 +282,7 @@ One complication of stopwords lists is that to produce functional results, a cus
 
 ## Working With Dates
 
-Knowing who spoke the most in parliament is useful.  But very often insight comes not from examining how counts change over time.  What if we want to know not merely who spoke the most, but who was the top speaker for each year in parliament?  Our `hansard_1830` data frame lists a date in the "speechdate" column, formatted as a four-digit year, two-digit month, and two digit day. To easily track speeches by year, we can add a new "field" -- that is, a column -- listing just the year of each speech.
+Knowing who spoke the most in parliament is useful.  But very often insight comes not from examining how counts change over time.  What if we want to know not merely who spoke the most, but who was the top speaker for each year in parliament?  Our `hansard_1830` data frame lists a date in the "speechdate" column, formatted as a four-digit year, two-digit month, and two digit day. To easily track speeches by year, we can add a column listing just the year of each speech.
 
 When working with information about dates we often need to extract the month, day, or year from a data set. The `lubridate` package makes it easy to extract this information from dates in any format.^4^ 
 
@@ -296,7 +296,7 @@ year1 <- year(date1)
 year1
 ```
 
-We will use the `year()` function from `lubridate` with `mutate()` to create a new column that has just the extracted year from the `speechdate` field. 
+We will use the `year()` function from `lubridate` with `mutate()` to create a new column that has just the extracted year from `speechdate`. 
 
 ```{r, message = F}
 # Load debate metadata for the 1830s
@@ -319,7 +319,7 @@ hansard_1830_w_year %>%
   kable() # Format the results as a table
 ```
 
-Notice that the resulting dataset has a new field, "year."
+Notice that the resulting dataset has a new column, `year`.
 
 At this point, we have already created `words_1830`, a large tokenized dataset where each row represents a word and its corresponding speaker. We now want to shift our analysis to how many words each speaker spoke per year. We will not use `words_1830` again, and keeping it while creating another tokenized dataset could cause us to run into memory limits. So, we will do two things:
 - Remove the old tokenized dataset (`words_1830`) to free memory.
@@ -368,7 +368,7 @@ words_per_speaker_1830 <- words_1830_w_year %>%
 head(words_per_speaker_1830)
 ```
 
-Notice that the result of grouping and counting is a data set with three columns: "speaker," "year," and "speaker_words_per_year." The last column is the count for each speaker per year -- a field that makes it possible to analyze change over time.
+Notice that the result of grouping and counting is a data set with three columns: "speaker," "year," and "speaker_words_per_year." The last column is the count for each speaker per year -- a column that makes it possible to analyze change over time.
 
 ### Women in 19th-century Parliament 
 
@@ -612,7 +612,7 @@ In the sections that follow, we will undertake each of these steps in turn. They
 
 Step #1 is easily accomplished by a quick adjustment in code, tweaking the command `slice_head(n=10)` from 10 to 500. Try changing the code and see what happens. 
 
-Step #2 is easily accomplished by revisiting the code in greater depth. We won't need any new commands, but we will need to apply the functions we've already seen -- `group_by()`, `summarize()`, and `n()` -- to the "speaker" field rather than the "year" field. 
+Step #2 is easily accomplished by revisiting the code in greater depth. We won't need any new commands, but we will need to apply the functions we've already seen -- `group_by()`, `summarize()`, and `n()` -- to the `suggested_speaker` column rather than the `year` column. 
 
 Let's do that now to answer the question, how many words did each speaker speak in the prereform and postreform period?
 
@@ -886,9 +886,9 @@ The results may not be impressive for the vast majority of speakers who spoke ve
 
 # Using Left Join to Annotate the Data
 
-That is, in *all_speakers_annotated*, we have a list of speakers and how many words they spoke every year. If we use *left_join()* to merge that dataset with the dataset *top_speakers()*, we'll have a record of whether each speaker was one of the most prolific speakers in their category. If we use *left_join()* to merge the dataset again with the dataset *speakers_key()*, we'll be able to use the literal transcriptions of speaker names to annotate the visualization later.
+That is, in *all_speakers_annotated*, we have a list of speakers and how many words they spoke every year. If we use *left_join()* to merge that dataset with the dataset `top_speakers`, we'll have a record of whether each speaker was one of the most prolific speakers in their category. If we use *left_join()* to merge the dataset again with the dataset `speaker_key`, we'll be able to use the literal transcriptions of speaker names to annotate the visualization later.
 
-The function *left_join()* takes as its first argument the name of the dataset with which we're merging our data. A second optional argument is the "by" argument, which allows us to specify a column or set of columns to use for matching. In the case of the first join, we'll specify two fields, concatenated into a list, using the syntax *by = c("suggested_speaker", "class").* 
+The function *left_join()* takes as its first argument the name of the dataset with which we're merging our data. A second optional argument is the "by" argument, which allows us to specify a column or set of columns to use for matching. In the case of the first join, we'll specify two columns, concatenated into a list, using the syntax *by = c("suggested_speaker", "class").* 
 
 ```{r, echo=FALSE}
 # Add the top speaker labels and representative speaker names
@@ -1011,7 +1011,7 @@ df %>%
 
 4) Count the number of unique speakers using both the speaker and suggested_speaker columns. Then compare the results. How do the two columns differ? What are the advantages and disadvantages of visualizing the original speaker names as recorded in Hansard (`speaker`) versus the disambiguated speaker names (`suggested_speaker`)?
 
-5) Why might the authors argue that cleaning and annotating data are historical decisions, not just programming questions? Support your answer by comparing the `speaker` and `suggested_speaker` fields using a visualization or a table.
+5) Why might the authors argue that cleaning and annotating data are historical decisions, not just programming questions? Support your answer by comparing the `speaker` and `suggested_speaker` columns using a visualization or a table.
 
 6) The Hansard data remain imperfect even after name disambiguation The chapter removes unidentified speakers (`suggested_speaker == ""`) before several analyses. Why might this improve the quality of the analysis? What information could be lost by making this choice? 
 
