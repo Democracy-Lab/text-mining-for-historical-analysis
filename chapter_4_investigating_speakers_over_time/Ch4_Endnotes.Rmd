@@ -16,7 +16,7 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-In previous chapters, we investigated how breaking up strings of text into individual words or multi-word phrases can give us insight into a corpus. We did things like count the number of words within an entire data frame. But historians often want to profile not merely the collective use of language, but also the role of specific speakers and how their language changed over time. 
+Historians often want to profile the role of specific speakers and how their language changed over time. 
 
 Understanding change over time begins with the question of what is to be understood over time.  Is it a list of words referring to women? Is it an individual life? Do we care about the course of change over days, weeks, years, or decades -- or within a single debate? For many historians, the answer might well be, "all of the above," which is fine. Counting one variable (say, references to women) by another variable of time (say, decades) is how we accomplish an analysis of change over time.   
 
@@ -34,7 +34,7 @@ In the exercises that follow, we anticipate that most researchers can see the va
 
 ## Counting by Group to Find the Wordiest Speakers
 
-Our first exercise is finding the most "wordy" Parliamentarians from 1830--that is, Parliamentarians who spoke the most words. Often, the Parliamentarians who spoke the most did so because fellow Parliamentarians trusted them to express the wants of their own social group. 
+Our first exercise is finding the Parliamentarians from 1830 who spoke the most words. Often, the Parliamentarians who spoke the most did so because fellow Parliamentarians trusted them to express the wants of their own social group. 
 
 To analyze speakers in Hansard, we will first need to import a new category of data from `hansardr`: `speaker_metadata`.^1^ 
 
@@ -62,25 +62,15 @@ data("speaker_metadata_1830")
 head(speaker_metadata_1830)
 ```
 
-For now, we will just go over three relevant fields from `speaker_metadata`. 
+To analyze speakers in Parliament, we first need to connect the debates to consistent speaker identities. The `speaker` field records the name as originally transcribed in Hansard, but these names are not standardized. The same person may appear as "William Gladstone," "William E. Gladstone," "W. Gladstone," or "Mr. Gladstone." Speakers may also be identified by changing office titles, such as "Prime Minister." Different speakers are sometimes recorded by the same name. For instance, two people named Sir Robert Peel served in Parliament during the 1820s and both are evoked by the same spelling of the name; the older Sir Robert Peel (1750-1830), the industrialist, briefly overlapped with his son, Sir Robert Peel (1841-46), the future prime minister.  Meanwhile, "Mr. W. Gladstone" could refer to William Ewart Gladstone or his son William Henry Gladstone. To make analysis of speaker names more challenging yet, during the digitization processes, optical character recognition (OCR) errors were introduced into the speaker names. Common OCR error include interpreting a lower case "L" as an "i," or the lower case letter "a" as an "o."
 
-Each sentence from the Hansard corpus is assigned a unique ID, as represented by the `sentence_id` field. The speaker who stated a sentence is assigned the same ID. The shared key across datasets allows us to join the data from speaker_metadata to other data from `hansardr`, such as the debate text. 
+Because of these variations in the transcriptions, any attempt to count words by the original speaker names would replicate these underlying inconsistencies. Therefore, we created an index that links variations in speaker names to consistent speaker identities. These standardized identities are recorded in the `suggested_speaker` column. We use the term "suggested" because the identities are informed estimates rather than definitive matches. The names were curated by historians and computer scientists using historical knowledge, bibliographic research, and custom written edit-distance algorithms. Our efforts build upon the work completed by the Digging into Linked Parliamentary Data Project and the Egger and Spirling database.^2^
 
-The other two important fields we will address are the `speaker` and the `suggested_speaker` fields. 
+Each suggested speaker has a unique ID to help differentiate between speakers who might share the same name, like multiple Gladstones or Peels. When possible, we used the Rush Parliamentary Archive ID. As a result, the IDs in `hansardr` correspond directly to those in the Parliamentary Archive, making it easier to connect Hansard debates with other historical records about the same Parliamentarians. The Rush Parliamentary Archive system started in 1832. As a result, Parliamentarians who served only before 1832 do not have Rush IDs. For these speakers, we created our own unique IDs so that every speaker in `hansardr`.
 
-The `speaker` field contains the speaker name as it was originally transcribed within the Hansard corpus. The resulting field contains inconsistencies and a lack of standardization that can make analysis of speakers difficult. A single speaker may have been recorded by different permutations of his first, middle and last name(s) (for example, "William Gladstone" may be transcribed as "William E. Gladstone", "W. Gladstone", or "Mr. Gladstone," to name just a few). In other cases, a speaker may have been called by a rotating office title (like "Prime Minister"). 
+We can now use these speaker identities to analyze how much each Parliamentarian spoke. 
 
-It is also the case that different speakers are recorded by the same name. For instance, two people named Sir Robert Peel served in Parliament during the 1820s and both are evoked by the same spelling of the name; the older Sir Robert Peel (1750-1830), the industrialist, briefly overlapped with his son, Sir Robert Peel (1841-46), the future prime minister.  Meanwhile, "Mr. W. Gladstone" could refer to William Ewart Gladstone or his son William Henry Gladstone.
-
-To make analysis of speaker names more challenging yet, during the digitization processes, optical character recognition (OCR) errors were introduced into the speaker names. Common OCR error include interpreting a lower case "L" as an "i," or the lower case letter "a" as an "o."
-
-Because of these nuances, any naive attempt to count words by speaker would be guaranteed to produce wrong results. It was paramount, therefore, that in managing the `hansardr` data, we produce an authoritative index of actual speakers that corresponded to the facts. In data science, adding a column with information inking this authoritative index to the names as presented is called "metadata."
-
-The curators of the dataset -- a team of historians and data scientists run by the authors -- stored the metadata about the speakers in the `suggested_speaker` field, building upon the work completed by the Digging into Linked Parliamentary Data Project and the Egger and Spirling database.^2^
-
-The `suggested_speaker` field contains our suggestion for the true identity of the speaker. Importantly, the `suggested_speaker` field represents a marked improvement on existing data sources, tested by historians, but our data is not guaranteed for universal accuracy; hence it is only "suggested." In the suggested_speaker field, a unique id is given that refers to one unique speaker who was in parliament during the time covered by the database.  While multiple speakers during the same period sometimes share the same name (like the two Gladstones or two Peels), each individual speaker is assigned a unique number.  Thus, when we see the number 3104 in the suggested_speaker field, the curators of the database have made the inference that the W. Gladstone in question refers to William Gladstone, not his son William Henry.  
-
-In the following code, we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" fields before tokenizing the data into individual words. 
+In the following code, we will make our data set smaller and easier to work with by just selecting the "speaker," "suggested_speaker," and "text" fields before tokenizing the data into individual words.
 
 ```{r, warning=FALSE, message=FALSE}
 # Load Hansard data
@@ -100,35 +90,18 @@ words_1830 <- hansard_1830 %>%
 head(words_1830) 
 ```
 
-With a data frame containing fields for "speaker", "suggested_speaker", and "word," we are now in a position to perform a new kind of analysis to see the number of words each speaker contributed to Parliament using two new functions: `group_by()` and `summarize()`. 
+Viewing the dataset, we see that Walter Scott was The Duke of Buccleugh in the 1830s debates.  
 
-We use `group_by()` to organize the data by group before using summarize for our count. By using `group_by()` we can count the number of times one variable occurs, given the presence of another variable.  We can count the number of words spoken by a speaker. We could also use group_by to count the words spoken in a given year -- or by a given speaker in a given year, and so on.
+We can now compare counts based on the speaker and suggested_speaker columns to see how resolving speaker identities can reveal patterns obscured by the original Hansard transcriptions.
 
-The arguments taken by the command `group_by()` tell the computer which variables to associate with each other. To group by speaker, we make the argument of `group_by()` speaker, like so:
-
-```{r, message = F}
-# Group the words by speaker
-# - group_by() organizes the data so later calculations are performed separately for each speaker
-words_per_speaker_1830 <- words_1830 %>%
-  group_by(speaker)
-```
-
-Alternatively, we could group by `suggested_speaker`:
+First, we will count the words attributed to each original speaker using group_by() and summarize(). Here, group_by() groups all words attributed to the same speaker name, while summarize() counts the words in each group. We use `summarize()` with the function `n()` to count the words spoken by each speaker. We store the results in a new column named `words_spoken`, which has each speaker's total word count. Finally, `arrange()` sorts the speakers from the highest to the lowest word count.
 
 ```{r, message = F}
 # Group the words by suggested speaker
 # - group_by() organizes the data so later calculations are performed separately for each suggested speaker
 words_per_speaker_1830 <- words_1830 %>%
   group_by(suggested_speaker)
-```
 
-A useful function that often accompanies `group_by()` is `summarize()`, a command that tells the computer to apply a mathematical transformation to each of the groups created by group_by.  Thus if we group_by(speaker) and then summarize(), we can count how many words each speaker spoke, or how many dates a speaker appeared on, or the first date when each speaker appeared. 
-
-The `summarize()` function can be used with any statistical transformation, for instance `mean()` or `max()`. Here, we will use `summarize()` with a function to count, which is `n()`. Finally, `arrange()` allows us to sort the speakers in descending order of total words spoken. 
-
-In the following code the argument `words_spoken = n()` tells `summarize()` to create a new column with the number of words that reflect each unique speaker
-
-```{r, message = F}
 # Count the total number of words spoken by each speaker
 # - group_by() groups all words by speaker
 # - summarize() counts the number of words spoken by each speaker
@@ -140,14 +113,9 @@ words_per_speaker_1830 <- words_1830 %>%
 
 head(words_per_speaker_1830)
 ```
+These names may be familiar to researchers of British history, such as the names of two prime ministers--Robert Peel and John Russell--as well as one noted Irish orator and nationalist, Mr. O'Connell (or Daniel O'Connell). The count above also shows us that among the most prolific speakers was the Chancellor of the Exchequer. This finding seems odd: the Chancellor of the Exchequer oversees the work of the Treasury, yet these counts suggest that the Chancellor spoke more than the Prime Minister. The finding seems less odd when considering that Chancellor of the Exchequer could refer to five different Parliamentarians: Henry Goulburn, who held office until November 1830; Viscount Althorp (John Charles Spencer), who held office from 1830 to 1834; Sir Robert Peel, who held office from 1834 to 1835; Thomas Denman, who briefly held office in 1834; or Thomas Spring Rice, who held office from 1835 to 1839. By basing our counts on the `speaker` column, the fifth most prolific speaker could represent an amalgamation of words spoken by several different individuals.
 
-Most students of British history will be familiar with the names of the speakers included in the `words_per_speaker_1830` variable, which include two prime ministers as well as one noted Irish orator and nationalist, Daniel O'Connell. The count above also shows us that among the most prolific speakers was the Chancellor of the Exchequer. How should we interpret this fact?
-
-A naive analyst might assume that the Chancellor of the Exchequer was one person, the fifth most prolific speaker in the 1830s. Yet this assumption would be an error of interpretation. The number of words spoken by the Chancellor counts the speeches of several distinct individuals. 
-
-The careful analyst will be concerned about the speaker classified as "The Chancellor of the Exchequer," for many individuals held this post over the course of the years 1830-39, which we are looking at now. The Chancellor of the Exchequer is the head financial officer of the United Kingdom. 
-
-A more experienced researcher might begin by using the suggested_speaker field -- not the speaker field -- to count words spoken by each individual. Notice that the lines of code below differ from the lines of code above only in that the argument of the function `group_by()` has been changed from "speaker" to "suggested_speaker:"
+Running the same code but grouping by `suggested_speaker` instead yields some of the same results, but separates speeches attributed to shared titles, like the successive Chancellors of the Exchequer, into their suggested individual names.
 
 ```{r, message = F}
 # Count words spoken by each identified speaker
@@ -164,29 +132,19 @@ words_per_speaker_1830 <- words_1830 %>%
 head(words_per_speaker_1830)
 ```
 
-In this view, we see the first and last names of individual speakers as well as their ID number from parliament (that is, Robert Peel is id 1664; 1664 is not, in this case, a date).
-
-Nevertheless, our first pass revealed something interesting -- as byways in the archives often do. It is interesting that Hansard represents the Chancellor of the Exchequer speaking more words than any other office -- including that of Prime Minister -- at least for the 1830s. The Chancellor of the Exchequer oversees the work of the Treasury.  In many cases, the Chancellor of the Exchequer was a preliminary step to becoming Prime Minister. Why was the Chancellor of the Exchequer so important? And what were the various Chancellors talking about that required so much speechifying?
+Jo -- analysis? 
 
 ## A Research Question: What were the Chancellors of the Exchequer talking about?
 
-It may seem arbitrary to investigate the Chancellor of the Exchequer, but the office provides a perfect opportunity to test how the metadata indexing individual speakers works. Next, will use the suggested_speaker field to pull apart the many individuals associated with the office.  
-
-Because the dataset includes metadata about each speaker and how they are described, we can find the many individuals who occupied the office of the Chancellor of the Exchequer, and we can do research on them instead. In a sense, it's a happy accident of our research process that we used `group_by()` applied to the speaker field rather than the authoritative suggested_speaker field, because the speaker field tells us about the way that individuals were actually designated in Hansard, including their office name.
-
-Before we proceed, we should try to refine our research question to provide maximum historical insight so that we can start to imagine how our quantitative research process becomes worthwhile.  For instance, we can ask questions about the diversity of views of the individuals who and we can ask questions about the office.  
+We can now investigate: what were the Chancellors of the Exchequer talking about? Jo fill in section. 
 
 We would expect most of the Chancellor of the Exchequer's speeches in parliament to reflect a predominant concern with taxation and spending.  However, it is also possible that different individuals who held this post prioritized different issues.  How different were they, the Chancellors of the Exchequer for 1830-39? 
 
-To analyze the different speakers, the code that follows will use `group_by()` to group the speeches made by Chancellors of the Exchequer by suggested_speaker -- the actual individuals behind the office.  Then, we can inspect the number of words used by each individual Chancellor, comparing their favorite words. 
-
 ## A Custom Stop Words List
 
-Before we proceed, a first step is to "clean" our data. In previous chapters we used an existing stop words list from `tidytext`. The `hansardr` library also provides its own stop words list.^3^ 
+The first step in our analysis is cleaning our data. We have three options available to us: using the stopwords list from `tidytext`, using the author's custom stop words list provided in `hansardr`, and creating our own custom stop words list here.^3^ We will create our own stop words list that caters to our dataset. 
 
-It may be the case, however, that an analyst wants to curate their own stop words list that caters to their specific data set or research question. In the following code we create a custom stop words list by assigning a list of words to a tibble (a `tidyverse`-style data frame). For our analysis, suppose we want to restrict all words referring to parliament, ideas, or procedures; we only want to look at words that are more or less substantive about the subjects being discussed in parliament. 
-
-An appropriate stopwords list might look like this:
+In the following code we create a custom stop words list by assigning a list of words to a tibble (a `tidyverse`-style data frame). For our analysis, suppose we want to restrict all words referring to parliament, ideas, or procedures; we only want to look at words that are more or less substantive about the subjects being discussed in parliament. 
 
 ```{r}
 # Create a custom list of stop words
@@ -251,8 +209,6 @@ custom_stop_words = tibble(word = c("hon", "speaker", "house", "question", "lord
 "existed", "fairly", "loss", "spirit", "west", "sum"))
 ```
 
-We are ready to filter and clean our data and explore the langauge of speakers called Chancellor of the Exchequer. 
-
 ## Counting the Words of Each Speaker
 
 In the following code we first remove instances of John Spencer and Rigby Wason, who spoke so few words as Chancellor of the Exchequer that he contributes little to our project.  Then we eliminate numbers, stop words, and custom stop words before counting each speaker's words with `group_by()` and `summarize()`.
@@ -282,9 +238,7 @@ chancellor_of_the_exchequeur %>%
   sample_n(5) 
 ```
 
-Note that in the table above, the "word" is annotated with information about the speaker. Annotation is used to prevent confusion about what is being counted; we're not just counting how many times a word appears, but how many times each speaker said it.
-
-Next, let's visualize the data so that we can see how many words are spoken. 
+Next, let's visualize the data so that we can see how many words are spoken by each Chancellor of the Exchequer. 
 
 ```{r, fig.cap="Most frequently used words by each Chancellor of the Exchequer in the 1830s. Bars show the top repeated terms spoken by Henry Goulburn (left panel) and Thomas Spring Rice (right panel). Counts on the x-axis represent the number of times each word appeared in that Chancellor's speeches during the decade.", message = F}
 # Reorder words within each speaker and visualize their most frequent words
@@ -307,9 +261,11 @@ ggplot(data = chancellor_of_the_exchequeur %>%
   ggtitle("Favorite Words of Each Chancellor of the Exchequer in the 1830s") # Add title
 ```
 
-The results show that the individuals who occupied the post of Chancellor of the Exchequer in fact represented a diversity of interests, ranging from Goulburn's interest in colonial commodities like "tobacco" to Rice's interest in the tension between the property and banking interests.  Their territorial interests varied as wel Goulbourn emphasized England and Ireland, while Rice emphasized Ireland and India  
+The results show that the individuals who occupied the post of Chancellor of the Exchequer represented a diversity of interests, ranging from Goulburn's interest in colonial commodities like "tobacco" to Rice's interest in the tension between the property and banking interests.  Their territorial interests varied as wel Goulbourn emphasized England and Ireland, while Rice emphasized Ireland and India  
 
 Goulburn is interested in talking about commodities such as beer, tobacco, and malt; Peel is interested in addressing questions about how taxes relate to the church and its tithes, as well as political issues about how dissenters, Protestants and Catholics. Peel also thinks about commodities, but his commodities are different than Goulburn's; they include malt, land, and barley. Rice takes the issues in a different direction, reflecting on Dublin, India, banks, newspapers, and pensions.  He shares with Peel a concern about property or land taxes.    
+
+[Jo -- using interested too many times is confusing, and please revise the following analysis for intellectual clarity]
 
 Interpretation always represents an intellectual challenge. A list of most frequent words is not necessarily an index of importance: the most frequently-mentioned terms are typically the terms most subject to debate. Robert Peel, for instance, does not name Ireland's church tithes because he was interested in protecting the church in Ireland; to the contrary, he wished to abolish the system of tithes.  Nor does the word list give us material for interpreting the rest of Peel's politics; the word list does nothing to tell the uninformed analyst about the movement for the abolition of taxes on grain, which forms a background to interpreting Peel's mentions of barley.  The word list tells us little about the presence in 1830s Ireland of two churches, Roman Catholic and the Church of England. Without further reading, we might never known that Goulburn was famous for arguing for reductions on taxation (although with this knowledge, we might become interested in the word "lower").  The analyst who comes to the Hansard corpus without a background in British history would gain greater insight by reading secondary sources before interpreting the graph.
 
@@ -322,7 +278,6 @@ How new is the information we have gleaned to readers of British history?  We ha
 ## Critical Thinking About Our Results
 
 In any research process, it is important to reflect on how the choices we have made impact our analysis, and how making different choices might have produced different results.  For some researchers, the list in `custom_stop_words` may unnecessarily eliminate words whose usage they might want to track. Some researchers will want to identify words for rhetorical statements such as "hoped" or "feeling"; others may be intrigued about how different speakers refer to "information" or "knowledge." In general, I have opted for a deep list which includes every general allusion to governance, institutions, discovery, and communication.  The beauty of custom lists is that each researcher can easily adjust the words to match their interests Analysts should understand how carefully they must tailor a custom stop words list to their project, and how much of a difference additions and subtractions make. Using a custom stop word list is very much an artisinal skill of research; it involves much the same skills of judgment, awareness, curiosity, and sensitivity to background issues from theory and secondary sources as does careful reading of primary sources.  
-
 One complication of stopwords lists is that to produce functional results, a custom stop words list must often be long; the hundreds of performative, rhetorical, and governmental words listed below is not a perfect list, and it would not work for every exercise. In later chapters, we will investigate approaches such as differential measurement which allow the reader to skip over custom stop words lists to obtain information about what distinguishes one speaker from another or one year from the next.  No process is perfect, however, and analysts must often resort to some kind of custom filter to get closer to information that is useful for their project.  There is no silver bullet for creating an absolutely accurate tool where text-mining research always produces useful information; rather, iterative inquiry, paired with background reading and in-depth reading of primary sources, is the basis upon which all insight is ultimately made.  
 
 ## Working With Dates
@@ -366,7 +321,7 @@ hansard_1830_w_year %>%
 
 Notice that the resulting dataset has a new field, "year."
 
-At this point in the chapter, we already created `words_1830`, a tokenized dataset with one row per word. That dataframe is very large, and we will not use it again. If we keep it while also creating a second tokenized dataset (this time with a year column), we may run into memory limits. So to continue our analysis, we will do two things:
+At this point, we have already created `words_1830`, a large tokenized dataset where each row represents a word and its corresponding speaker. We now want to shift our analysis to how many words each speaker spoke per year. We will not use `words_1830` again, and keeping it while creating another tokenized dataset could cause us to run into memory limits. So, we will do two things:
 - Remove the old tokenized dataset (`words_1830`) to free memory.
 - Tokenize the speeches again, but now we keep the year column so we can count words by year (and by speaker within each year).
 
@@ -396,7 +351,7 @@ words_1830_w_year %>%
   kable() # Format the results as a table
 ```
 
-Now that we have a field for the year of each speech, we can return to "grouping" data to execute a faceted count where we count words by speaker and year.  When we used the command `group_by()` above, we used it with one argument.  But `group_by()` can take multiple arguments, allowing the analyst to perform grouped counts that involve multiple dimensions of the dataset.  Next, we will use `group_by()` on two data fields at the same time -- the "speaker" and "year" columns of as the arguments of `group_by()`, as in `group_by(speaker, year)`.
+Now that we have a year column, we can count how many words each speaker spoke in each year. To do this, we pass both speaker and year to group_by(). This creates a separate group for each speaker in each year, and summarize() then counts the words in each group. Finally, arrange() sorts these groups from the highest to the lowest word count.
 
 ```{r, message = F}
 # Count the number of words spoken by each speaker per year
@@ -414,8 +369,6 @@ head(words_per_speaker_1830)
 ```
 
 Notice that the result of grouping and counting is a data set with three columns: "speaker," "year," and "speaker_words_per_year." The last column is the count for each speaker per year -- a field that makes it possible to analyze change over time.
-
-When we use the `group_by()` command, the fields we use for grouping are preserved in the output.  Two columns are the names of the facets we used for grouping -- "speaker" and "year" -- while the last column, "words_spoken," is the count of how many words are recorded for each speaker per year.  
 
 ### Women in 19th-century Parliament 
 
@@ -509,33 +462,7 @@ ggplot(data = mrs_walrand_top_words,
 ```
 ## Investigating an Event
 
-Next, let's move toward investigating an event.
-
-First, let's organize the data into two groups: the words spoken prereform and those spoken postreform. Then, we'll break the text into individual words and count how many words appear in each group.
-
-```{r, echo=FALSE, eval=FALSE}
-# Create a dataset of speeches made before the Second Reform Act
-# - select() keeps the columns needed for analysis
-# - filter() keeps speeches from June 4, 1822 through June 3, 1832
-# - mutate() extracts the year and labels the period
-prereform <- hansard %>%
-  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>% # Keep the relevant columns
-  filter(speechdate >= as.Date("1822-06-04"), # Keep speeches on or after June 4, 1822
-         speechdate < as.Date("1832-06-04")) %>% # Keep speeches before June 4, 1832
-  mutate(year = year(speechdate), # Extract the year from the speech date
-         period = "prereform") # Label the speeches as prereform
-
-# Create a dataset of speeches made after the Second Reform Act
-# - select() keeps the columns needed for analysis
-# - filter() keeps speeches from June 4, 1832 through June 4, 1842
-# - mutate() extracts the year and labels the period
-postreform <- hansard %>%
-  select(sentence_id, speechdate, debate, text, speaker, suggested_speaker) %>% # Keep the relevant columns
-  filter(speechdate >= as.Date("1832-06-04"), # Keep speeches on or after June 4, 1832
-         speechdate <= as.Date("1842-06-04")) %>% # Keep speeches on or before June 4, 1842
-  mutate(year = year(speechdate), # Extract the year from the speech date
-         period = "postreform") # Label the speeches as postreform
-```
+Next, let's move toward investigating an event. First, let's organize the data into two groups: the words spoken prereform and those spoken postreform. Then, we'll break the text into individual words and count how many words appear in each group.
 
 ```{r, message=FALSE, echo=FALSE}
 # Load Hansard data and metadata for the 1840s
@@ -606,7 +533,8 @@ both_periods_word_count_totals <- both_periods_word_count %>%
   summarize(total = sum(wordcount)) # Calculate the total words
 ```
 
-Now we can create a basic bar chart. 
+
+Now we can create a bar chart. 
 
 ```{r}
 # Visualize the total number of words spoken in each period
@@ -631,16 +559,18 @@ ggplot(both_periods_word_count_totals,
        y = "Words") # Label the y-axis
 ```
 
+Jo -- please help with analysis. 
+
 Many more words were spoken in the ten years after the reform than the ten years before. How many more? Text mining means we never have to guess.
 
 
 ```{r, echo=FALSE}
 # Find the difference in total words spoken between the two periods
 # - subtract the prereform total from the postreform total
-both_periods_word_count_totals$total[2] - both_periods_word_count_totals$total[1]
+both_periods_word_count_totals$total[1] - both_periods_word_count_totals$total[2]
 ```
 
-Next, let's look at the actual words spoken in each period and see how they compare.
+Next, let's look at the words spoken in each period and see how they compare.
 
 ```{r, echo=FALSE}
 # Find the most frequently used words in each period
@@ -688,6 +618,8 @@ Let's do that now to answer the question, how many words did each speaker speak 
 
 ## Investigating Speakers' Word Counts, Pre- and Post-Reform
 
+This code combines the prereform and postreform speeches into a single dataset and then counts how many words each speaker spoke in each year. It removes speeches without an identified speaker and organizes the results by speaker, year, and reform period. Finally, it displays the six speaker-year combinations with the highest word counts.
+
 ```{r, echo=FALSE}
 # Combine the prereform and postreform data
 # - bind_rows() stacks the rows from both periods
@@ -733,7 +665,7 @@ With the data frame both_periods_speakers, we have word counts for each speaker 
 
 We will start by asking how many members of parliament stood for the ten years pre- and postreform. We will label each with a "class" called "prereform only," "postreform only," or "continuous speakers." Note that these "classes" are fundamentally different than the "period" categorization we applied above, where we labeled speeches given before the 1832 reform law as "prereform" and those after the law as "postreform." Instead of labeling the years, we want to identify the speakers that spoke only in one period or the other, and those who spoke in both. 
 
-To find the prereform-only and postreform-only speakers, we will find the "difference" between the two sets by using a function named "anti_join()."  The anti_join() function excludes from one dataset all the data that appear in a second dataset.  If we begin with a dataset of all members of parliament who spoke prereform and perform an "anti-join" with the set of speakers who spoke postreform, the resulting dataset is a list of speakers who only spoke prereform.
+This code identifies speakers who appear only in the prereform period. It first creates separate lists of speakers who appear before and after the Reform Act. It then uses anti_join() to remove anyone who appears in both periods, leaving only speakers who spoke during the prereform period.
 
 ```{r, echo=FALSE}
 # Find the prereform speakers
@@ -771,7 +703,7 @@ How many speakers are there in our dataset? To answer the question, we just need
 nrow(prereform_only_speakers)
 ```
 
-Performing the same operation again, beginning with postreform speeches and removing the rows of data that appear prereform, yields a dataset of speakers who *only* spoke after the reform.
+Performing the same operation again, beginning with postreform speeches and removing the rows of data that appear prereform, yields a dataset of speakers who only spoke after the reform.
 
 ```{r, echo=FALSE}
 # Find the postreform-only speakers
@@ -813,7 +745,7 @@ Because recorded parliamentary speech is an index of importance, the members who
 
 We might guess that it was vanishingly small, because a reform of historical significance could have swept away all incumbents. On the other hand, many historians of the 1832 Reform Bill have pointed out that it didn't shift the election process so drastically as had once been assumed. 
 
-In any case, to identify the speakers who appear in both the prereform and postreform datasets, we will use another function -- `inner_join()` -- to identify what is known as the "intersection" of the two datasets. That is, we are looking for speakers who occupy a row in both the `prereform_speakers_wordcount` data frame and the `postreform_speakers_wordcount` data frame. The syntax for `inner_join()` is just like that of `anti_join()`, but the result is to keep rows that appear in both datasets.
+In any case, to identify the speakers who appear in both the prereform and postreform datasets, we will use another function -- `inner_join()` to compare prereform and postreform speaker lists and keeps only the speakers who appear in both. That is, we are looking for speakers who occupy a row in both the `prereform_speakers_wordcount` data frame and the `postreform_speakers_wordcount` data frame. The syntax for `inner_join()` is just like that of `anti_join()`, but the result is to keep rows that appear in both datasets.
 
 ```{r, echo=FALSE}
 # Find speakers who appear in both periods
@@ -830,7 +762,6 @@ nrow(continuous_speakers)
 ```
 
 We now have actual numbers for the members of parliament recorded as only having spoken before the reform, those who were recorded as only having spoken after the reform, and those who were recorded as having spoken both before and after the reform.
-Let's represent our results visually.
 
 ```{r, echo=FALSE}
 # Combine the speaker groups
@@ -926,7 +857,7 @@ head(top_speakers)
 
 ## Annotating Our Data
 
-Before we go any further, let's do some work to make the speaker names more elegant. Because of the structure of our data, names that were algorithmically cleaned are labeled with a standardized name and number, e.g. "robert_peel_1665." When we make a graph to share, we'd like to substitute one of Robert Peel's names as given in the text for this awkward string. The names as given in the text are in the Hansard dataset under the `speaker` column. We can grab any one of them -- minus the titles like "Lord Chancellor" with which some speakers are referenced  -- and it will read like a normal name. The `str_detect()` function is useful for searching for a string. In this case, `!str_detect()` will allow us to throw out names that include titles we don't want to use. `sample_n()` is useful here as it tells the computer to select a random pick from a set; in other words, if we've grouped Robert Peel's many possible names, and we have the set "Robert Peel," "Sir Robert Peel," and "Mr. Robert Peel," the computer is instructed to pull out one of these at random.  
+Before we go any further, let's do some work to make the speaker names more human readable. Because of the structure of our data, names that were algorithmically cleaned are labeled with a standardized name and number, e.g. "robert_peel_1665." When we make a graph to share, we'd like to substitute one of Robert Peel's names as given in the text for this awkward string. The names as given in the text are in the Hansard dataset under the `speaker` column. We can grab any one of them -- minus the titles like "Lord Chancellor" with which some speakers are referenced  -- and it will read like a normal name. The `str_detect()` function is useful for searching for a string. In this case, `!str_detect()` will allow us to throw out names that include titles we don't want to use. `sample_n()` is useful here as it tells the computer to select a random pick from a set; in other words, if we've grouped Robert Peel's many possible names, and we have the set "Robert Peel," "Sir Robert Peel," and "Mr. Robert Peel," the computer is instructed to pull out one of these at random.  
 
 After we choose one name to use from the full Hansard list of literal speaker references, we can use these names to annotate the previous dataset, `all_speakers_annotated`, which has the `wordcount` and speaker class. 
 
@@ -1038,7 +969,7 @@ Note that our visualization is only as good as the quality of the data. Where sp
 
 ## Exercises
 
-1) As we discussed at the beginning of this chapter, analyzing the speeches of Members of Parliament can provide insight into how Parliament functioned as an institution of power. These speeches allow us to examine how elite white men exercised political authority and advanced both their own interests and those of their peers through parliamentary debate.
+1) As we discussed at the beginning of this chapter, analyzing the speeches of Members of Parliament can show us how Parliament functioned as an institution of power. These speeches allow us to examine how elite white men exercised political authority and advanced both their own interests and those of their peers through parliamentary debate.
 
 The debates also make it possible to study the role of women in Parliament, despite the fact that women were prohibited from serving as Members of Parliament during this period. Women's voices entered the parliamentary record when introduced by a Member of Parliament—for example, through petitions, testimony, or correspondence. Their participation therefore depended on the selection and mediation of male Members of Parliament, rather than on direct political representation. In this sense, women's presence in Parliament was constrained by institutional structures that positioned them as subjects rather than holders of parliamentary power.
 
@@ -1082,9 +1013,9 @@ df %>%
 
 5) Why might the authors argue that cleaning and annotating data are historical decisions, not just programming questions? Support your answer by comparing the `speaker` and `suggested_speaker` fields using a visualization or a table.
 
-6) The Hansard data remain imperfect even after cleaning. The chapter removes unidentified speakers (`suggested_speaker == ""`) before several analyses. Why might this improve the quality of the analysis? What information could be lost by making this choice? 
+6) The Hansard data remain imperfect even after name disambiguation The chapter removes unidentified speakers (`suggested_speaker == ""`) before several analyses. Why might this improve the quality of the analysis? What information could be lost by making this choice? 
 
-7) The authors argue that computational analysis should generate new research questions rather than provide final answers. Choose one visualization from the chapter. What historical question does it raise? Explain how you could use close reading of speeches or additional text mining techniques to investigate that question further.
+7) The authors argue that computational analysis can help us to generate research questions. Choose one visualization from the chapter. What historical question does it raise? Explain how you could use close reading of speeches or additional text mining techniques to investigate that question further.
 
-8) This chapter uses distant reading to analyze both large datasets (such as all parliamentary speakers before and after the Reform Act) and much smaller datasets (such as the speeches of Mrs. Walrand). Is distant reading equally valuable for both large and small datasets? 
+8) This chapter uses distant reading to analyze both large datasets (such as all parliamentary speakers before and after the Reform Act) and much smaller datasets (such as the speeches of Mrs. Walrand). Is distant reading valuable for both large and small datasets? 
 
